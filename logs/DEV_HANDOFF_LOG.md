@@ -386,6 +386,80 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Generate an app auth secret if needed.
 - Implement the Google login/signup page and callback flow.
 
+## 2026-06-12 23:55 KST - Google Login/Signup Implemented
+
+### User Request
+- User said `env.txt` was updated and Google Cloud Console setup was complete.
+- User asked to build Google signup/login.
+
+### Input Values
+- `env.txt` contains:
+  - `GOOGLE_CLIENT_ID`
+  - `GOOGLE_CLIENT_SECRET`
+  - Existing Turso database URL/token
+- Secrets were not printed into logs or committed.
+
+### Reflected Work
+- Converted the project from a static HTML page to a Next.js app.
+- Installed dependencies:
+  - `next`
+  - `react`
+  - `react-dom`
+  - `next-auth`
+- Implemented NextAuth Google provider.
+- Added server auth route:
+  - `app/api/auth/[...nextauth]/route.js`
+- Added shared auth config:
+  - `lib/auth.js`
+- Added app pages/styles:
+  - `app/layout.js`
+  - `app/page.js`
+  - `app/auth-actions.js`
+  - `app/globals.css`
+- Removed the previous static page:
+  - `public/index.html`
+- Generated `NEXTAUTH_SECRET`.
+- Configured local `.env.local`.
+- Added Vercel Production and Development environment variables:
+  - `GOOGLE_CLIENT_ID`
+  - `GOOGLE_CLIENT_SECRET`
+  - `NEXTAUTH_SECRET`
+  - `NEXTAUTH_URL`
+- Changed Vercel project framework setting from `Other` to `Next.js`.
+
+### Verification
+- `npm run build` completed successfully.
+- Vercel environment variable list shows encrypted Google/NextAuth variables for Production and Development.
+- Vercel project settings now show:
+  - Framework Preset: `Next.js`
+  - Output Directory: `Next.js default`
+- Deployed with Vercel remote build because local prebuilt deployment on Windows failed on symlink creation.
+
+### Known Notes
+- In-app browser tool was unavailable in this session, so verification used build output and HTTP checks.
+- Full end-to-end Google login requires the user to click through Google OAuth in a browser.
+- Vercel Preview variables remain pending until a non-production branch or dashboard configuration is used.
+
+### Changed Files
+- `.env.example`
+- `package.json`
+- `package-lock.json`
+- `app/api/auth/[...nextauth]/route.js`
+- `app/auth-actions.js`
+- `app/globals.css`
+- `app/layout.js`
+- `app/page.js`
+- `lib/auth.js`
+- `public/index.html` removed
+- `deliverables/AUTH_SETUP.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Next Actions
+- Commit and push implementation.
+- Deploy production.
+- User should test Google login from `https://zezari.vercel.app`.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`

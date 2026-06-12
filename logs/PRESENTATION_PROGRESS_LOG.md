@@ -289,3 +289,40 @@ This file is the cumulative presentation-ready project log. It is written so the
 - `deliverables/AUTH_SETUP.md`
 - Updated `deliverables/README.md`
 - Updated project logs.
+
+## 2026-06-12 - Google Login Implemented
+
+### Request
+- User completed Google Cloud Console setup and added the values to `env.txt`.
+- User asked to create Google signup/login.
+
+### Reflected Content
+- Built the project as a Next.js app.
+- Added Google login through NextAuth.
+- Added a login page with:
+  - Google login button
+  - Logged-in user name/email display
+  - Logout button
+- Registered Google and NextAuth environment variables locally and in Vercel.
+- Updated Vercel project settings from static/other to Next.js.
+
+### Result
+- Google login/signup implementation is now in the app.
+- The callback route is:
+  - `https://zezari.vercel.app/api/auth/callback/google`
+- Local callback route is:
+  - `http://localhost:3000/api/auth/callback/google`
+
+### Time Spent
+- Implementation, environment setup, build verification, Vercel project setting fix, and documentation: approximately 30 minutes.
+
+### Output
+- Next.js app files under `app/`.
+- Auth config under `lib/auth.js`.
+- Updated `.env.example`.
+- Updated `deliverables/AUTH_SETUP.md`.
+- Updated project logs.
+
+### Presentation Note
+- The first real user-facing feature is now implemented: Google-based signup/login.
+- A full OAuth click-through should be tested by the project owner in the browser.
