@@ -11,6 +11,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `image_prompts/IMAGE_PROMPTS.md`: cumulative prompt archive for diagrams and generated visuals.
 - `INTEGRATION_SETUP.md`: Vercel and Turso integration status and setup guide.
 - `AUTH_SETUP.md`: Google login/signup setup requirements and environment variable plan.
+- `PWA_SETUP.md`: installable web app setup for desktop and mobile.
 
 ## Planned Deliverables
 - Requirements specification

@@ -474,6 +474,50 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - Providers response includes Google provider and callback URL:
     - `https://zezari.vercel.app/api/auth/callback/google`
 
+## 2026-06-13 00:10 KST - Login UI Updated and PWA Install Support Added
+
+### User Request
+- User confirmed Google login works.
+- User asked to remove `hellow`.
+- User asked to add the Google logo to the Google login button.
+- User asked to make the web page installable like Chrome's install feature and usable from desktop/mobile home-screen icons.
+
+### Reflected Work
+- Removed `hellow zezari` heading and replaced it with `zezari` branding.
+- Added a simple app mark.
+- Added Google logo SVG inside the Google login button.
+- Changed login copy to Korean.
+- Added installable PWA support:
+  - Web app manifest.
+  - Service worker.
+  - PNG app icons at 192px and 512px.
+  - Maskable 512px icon.
+  - Desktop/Android install prompt button using `beforeinstallprompt`.
+  - iOS home-screen guidance because iOS does not allow JavaScript-triggered installation.
+- Excluded `/api/auth` routes from service worker handling to avoid interfering with Google OAuth.
+
+### Changed Files
+- `app/auth-actions.js`
+- `app/globals.css`
+- `app/layout.js`
+- `app/page.js`
+- `public/manifest.webmanifest`
+- `public/sw.js`
+- `public/icons/icon-192.png`
+- `public/icons/icon-512.png`
+- `public/icons/maskable-512.png`
+- `deliverables/PWA_SETUP.md`
+- `deliverables/README.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` completed successfully.
+
+### Next Actions
+- Deploy to Vercel.
+- Verify manifest, service worker, icons, home page, and provider route on `https://zezari.vercel.app`.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`

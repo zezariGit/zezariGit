@@ -336,3 +336,35 @@ This file is the cumulative presentation-ready project log. It is written so the
   - Page opens successfully.
   - Google login button appears.
   - Google authentication provider route is active.
+
+## 2026-06-13 - App Install Support and Login UI Update
+
+### Request
+- Remove `hellow`.
+- Add the Google logo to the Google login button.
+- Make the website installable like an app on Chrome desktop and mobile.
+
+### Reflected Content
+- Updated the login screen branding to `zezari`.
+- Added Google logo to the login button.
+- Added web app manifest.
+- Added service worker.
+- Added app icons for installation.
+- Added install prompt support for desktop Chrome and Android.
+- Added iPhone home-screen guidance.
+
+### Result
+- The site is now prepared as an installable PWA.
+- Users can install it from supported browsers and open it from the desktop or phone home screen.
+
+### Time Spent
+- UI update, PWA setup, icon generation, build verification, and documentation: approximately 25 minutes.
+
+### Output
+- `public/manifest.webmanifest`
+- `public/sw.js`
+- `public/icons/icon-192.png`
+- `public/icons/icon-512.png`
+- `public/icons/maskable-512.png`
+- `deliverables/PWA_SETUP.md`
+- Updated project logs.
