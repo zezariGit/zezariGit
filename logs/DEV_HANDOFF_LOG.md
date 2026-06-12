@@ -801,6 +801,44 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - `/sw.js` returned HTTP 200 and includes cache version `zezari-v5`.
   - Authenticated dashboard visual/CRUD should be manually checked in browser after Google login.
 
+## 2026-06-13 02:05 KST - Dashboard and Info Entry Screens Separated
+
+### User Request
+- Separate the information entry screen and dashboard.
+- Make the information entry screen visually similar to the dashboard.
+- Add top-level menu navigation with order:
+  - Dashboard first
+  - Information entry second
+
+### Reflected Work
+- Added query-based tab routing:
+  - `/?tab=dashboard`
+  - `/?tab=info`
+- Default logged-in view is `대시보드`.
+- Added top menu:
+  - `대시보드`
+  - `정보입력`
+- Moved guardian/subject forms into the `정보입력` tab only.
+- Dashboard tab now shows:
+  - Status dashboard if guardian profile is complete.
+  - Setup prompt with link to `정보입력` if profile is incomplete.
+- Quick action links now route to `정보입력` anchors.
+- Improved info-entry panel styling.
+- Updated service worker cache version:
+  - `zezari-v6`
+
+### Changed Files
+- `app/page.js`
+- `app/dashboard.js`
+- `app/globals.css`
+- `public/sw.js`
+- `deliverables/DATABASE_SCHEMA.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Next Actions
+- Build, deploy, and verify public routes.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`

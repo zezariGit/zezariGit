@@ -543,3 +543,26 @@ This file is the cumulative presentation-ready project log. It is written so the
   - Public page opens.
   - Google login remains active.
   - Latest PWA cache version is active.
+
+## 2026-06-13 - Dashboard and Info Entry Split
+
+### Request
+- Separate the information entry screen from the dashboard.
+- Style the information entry screen like the dashboard.
+- Add a top-level menu with dashboard first, information entry second.
+
+### Reflected Content
+- Added top menu:
+  - `대시보드`
+  - `정보입력`
+- Default logged-in screen is now the dashboard.
+- Information forms are now only on the `정보입력` screen.
+- If profile information is incomplete, the dashboard shows a prompt to move to information entry.
+
+### Result
+- Logged-in users now have two distinct screens:
+  - Dashboard for status overview.
+  - Information entry for profile and target-person edits.
+
+### Time Spent
+- Tab routing, screen separation, UI styling, cache update, and documentation: approximately 20 minutes.

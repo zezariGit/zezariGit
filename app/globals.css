@@ -220,6 +220,56 @@ a {
   align-items: start;
 }
 
+.dashboard-menu {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 22px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(21, 32, 28, 0.05);
+}
+
+.dashboard-menu a {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.dashboard-menu a.active {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.setup-panel,
+.summary-panel {
+  width: min(100%, 520px);
+  margin: 0 auto 22px;
+  text-align: center;
+}
+
+.setup-panel p,
+.summary-panel p {
+  margin: 0 0 16px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.info-grid {
+  grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.45fr);
+}
+
+.info-panel {
+  border-color: rgba(23, 107, 91, 0.18);
+}
+
 .status-dashboard {
   display: grid;
   place-items: center;

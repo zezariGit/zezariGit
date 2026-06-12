@@ -4,11 +4,12 @@ import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
 const genders = ["남성", "여성", "기타"];
 const statuses = ["문제없음", "찾는중", "QR활성화필요"];
 
-export default function GuardianDashboard({ guardian, subjects, session }) {
+export default function GuardianDashboard({ guardian, subjects, session, activeTab = "dashboard" }) {
   const emptySlots = Array.from({ length: Math.max(0, 4 - subjects.length) });
   const guardianComplete = Boolean(
     guardian.name && guardian.login_id && guardian.password_hash && guardian.phone && guardian.email
   );
+  const isDashboard = activeTab !== "info";
 
   return (
     <main className="dashboard-page">
@@ -17,12 +18,18 @@ export default function GuardianDashboard({ guardian, subjects, session }) {
           <div>
             <p className="intro-kicker">{guardianComplete ? "보호자 대시보드" : "정보 입력"}</p>
             <h1 className="dashboard-title">
-              {guardianComplete ? `안녕하세요, ${guardian.name}님!` : "보호자 정보를 먼저 입력해 주세요"}
+              {isDashboard
+                ? guardianComplete
+                  ? `안녕하세요, ${guardian.name}님!`
+                  : "대시보드 준비가 필요합니다"
+                : "정보입력"}
             </h1>
             <p className="dashboard-subtitle">
-              {guardianComplete
-                ? "로그인한 보호자에게 등록된 관리대상과 현재 상태를 확인할 수 있습니다."
-                : "정보 입력이 완료되면 다음 로그인부터 대시보드에서 관리대상을 바로 조회할 수 있습니다."}
+              {isDashboard
+                ? guardianComplete
+                  ? "로그인한 보호자에게 등록된 관리대상과 현재 상태를 확인할 수 있습니다."
+                  : "보호자 정보 입력을 완료하면 대시보드에서 관리대상을 바로 조회할 수 있습니다."
+                : "보호자 정보와 관리대상 정보를 입력하고 수정합니다."}
             </p>
           </div>
           <div className="dashboard-header-actions">
@@ -31,33 +38,77 @@ export default function GuardianDashboard({ guardian, subjects, session }) {
           </div>
         </header>
 
-        {guardianComplete && <StatusDashboard guardian={guardian} subjects={subjects} />}
+        <nav className="dashboard-menu" aria-label="보호자 메뉴">
+          <a className={isDashboard ? "active" : ""} href="/?tab=dashboard">
+            대시보드
+          </a>
+          <a className={!isDashboard ? "active" : ""} href="/?tab=info">
+            정보입력
+          </a>
+        </nav>
 
-        <div className="dashboard-grid">
-          <section className="dashboard-panel">
-            <h2 id="guardian-info">{guardianComplete ? "내 정보 수정" : "보호자 정보 입력"}</h2>
-            <GuardianForm guardian={guardian} session={session} />
-          </section>
-
-          <section className="dashboard-panel">
-            <div className="panel-heading">
-              <h2 id="subjects-info">관리대상 정보 {guardianComplete ? "수정" : "입력"}</h2>
-              <span>{subjects.length}/4명</span>
-            </div>
-            <div className="subject-list">
-              {subjects.map((subject) => (
-                <SubjectForm key={subject.id} subject={subject} />
-              ))}
-              {emptySlots.length > 0 && <SubjectForm />}
-            </div>
-          </section>
-        </div>
+        {isDashboard ? (
+          <DashboardTab guardian={guardian} guardianComplete={guardianComplete} subjects={subjects} />
+        ) : (
+          <InfoTab guardian={guardian} session={session} subjects={subjects} emptySlots={emptySlots} />
+        )}
 
         <div className="install-area dashboard-install">
           <PwaInstallPrompt />
         </div>
       </section>
     </main>
+  );
+}
+
+function DashboardTab({ guardian, guardianComplete, subjects }) {
+  if (!guardianComplete) {
+    return (
+      <section className="dashboard-panel setup-panel">
+        <h2>정보 입력이 필요합니다</h2>
+        <p>대시보드를 사용하려면 보호자 정보를 먼저 입력해 주세요.</p>
+        <a className="action" href="/?tab=info">
+          정보입력으로 이동
+        </a>
+      </section>
+    );
+  }
+
+  return (
+    <>
+      <StatusDashboard guardian={guardian} subjects={subjects} />
+      <section className="dashboard-panel summary-panel">
+        <div className="panel-heading">
+          <h2>관리대상 요약</h2>
+          <span>{subjects.length}/4명</span>
+        </div>
+        <p>상태 변경이나 정보 수정은 정보입력 메뉴에서 진행할 수 있습니다.</p>
+      </section>
+    </>
+  );
+}
+
+function InfoTab({ guardian, session, subjects, emptySlots }) {
+  return (
+    <div className="dashboard-grid info-grid">
+      <section className="dashboard-panel info-panel">
+        <h2 id="guardian-info">보호자 정보</h2>
+        <GuardianForm guardian={guardian} session={session} />
+      </section>
+
+      <section className="dashboard-panel info-panel">
+        <div className="panel-heading">
+          <h2 id="subjects-info">관리대상 정보</h2>
+          <span>{subjects.length}/4명</span>
+        </div>
+        <div className="subject-list">
+          {subjects.map((subject) => (
+            <SubjectForm key={subject.id} subject={subject} />
+          ))}
+          {emptySlots.length > 0 && <SubjectForm />}
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -105,15 +156,15 @@ function StatusDashboard({ guardian, subjects }) {
           )}
         </div>
         <div className="quick-actions">
-          <a href="#subjects-info">
+          <a href="/?tab=info#subjects-info">
             <span aria-hidden="true">!</span>
             실종신고
           </a>
-          <a href="#subjects-info">
+          <a href="/?tab=info#subjects-info">
             <span aria-hidden="true">B</span>
             상품 구매
           </a>
-          <a href="#guardian-info">
+          <a href="/?tab=info#guardian-info">
             <span aria-hidden="true">M</span>
             내 정보
           </a>

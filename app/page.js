@@ -5,14 +5,16 @@ import OnboardingGate from "./onboarding-gate";
 import { authOptions } from "../lib/auth";
 import { getDashboardData } from "../lib/db";
 
-export default async function HomePage() {
+export default async function HomePage({ searchParams }) {
+  const resolvedSearchParams = await searchParams;
+  const activeTab = resolvedSearchParams?.tab === "info" ? "info" : "dashboard";
   const session = await getServerSession(authOptions);
   const userName = session?.user?.name || "Google user";
   const userEmail = session?.user?.email || "";
 
   if (session) {
     const dashboardData = await getDashboardData(session);
-    return <GuardianDashboard {...dashboardData} session={session} />;
+    return <GuardianDashboard {...dashboardData} session={session} activeTab={activeTab} />;
   }
 
   const loginPanel = (

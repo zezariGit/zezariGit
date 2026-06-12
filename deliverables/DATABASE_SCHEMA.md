@@ -58,3 +58,11 @@ Stores target/person records belonging to a guardian.
 - Tables verified:
   - `guardians`
   - `subjects`
+
+## Dashboard Flow
+- Logged-in guardians enter the dashboard route first.
+- The top menu order is:
+  - `대시보드`
+  - `정보입력`
+- `정보입력` contains guardian and subject edit forms.
+- `대시보드` contains the status overview for the logged-in guardian.
