@@ -494,3 +494,15 @@ This file is the cumulative presentation-ready project log. It is written so the
 - `lib/db.js`
 - `lib/security.js`
 - `deliverables/DATABASE_SCHEMA.md`
+
+### Completion Update
+- GitHub commit:
+  - `38501f0 Add guardian and subject management`
+- Production URL:
+  - `https://zezari.vercel.app`
+- Verified:
+  - Build succeeded.
+  - Database schema was created in Turso.
+  - Public page opens.
+  - Google login remains active.
+  - Logged-in dashboard should be checked after Google login.

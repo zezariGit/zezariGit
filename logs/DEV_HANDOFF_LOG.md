@@ -729,6 +729,21 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Commit, push, deploy to Vercel.
 - Verify production dashboard after Google login.
 
+### Completion Update
+- Implementation commit:
+  - `38501f0 Add guardian and subject management`
+- Production deployment:
+  - Deployment URL: `https://zezari-kwgq7gfi8-zezari.vercel.app`
+  - Public alias: `https://zezari.vercel.app`
+- Verification:
+  - `npm run build` completed successfully.
+  - Turso schema was initialized and verified locally against the configured DB.
+  - Production home page returned HTTP 200.
+  - Production logged-out page still shows onboarding, which is expected.
+  - `/api/auth/providers` returned HTTP 200 and includes Google provider.
+  - `/sw.js` returned HTTP 200 and includes cache version `zezari-v4`.
+  - Full dashboard CRUD requires an authenticated browser session and should be tested manually after Google login.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`
