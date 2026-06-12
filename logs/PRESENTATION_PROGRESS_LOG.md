@@ -381,3 +381,34 @@ This file is the cumulative presentation-ready project log. It is written so the
   - Service worker is available.
   - App icons are available.
   - Google login provider remains active.
+
+## 2026-06-13 - Three-Page Service Introduction
+
+### Request
+- Add a three-page service introduction before the login screen.
+- Make the pages swipe horizontally.
+- Add `다시보지 않기` so the user can go directly to login later.
+
+### Reflected Content
+- Added an onboarding screen before login.
+- Added three service pages:
+  - QR 안심 서비스
+  - 실종 발생 시 빠른 대응
+  - 온라인 실종 공고
+- Added swipe support on mobile.
+- Added side-by-side phone panels on desktop.
+- Added `다시보지 않기` using browser local storage.
+
+### Result
+- First-time logged-out users see the service introduction before login.
+- Users who click `다시보지 않기` skip directly to the login screen on future visits from the same browser/device.
+
+### Time Spent
+- Onboarding UI, responsive layout, skip behavior, build verification, and documentation: approximately 25 minutes.
+
+### Output
+- `app/onboarding-gate.js`
+- Updated `app/page.js`
+- Updated `app/globals.css`
+- Updated `public/sw.js`
+- `deliverables/ONBOARDING_FLOW.md`

@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { GoogleLoginButton, LogoutButton, PwaInstallPrompt } from "./auth-actions";
+import OnboardingGate from "./onboarding-gate";
 import { authOptions } from "../lib/auth";
 
 export default async function HomePage() {
@@ -7,7 +8,7 @@ export default async function HomePage() {
   const userName = session?.user?.name || "Google user";
   const userEmail = session?.user?.email || "";
 
-  return (
+  const loginPanel = (
     <main className="page">
       <section className="auth-panel" aria-label="Google login">
         <div className="app-mark" aria-hidden="true">Z</div>
@@ -35,4 +36,6 @@ export default async function HomePage() {
       </section>
     </main>
   );
+
+  return <OnboardingGate enabled={!session}>{loginPanel}</OnboardingGate>;
 }

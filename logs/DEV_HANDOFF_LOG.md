@@ -537,6 +537,54 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - `/icons/icon-512.png` returned HTTP 200 with `image/png`.
   - `/api/auth/providers` returned HTTP 200 and includes Google provider.
 
+## 2026-06-13 00:40 KST - Three-Page Onboarding Added Before Login
+
+### User Request
+- User provided a reference image showing three phone-style service introduction pages.
+- User asked to show three pages that can be swiped before the login screen.
+- User asked that clicking `다시보지 않기` should take the user directly to the login screen in the future.
+
+### Reflected Work
+- Added client onboarding gate:
+  - `app/onboarding-gate.js`
+- Login page now wraps the login panel with onboarding for logged-out users only.
+- Added three service introduction slides:
+  - `01 QR로 연결되는 안심 서비스`
+  - `02 실종 발생 시 빠른 대응`
+  - `03 온라인 실종 공고`
+- Mobile behavior:
+  - Horizontal slide track.
+  - Touch swipe support.
+  - Previous/Next controls.
+  - Final button: `로그인 시작`.
+- Desktop behavior:
+  - Shows all three phone-style panels side by side.
+  - Shows `로그인 시작` button.
+- Added `다시보지 않기` behavior:
+  - Stores `zezari:onboarding:hidden=true` in localStorage.
+  - Immediately displays the login screen.
+  - Skips onboarding on future visits from the same browser/device.
+- Updated service worker cache version:
+  - From `zezari-v1` to `zezari-v2`.
+
+### Changed Files
+- `app/onboarding-gate.js`
+- `app/page.js`
+- `app/globals.css`
+- `public/sw.js`
+- `deliverables/ONBOARDING_FLOW.md`
+- `deliverables/README.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` completed successfully.
+
+### Next Actions
+- Commit and push.
+- Deploy to Vercel.
+- Verify production page, login screen, and auth provider route.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`
