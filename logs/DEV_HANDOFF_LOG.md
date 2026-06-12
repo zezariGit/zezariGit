@@ -839,6 +839,20 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Next Actions
 - Build, deploy, and verify public routes.
 
+### Completion Update
+- Implementation commit:
+  - `1e7fa08 Separate dashboard and info entry screens`
+- Production deployment:
+  - Deployment URL: `https://zezari-l9i9p838x-zezari.vercel.app`
+  - Public alias: `https://zezari.vercel.app`
+- Verification:
+  - `npm run build` completed successfully.
+  - Production home page returned HTTP 200.
+  - Production logged-out page still shows onboarding, as expected.
+  - `/api/auth/providers` returned HTTP 200 and includes Google provider.
+  - `/sw.js` returned HTTP 200 and includes cache version `zezari-v6`.
+  - Authenticated tab navigation should be manually checked after Google login.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`

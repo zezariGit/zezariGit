@@ -566,3 +566,14 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### Time Spent
 - Tab routing, screen separation, UI styling, cache update, and documentation: approximately 20 minutes.
+
+### Completion Update
+- GitHub commit:
+  - `1e7fa08 Separate dashboard and info entry screens`
+- Production URL:
+  - `https://zezari.vercel.app`
+- Verified:
+  - Build succeeded.
+  - Public page opens.
+  - Google login remains active.
+  - Latest PWA cache version is active.
