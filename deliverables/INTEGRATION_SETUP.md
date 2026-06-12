@@ -24,36 +24,27 @@ Project: REAL_QR_FIND
 ## Turso
 
 ### Status
-- Pending.
+- Connected for local development and Vercel Production/Development environments.
 
-### Current Blocker
-- Turso CLI is not installed.
-- Official Turso Windows CLI setup requires WSL.
-- This PC currently reports that WSL is not installed.
+### Database
+- Database URL host:
+  - `zezariturso-zezarigit.aws-ap-northeast-1.turso.io`
 
 ### Required Environment Variables
 - `TURSO_DATABASE_URL`
 - `TURSO_AUTH_TOKEN`
 
-### Recommended Next Path
-1. Install WSL on Windows.
-2. Install Turso CLI inside WSL using the official install script.
-3. Authenticate with Turso.
-4. Create the production database for this project.
-5. Create a database auth token.
-6. Add `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` to:
-   - Local `.env.local`
-   - Vercel project environment variables
+### Configured Locations
+- Local `.env.local`
+- Vercel Production
+- Vercel Development
 
-### Alternative Path
-- Use the Turso dashboard or Platform API to create the database and token, then provide:
-  - Database URL
-  - Auth token
-- After that, the values can be added to Vercel with:
-  - `vercel env add TURSO_DATABASE_URL`
-  - `vercel env add TURSO_AUTH_TOKEN`
+### Preview Environment Note
+- Vercel CLI rejected adding Preview variables to the `main` branch because `main` is the Production branch.
+- Preview variables should be added later when a non-production preview branch exists, or through the Vercel dashboard for all Preview branches.
 
 ## Notes
 - Do not commit real secrets.
 - Use `.env.example` only for variable names.
-- Store actual values in local `.env.local` and Vercel environment variables.
+- Store actual values in local `.env.local`, user-local `env.txt`, and Vercel environment variables.
+- `env.txt` and `.env.local` are ignored by Git.

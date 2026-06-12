@@ -201,6 +201,57 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - Install WSL and continue Turso CLI setup.
   - Provide Turso database URL and auth token so environment variables can be configured.
 
+## 2026-06-12 23:20 KST - Turso Environment Variables Configured from env.txt
+
+### User Request
+- User said they would create the database and save the URL/key values in `env.txt`.
+- User asked whether Codex can configure environment variables from that file.
+
+### Input File
+- `env.txt` existed in the project root.
+- It contained:
+  - Turso libSQL database URL.
+  - Turso auth token.
+- The token is treated as a secret and must not be committed or written into logs.
+
+### Reflected Work
+- Added `env.txt` to `.gitignore`.
+- Parsed `env.txt` for:
+  - `TURSO_DATABASE_URL`
+  - `TURSO_AUTH_TOKEN`
+- Created local `.env.local`.
+- Added Turso values to Vercel environment variables:
+  - Production
+  - Development
+- Updated official integration deliverable.
+
+### Vercel Preview Note
+- Attempted to add Preview environment variables.
+- Vercel CLI required a non-production Git branch for Preview.
+- Attempting to use `main` was rejected because `main` is the Production branch.
+- Preview variables remain pending until a separate preview branch exists or the values are added through the Vercel dashboard for Preview.
+
+### Verification
+- Local `.env.local` contains:
+  - `TURSO_DATABASE_URL`
+  - `TURSO_AUTH_TOKEN`
+- `vercel env ls` shows encrypted values for:
+  - `TURSO_DATABASE_URL` in Production and Development.
+  - `TURSO_AUTH_TOKEN` in Production and Development.
+- Database URL host:
+  - `zezariturso-zezarigit.aws-ap-northeast-1.turso.io`
+
+### Changed Files
+- `.gitignore`
+- `deliverables/INTEGRATION_SETUP.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Security Notes
+- Do not commit `env.txt`.
+- Do not commit `.env.local`.
+- Do not paste the Turso auth token into logs, commits, issues, or chat output.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`

@@ -171,3 +171,33 @@ This file is the cumulative presentation-ready project log. It is written so the
 ### Presentation Note
 - Hosting integration is ready through Vercel.
 - Database integration path is prepared, but Turso requires either WSL setup or database credentials from the Turso dashboard.
+
+## 2026-06-12 - Turso Environment Variable Setup
+
+### Request
+- User saved the Turso database URL and key in `env.txt`.
+- User asked Codex to configure the environment variables.
+
+### Reflected Content
+- Read the Turso values from `env.txt`.
+- Created local `.env.local`.
+- Added the Turso variables to Vercel.
+- Protected `env.txt` from Git commits by adding it to `.gitignore`.
+
+### Result
+- Local development has Turso environment variables configured.
+- Vercel Production has Turso environment variables configured.
+- Vercel Development has Turso environment variables configured.
+- Vercel Preview is pending because Vercel requires a non-production preview branch or dashboard configuration.
+
+### Time Spent
+- Environment parsing, local setup, Vercel setup, verification, and documentation: approximately 10 minutes.
+
+### Output
+- Updated `.gitignore`.
+- Updated `deliverables/INTEGRATION_SETUP.md`.
+- Updated project logs.
+
+### Presentation Note
+- The database is now ready for local and production/development Vercel use.
+- Secret values were intentionally excluded from Git and logs.
