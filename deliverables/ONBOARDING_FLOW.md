@@ -40,4 +40,4 @@ Project: REAL_QR_FIND / zezari
 
 ## Notes
 - The onboarding skip state is per browser/device because it uses localStorage.
-- Service worker cache version was updated to `zezari-v3`.
+- Service worker cache version was updated to `zezari-v5`.

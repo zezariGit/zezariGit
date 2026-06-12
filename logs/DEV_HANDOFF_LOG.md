@@ -744,6 +744,48 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - `/sw.js` returned HTTP 200 and includes cache version `zezari-v4`.
   - Full dashboard CRUD requires an authenticated browser session and should be tested manually after Google login.
 
+## 2026-06-13 01:45 KST - Logged-In Guardian Dashboard Refined
+
+### User Request
+- If guardian input is completed or already exists, login should lead to a dashboard.
+- Dashboard should show the four managed subjects entered by the logged-in guardian.
+- Each managed subject should show current status.
+- User provided a dashboard reference capture.
+
+### Reflected Work
+- Added subject status field:
+  - `문제없음`
+  - `찾는중`
+  - `QR활성화필요`
+- Updated Turso schema handling to create/add `subjects.status`.
+- Updated subject save/edit form to include current status.
+- Updated logged-in dashboard behavior:
+  - Incomplete guardian profile shows information-entry mode.
+  - Completed guardian profile shows dashboard first.
+  - Dashboard displays four management slots.
+  - Registered subjects show photo/name/birth date/status.
+  - Empty slots are shown as unregistered.
+- Added quick dashboard actions:
+  - `실종신고`
+  - `상품 구매`
+  - `내 정보`
+- Updated dashboard CSS to better match the reference flow.
+- Updated service worker cache version:
+  - `zezari-v5`
+
+### Changed Files
+- `app/dashboard.js`
+- `app/globals.css`
+- `lib/db.js`
+- `public/sw.js`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/ONBOARDING_FLOW.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Next Actions
+- Build, migrate Turso, deploy, and verify production routes.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`

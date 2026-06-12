@@ -35,6 +35,7 @@ Stores target/person records belonging to a guardian.
 | `name` | TEXT | Subject name |
 | `birth_date` | TEXT | Date input value |
 | `gender` | TEXT | Selected gender |
+| `status` | TEXT | Current status: `문제없음`, `찾는중`, `QR활성화필요` |
 | `photo_data_url` | TEXT | Uploaded image as data URL |
 | `photo_name` | TEXT | Original uploaded file name |
 | `created_at` | TEXT | Created timestamp |
@@ -44,6 +45,7 @@ Stores target/person records belonging to a guardian.
 - Dashboard data is loaded only after Google login.
 - A guardian can only query/update subjects where `subjects.guardian_id` belongs to the logged-in guardian.
 - Server-side save logic limits each guardian to 4 subjects.
+- Subject status is stored per subject and shown on the guardian dashboard.
 
 ## Upload Rules
 - Photo file must be an image.

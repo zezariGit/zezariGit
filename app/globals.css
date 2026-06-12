@@ -220,6 +220,178 @@ a {
   align-items: start;
 }
 
+.status-dashboard {
+  display: grid;
+  place-items: center;
+  margin: 4px 0 22px;
+}
+
+.status-phone {
+  width: min(100%, 390px);
+  border: 2px solid #3f4643;
+  border-radius: 30px;
+  background: #ffffff;
+  padding: 24px 18px 26px;
+  box-shadow: 0 16px 44px rgba(21, 32, 28, 0.08);
+}
+
+.status-phone-top {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.status-phone-top h2 {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: 0;
+}
+
+.bell-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border: 2px solid #111111;
+  border-radius: 50%;
+  color: #111111;
+  font-weight: 900;
+}
+
+.managed-list {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #1c2421;
+  border-radius: 6px;
+}
+
+.managed-card {
+  display: grid;
+  grid-template-columns: 54px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 64px;
+  padding: 6px;
+  border: 1px solid #1c2421;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.managed-photo {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 2px solid #111111;
+  border-radius: 50%;
+  background: #f3f5f4;
+}
+
+.managed-photo span {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #111111;
+  box-shadow: 0 20px 0 8px #111111;
+  transform: translateY(-4px);
+}
+
+.managed-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.managed-info {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.managed-info strong {
+  overflow: hidden;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.managed-info span {
+  color: #111111;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 76px;
+  min-height: 34px;
+  padding: 0 9px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.status-badge.safe {
+  background: #edf8ef;
+  color: #14823a;
+}
+
+.status-badge.searching {
+  background: #fff0ed;
+  color: #d43f34;
+}
+
+.status-badge.qr-needed {
+  background: #fff5df;
+  color: #d07716;
+}
+
+.status-badge.neutral {
+  background: #eef1f0;
+  color: #65726d;
+}
+
+.empty-managed {
+  opacity: 0.72;
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 20px;
+}
+
+.quick-actions a {
+  min-height: 82px;
+  display: grid;
+  place-items: center;
+  gap: 6px;
+  border: 1px solid #111111;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #111111;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.quick-actions span {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #111111;
+  color: #ffffff;
+  font-size: 15px;
+}
+
 .dashboard-panel,
 .subject-card {
   background: #ffffff;
@@ -585,6 +757,20 @@ select:focus {
 @media (max-width: 560px) {
   .dashboard-page {
     padding: 18px 12px;
+  }
+
+  .status-phone {
+    border-radius: 24px;
+    padding: 20px 12px 22px;
+  }
+
+  .managed-card {
+    grid-template-columns: 48px 1fr;
+  }
+
+  .status-badge {
+    grid-column: 2;
+    justify-self: start;
   }
 
   .form-grid,

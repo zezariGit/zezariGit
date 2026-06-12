@@ -506,3 +506,28 @@ This file is the cumulative presentation-ready project log. It is written so the
   - Public page opens.
   - Google login remains active.
   - Logged-in dashboard should be checked after Google login.
+
+## 2026-06-13 - Dashboard Status View
+
+### Request
+- After profile input is complete, logged-in guardians should go to a dashboard.
+- The dashboard should show the guardian's four managed people.
+- Each managed person should show their current status.
+- User provided a reference dashboard capture.
+
+### Reflected Content
+- Added current status to managed people.
+- Added dashboard view before the edit forms for completed guardian profiles.
+- Added four management slots.
+- Added status badges:
+  - `문제없음`
+  - `찾는중`
+  - `QR활성화필요`
+- Added quick action buttons similar to the reference.
+
+### Result
+- Completed guardians now land on a status dashboard after login.
+- They can still edit guardian/subject information below the dashboard.
+
+### Time Spent
+- Dashboard flow update, DB status field, styling, and documentation: approximately 30 minutes.
