@@ -26,24 +26,20 @@ const slides = [
 ];
 
 export default function OnboardingGate({ enabled, children }) {
-  const [ready, setReady] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(enabled);
   const [active, setActive] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
 
   useEffect(() => {
     if (!enabled) {
-      setReady(true);
       setShowOnboarding(false);
       return;
     }
 
     const hidden = window.localStorage.getItem(STORAGE_KEY) === "true";
     setShowOnboarding(!hidden);
-    setReady(true);
   }, [enabled]);
 
-  if (!ready) return null;
   if (!enabled || !showOnboarding) return children;
 
   const isLast = active === slides.length - 1;
