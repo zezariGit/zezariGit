@@ -254,3 +254,38 @@ This file is the cumulative presentation-ready project log. It is written so the
 ### Future Domain Note
 - `zezari.com` can be connected later if the domain is owned or controlled.
 - It will require Vercel domain registration plus DNS setup at the domain provider.
+
+## 2026-06-12 - Google Login Preparation
+
+### Request
+- Start the first feature: Google signup/login.
+- Tell the user what information is needed from Google Cloud Console.
+- User will write the needed values in `env.txt`.
+
+### Reflected Content
+- Defined the Google OAuth setup requirements.
+- Created an authentication setup deliverable.
+- Prepared the required redirect URLs for current Vercel URL and future custom domain.
+
+### Required from Google Cloud
+- Google OAuth Client ID.
+- Google OAuth Client Secret.
+
+### Required Console Settings
+- App type: Web application.
+- Production origin:
+  - `https://zezari.vercel.app`
+- Production redirect URI:
+  - `https://zezari.vercel.app/api/auth/callback/google`
+- Local origin:
+  - `http://localhost:3000`
+- Local redirect URI:
+  - `http://localhost:3000/api/auth/callback/google`
+
+### Time Spent
+- OAuth setup review and documentation: approximately 8 minutes.
+
+### Output
+- `deliverables/AUTH_SETUP.md`
+- Updated `deliverables/README.md`
+- Updated project logs.

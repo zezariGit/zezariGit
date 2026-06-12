@@ -327,6 +327,65 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Next Actions
 - Commit and push this documentation update.
 
+## 2026-06-12 23:50 KST - Google Login Setup Requirements Defined
+
+### User Request
+- User asked to start with Google signup/login.
+- User asked what is needed from Google Cloud Console.
+- User said they will write the required information into `env.txt`.
+
+### Research/Reference
+- Checked official Google OAuth documentation for web server applications and OAuth client redirect URI requirements.
+- Relevant sources:
+  - `https://developers.google.com/identity/protocols/oauth2/web-server`
+  - `https://support.google.com/cloud/answer/15549257`
+
+### Implementation Direction
+- Use server-side Google OAuth flow.
+- Recommended implementation target:
+  - Next.js on Vercel
+  - Auth.js/NextAuth-style Google provider
+- Planned callback path:
+  - `/api/auth/callback/google`
+
+### Required Google Cloud Console Values
+- OAuth Client ID.
+- OAuth Client Secret.
+
+### Required Google Cloud Console Settings
+- OAuth consent screen:
+  - App name: `zezari`
+  - Audience: `External`
+  - Scopes: `openid`, `email`, `profile`
+  - Add test users while app is in testing mode.
+- OAuth client:
+  - Type: `Web application`
+  - Authorized JavaScript origins:
+    - `https://zezari.vercel.app`
+    - `http://localhost:3000`
+    - Future: `https://zezari.com`
+  - Authorized redirect URIs:
+    - `https://zezari.vercel.app/api/auth/callback/google`
+    - `http://localhost:3000/api/auth/callback/google`
+    - Future: `https://zezari.com/api/auth/callback/google`
+
+### env.txt Format Requested
+- User should add:
+  - `GOOGLE_CLIENT_ID=...`
+  - `GOOGLE_CLIENT_SECRET=...`
+
+### Changed Files
+- `deliverables/AUTH_SETUP.md`
+- `deliverables/README.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Next Actions
+- Wait for user to add Google OAuth values to `env.txt`.
+- Then configure local and Vercel environment variables.
+- Generate an app auth secret if needed.
+- Implement the Google login/signup page and callback flow.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`
