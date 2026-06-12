@@ -229,3 +229,28 @@ This file is the cumulative presentation-ready project log. It is written so the
 ### Presentation Note
 - This is the first visible deployed screen for the project.
 - It confirms that the project can move from local source code to Vercel deployment.
+
+## 2026-06-12 - Public URL Renamed
+
+### Request
+- Change the public URL wording from `real-qr-find` to `zezari`.
+- Confirm whether `zezari.com` can be used later.
+
+### Reflected Content
+- Renamed the Vercel project to `zezari`.
+- Added the public alias `https://zezari.vercel.app`.
+- Disabled Vercel deployment protection so the new URL opens publicly.
+- Confirmed the page opens and displays `hellow zezari`.
+
+### Result
+- Current public URL:
+  - `https://zezari.vercel.app`
+- Previous URL still exists as an alias:
+  - `https://real-qr-find.vercel.app`
+
+### Time Spent
+- Vercel project rename, alias setup, protection check, verification, and documentation: approximately 8 minutes.
+
+### Future Domain Note
+- `zezari.com` can be connected later if the domain is owned or controlled.
+- It will require Vercel domain registration plus DNS setup at the domain provider.

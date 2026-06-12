@@ -291,6 +291,42 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Commit and push the page.
 - Confirm Vercel production URL after deployment.
 
+## 2026-06-12 23:40 KST - Vercel Public URL Changed to zezari.vercel.app
+
+### User Request
+- User asked to change the URL wording from `real-qr-find` to `zezari`.
+- User asked whether it can later be changed to `zezari.com`.
+
+### Reflected Work
+- Renamed Vercel project:
+  - From: `real-qr-find`
+  - To: `zezari`
+- Added alias:
+  - `https://zezari.vercel.app`
+- Disabled Vercel SSO deployment protection for the project so the new Vercel URL can be accessed publicly.
+- Pulled Vercel project settings so local `.vercel/project.json` reflects project name `zezari`.
+
+### Verification
+- `https://zezari.vercel.app` returns HTTP 200.
+- Response contains `hellow zezari`.
+- Vercel alias list shows:
+  - `zezari.vercel.app`
+
+### Custom Domain Note
+- `zezari.com` can be connected later if the user owns or controls the domain.
+- Future steps will be:
+  - Add `zezari.com` to the Vercel project domains.
+  - Configure DNS records at the domain registrar/DNS provider.
+  - Wait for DNS and SSL certificate activation.
+
+### Changed Files
+- `deliverables/INTEGRATION_SETUP.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Next Actions
+- Commit and push this documentation update.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`
