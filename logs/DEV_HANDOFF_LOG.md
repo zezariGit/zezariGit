@@ -650,6 +650,85 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - `/api/auth/providers` returned HTTP 200 and includes Google provider.
   - In-app browser was unavailable in this environment, so final visual verification used build and HTTP checks.
 
+## 2026-06-13 01:20 KST - Guardian and Subject Management Implemented
+
+### User Request
+- Logged-in users are guardians.
+- A guardian information entry/edit screen is needed.
+- One guardian can enter up to 4 target/subject people.
+- Each subject can have a photo uploaded.
+- Subject fields:
+  - Name
+  - Birth date
+  - Gender
+- Guardian fields:
+  - Name
+  - ID
+  - Password
+  - Phone number for contact
+  - Email
+- All data should be saved to DB and queryable anytime.
+- Logged-in users should only query their own data.
+- Entered information should be editable.
+
+### Reflected Work
+- Added Turso DB client dependency:
+  - `@libsql/client`
+- Added auth callbacks to persist a Google user key in the session.
+- Added database layer:
+  - `lib/db.js`
+- Added password hashing helper:
+  - `lib/security.js`
+- Added server actions:
+  - `app/actions.js`
+- Added guardian dashboard:
+  - `app/dashboard.js`
+- Updated home page:
+  - Logged-out users see onboarding/login.
+  - Logged-in users see guardian/subject dashboard.
+- Added DB schema deliverable:
+  - `deliverables/DATABASE_SCHEMA.md`
+
+### Database Tables
+- `guardians`
+- `subjects`
+
+### Security/Access Notes
+- Guardian profile is keyed by the logged-in Google user ID/email.
+- Subject queries and mutations are scoped by the logged-in guardian's DB ID.
+- Passwords are stored as PBKDF2 hashes, not plaintext.
+- Subject uploads are limited to image files up to 1MB.
+- Subject photos are currently stored as data URLs in Turso.
+- Server logic prevents creating more than 4 subjects per guardian.
+
+### Verification
+- `npm run build` completed successfully.
+- Turso schema initialization was run and verified.
+- Turso contains tables:
+  - `guardians`
+  - `subjects`
+
+### Changed Files
+- `package.json`
+- `package-lock.json`
+- `.env.example`
+- `lib/auth.js`
+- `lib/security.js`
+- `lib/db.js`
+- `app/actions.js`
+- `app/dashboard.js`
+- `app/page.js`
+- `app/globals.css`
+- `public/sw.js`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/README.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Next Actions
+- Commit, push, deploy to Vercel.
+- Verify production dashboard after Google login.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`

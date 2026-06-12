@@ -458,3 +458,39 @@ This file is the cumulative presentation-ready project log. It is written so the
   - Three slide titles appear.
   - Old side-by-side desktop layout was removed.
   - Google login remains active.
+
+## 2026-06-13 - Guardian and Subject Management
+
+### Request
+- Treat logged-in users as guardians.
+- Add guardian information entry/edit screen.
+- Allow each guardian to register up to 4 target people.
+- Allow photo upload per target.
+- Save all information in the database.
+- Let each guardian view and edit only their own information.
+
+### Reflected Content
+- Added Turso database tables for guardians and subjects.
+- Added guardian profile form.
+- Added target/person forms.
+- Added photo upload support.
+- Added edit support for saved information.
+- Added server-side owner filtering by logged-in Google account.
+- Added server-side maximum of 4 target people per guardian.
+- Added password hashing so passwords are not stored as plaintext.
+
+### Result
+- After Google login, the user now sees a guardian dashboard.
+- The guardian can save/update their own information.
+- The guardian can add/update/delete their own target people.
+- Subject information is stored in Turso.
+
+### Time Spent
+- DB schema, dashboard UI, server actions, photo upload, password hashing, build verification, and documentation: approximately 45 minutes.
+
+### Output
+- `app/dashboard.js`
+- `app/actions.js`
+- `lib/db.js`
+- `lib/security.js`
+- `deliverables/DATABASE_SCHEMA.md`

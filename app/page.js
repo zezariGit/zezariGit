@@ -1,12 +1,19 @@
 import { getServerSession } from "next-auth";
 import { GoogleLoginButton, LogoutButton, PwaInstallPrompt } from "./auth-actions";
+import GuardianDashboard from "./dashboard";
 import OnboardingGate from "./onboarding-gate";
 import { authOptions } from "../lib/auth";
+import { getDashboardData } from "../lib/db";
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
   const userName = session?.user?.name || "Google user";
   const userEmail = session?.user?.email || "";
+
+  if (session) {
+    const dashboardData = await getDashboardData(session);
+    return <GuardianDashboard {...dashboardData} session={session} />;
+  }
 
   const loginPanel = (
     <main className="page">
@@ -19,17 +26,7 @@ export default async function HomePage() {
             : "Google 계정으로 가입하거나 로그인하세요."}
         </p>
 
-        {session ? (
-          <>
-            <div className="profile">
-              <div className="profile-name">{userName}</div>
-              <div className="profile-email">{userEmail}</div>
-            </div>
-            <LogoutButton />
-          </>
-        ) : (
-          <GoogleLoginButton />
-        )}
+        <GoogleLoginButton />
         <div className="install-area">
           <PwaInstallPrompt />
         </div>
