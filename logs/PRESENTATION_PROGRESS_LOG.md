@@ -106,3 +106,35 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### Presentation Note
 - Future Git commits will use the `zezariGit / general@zezari.com` identity by default unless a project-specific Git setting overrides it.
+
+## 2026-06-12 - GitHub Repository Connection
+
+### Request
+- User provided the repository URL `https://github.com/zezariGit/zezariGit.git`.
+- User asked to apply the Git initialization and GitHub push script.
+
+### Reflected Content
+- Initialized the project folder as a Git repository.
+- Created the first Git commit.
+- Connected the project to the GitHub repository.
+- Resolved an account mismatch in Windows Git credentials.
+- Pushed the project to GitHub.
+
+### Result
+- The local project is now connected to GitHub.
+- Branch `main` is tracking `origin/main`.
+- The first project commit is available on the remote repository.
+
+### Time Spent
+- Repository initialization, authentication fix, push, and verification: approximately 15 minutes.
+
+### Output
+- GitHub remote:
+  - `https://github.com/zezariGit/zezariGit.git`
+- Initial commit:
+  - `90dc4c7`
+  - `Initial project setup`
+
+### Presentation Note
+- A Windows credential entry was still using the old `soonsuboy` account, which initially blocked the push.
+- After updating Git Credential Manager to `zezariGit`, the project was successfully pushed to GitHub.
