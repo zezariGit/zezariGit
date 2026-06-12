@@ -425,3 +425,24 @@ This file is the cumulative presentation-ready project log. It is written so the
   - `다시보지 않기` appears.
   - `로그인 시작` appears.
   - Google login provider remains active.
+
+## 2026-06-13 - Onboarding Flow Corrected
+
+### Request
+- User clarified that the onboarding should not show the capture-like three-phone layout.
+- The service introduction should be three separate pages with images.
+- Users should move from page 1 to page 2 to page 3, then reach the login page.
+- `다시보지 않기` should immediately open the login page.
+
+### Reflected Content
+- Changed the onboarding to show one page at a time on both desktop and mobile.
+- Removed the side-by-side desktop layout.
+- Improved the visual design with one large illustration per page.
+- Kept swipe and navigation controls.
+- Kept `다시보지 않기` skip behavior.
+
+### Result
+- The onboarding now behaves as a true three-page intro before login.
+
+### Time Spent
+- Flow correction, CSS redesign, cache version update, and documentation: approximately 18 minutes.

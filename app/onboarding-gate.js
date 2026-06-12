@@ -57,6 +57,10 @@ export default function OnboardingGate({ enabled, children }) {
     setShowOnboarding(false);
   };
 
+  const goPrevious = () => {
+    setActive((current) => Math.max(current - 1, 0));
+  };
+
   const handleTouchEnd = (event) => {
     if (touchStart === null) return;
     const diff = touchStart - event.changedTouches[0].clientX;
@@ -70,7 +74,10 @@ export default function OnboardingGate({ enabled, children }) {
     <main className="onboarding-page">
       <section className="onboarding-shell" aria-label="서비스 소개">
         <div className="onboarding-top">
-          <p className="intro-label">서비스 소개</p>
+          <div>
+            <p className="intro-kicker">zezari</p>
+            <h1 className="intro-label">서비스 소개</h1>
+          </div>
           <button className="plain-button" type="button" onClick={hideForever}>
             다시보지 않기
           </button>
@@ -84,9 +91,8 @@ export default function OnboardingGate({ enabled, children }) {
           <div className="slide-track" style={{ transform: `translateX(-${active * 100}%)` }}>
             {slides.map((slide) => (
               <article className="slide" key={slide.number}>
-                <div className="phone-frame">
-                  <div className="phone-notch" />
-                  <div className="slide-art">
+                <div className="service-slide-card">
+                  <div className="slide-visual">
                     <SlideArt kind={slide.kind} />
                   </div>
                   <div className="slide-copy">
@@ -94,25 +100,29 @@ export default function OnboardingGate({ enabled, children }) {
                     <h2>{slide.title}</h2>
                     <p>{slide.body}</p>
                   </div>
-                  <div className="slide-dots" aria-label={`${slide.number} 페이지`}>
-                    {slides.map((dot) => (
-                      <span
-                        className={dot.number === slide.number ? "dot active" : "dot"}
-                        key={dot.number}
-                      />
-                    ))}
-                  </div>
                 </div>
               </article>
             ))}
           </div>
         </div>
 
+        <div className="slide-dots" aria-label="서비스 소개 페이지">
+          {slides.map((slide, index) => (
+            <button
+              className={index === active ? "dot active" : "dot"}
+              type="button"
+              key={slide.number}
+              aria-label={`${index + 1}번 소개 보기`}
+              onClick={() => setActive(index)}
+            />
+          ))}
+        </div>
+
         <div className="onboarding-controls">
           <button
             className="ghost-button"
             type="button"
-            onClick={() => setActive((current) => Math.max(current - 1, 0))}
+            onClick={goPrevious}
             disabled={active === 0}
           >
             이전
@@ -121,9 +131,6 @@ export default function OnboardingGate({ enabled, children }) {
             {isLast ? "로그인 시작" : "다음"}
           </button>
         </div>
-        <button className="desktop-start primary-button" type="button" onClick={() => setShowOnboarding(false)}>
-          로그인 시작
-        </button>
       </section>
     </main>
   );

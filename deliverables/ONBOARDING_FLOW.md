@@ -11,14 +11,15 @@ Project: REAL_QR_FIND / zezari
 
 ## User Flow
 1. First visit while logged out:
-   - Show service introduction.
+   - Show the first service introduction page.
 2. Mobile:
    - User can swipe left/right.
    - User can use Previous/Next buttons.
    - Last slide button changes to `로그인 시작`.
 3. Desktop:
-   - Three phone-style introduction panels are shown side by side.
-   - User can click `로그인 시작`.
+   - User sees one service introduction page at a time.
+   - User can move through page 1, page 2, and page 3 with controls.
+   - After page 3, `로그인 시작` opens the login screen.
 4. If user clicks `다시보지 않기`:
    - Store `zezari:onboarding:hidden=true` in browser localStorage.
    - Immediately show login screen.
@@ -39,4 +40,4 @@ Project: REAL_QR_FIND / zezari
 
 ## Notes
 - The onboarding skip state is per browser/device because it uses localStorage.
-- Service worker cache version was updated to `zezari-v2`.
+- Service worker cache version was updated to `zezari-v3`.

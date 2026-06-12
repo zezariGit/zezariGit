@@ -600,6 +600,39 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - Home page contains `로그인 시작`.
   - `/api/auth/providers` returned HTTP 200 and includes Google provider.
 
+## 2026-06-13 00:55 KST - Onboarding Changed to Sequential Pages
+
+### User Request
+- User clarified the onboarding was wrong because it looked like the provided capture image.
+- User wants three separate pages/images that the user moves through from left to right.
+- After the three pages, the login page should appear.
+- `다시보지 않기` should go directly to the login page.
+- CSS should look polished.
+
+### Reflected Work
+- Removed desktop behavior that showed all three phone-style panels side by side.
+- Reworked onboarding into one slide/page at a time on all screen sizes.
+- Kept horizontal swipe support and previous/next controls.
+- Kept `다시보지 않기` localStorage skip behavior.
+- Updated visual styling to a cleaner app-style onboarding card:
+  - One large illustration per page.
+  - Centered title/body.
+  - Progress dots.
+  - Cleaner desktop/mobile responsive layout.
+- Updated service worker cache version:
+  - From `zezari-v2` to `zezari-v3`.
+
+### Changed Files
+- `app/onboarding-gate.js`
+- `app/globals.css`
+- `public/sw.js`
+- `deliverables/ONBOARDING_FLOW.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Next Actions
+- Build, deploy, and verify production response.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`
