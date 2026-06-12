@@ -21,6 +21,7 @@ Stores one guardian profile per logged-in Google user.
 | `password_hash` | TEXT | PBKDF2 password hash, never plaintext |
 | `phone` | TEXT | Contact phone number |
 | `email` | TEXT | Contact email |
+| `is_active` | INTEGER | `1` active, `0` inactive |
 | `created_at` | TEXT | Created timestamp |
 | `updated_at` | TEXT | Updated timestamp |
 
@@ -46,6 +47,7 @@ Stores target/person records belonging to a guardian.
 - A guardian can only query/update subjects where `subjects.guardian_id` belongs to the logged-in guardian.
 - Server-side save logic limits each guardian to 4 subjects.
 - Subject status is stored per subject and shown on the guardian dashboard.
+- Admin users can list guardians and activate/deactivate them.
 
 ## Upload Rules
 - Photo file must be an image.

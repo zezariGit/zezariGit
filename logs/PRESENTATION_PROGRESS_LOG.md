@@ -577,3 +577,32 @@ This file is the cumulative presentation-ready project log. It is written so the
   - Public page opens.
   - Google login remains active.
   - Latest PWA cache version is active.
+
+## 2026-06-13 - Admin Guardian Management
+
+### Request
+- Add an admin page.
+- Allow admin to activate/deactivate guardians.
+- Show guardians in a left-side grid.
+- Show selected guardian's four managed people in a right-side grid.
+
+### Reflected Content
+- Added `/admin`.
+- Added admin-only access based on Google login email.
+- Added guardian active/inactive state.
+- Added left guardian grid.
+- Added right managed-person grid.
+- Added activate/deactivate button.
+- Inactive guardians now see a disabled-account notice.
+
+### Result
+- Admins can manage guardian activation and inspect each guardian's registered managed people.
+
+### Time Spent
+- Admin page, DB activation field, access control, UI styling, migration check, and documentation: approximately 35 minutes.
+
+### Output
+- `app/admin/page.js`
+- `app/admin/actions.js`
+- `lib/admin.js`
+- `deliverables/ADMIN_SETUP.md`

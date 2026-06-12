@@ -1,4 +1,4 @@
-const CACHE_NAME = "zezari-v6";
+const CACHE_NAME = "zezari-v7";
 const APP_SHELL = ["/", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {

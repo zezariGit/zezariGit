@@ -853,6 +853,67 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - `/sw.js` returned HTTP 200 and includes cache version `zezari-v6`.
   - Authenticated tab navigation should be manually checked after Google login.
 
+## 2026-06-13 02:35 KST - Admin Guardian Management Page Added
+
+### User Request
+- Add an admin page.
+- Admin should be able to activate/deactivate guardians.
+- Show guardians in a grid on the left.
+- When a guardian is clicked, show that guardian's four managed subjects in a grid on the right.
+
+### Reflected Work
+- Added admin access helper:
+  - `lib/admin.js`
+- Added admin route:
+  - `app/admin/page.js`
+- Added admin server action:
+  - `app/admin/actions.js`
+- Added admin DB functions:
+  - Guardian list with subject counts.
+  - Selected guardian subject lookup.
+  - Guardian active/inactive update.
+- Added `guardians.is_active` DB column.
+- Added inactive guardian handling in user dashboard.
+- Added admin link for admin sessions in the user dashboard header.
+- Added admin UI styling:
+  - Left guardian grid.
+  - Right selected guardian and subject grid.
+  - Activation/deactivation controls.
+- Added deliverable:
+  - `deliverables/ADMIN_SETUP.md`
+- Updated service worker cache version:
+  - `zezari-v7`
+
+### Access Control
+- Admin access requires Google login.
+- Admin emails are read from `ADMIN_EMAILS`.
+- Default admin email if env is unset:
+  - `general@zezari.com`
+
+### Verification
+- Turso `guardians` table includes `is_active`.
+- `npm run build` completed successfully.
+- Build output includes `/admin` route.
+
+### Changed Files
+- `.env.example`
+- `app/admin/page.js`
+- `app/admin/actions.js`
+- `app/dashboard.js`
+- `app/globals.css`
+- `lib/admin.js`
+- `lib/db.js`
+- `public/sw.js`
+- `deliverables/ADMIN_SETUP.md`
+- `deliverables/README.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Next Actions
+- Commit, push, deploy to Vercel.
+- Verify `/admin` route and auth provider route in production.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`

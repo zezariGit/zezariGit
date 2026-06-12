@@ -1,5 +1,6 @@
 import { deleteSubjectAction, saveGuardianAction, saveSubjectAction } from "./actions";
 import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
+import { isAdminSession } from "../lib/admin";
 
 const genders = ["남성", "여성", "기타"];
 const statuses = ["문제없음", "찾는중", "QR활성화필요"];
@@ -9,6 +10,8 @@ export default function GuardianDashboard({ guardian, subjects, session, activeT
   const guardianComplete = Boolean(
     guardian.name && guardian.login_id && guardian.password_hash && guardian.phone && guardian.email
   );
+  const guardianActive = guardian.is_active !== 0;
+  const admin = isAdminSession(session);
   const isDashboard = activeTab !== "info";
 
   return (
@@ -34,9 +37,22 @@ export default function GuardianDashboard({ guardian, subjects, session, activeT
           </div>
           <div className="dashboard-header-actions">
             <span className="session-email">{session.user?.email}</span>
+            {admin && (
+              <a className="admin-link" href="/admin">
+                관리자 페이지
+              </a>
+            )}
             <LogoutButton />
           </div>
         </header>
+
+        {!guardianActive ? (
+          <section className="dashboard-panel setup-panel">
+            <h2>계정이 비활성화되었습니다</h2>
+            <p>관리자에게 문의해 주세요. 비활성화된 보호자 계정은 관리 기능을 사용할 수 없습니다.</p>
+          </section>
+        ) : (
+          <>
 
         <nav className="dashboard-menu" aria-label="보호자 메뉴">
           <a className={isDashboard ? "active" : ""} href="/?tab=dashboard">
@@ -56,6 +72,8 @@ export default function GuardianDashboard({ guardian, subjects, session, activeT
         <div className="install-area dashboard-install">
           <PwaInstallPrompt />
         </div>
+          </>
+        )}
       </section>
     </main>
   );
