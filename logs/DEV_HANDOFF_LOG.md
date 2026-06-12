@@ -140,6 +140,67 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Next Actions
 - Commit and push this log update so GitHub also contains the record of the GitHub connection process.
 
+## 2026-06-12 23:00 KST - Vercel Connected and Turso Integration Prepared
+
+### User Request
+- User said Vercel and Turso signup is complete and asked to connect them.
+
+### Checks Performed
+- Checked whether Vercel CLI is installed.
+- Checked whether Turso CLI is installed.
+- Checked Node/npm availability.
+- Checked WSL availability for Turso CLI.
+- Checked Vercel login state after authentication.
+- Checked Vercel project link metadata.
+
+### Vercel Result
+- Installed Vercel CLI globally with npm.
+- Vercel CLI version: `54.12.2`.
+- Logged in successfully.
+- `vercel whoami` returns `zezarigit`.
+- Linked local folder `c:\REAL_QR_FIND` to Vercel project:
+  - Scope: `zezari-vercel-s-projects`
+  - Project: `real-qr-find`
+- Vercel connected the GitHub repository:
+  - `https://github.com/zezariGit/zezariGit`
+- Local Vercel metadata was created at `.vercel/project.json`.
+
+### Turso Result
+- Turso CLI is not currently installed.
+- Official Turso docs state Windows CLI installation requires WSL.
+- Current PC reports WSL is not installed.
+- Turso connection is pending until either:
+  - WSL is installed and Turso CLI auth is completed, or
+  - User provides Turso database URL and auth token from the dashboard/API.
+
+### Reflected Work
+- Added `.gitignore` to prevent committing local secrets and Vercel local metadata.
+- Added `.env.example` with expected Turso environment variable names.
+- Added official integration deliverable:
+  - `deliverables/INTEGRATION_SETUP.md`
+- Updated deliverable index.
+
+### Changed Files
+- `.gitignore`
+- `.env.example`
+- `deliverables/INTEGRATION_SETUP.md`
+- `deliverables/README.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `vercel --version` succeeded.
+- `vercel login` completed successfully.
+- `vercel whoami` returned `zezarigit`.
+- `vercel link --yes --project real-qr-find` completed successfully.
+- `.vercel/project.json` contains project metadata for `real-qr-find`.
+
+### Next Actions
+- Commit and push Vercel setup files/logs.
+- For Turso, choose one:
+  - Install WSL and continue Turso CLI setup.
+  - Provide Turso database URL and auth token so environment variables can be configured.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`

@@ -138,3 +138,36 @@ This file is the cumulative presentation-ready project log. It is written so the
 ### Presentation Note
 - A Windows credential entry was still using the old `soonsuboy` account, which initially blocked the push.
 - After updating Git Credential Manager to `zezariGit`, the project was successfully pushed to GitHub.
+
+## 2026-06-12 - Vercel and Turso Connection Setup
+
+### Request
+- User said Vercel and Turso signup is complete and asked to connect them.
+
+### Reflected Content
+- Installed and logged in to Vercel CLI.
+- Linked the local project folder to Vercel.
+- Connected the GitHub repository to the Vercel project.
+- Checked Turso CLI availability and Windows setup requirements.
+- Prepared environment variable structure for Turso.
+
+### Result
+- Vercel connection is complete.
+- Vercel account: `zezarigit`
+- Vercel project: `real-qr-find`
+- GitHub repository connected to Vercel: `zezariGit/zezariGit`
+- Turso connection is pending because official Windows setup requires WSL and WSL is not currently installed.
+
+### Time Spent
+- Vercel installation, login, project link, Turso check, and documentation: approximately 20 minutes.
+
+### Output
+- `.gitignore`
+- `.env.example`
+- `deliverables/INTEGRATION_SETUP.md`
+- Updated `deliverables/README.md`
+- Updated project logs
+
+### Presentation Note
+- Hosting integration is ready through Vercel.
+- Database integration path is prepared, but Turso requires either WSL setup or database credentials from the Turso dashboard.
