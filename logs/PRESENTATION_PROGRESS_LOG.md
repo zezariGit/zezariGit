@@ -412,3 +412,16 @@ This file is the cumulative presentation-ready project log. It is written so the
 - Updated `app/globals.css`
 - Updated `public/sw.js`
 - `deliverables/ONBOARDING_FLOW.md`
+
+### Completion Update
+- GitHub commits:
+  - `6cc0bc2 Add onboarding before login`
+  - `3f247d2 Render onboarding immediately`
+- Production URL:
+  - `https://zezari.vercel.app`
+- Verified:
+  - Service introduction appears.
+  - Three slide texts appear.
+  - `다시보지 않기` appears.
+  - `로그인 시작` appears.
+  - Google login provider remains active.

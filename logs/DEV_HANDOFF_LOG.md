@@ -585,6 +585,21 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Deploy to Vercel.
 - Verify production page, login screen, and auth provider route.
 
+### Completion Update
+- Implementation commits:
+  - `6cc0bc2 Add onboarding before login`
+  - `3f247d2 Render onboarding immediately`
+- Production deployment:
+  - Deployment URL: `https://zezari-exlbx4f2k-zezari.vercel.app`
+  - Public alias: `https://zezari.vercel.app`
+- HTTP verification:
+  - Home page returned HTTP 200.
+  - Home page contains `서비스 소개`.
+  - Home page contains `다시보지 않기`.
+  - Home page contains slide text for all three slides.
+  - Home page contains `로그인 시작`.
+  - `/api/auth/providers` returned HTTP 200 and includes Google provider.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`
