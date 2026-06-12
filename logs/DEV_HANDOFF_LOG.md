@@ -633,6 +633,23 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Next Actions
 - Build, deploy, and verify production response.
 
+### Completion Update
+- Implementation commit:
+  - `dfc60fb Correct onboarding to sequential pages`
+- Production deployment:
+  - Deployment URL: `https://zezari-cvmyjq6is-zezari.vercel.app`
+  - Public alias: `https://zezari.vercel.app`
+- Verification:
+  - `npm run build` completed successfully.
+  - Home page returned HTTP 200.
+  - Home page contains `서비스 소개`.
+  - Home page contains `다시보지 않기`.
+  - Home page contains all three slide titles.
+  - Side-by-side desktop-only marker `desktop-start` is no longer present.
+  - `/sw.js` returned HTTP 200 and contains `zezari-v3`.
+  - `/api/auth/providers` returned HTTP 200 and includes Google provider.
+  - In-app browser was unavailable in this environment, so final visual verification used build and HTTP checks.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`
