@@ -364,6 +364,21 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Confirm each provider dashboard has the production callback URL registered.
 - Redeploy after provider keys are added.
 
+### Completion Update
+- GitHub commit:
+  - `f834a3e Add Kakao and Naver login foundation`
+- Vercel production deployment:
+  - `https://zezari-qvparkrgz-zezari.vercel.app`
+- Public alias:
+  - `https://zezari.vercel.app`
+- Production verification:
+  - `/api/auth/providers` returned HTTP 200.
+  - Google provider is active.
+  - Kakao/Naver providers are not active yet because their credentials are not configured.
+  - `/admin` returned HTTP 200 and includes Kakao/Naver login buttons.
+  - Kakao/Naver buttons show setup-needed state.
+  - `/sw.js` includes cache version `zezari-v10`.
+
 ## 2026-06-12 22:48 KST - Git Repository Initialized and Pushed to GitHub
 
 ### User Request

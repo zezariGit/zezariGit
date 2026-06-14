@@ -798,6 +798,17 @@ This file is the cumulative presentation-ready project log. It is written so the
 - Local build succeeded.
 - Current provider API shows Google only because Kakao/Naver credentials are not configured yet.
 - Login gate displays Google, Kakao, and Naver buttons.
+
+### Completion Update
+- GitHub commit:
+  - `f834a3e Add Kakao and Naver login foundation`
+- Production URL:
+  - `https://zezari.vercel.app`
+- Verified:
+  - Production auth provider API opens.
+  - Google provider is active.
+  - Kakao/Naver buttons are visible but disabled until credentials are added.
+  - PWA cache version updated to `zezari-v10`.
 - Turso seed result:
   - 30 total QR records
   - 30 active QR records
