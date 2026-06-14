@@ -163,6 +163,22 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Add the actual missing-person report/contact workflow to `/find/[key]`.
 - Decide whether inactive QR should show a public support contact or only a generic disabled message.
 
+### Completion Update
+- GitHub commit:
+  - `b3a15d3 Add QR code management`
+- Vercel production deployment:
+  - `https://zezari-jrx5s7ofz-zezari.vercel.app`
+- Public alias:
+  - `https://zezari.vercel.app`
+- Vercel environment update:
+  - Added `PUBLIC_APP_URL=https://zezari.vercel.app` to Production and Development.
+- Production verification:
+  - `/` returned HTTP 200.
+  - `/admin?section=qr` returned HTTP 200 and showed the admin login gate while logged out.
+  - `/find/{sample-active-key}` returned HTTP 200 and showed active QR confirmation content.
+  - `/sw.js` includes cache version `zezari-v9`.
+  - `/manifest.webmanifest` returned HTTP 200.
+
 ## 2026-06-12 22:48 KST - Git Repository Initialized and Pushed to GitHub
 
 ### User Request
