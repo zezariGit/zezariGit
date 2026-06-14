@@ -1,8 +1,8 @@
 import { getServerSession } from "next-auth";
 import QRCode from "qrcode";
-import { GoogleLoginButton, LogoutButton } from "../auth-actions";
+import { LogoutButton, SocialLoginButtons } from "../auth-actions";
 import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
-import { authOptions } from "../../lib/auth";
+import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
 import { getAdminData, getAdminUsersData, getQrAdminData, isDbAdminSession } from "../../lib/db";
 import {
   generateQrCodesAction,
@@ -14,14 +14,15 @@ import {
 export default async function AdminPage({ searchParams }) {
   const session = await getServerSession(authOptions);
   const resolvedSearchParams = await searchParams;
+  const enabledProviders = getConfiguredProviderIds();
 
   if (!session) {
     return (
       <main className="admin-page">
         <section className="admin-empty">
           <h1>관리자 로그인</h1>
-          <p>관리자 페이지를 사용하려면 Google 로그인이 필요합니다.</p>
-          <GoogleLoginButton />
+          <p>관리자 페이지를 사용하려면 등록된 소셜 계정 로그인이 필요합니다.</p>
+          <SocialLoginButtons enabledProviders={enabledProviders} />
         </section>
       </main>
     );

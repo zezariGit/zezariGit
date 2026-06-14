@@ -34,3 +34,14 @@ Create a clean Korean public-service style system diagram for "REAL_QR_FIND" adm
 
 ### Notes
 - Use for explaining the difference between base admins from environment variables and DB-admin users granted through the admin page.
+
+## 2026-06-15 - Multi-Provider Social Login
+
+### Purpose
+- Presentation diagram for Google, Kakao, and Naver login support.
+
+### Prompt
+Create a clean Korean public-service style architecture diagram for "REAL_QR_FIND" social login. Show three login buttons with recognizable Google, Kakao, and Naver brand colors, each connecting through OAuth callbacks to `/api/auth/callback/google`, `/api/auth/callback/kakao`, and `/api/auth/callback/naver`. Show NextAuth issuing a session, then the app loading the guardian dashboard and Turso database profile. Include a note that providers are enabled when client ID and client secret environment variables are configured. Use white surfaces, blue civic-tech accents, and simple secure-auth icons. Avoid real personal data.
+
+### Notes
+- Use when presenting the expanded login/signup foundation.

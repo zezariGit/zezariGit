@@ -6,7 +6,7 @@ Project: REAL_QR_FIND / zezari
 - Implemented.
 
 ## Purpose
-- Show a three-page service introduction before the Google login screen.
+- Show a three-page service introduction before the social login screen.
 - Let users skip future onboarding with a "다시보지 않기" action.
 
 ## User Flow

@@ -761,6 +761,43 @@ This file is the cumulative presentation-ready project log. It is written so the
   - Production admin-management route opens.
   - Logged-out users see the admin login gate.
   - Google login provider remains available.
+
+## 2026-06-15 - Kakao/Naver Social Login Foundation
+
+### Request
+- Add Kakao and Naver login/signup in addition to Google.
+- Show matching logo buttons.
+- Prepare the base so login works once each platform key is entered.
+
+### Reflected Content
+- Added Google/Kakao/Naver provider foundation.
+- Added three social login buttons:
+  - Google
+  - Kakao
+  - Naver
+- Providers activate automatically when both client ID and client secret are configured.
+- Kakao/Naver buttons remain visible but disabled until their keys are entered.
+- Updated the login screen and admin login gate from Google-only to social-login wording.
+- Added environment variable placeholders and callback URL documentation.
+
+### Result
+- The app is ready for Kakao and Naver OAuth credentials.
+- Once keys are entered and deployed, users can sign up/login through Kakao or Naver.
+
+### Time Spent
+- Provider setup, button UI, environment documentation, build verification, and logs: approximately 30 minutes.
+
+### Output
+- `lib/auth.js`
+- `app/auth-actions.js`
+- `app/page.js`
+- `app/admin/page.js`
+- `deliverables/AUTH_SETUP.md`
+
+### Verification
+- Local build succeeded.
+- Current provider API shows Google only because Kakao/Naver credentials are not configured yet.
+- Login gate displays Google, Kakao, and Naver buttons.
 - Turso seed result:
   - 30 total QR records
   - 30 active QR records

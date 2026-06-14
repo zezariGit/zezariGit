@@ -14,8 +14,8 @@ Stores one guardian profile per logged-in Google user.
 | Column | Type | Notes |
 | --- | --- | --- |
 | `id` | TEXT | Primary key |
-| `google_id` | TEXT | Unique Google user key |
-| `google_email` | TEXT | Email from Google login |
+| `google_id` | TEXT | Legacy column name; stores unique social login user key |
+| `google_email` | TEXT | Legacy column name; stores email from social login |
 | `name` | TEXT | Guardian name |
 | `login_id` | TEXT | Guardian-chosen app ID |
 | `password_hash` | TEXT | PBKDF2 password hash, never plaintext |
@@ -58,7 +58,7 @@ Stores QR codes and the unique public strings used as the final segment of peopl
 | `updated_at` | TEXT | Updated timestamp |
 
 ## Access Rules
-- Dashboard data is loaded only after Google login.
+- Dashboard data is loaded only after social login.
 - A guardian can only query/update subjects where `subjects.guardian_id` belongs to the logged-in guardian.
 - Server-side save logic limits each guardian to 4 subjects.
 - Subject status is stored per subject and shown on the guardian dashboard.

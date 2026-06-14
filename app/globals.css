@@ -113,6 +113,15 @@ a {
   background: var(--accent-strong);
 }
 
+.social-login-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.social-action {
+  gap: 12px;
+}
+
 .google-action {
   gap: 12px;
   background: #ffffff;
@@ -128,6 +137,32 @@ a {
   width: 20px;
   height: 20px;
   flex: 0 0 auto;
+}
+
+.social-logo {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+.kakao-action {
+  background: #fee500;
+  color: #191919;
+  border: 1px solid #f3d900;
+}
+
+.kakao-action:hover {
+  background: #f5dc00;
+}
+
+.naver-action {
+  background: #03c75a;
+  color: #ffffff;
+  border: 1px solid #02b351;
+}
+
+.naver-action:hover {
+  background: #02b351;
 }
 
 .action.secondary {
@@ -1194,6 +1229,18 @@ body {
   border: 0.5px solid var(--c-border-strong);
 }
 
+.kakao-action {
+  background: #fee500;
+  color: #191919;
+  border: 0.5px solid #f3d900;
+}
+
+.naver-action {
+  background: #03c75a;
+  color: #ffffff;
+  border: 0.5px solid #02b351;
+}
+
 .google-action:hover,
 .ghost-button:hover,
 .install-action:hover,
@@ -1202,6 +1249,16 @@ body {
   background: var(--c-accent-light);
   color: var(--c-primary-dark);
   text-decoration: none;
+}
+
+.kakao-action:hover {
+  background: #f5dc00;
+  color: #191919;
+}
+
+.naver-action:hover {
+  background: #02b351;
+  color: #ffffff;
 }
 
 .action.secondary,

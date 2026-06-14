@@ -30,12 +30,12 @@ Project: REAL_QR_FIND / zezari
 - Background color: `#f6f8f7`
 
 ## Service Worker
-- Cache name: `zezari-v1`
+- Current cache name: `zezari-v10`
 - Caches app shell:
   - `/`
   - `/manifest.webmanifest`
 - Uses network-first behavior for GET requests.
-- Excludes `/api/auth` routes from service worker handling to avoid interfering with Google OAuth.
+- Excludes `/api/auth` routes from service worker handling to avoid interfering with OAuth login.
 
 ## Install UI
 - Android/Desktop Chrome:
@@ -52,4 +52,4 @@ Project: REAL_QR_FIND / zezari
 - `https://zezari.vercel.app/icons/icon-192.png` returns the app icon.
 - `https://zezari.vercel.app/icons/icon-512.png` returns the app icon.
 - Home page no longer displays `hellow`.
-- Google login button displays Google logo and text.
+- Social login buttons display Google, Kakao, and Naver logos/text.

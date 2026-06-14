@@ -287,6 +287,83 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - `/admin?section=admins` returned HTTP 200 and shows the admin login gate when logged out.
   - `/api/auth/providers` returned HTTP 200 and includes Google provider.
 
+## 2026-06-15 00:00 KST - Google/Kakao/Naver Social Login Foundation
+
+### User Request
+- Current login/signup uses Google.
+- Add Kakao and Naver login/signup too.
+- Create matching login buttons with logos.
+- Build the base structure so each platform works once the related keys are entered.
+
+### Reflected Work
+- Expanded NextAuth provider setup:
+  - Google
+  - Kakao
+  - Naver
+- Providers are registered conditionally:
+  - A provider is enabled only when both client ID and client secret are present.
+  - This prevents the app from breaking before Kakao/Naver keys are entered.
+- Added social login button set:
+  - Google logo button
+  - Kakao logo/color button
+  - Naver logo/color button
+- Disabled unconfigured provider buttons with setup-needed text.
+- Updated login screen copy from Google-only to social-login language.
+- Updated admin login gate to use the same social login button set.
+- Updated session ID handling:
+  - Existing Google users keep the same user key behavior.
+  - Kakao/Naver users use provider-prefixed keys like `kakao:{id}` and `naver:{id}`.
+- Added environment variable placeholders:
+  - `KAKAO_CLIENT_ID`
+  - `KAKAO_CLIENT_SECRET`
+  - `NAVER_CLIENT_ID`
+  - `NAVER_CLIENT_SECRET`
+- Updated auth deliverable and image prompt archive.
+- Updated PWA cache version to `zezari-v10`.
+
+### Required Provider Callback URLs
+- Google:
+  - `https://zezari.vercel.app/api/auth/callback/google`
+  - `http://localhost:3000/api/auth/callback/google`
+- Kakao:
+  - `https://zezari.vercel.app/api/auth/callback/kakao`
+  - `http://localhost:3000/api/auth/callback/kakao`
+- Naver:
+  - `https://zezari.vercel.app/api/auth/callback/naver`
+  - `http://localhost:3000/api/auth/callback/naver`
+
+### Files Changed
+- `.env.example`
+- `lib/auth.js`
+- `app/auth-actions.js`
+- `app/page.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `public/sw.js`
+- `deliverables/AUTH_SETUP.md`
+- `deliverables/PWA_SETUP.md`
+- `deliverables/ONBOARDING_FLOW.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` completed successfully.
+- Local `/api/auth/providers` returned HTTP 200.
+- Current local provider response includes Google only because Kakao/Naver keys are not configured yet.
+- Local `/admin` login gate returned HTTP 200 and includes Google, Kakao, and Naver buttons.
+- Kakao/Naver buttons show setup-needed state until their keys are configured.
+
+### Time Spent
+- Multi-provider auth setup, UI buttons, provider guards, docs, and verification: approximately 30 minutes.
+
+### Next Actions
+- User should provide Kakao/Naver client ID and client secret values in `env.txt`.
+- Add those values to Vercel Production/Development environment variables.
+- Confirm each provider dashboard has the production callback URL registered.
+- Redeploy after provider keys are added.
+
 ## 2026-06-12 22:48 KST - Git Repository Initialized and Pushed to GitHub
 
 ### User Request

@@ -3,13 +3,55 @@
 import { signIn, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 
-export function GoogleLoginButton() {
+const socialProviders = [
+  {
+    id: "google",
+    label: "Google로 계속하기",
+    className: "google-action",
+    Logo: GoogleLogo,
+  },
+  {
+    id: "kakao",
+    label: "카카오로 계속하기",
+    className: "kakao-action",
+    Logo: KakaoLogo,
+  },
+  {
+    id: "naver",
+    label: "네이버로 계속하기",
+    className: "naver-action",
+    Logo: NaverLogo,
+  },
+];
+
+export function SocialLoginButtons({ enabledProviders = [] }) {
+  const enabled = new Set(enabledProviders);
+
   return (
-    <button className="action google-action" type="button" onClick={() => signIn("google")}>
-      <GoogleLogo />
-      <span>Google로 계속하기</span>
-    </button>
+    <div className="social-login-stack">
+      {socialProviders.map(({ id, label, className, Logo }) => {
+        const configured = enabled.has(id);
+
+        return (
+          <button
+            className={`action social-action ${className}`}
+            type="button"
+            key={id}
+            onClick={() => configured && signIn(id)}
+            disabled={!configured}
+            title={configured ? label : "환경변수 설정 후 사용할 수 있습니다."}
+          >
+            <Logo />
+            <span>{configured ? label : `${label} - 설정 필요`}</span>
+          </button>
+        );
+      })}
+    </div>
   );
+}
+
+export function GoogleLoginButton({ enabledProviders = ["google"] }) {
+  return <SocialLoginButtons enabledProviders={enabledProviders.filter((provider) => provider === "google")} />;
 }
 
 export function LogoutButton() {
@@ -104,6 +146,25 @@ function GoogleLogo() {
         fill="#EA4335"
         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06L5.84 9.9C6.71 7.3 9.14 5.38 12 5.38z"
       />
+    </svg>
+  );
+}
+
+function KakaoLogo() {
+  return (
+    <svg className="social-logo" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="#191919"
+        d="M12 4C6.98 4 3 7.14 3 11.02c0 2.47 1.62 4.64 4.05 5.89l-.72 2.65c-.08.31.27.56.53.38l3.16-2.1c.64.13 1.3.2 1.98.2 5.02 0 9-3.14 9-7.02S17.02 4 12 4z"
+      />
+    </svg>
+  );
+}
+
+function NaverLogo() {
+  return (
+    <svg className="social-logo" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="#ffffff" d="M7 6h3.85l3.3 4.78V6H17v12h-3.85l-3.3-4.78V18H7V6z" />
     </svg>
   );
 }
