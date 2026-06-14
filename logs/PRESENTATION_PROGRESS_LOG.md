@@ -751,6 +751,16 @@ This file is the cumulative presentation-ready project log. It is written so the
   - Registered users: 4
   - DB admins: 1
 - Local `/admin?section=admins` route returned HTTP 200 and showed the login gate while logged out.
+
+### Completion Update
+- GitHub commit:
+  - `7707d72 Add admin role management`
+- Production URL:
+  - `https://zezari.vercel.app/admin?section=admins`
+- Verified:
+  - Production admin-management route opens.
+  - Logged-out users see the admin login gate.
+  - Google login provider remains available.
 - Turso seed result:
   - 30 total QR records
   - 30 active QR records

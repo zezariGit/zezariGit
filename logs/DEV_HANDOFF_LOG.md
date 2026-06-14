@@ -276,6 +276,17 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Time Spent
 - DB role design, admin authorization update, admin-management UI, migration, verification, and documentation: approximately 35 minutes.
 
+### Completion Update
+- GitHub commit:
+  - `7707d72 Add admin role management`
+- Vercel production deployment:
+  - `https://zezari-er1pv1m2t-zezari.vercel.app`
+- Public alias:
+  - `https://zezari.vercel.app`
+- Production verification:
+  - `/admin?section=admins` returned HTTP 200 and shows the admin login gate when logged out.
+  - `/api/auth/providers` returned HTTP 200 and includes Google provider.
+
 ## 2026-06-12 22:48 KST - Git Repository Initialized and Pushed to GitHub
 
 ### User Request
