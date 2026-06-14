@@ -11,7 +11,7 @@ export default function GuardianDashboard({ guardian, subjects, session, activeT
     guardian.name && guardian.login_id && guardian.password_hash && guardian.phone && guardian.email
   );
   const guardianActive = guardian.is_active !== 0;
-  const admin = isAdminSession(session);
+  const admin = isAdminSession(session) || Number(guardian.is_admin || 0) === 1;
   const isDashboard = activeTab !== "info";
 
   return (

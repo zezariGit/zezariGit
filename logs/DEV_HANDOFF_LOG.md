@@ -219,6 +219,63 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - `/admin` returned HTTP 200 and shows the admin login gate when logged out.
   - `/api/auth/providers` returned HTTP 200 and includes Google provider.
 
+## 2026-06-14 23:10 KST - Admin Role Management Tab
+
+### User Request
+- Add `관리자 관리` to the admin page alongside `보호자 관리` and `QR 관리`.
+- Allow an admin to grant administrator role to registered users/guardians.
+
+### Reflected Work
+- Added DB-based administrator role:
+  - `guardians.is_admin`
+  - `1`: DB administrator
+  - `0`: normal guardian
+- Kept environment-based base admins:
+  - `ADMIN_EMAILS`
+  - Default code fallback emails remain `general@zezari.com` and `soonsuboy10@gmail.com`.
+- Updated admin authorization:
+  - Access is allowed when the Google login email is in `ADMIN_EMAILS`.
+  - Access is also allowed when the logged-in guardian has `guardians.is_admin = 1`.
+- Added admin page tab:
+  - `/admin?section=admins`
+  - Shows registered guardians.
+  - Shows role badges: administrator, normal guardian, base admin, inactive user, subject count.
+  - Allows granting/removing DB admin role.
+  - Base admins are protected in the UI because their access is configured outside the DB.
+- Updated dashboard admin link visibility so DB admins also see the admin link after login.
+- Updated official deliverables and image prompt archive.
+
+### Database Details
+- Added column to Turso:
+  - `guardians.is_admin INTEGER NOT NULL DEFAULT 0`
+- Migration result:
+  - Registered guardians: `4`
+  - DB administrators after sync: `1`
+  - Existing default admin record matched and was updated.
+
+### Files Changed
+- `lib/admin.js`
+- `lib/db.js`
+- `app/admin/page.js`
+- `app/admin/actions.js`
+- `app/dashboard.js`
+- `app/globals.css`
+- `deliverables/ADMIN_SETUP.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` completed successfully.
+- `git diff --check` completed with no whitespace errors.
+- Local production server:
+  - `/admin?section=admins` returned HTTP 200.
+  - Logged-out users see the admin login gate.
+
+### Time Spent
+- DB role design, admin authorization update, admin-management UI, migration, verification, and documentation: approximately 35 minutes.
+
 ## 2026-06-12 22:48 KST - Git Repository Initialized and Pushed to GitHub
 
 ### User Request

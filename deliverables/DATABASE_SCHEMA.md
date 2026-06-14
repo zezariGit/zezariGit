@@ -22,6 +22,7 @@ Stores one guardian profile per logged-in Google user.
 | `phone` | TEXT | Contact phone number |
 | `email` | TEXT | Contact email |
 | `is_active` | INTEGER | `1` active, `0` inactive |
+| `is_admin` | INTEGER | `1` DB administrator, `0` normal guardian |
 | `created_at` | TEXT | Created timestamp |
 | `updated_at` | TEXT | Updated timestamp |
 
@@ -62,6 +63,7 @@ Stores QR codes and the unique public strings used as the final segment of peopl
 - Server-side save logic limits each guardian to 4 subjects.
 - Subject status is stored per subject and shown on the guardian dashboard.
 - Admin users can list guardians and activate/deactivate them.
+- Admin users can grant or revoke DB admin role for registered guardians.
 - Admin users can list QR codes, generate additional unique QR codes, and activate/deactivate each QR.
 - Public find pages can read QR status by `public_key` without login, but guardian/subject personal data is not exposed in this phase.
 

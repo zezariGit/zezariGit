@@ -23,3 +23,14 @@ Create a professional Korean civic-tech flow diagram for "REAL_QR_FIND" showing 
 
 ### Notes
 - Use for presentation material explaining how QR records connect to public people-finding URLs.
+
+## 2026-06-14 - Admin Role Management Flow
+
+### Purpose
+- Presentation diagram for managing administrators from registered guardian users.
+
+### Prompt
+Create a clean Korean public-service style system diagram for "REAL_QR_FIND" administrator role management. Show Google login leading to registered guardian users, a database field `guardians.is_admin`, and an admin page tab labeled "관리자 관리" where an existing admin grants or revokes administrator role for a guardian. Also show environment-based base admins as protected access outside the database. Use white cards, blue civic-tech accents, green enabled states, and neutral gray database/security icons. Avoid real personal information.
+
+### Notes
+- Use for explaining the difference between base admins from environment variables and DB-admin users granted through the admin page.

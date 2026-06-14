@@ -1,10 +1,15 @@
 import { getServerSession } from "next-auth";
 import QRCode from "qrcode";
 import { GoogleLoginButton, LogoutButton } from "../auth-actions";
-import { isAdminSession } from "../../lib/admin";
+import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
 import { authOptions } from "../../lib/auth";
-import { getAdminData, getQrAdminData } from "../../lib/db";
-import { generateQrCodesAction, setGuardianActiveAction, setQrActiveAction } from "./actions";
+import { getAdminData, getAdminUsersData, getQrAdminData, isDbAdminSession } from "../../lib/db";
+import {
+  generateQrCodesAction,
+  setGuardianActiveAction,
+  setGuardianAdminAction,
+  setQrActiveAction,
+} from "./actions";
 
 export default async function AdminPage({ searchParams }) {
   const session = await getServerSession(authOptions);
@@ -22,7 +27,8 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  if (!isAdminSession(session)) {
+  const adminAuthorized = isAdminSession(session) || (await isDbAdminSession(session));
+  if (!adminAuthorized) {
     return (
       <main className="admin-page">
         <section className="admin-empty">
@@ -34,11 +40,21 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = resolvedSearchParams?.section === "qr" ? "qr" : "guardians";
+  const activeSection = ["qr", "admins"].includes(resolvedSearchParams?.section)
+    ? resolvedSearchParams.section
+    : "guardians";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
   const adminData = activeSection === "guardians" ? await getAdminData(selectedGuardianId) : null;
   const qrData = activeSection === "qr" ? await getQrAdminData() : null;
+  const adminUsersData = activeSection === "admins" ? await getAdminUsersData() : null;
   const qrItems = qrData ? await withQrImages(qrData.qrCodes) : [];
+  const title = activeSection === "qr" ? "QR 관리" : activeSection === "admins" ? "관리자 관리" : "보호자 관리";
+  const description =
+    activeSection === "qr"
+      ? "사람찾기 URL로 연결되는 QR 코드와 고유 문자열을 생성하고 활성 상태를 관리합니다."
+      : activeSection === "admins"
+        ? "가입된 보호자 사용자에게 관리자 역할을 부여하거나 회수합니다."
+        : "보호자를 활성화/비활성화하고, 선택한 보호자의 관리대상 4명을 조회합니다.";
 
   return (
     <main className="admin-page">
@@ -46,12 +62,8 @@ export default async function AdminPage({ searchParams }) {
         <header className="admin-header">
           <div>
             <p className="intro-kicker">관리자</p>
-            <h1>{activeSection === "qr" ? "QR 관리" : "보호자 관리"}</h1>
-            <p>
-              {activeSection === "qr"
-                ? "사람찾기 URL로 연결되는 QR 코드와 고유 문자열을 생성하고 활성 상태를 관리합니다."
-                : "보호자를 활성화/비활성화하고, 선택한 보호자의 관리대상 4명을 조회합니다."}
-            </p>
+            <h1>{title}</h1>
+            <p>{description}</p>
           </div>
           <div className="admin-header-actions">
             <a className="admin-link" href="/">
@@ -68,15 +80,90 @@ export default async function AdminPage({ searchParams }) {
           <a className={activeSection === "qr" ? "active" : ""} href="/admin?section=qr">
             QR 관리
           </a>
+          <a className={activeSection === "admins" ? "active" : ""} href="/admin?section=admins">
+            관리자 관리
+          </a>
         </nav>
 
         {activeSection === "qr" ? (
           <QrManagementSection qrData={qrData} qrItems={qrItems} />
+        ) : activeSection === "admins" ? (
+          <AdminRoleManagementSection adminUsersData={adminUsersData} />
         ) : (
           <GuardianManagementSection adminData={adminData} />
         )}
       </section>
     </main>
+  );
+}
+
+function AdminRoleManagementSection({ adminUsersData }) {
+  const { users, adminCount } = adminUsersData;
+  const accessCount = users.filter((user) => user.is_admin || isBaseAdminUser(user)).length;
+
+  return (
+    <div className="qr-admin-stack">
+      <section className="admin-panel qr-create-panel">
+        <div>
+          <div className="panel-heading">
+            <h2>관리자 역할</h2>
+            <span>{accessCount}명</span>
+          </div>
+          <p className="empty-text">
+            가입된 보호자 중에서 관리자 페이지에 접근할 사용자를 선택합니다. 기본 관리자는 환경변수로
+            보호됩니다.
+          </p>
+        </div>
+        <div className="qr-stats" aria-label="관리자 권한 요약">
+          <span>DB 관리자 {adminCount}명</span>
+          <span>전체 사용자 {users.length}명</span>
+        </div>
+      </section>
+
+      <section className="admin-panel">
+        <div className="panel-heading">
+          <h2>가입된 사용자</h2>
+          <span>{users.length}명</span>
+        </div>
+        <div className="admin-user-grid">
+          {users.map((user) => {
+            const baseAdmin = isBaseAdminUser(user);
+            const dbAdmin = Number(user.is_admin || 0) === 1;
+            const hasAccess = baseAdmin || dbAdmin;
+
+            return (
+              <article className="admin-user-card" key={user.id}>
+                <div>
+                  <strong>{user.name || "이름 미입력"}</strong>
+                  <span>{user.email || user.google_email || "-"}</span>
+                  <span>{user.phone || "전화번호 미입력"}</span>
+                </div>
+                <div className="admin-role-badges">
+                  <em className={hasAccess ? "status-badge safe" : "status-badge neutral"}>
+                    {hasAccess ? "관리자" : "일반 보호자"}
+                  </em>
+                  {baseAdmin && <em className="status-badge qr-needed">기본관리자</em>}
+                  {!user.is_active && <em className="status-badge searching">비활성 사용자</em>}
+                  <em className="status-badge neutral">{user.subject_count || 0}/4명</em>
+                </div>
+                <form action={setGuardianAdminAction}>
+                  <input type="hidden" name="guardianId" value={user.id} />
+                  <input type="hidden" name="admin" value={dbAdmin ? "0" : "1"} />
+                  <button
+                    className={dbAdmin ? "danger-button compact" : "activate-button"}
+                    disabled={baseAdmin}
+                    type="submit"
+                  >
+                    {baseAdmin ? "기본관리자 유지" : dbAdmin ? "관리자 회수" : "관리자 부여"}
+                  </button>
+                </form>
+              </article>
+            );
+          })}
+          {users.length === 0 && <p className="empty-text">가입된 사용자가 없습니다.</p>}
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -265,4 +352,8 @@ function statusClass(status) {
   if (status === "찾는중") return "searching";
   if (status === "QR활성화필요") return "qr-needed";
   return "safe";
+}
+
+function isBaseAdminUser(user) {
+  return isDefaultAdminEmail(user.email) || isDefaultAdminEmail(user.google_email);
 }

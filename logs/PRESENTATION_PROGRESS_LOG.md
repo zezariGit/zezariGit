@@ -712,6 +712,45 @@ This file is the cumulative presentation-ready project log. It is written so the
 - Verified:
   - Admin page opens.
   - Google login provider remains available.
+
+## 2026-06-14 - Admin Role Management
+
+### Request
+- Add `관리자 관리` to the admin page.
+- Let an admin grant administrator role to registered guardian users.
+
+### Reflected Content
+- Added a new admin menu tab:
+  - `관리자 관리`
+- Added DB admin role field:
+  - `guardians.is_admin`
+- Admin access now works through either:
+  - Environment admin email list.
+  - DB admin role granted to a registered guardian.
+- The admin management screen lists registered users and lets admins grant or revoke DB admin role.
+- Base admins configured by environment are protected from role removal in the UI.
+
+### Result
+- 관리자 페이지에서 보호자 사용자에게 관리자 권한을 직접 부여할 수 있게 되었습니다.
+- 앞으로 새 운영자가 가입하면 기존 관리자가 화면에서 관리자 역할을 줄 수 있습니다.
+
+### Time Spent
+- DB role field, admin authorization, admin UI, migration, verification, and documentation: approximately 35 minutes.
+
+### Output
+- `app/admin/page.js`
+- `app/admin/actions.js`
+- `lib/db.js`
+- `lib/admin.js`
+- `deliverables/ADMIN_SETUP.md`
+- `deliverables/DATABASE_SCHEMA.md`
+
+### Verification
+- Local build succeeded.
+- Turso migration succeeded:
+  - Registered users: 4
+  - DB admins: 1
+- Local `/admin?section=admins` route returned HTTP 200 and showed the login gate while logged out.
 - Turso seed result:
   - 30 total QR records
   - 30 active QR records

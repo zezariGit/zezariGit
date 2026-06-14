@@ -1549,6 +1549,51 @@ textarea:focus {
   font-weight: 700;
 }
 
+.admin-user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-md);
+}
+
+.admin-user-card {
+  min-height: 190px;
+  display: grid;
+  align-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+}
+
+.admin-user-card strong {
+  display: block;
+  color: var(--c-text);
+  font-size: 1.02rem;
+}
+
+.admin-user-card span {
+  display: block;
+  margin-top: 4px;
+  color: var(--c-text-muted);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.admin-role-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+button:disabled,
+button:disabled:hover {
+  cursor: not-allowed;
+  border-color: var(--c-border);
+  background: #f1f2f4;
+  color: var(--c-text-muted);
+}
+
 .find-page {
   min-height: 100vh;
   display: grid;
