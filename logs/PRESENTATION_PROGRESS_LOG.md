@@ -660,3 +660,51 @@ This file is the cumulative presentation-ready project log. It is written so the
   - Admin page opens.
   - Latest PWA cache version is active.
   - Manifest theme color uses the gov-style blue.
+
+## 2026-06-14 - QR Code Management
+
+### Request
+- Create about 30 QR codes and QR-linked unique strings.
+- Store them in the database.
+- Let admins view and activate/deactivate QR codes.
+- Let admins generate more non-duplicated QR codes by desired count.
+- Use the unique string as the final URL segment for the people-finding page.
+
+### Reflected Content
+- Added a new `qr_codes` database table.
+- Seeded 30 initial active QR records.
+- Added an admin QR management tab:
+  - QR image
+  - QR label
+  - Unique string
+  - Public find URL
+  - Active/inactive status
+  - Additional QR generation form
+- Added the public route:
+  - `/find/{unique-string}`
+- Added active, inactive, and unknown QR display states.
+- Added official QR management deliverable and presentation image prompt.
+
+### Result
+- Admins can now manage QR code inventory from the admin page.
+- QR codes now point to a stable public people-finding URL pattern.
+- The project is ready for the next stage: assigning QR codes to managed people and adding report/contact flow.
+
+### Time Spent
+- QR DB design, unique generation, admin UI, public page, seeding, verification, and documentation: approximately 45 minutes.
+
+### Output
+- `lib/db.js`
+- `app/admin/page.js`
+- `app/admin/actions.js`
+- `app/find/[key]/page.js`
+- `deliverables/QR_MANAGEMENT.md`
+- `deliverables/DATABASE_SCHEMA.md`
+
+### Verification
+- Local build succeeded.
+- Turso seed result:
+  - 30 total QR records
+  - 30 active QR records
+- Local public QR URL returned HTTP 200 and displayed the active QR confirmation.
+- Admin QR URL returned HTTP 200 and showed the login gate while logged out.

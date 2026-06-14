@@ -72,6 +72,97 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `logs/DEV_HANDOFF_LOG.md`
 - `logs/PRESENTATION_PROGRESS_LOG.md`
 
+## 2026-06-14 22:37 KST - QR Code Management And Public Find URL
+
+### User Request
+- Generate and manage about 30 QR codes and QR-linked unique strings in the database.
+- Allow admins to view existing QR codes and unique strings.
+- Allow admins to activate/deactivate each QR.
+- Allow admins to generate any additional desired count of non-duplicated QR codes and strings using the same logic.
+- Use the unique QR-linked strings as the last segment of the people-finding page URL.
+
+### Reflected Work
+- Added Turso table support for `qr_codes`.
+- Added initial QR seeding logic to ensure at least 30 records.
+- Added unique generation logic:
+  - Admin-facing QR label: `ZRF-XXXX-XXXX`
+  - Public URL key: `zrf-{unique-string}`
+  - Public URL: `/find/{public_key}`
+- Added admin QR management section:
+  - `/admin?section=qr`
+  - QR image preview
+  - QR code label
+  - Unique public string
+  - Public find URL
+  - Active/inactive state
+  - Additional generation form
+- Added admin server actions:
+  - Generate QR codes
+  - Activate/deactivate QR codes
+- Added public find route:
+  - `/find/[key]`
+  - Unknown QR message
+  - Inactive QR message
+  - Active QR confirmation message
+- Added `qrcode` package to generate scan-ready QR images.
+- Updated PWA cache version to `zezari-v9`.
+- Added official QR management deliverable and updated DB schema deliverable.
+
+### Database Details
+- New table: `qr_codes`
+- Columns:
+  - `id`
+  - `code`
+  - `public_key`
+  - `target_url`
+  - `is_active`
+  - `created_at`
+  - `updated_at`
+- Indexes:
+  - `idx_qr_codes_public_key`
+  - `idx_qr_codes_active`
+- Initial production/Turso seed result:
+  - Created: `30`
+  - Total: `30`
+  - Active: `30`
+
+### Files Changed
+- `.env.example`
+- `package.json`
+- `package-lock.json`
+- `lib/db.js`
+- `app/admin/page.js`
+- `app/admin/actions.js`
+- `app/find/[key]/page.js`
+- `app/globals.css`
+- `public/sw.js`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/QR_MANAGEMENT.md`
+- `deliverables/README.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` completed successfully.
+- Build output includes:
+  - `/admin`
+  - `/find/[key]`
+- Turso QR seed script completed without printing secrets.
+- Local production server verification:
+  - `/find/{sample-active-key}` returned HTTP 200.
+  - Active QR confirmation content was present.
+  - `/admin?section=qr` returned HTTP 200 and showed the admin login gate while logged out.
+
+### Time Spent
+- QR schema, generation logic, admin UI, public find page, DB seeding, build checks, and documentation: approximately 45 minutes.
+
+### Next Actions
+- Connect QR codes to specific managed subjects.
+- Add QR assignment/reassignment controls in admin or guardian information entry.
+- Add the actual missing-person report/contact workflow to `/find/[key]`.
+- Decide whether inactive QR should show a public support contact or only a generic disabled message.
+
 ## 2026-06-12 22:48 KST - Git Repository Initialized and Pushed to GitHub
 
 ### User Request

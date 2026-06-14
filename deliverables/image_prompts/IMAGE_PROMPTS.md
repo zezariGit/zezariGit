@@ -12,3 +12,14 @@ Create a clean professional system-concept illustration for a project named "REA
 
 ### Notes
 - Use this only as a concept image, not as a final UI design.
+
+## 2026-06-14 - QR Generation And Find URL Flow
+
+### Purpose
+- Presentation diagram for the QR code lifecycle now implemented in the admin system.
+
+### Prompt
+Create a professional Korean civic-tech flow diagram for "REAL_QR_FIND" showing an administrator generating unique QR codes, storing QR labels and URL-safe public keys in a secure database, printing or distributing QR codes, and a finder scanning a QR that opens a public URL like `/find/{unique-key}`. Include active/inactive status controls, a database table concept, QR image cards, and a mobile find page. Use the same public-service visual style as a Korean government web service: clean white surfaces, blue accents, green success states, red inactive warning states, and clear arrows. Avoid real personal data and avoid cartoon exaggeration.
+
+### Notes
+- Use for presentation material explaining how QR records connect to public people-finding URLs.
