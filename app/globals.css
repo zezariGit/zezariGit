@@ -1106,3 +1106,300 @@ select:focus {
     justify-items: start;
   }
 }
+
+/* ============================================================
+   Gov-style integration overrides
+   모든 현재/향후 페이지의 앱 전용 클래스도 css/gov-style.css 토큰을 따르도록 보정
+   ============================================================ */
+:root {
+  --bg: var(--c-bg);
+  --ink: var(--c-text);
+  --muted: var(--c-text-muted);
+  --line: var(--c-border);
+  --accent: var(--c-primary);
+  --accent-strong: var(--c-primary-dark);
+  --accent-soft: var(--c-accent-light);
+  --purple: var(--c-primary);
+  --panel: var(--c-surface);
+}
+
+html,
+body {
+  font-family: var(--font);
+  background: var(--c-bg);
+  color: var(--c-text);
+}
+
+.page,
+.dashboard-page,
+.admin-page,
+.onboarding-page {
+  background: var(--c-bg);
+}
+
+.auth-panel,
+.dashboard-panel,
+.subject-card,
+.admin-panel,
+.admin-empty,
+.dashboard-menu,
+.onboarding-shell,
+.status-phone,
+.service-slide-card,
+.slide-visual {
+  background: var(--c-surface);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.auth-panel,
+.dashboard-panel,
+.admin-panel,
+.admin-empty {
+  padding: var(--space-lg);
+}
+
+.app-mark,
+.action,
+.dashboard-menu a.active,
+.primary-button {
+  background: var(--c-primary);
+  color: #ffffff;
+}
+
+.action,
+.install-action,
+.ghost-button,
+.primary-button,
+.danger-button,
+.activate-button,
+.admin-link,
+.plain-button,
+.dashboard-menu a,
+.quick-actions a {
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.action:hover,
+.primary-button:hover {
+  background: var(--c-primary-dark);
+}
+
+.google-action {
+  background: var(--c-surface);
+  color: var(--c-text);
+  border: 0.5px solid var(--c-border-strong);
+}
+
+.google-action:hover,
+.ghost-button:hover,
+.install-action:hover,
+.admin-link:hover,
+.dashboard-menu a:not(.active):hover {
+  background: var(--c-accent-light);
+  color: var(--c-primary-dark);
+  text-decoration: none;
+}
+
+.action.secondary,
+.install-action,
+.admin-link,
+.plain-button,
+.ghost-button {
+  background: var(--c-surface);
+  color: var(--c-primary-dark);
+  border: 0.5px solid var(--c-primary-border);
+}
+
+.brand,
+.dashboard-title,
+.admin-header h1,
+.dashboard-panel h2,
+.admin-empty h1,
+.selected-guardian h2,
+.slide-copy h2,
+.intro-label {
+  color: var(--c-text);
+  font-weight: 500;
+}
+
+.status,
+.dashboard-subtitle,
+.install-note,
+.session-email,
+.empty-text,
+.selected-guardian p,
+.guardian-row span,
+.admin-subject-card > span,
+.slide-copy p {
+  color: var(--c-text-muted);
+}
+
+.intro-kicker,
+.slide-number,
+.panel-heading span,
+.text-primary {
+  color: var(--c-primary-dark);
+}
+
+input,
+select,
+textarea {
+  min-height: 42px;
+  border: 0.5px solid var(--c-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-family: var(--font);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px rgba(46, 134, 193, 0.12);
+  outline: none;
+}
+
+.dashboard-menu {
+  padding: var(--space-xs);
+  border-color: var(--c-primary-border);
+  background: var(--c-primary-light);
+}
+
+.dashboard-menu a {
+  color: var(--c-info);
+  font-weight: 500;
+}
+
+.status-phone {
+  border-color: var(--c-primary-border);
+}
+
+.managed-list,
+.managed-card,
+.quick-actions a,
+.guardian-row,
+.admin-subject-card {
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+}
+
+.managed-list {
+  background: #f5fbff;
+}
+
+.managed-card,
+.guardian-row,
+.admin-subject-card {
+  background: var(--c-surface);
+}
+
+.guardian-row.active,
+.info-panel,
+.slide-visual {
+  border-color: var(--c-primary-border);
+  background: var(--c-accent-light);
+}
+
+.bell-icon,
+.quick-actions span {
+  border-color: var(--c-primary-dark);
+  background: var(--c-primary);
+  color: #ffffff;
+}
+
+.quick-actions a {
+  color: var(--c-text);
+}
+
+.managed-photo,
+.admin-subject-photo {
+  border-color: var(--c-primary-border);
+  background: var(--c-info-bg);
+}
+
+.managed-photo span,
+.admin-subject-photo span {
+  background: var(--c-primary-dark);
+  box-shadow: 0 20px 0 8px var(--c-primary-dark);
+}
+
+.admin-subject-photo span {
+  box-shadow: 0 26px 0 10px var(--c-primary-dark);
+}
+
+.status-badge.safe {
+  background: var(--c-success-bg);
+  color: var(--c-success);
+  border: 0.5px solid var(--c-success-border);
+}
+
+.status-badge.searching {
+  background: var(--c-danger-bg);
+  color: var(--c-danger);
+  border: 0.5px solid var(--c-danger-border);
+}
+
+.status-badge.qr-needed {
+  background: var(--c-warn-bg);
+  color: var(--c-warn);
+  border: 0.5px solid var(--c-warn-border);
+}
+
+.status-badge.neutral,
+.badge-default {
+  background: #f1f2f4;
+  color: #374151;
+  border: 0.5px solid var(--c-border);
+}
+
+.active-state {
+  color: var(--c-success);
+}
+
+.inactive-state,
+.danger-button {
+  color: var(--c-danger);
+}
+
+.danger-button {
+  background: var(--c-danger-bg);
+  border: 0.5px solid var(--c-danger-border);
+}
+
+.danger-button:hover {
+  background: #fecaca;
+}
+
+.activate-button {
+  background: var(--c-success-bg);
+  color: var(--c-success);
+  border: 0.5px solid var(--c-success-border);
+}
+
+.onboarding-page {
+  background:
+    linear-gradient(180deg, rgba(214, 234, 248, 0.72), rgba(247, 248, 250, 1));
+}
+
+.onboarding-shell {
+  border-color: var(--c-primary-border);
+}
+
+.slide-visual {
+  background:
+    linear-gradient(145deg, rgba(232, 244, 253, 0.95), rgba(255, 255, 255, 0.85)),
+    var(--c-surface);
+}
+
+.dot {
+  background: var(--c-primary-border);
+}
+
+.dot.active {
+  background: var(--c-primary);
+}

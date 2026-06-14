@@ -15,6 +15,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `ONBOARDING_FLOW.md`: three-page service introduction and skip behavior.
 - `DATABASE_SCHEMA.md`: Turso schema for guardians and subjects.
 - `ADMIN_SETUP.md`: admin page access, guardian activation, and subject lookup behavior.
+- `UI_STYLE_GUIDE.md`: gov-style design base and future page styling rules.
 
 ## Planned Deliverables
 - Requirements specification

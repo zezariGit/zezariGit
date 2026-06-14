@@ -929,6 +929,48 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - `/sw.js` returned HTTP 200 and includes cache version `zezari-v7`.
   - Admin authenticated behavior should be manually checked after signing in as an admin email.
 
+## 2026-06-14 21:00 KST - Gov Style Applied Globally
+
+### User Request
+- Use `css/gov-style.css` as a reference.
+- Apply the same style to all existing pages.
+- Make the style apply to future pages as well.
+
+### Reflected Work
+- Imported `css/gov-style.css` globally from `app/layout.js`.
+- Kept `app/globals.css` for app-specific layouts.
+- Added integration overrides so existing custom classes use gov-style tokens:
+  - Login page
+  - Onboarding
+  - Guardian dashboard
+  - Information entry screen
+  - Admin page
+  - PWA install UI
+- Updated PWA theme colors:
+  - `public/manifest.webmanifest`
+  - `app/layout.js` viewport theme color
+- Updated service worker cache version:
+  - `zezari-v8`
+- Added UI style guide deliverable:
+  - `deliverables/UI_STYLE_GUIDE.md`
+
+### Changed Files
+- `css/gov-style.css`
+- `app/layout.js`
+- `app/globals.css`
+- `public/manifest.webmanifest`
+- `public/sw.js`
+- `deliverables/UI_STYLE_GUIDE.md`
+- `deliverables/README.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` completed successfully.
+
+### Next Actions
+- Commit, push, deploy, and verify production routes.
+
 ### Verification
 - Commands completed:
   - `git config --global --get user.name`

@@ -1,3 +1,4 @@
+import "../css/gov-style.css";
 import "./globals.css";
 
 export const metadata = {
@@ -19,7 +20,7 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: "#176b5b",
+  themeColor: "#2e86c1",
 };
 
 export default function RootLayout({ children }) {

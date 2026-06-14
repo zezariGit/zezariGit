@@ -617,3 +617,34 @@ This file is the cumulative presentation-ready project log. It is written so the
   - Logged-out users see admin login gate.
   - Google login remains active.
   - Latest PWA cache version is active.
+
+## 2026-06-14 - Gov Style Applied
+
+### Request
+- Apply the style from `css/gov-style.css` to all current pages.
+- Make future pages use the same style.
+
+### Reflected Content
+- Connected `gov-style.css` globally.
+- Updated existing custom UI classes to follow gov-style tokens.
+- Applied the light-blue public-sector style to:
+  - Login
+  - Onboarding
+  - Dashboard
+  - Information entry
+  - Admin page
+- Updated PWA theme color.
+- Added a style guide deliverable for future pages.
+
+### Result
+- The app now has a shared design base for current and future pages.
+
+### Time Spent
+- Global CSS integration, style overrides, PWA theme update, build verification, and documentation: approximately 25 minutes.
+
+### Output
+- `css/gov-style.css`
+- `deliverables/UI_STYLE_GUIDE.md`
+- Updated `app/layout.js`
+- Updated `app/globals.css`
+- Updated PWA metadata
