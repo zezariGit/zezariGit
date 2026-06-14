@@ -179,6 +179,35 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - `/sw.js` includes cache version `zezari-v9`.
   - `/manifest.webmanifest` returned HTTP 200.
 
+## 2026-06-14 22:50 KST - Add Additional Admin Email
+
+### User Request
+- Grant admin access to the user with email:
+  - `soonsuboy10@gmail.com`
+
+### Reflected Work
+- Updated default admin email list in code:
+  - `general@zezari.com`
+  - `soonsuboy10@gmail.com`
+- Updated `.env.example` to document both admin emails.
+- Added Vercel `ADMIN_EMAILS` environment variable to:
+  - Production
+  - Development
+- Environment value:
+  - `general@zezari.com,soonsuboy10@gmail.com`
+
+### Files Changed
+- `lib/admin.js`
+- `.env.example`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` completed successfully.
+
+### Time Spent
+- Admin access update, Vercel env update, build verification, and logging: approximately 10 minutes.
+
 ## 2026-06-12 22:48 KST - Git Repository Initialized and Pushed to GitHub
 
 ### User Request

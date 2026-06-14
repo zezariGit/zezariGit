@@ -719,3 +719,23 @@ This file is the cumulative presentation-ready project log. It is written so the
   - Admin QR tab URL opens and shows the admin login gate when logged out.
   - A sample active QR finding URL opens.
   - PWA cache version was updated to `zezari-v9`.
+
+## 2026-06-14 - Additional Admin Email
+
+### Request
+- Give admin access to:
+  - `soonsuboy10@gmail.com`
+
+### Reflected Content
+- Added `soonsuboy10@gmail.com` to the default admin email list.
+- Added Vercel `ADMIN_EMAILS` for Production and Development with both admin emails.
+- Updated environment example documentation.
+
+### Result
+- Users logged in with `soonsuboy10@gmail.com` can access the admin page after the new production deployment.
+
+### Time Spent
+- Admin setting update, environment configuration, build verification, and documentation: approximately 10 minutes.
+
+### Verification
+- Local build succeeded.
