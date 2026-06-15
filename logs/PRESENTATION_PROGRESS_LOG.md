@@ -886,6 +886,53 @@ This file is the cumulative presentation-ready project log. It is written so the
 ### Verification
 - Local build succeeded.
 - Production prepare API remains protected and returns login-required while logged out.
+
+## 2026-06-15 - Subscription Options And Pause Resume
+
+### Request
+- Users should be able to pause/resume after subscribing.
+- Subscription service should support:
+  - 1 month
+  - 3 months
+  - 6 months
+- Admin should be able to configure prices for each option in the admin page.
+
+### Reflected Content
+- Added 1/3/6-month subscription options.
+- Added administrator price management:
+  - `/admin?section=payments`
+  - `결제 관리`
+- Added user dashboard controls:
+  - Plan selector before payment.
+  - `구독결제하기`.
+  - `구독중`.
+  - `일시정지`.
+  - `일시정지중`.
+  - `재개`.
+- Added DB support for subscription plan prices and subscription periods.
+- Updated Toss payment preparation so price is loaded from the server-side database.
+
+### Result
+- Subscription pricing can now be changed from the admin page.
+- Users can control app-level subscription pause/resume from the dashboard.
+- The app is ready to test payment for 1/3/6-month options.
+
+### Time Spent
+- Plan pricing schema, admin UI, dashboard controls, Toss prepare update, migration, verification, and docs: approximately 45 minutes.
+
+### Output
+- `subscription_plans` DB table.
+- `app/api/subscription/status/route.js`
+- Updated dashboard subscription component.
+- Updated admin payment-management screen.
+
+### Verification
+- Local build succeeded.
+- Turso migration succeeded:
+  - 1 existing subscription.
+  - 3 subscription plans seeded.
+- Local unauthenticated APIs return login-required.
+- Local admin payment route opens and shows login gate while logged out.
 - Turso seed result:
   - 30 total QR records
   - 30 active QR records

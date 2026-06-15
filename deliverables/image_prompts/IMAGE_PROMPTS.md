@@ -56,3 +56,14 @@ Create a clean Korean civic-tech architecture diagram for "REAL_QR_FIND" Toss Pa
 
 ### Notes
 - Use for explaining why the secret key stays on the server and why subscription status is updated only after server-side Toss API success.
+
+## 2026-06-15 - Subscription Plans And Pause Resume
+
+### Purpose
+- Presentation diagram for subscription option pricing and user pause/resume.
+
+### Prompt
+Create a clean Korean public-service style product flow diagram for "REAL_QR_FIND" subscription management. Show an admin page tab "결제 관리" where an administrator edits prices for 1개월, 3개월, and 6개월 plans. Show a guardian dashboard "현재 상태" area with a plan selector, "구독결제하기", "구독중", "일시정지", "일시정지중", and "재개" states. Include a Turso `subscription_plans` table and `subscriptions` table, plus a Toss Payments billing-key payment flow. Use white surfaces, civic blue accents, Toss blue, green active states, yellow paused states, and clear arrows. Avoid real payment data or secrets.
+
+### Notes
+- Use for explaining that plan prices are controlled by admin and service pause/resume is separate from billing-key deletion.

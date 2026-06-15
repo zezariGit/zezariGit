@@ -340,6 +340,12 @@ a {
   margin-left: auto;
 }
 
+.subscription-plan-select {
+  min-height: 34px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+}
+
 .subscription-button,
 .subscription-badge {
   min-height: 36px;
@@ -364,10 +370,26 @@ a {
   background: var(--c-primary-dark);
 }
 
+.subscription-button.secondary {
+  border-color: var(--c-warn-border);
+  background: var(--c-warn-bg);
+  color: var(--c-warn);
+}
+
+.subscription-button.secondary:hover {
+  background: #fdecc8;
+}
+
 .subscription-badge.active {
   border: 0.5px solid var(--c-success-border);
   background: var(--c-success-bg);
   color: var(--c-success);
+}
+
+.subscription-badge.paused {
+  border: 0.5px solid var(--c-warn-border);
+  background: var(--c-warn-bg);
+  color: var(--c-warn);
 }
 
 .subscription-message {
@@ -420,6 +442,51 @@ a {
   background: var(--c-danger-bg);
   color: var(--c-danger) !important;
   overflow-wrap: anywhere;
+}
+
+.payment-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-md);
+}
+
+.payment-plan-card {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+}
+
+.payment-plan-card strong,
+.payment-plan-card span {
+  display: block;
+}
+
+.payment-plan-card strong {
+  color: var(--c-text);
+  font-size: 1rem;
+}
+
+.payment-plan-card span {
+  margin-top: 4px;
+  color: var(--c-text-muted);
+  font-size: 0.9rem;
+}
+
+.payment-plan-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--space-xs);
+}
+
+.payment-plan-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--c-text);
+  font-weight: 500;
 }
 
 .bell-icon {

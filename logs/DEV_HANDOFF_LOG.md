@@ -546,6 +546,99 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - Vercel `TOSS_CLIENT_KEY` and `TOSS_SECRET_KEY` for deployed environments.
 - No source code change is needed when only replacing keys.
 
+## 2026-06-15 01:20 KST - Subscription Plans, Pause, Resume
+
+### User Request
+- After subscription, users should be able to pause/resume with buttons.
+- Subscription service should offer 1-month, 3-month, and 6-month options.
+- Admin should be able to configure prices for each option from the admin page.
+
+### Reflected Work
+- Added subscription plan table:
+  - `subscription_plans`
+  - Options: 1, 3, 6 months.
+  - Default prices:
+    - 1 month: `9900`
+    - 3 months: `27000`
+    - 6 months: `50000`
+- Added admin payment management section:
+  - `/admin?section=payments`
+  - Menu label: `결제 관리`
+  - Admin can edit option prices.
+- Extended subscription records:
+  - `plan_months`
+  - `current_period_start`
+  - `current_period_end`
+  - `paused_at`
+  - `resumed_at`
+- Updated dashboard subscription UI:
+  - Non-subscribed users choose 1/3/6 months and click `구독결제하기`.
+  - Active subscribers see `구독중` and `일시정지`.
+  - Paused subscribers see `일시정지중` and `재개`.
+- Added user subscription status API:
+  - `POST /api/subscription/status`
+  - Requires login.
+  - Accepts `pause` or `resume`.
+- Updated Toss prepare API:
+  - Accepts `planMonths`.
+  - Resolves price server-side from `subscription_plans`.
+  - Does not trust client-provided amount.
+- Updated Toss success flow:
+  - Uses selected plan name and DB amount.
+  - Sets current subscription period based on selected months.
+- Updated PWA cache version:
+  - `zezari-v12`
+
+### Important Behavior Note
+- Pause/resume currently controls the app service state (`active`/`paused`).
+- It does not delete Toss billing keys or unregister cards.
+- Future recurring billing scheduler must respect `paused` before charging again.
+
+### Database Migration Result
+- Existing subscriptions: `1`
+- Plans:
+  - `{ months: 1, amount: 9900 }`
+  - `{ months: 3, amount: 27000 }`
+  - `{ months: 6, amount: 50000 }`
+
+### Files Changed
+- `lib/db.js`
+- `app/dashboard.js`
+- `app/toss-subscription-button.js`
+- `app/api/payments/toss/subscription/prepare/route.js`
+- `app/api/subscription/status/route.js`
+- `app/payments/toss/subscription/success/page.js`
+- `app/admin/page.js`
+- `app/admin/actions.js`
+- `app/globals.css`
+- `public/sw.js`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/TOSS_PAYMENTS_SETUP.md`
+- `deliverables/PWA_SETUP.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` completed successfully.
+- `git diff --check` completed with no whitespace errors.
+- Build output includes:
+  - `/api/subscription/status`
+  - `/api/payments/toss/subscription/prepare`
+  - Toss success/fail pages.
+- Local production server checks:
+  - `POST /api/subscription/status` returned HTTP 401 while logged out.
+  - `POST /api/payments/toss/subscription/prepare` returned HTTP 401 while logged out.
+  - `/admin?section=payments` returned HTTP 200 and showed the admin login gate while logged out.
+
+### Time Spent
+- Plan schema, admin pricing UI, user pause/resume, Toss prepare update, migration, verification, and documentation: approximately 45 minutes.
+
+### Next Actions
+- Test authenticated subscription payment with each plan option.
+- Confirm paused subscriptions are excluded when future recurring billing scheduler is added.
+- Add billing-key/card cancellation if the service needs full subscription cancellation rather than app-level pause.
+
 ## 2026-06-12 22:48 KST - Git Repository Initialized and Pushed to GitHub
 
 ### User Request

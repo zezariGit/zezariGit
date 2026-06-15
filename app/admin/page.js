@@ -3,12 +3,19 @@ import QRCode from "qrcode";
 import { LogoutButton, SocialLoginButtons } from "../auth-actions";
 import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
 import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
-import { getAdminData, getAdminUsersData, getQrAdminData, isDbAdminSession } from "../../lib/db";
+import {
+  getAdminData,
+  getAdminSubscriptionPlansData,
+  getAdminUsersData,
+  getQrAdminData,
+  isDbAdminSession,
+} from "../../lib/db";
 import {
   generateQrCodesAction,
   setGuardianActiveAction,
   setGuardianAdminAction,
   setQrActiveAction,
+  setSubscriptionPlanPriceAction,
 } from "./actions";
 
 export default async function AdminPage({ searchParams }) {
@@ -41,21 +48,31 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["qr", "admins"].includes(resolvedSearchParams?.section)
+  const activeSection = ["qr", "admins", "payments"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "guardians";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
   const adminData = activeSection === "guardians" ? await getAdminData(selectedGuardianId) : null;
   const qrData = activeSection === "qr" ? await getQrAdminData() : null;
   const adminUsersData = activeSection === "admins" ? await getAdminUsersData() : null;
+  const paymentData = activeSection === "payments" ? await getAdminSubscriptionPlansData() : null;
   const qrItems = qrData ? await withQrImages(qrData.qrCodes) : [];
-  const title = activeSection === "qr" ? "QR 관리" : activeSection === "admins" ? "관리자 관리" : "보호자 관리";
+  const title =
+    activeSection === "qr"
+      ? "QR 관리"
+      : activeSection === "admins"
+        ? "관리자 관리"
+        : activeSection === "payments"
+          ? "결제 관리"
+          : "보호자 관리";
   const description =
     activeSection === "qr"
       ? "사람찾기 URL로 연결되는 QR 코드와 고유 문자열을 생성하고 활성 상태를 관리합니다."
       : activeSection === "admins"
         ? "가입된 보호자 사용자에게 관리자 역할을 부여하거나 회수합니다."
-        : "보호자를 활성화/비활성화하고, 선택한 보호자의 관리대상 4명을 조회합니다.";
+        : activeSection === "payments"
+          ? "구독 옵션별 기간과 가격을 관리합니다."
+          : "보호자를 활성화/비활성화하고, 선택한 보호자의 관리대상 4명을 조회합니다.";
 
   return (
     <main className="admin-page">
@@ -84,17 +101,57 @@ export default async function AdminPage({ searchParams }) {
           <a className={activeSection === "admins" ? "active" : ""} href="/admin?section=admins">
             관리자 관리
           </a>
+          <a className={activeSection === "payments" ? "active" : ""} href="/admin?section=payments">
+            결제 관리
+          </a>
         </nav>
 
         {activeSection === "qr" ? (
           <QrManagementSection qrData={qrData} qrItems={qrItems} />
         ) : activeSection === "admins" ? (
           <AdminRoleManagementSection adminUsersData={adminUsersData} />
+        ) : activeSection === "payments" ? (
+          <PaymentManagementSection paymentData={paymentData} />
         ) : (
           <GuardianManagementSection adminData={adminData} />
         )}
       </section>
     </main>
+  );
+}
+
+function PaymentManagementSection({ paymentData }) {
+  const { plans } = paymentData;
+
+  return (
+    <div className="qr-admin-stack">
+      <section className="admin-panel">
+        <div className="panel-heading">
+          <h2>구독 옵션 가격</h2>
+          <span>{plans.length}개</span>
+        </div>
+        <div className="payment-plan-grid">
+          {plans.map((plan) => (
+            <article className="payment-plan-card" key={plan.months}>
+              <div>
+                <strong>{plan.name}</strong>
+                <span>{plan.months}개월 옵션</span>
+              </div>
+              <form action={setSubscriptionPlanPriceAction} className="payment-plan-form">
+                <input type="hidden" name="months" value={plan.months} />
+                <label>
+                  가격
+                  <input name="amount" type="number" min="0" step="100" defaultValue={plan.amount} />
+                </label>
+                <button className="primary-button compact" type="submit">
+                  저장
+                </button>
+              </form>
+            </article>
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }
 

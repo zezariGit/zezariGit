@@ -30,7 +30,7 @@ Project: REAL_QR_FIND / zezari
 - Background color: `#f6f8f7`
 
 ## Service Worker
-- Current cache name: `zezari-v11`
+- Current cache name: `zezari-v12`
 - Caches app shell:
   - `/`
   - `/manifest.webmanifest`

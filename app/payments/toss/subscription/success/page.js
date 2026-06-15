@@ -36,7 +36,7 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
       customerKey,
       amount: Number(subscription.amount || process.env.TOSS_SUBSCRIPTION_AMOUNT || 9900),
       orderId,
-      orderName: process.env.TOSS_SUBSCRIPTION_ORDER_NAME || "zezari 월 구독",
+      orderName: subscription.plan_name || process.env.TOSS_SUBSCRIPTION_ORDER_NAME || "zezari 월 구독",
     });
 
     await markSubscriptionActive({

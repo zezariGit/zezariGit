@@ -69,13 +69,31 @@ Stores Toss Payments subscription/billing state for a guardian.
 | `billing_key` | TEXT | Toss billing key, server-side only |
 | `status` | TEXT | `ready`, `active`, `failed`, etc. |
 | `plan_name` | TEXT | Subscription plan identifier |
+| `plan_months` | INTEGER | Selected plan duration: `1`, `3`, or `6` |
 | `amount` | INTEGER | Subscription amount in KRW |
 | `currency` | TEXT | Currency, currently `KRW` |
+| `current_period_start` | TEXT | Current subscription period start |
+| `current_period_end` | TEXT | Current subscription period end |
+| `paused_at` | TEXT | Last pause timestamp |
+| `resumed_at` | TEXT | Last resume timestamp |
 | `last_order_id` | TEXT | Last Toss billing order ID |
 | `last_payment_key` | TEXT | Last Toss payment key |
 | `last_payment_status` | TEXT | Last Toss payment status |
 | `error_code` | TEXT | Last Toss or app error code |
 | `error_message` | TEXT | Last Toss or app error message |
+| `created_at` | TEXT | Created timestamp |
+| `updated_at` | TEXT | Updated timestamp |
+
+### subscription_plans
+
+Stores administrator-managed subscription plan prices.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `months` | INTEGER | Primary key: `1`, `3`, or `6` |
+| `name` | TEXT | Plan display name |
+| `amount` | INTEGER | Plan amount in KRW |
+| `is_active` | INTEGER | `1` active, `0` inactive |
 | `created_at` | TEXT | Created timestamp |
 | `updated_at` | TEXT | Updated timestamp |
 
@@ -90,6 +108,8 @@ Stores Toss Payments subscription/billing state for a guardian.
 - Public find pages can read QR status by `public_key` without login, but guardian/subject personal data is not exposed in this phase.
 - Logged-in guardians can start Toss Payments subscription billing from the dashboard.
 - Subscription is marked active only after server-side Toss billing API succeeds.
+- Logged-in guardians can pause/resume their own subscription service state.
+- Admin users can edit 1/3/6-month subscription option prices.
 
 ## Upload Rules
 - Photo file must be an image.
@@ -104,6 +124,7 @@ Stores Toss Payments subscription/billing state for a guardian.
   - `subjects`
   - `qr_codes`
   - `subscriptions`
+  - `subscription_plans`
 
 ## Dashboard Flow
 - Logged-in guardians enter the dashboard route first.
