@@ -10,6 +10,7 @@ import {
   setGuardianActive,
   setGuardianAdmin,
   setQrActive,
+  setQrSubject,
   setSubscriptionPlanPrice,
 } from "../../lib/db";
 
@@ -34,6 +35,14 @@ export async function setQrActiveAction(formData) {
   if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
 
   await setQrActive(formData);
+  revalidatePath("/admin");
+}
+
+export async function setQrSubjectAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  await setQrSubject(formData);
   revalidatePath("/admin");
 }
 

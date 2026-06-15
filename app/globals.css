@@ -1685,6 +1685,23 @@ textarea:focus {
   color: var(--c-text);
 }
 
+.qr-filter-panel {
+  padding: var(--space-md);
+}
+
+.qr-filter-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr)) auto auto;
+  align-items: end;
+  gap: var(--space-sm);
+}
+
+.qr-filter-form label,
+.qr-match-form label {
+  font-weight: 500;
+  color: var(--c-text);
+}
+
 .qr-stats {
   display: flex;
   flex-wrap: wrap;
@@ -1771,6 +1788,22 @@ textarea:focus {
 .qr-card-footer em {
   font-style: normal;
   font-weight: 700;
+}
+
+.qr-match-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--space-xs);
+  padding-top: var(--space-xs);
+  border-top: 0.5px solid var(--c-border);
+}
+
+.qr-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-xs);
 }
 
 .admin-user-grid {
@@ -1953,7 +1986,9 @@ button:disabled:hover {
 @media (max-width: 720px) {
   .qr-create-panel,
   .qr-create-form,
+  .qr-filter-form,
   .qr-card,
+  .qr-match-form,
   .find-profile,
   .find-contact-grid {
     grid-template-columns: 1fr;
@@ -1966,5 +2001,9 @@ button:disabled:hover {
   .qr-card-footer {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .qr-card-actions {
+    justify-content: flex-start;
   }
 }

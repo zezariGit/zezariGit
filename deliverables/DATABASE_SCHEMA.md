@@ -121,6 +121,9 @@ Stores administrator-managed subscription plan prices.
 - Admin users can list guardians and activate/deactivate them.
 - Admin users can grant or revoke DB admin role for registered guardians.
 - Admin users can list QR codes, generate additional unique QR codes, and activate/deactivate each QR.
+- Admin users can filter QR codes by matching status and activation status.
+- Admin users can manually assign, change, or clear a QR-to-subject match.
+- Manual assignment clears any previous QR assignment for the selected subject before assigning it to the selected QR.
 - Public find pages can read QR status by `public_key` without login.
 - When a QR is assigned to a subject, the public find page shows subject basic information and guardian contact information so the finder can respond.
 - Each subject receives one QR assignment. Because each guardian can register up to 4 subjects, one guardian can have up to 4 assigned QR codes.

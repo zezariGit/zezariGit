@@ -15,6 +15,7 @@ import {
   setGuardianActiveAction,
   setGuardianAdminAction,
   setQrActiveAction,
+  setQrSubjectAction,
   setSubscriptionPlanPriceAction,
 } from "./actions";
 
@@ -52,8 +53,12 @@ export default async function AdminPage({ searchParams }) {
     ? resolvedSearchParams.section
     : "guardians";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
+  const qrFilters = {
+    match: resolvedSearchParams?.match || "all",
+    active: resolvedSearchParams?.active || "all",
+  };
   const adminData = activeSection === "guardians" ? await getAdminData(selectedGuardianId) : null;
-  const qrData = activeSection === "qr" ? await getQrAdminData() : null;
+  const qrData = activeSection === "qr" ? await getQrAdminData(qrFilters) : null;
   const adminUsersData = activeSection === "admins" ? await getAdminUsersData() : null;
   const paymentData = activeSection === "payments" ? await getAdminSubscriptionPlansData() : null;
   const qrItems = qrData ? await withQrImages(qrData.qrCodes) : [];
@@ -341,13 +346,43 @@ function QrManagementSection({ qrData, qrItems }) {
         <div className="qr-stats" aria-label="QR 상태 요약">
           <span>활성 {qrData.activeCount}개</span>
           <span>비활성 {qrData.inactiveCount}개</span>
+          <span>매칭 {qrData.matchedCount}개</span>
+          <span>미매칭 {qrData.unmatchedCount}개</span>
         </div>
+      </section>
+
+      <section className="admin-panel qr-filter-panel">
+        <form className="qr-filter-form" action="/admin">
+          <input type="hidden" name="section" value="qr" />
+          <label>
+            매칭상태
+            <select name="match" defaultValue={qrData.filters.match}>
+              <option value="all">전체</option>
+              <option value="matched">관리대상 매칭됨</option>
+              <option value="unmatched">관리대상 미매칭</option>
+            </select>
+          </label>
+          <label>
+            활성상태
+            <select name="active" defaultValue={qrData.filters.active}>
+              <option value="all">전체</option>
+              <option value="active">활성</option>
+              <option value="inactive">비활성</option>
+            </select>
+          </label>
+          <button className="primary-button compact" type="submit">
+            필터 적용
+          </button>
+          <a className="admin-link" href="/admin?section=qr">
+            초기화
+          </a>
+        </form>
       </section>
 
       <section className="admin-panel">
         <div className="panel-heading">
           <h2>생성된 QR</h2>
-          <span>{qrItems.length}개</span>
+          <span>{qrData.filteredCount}/{qrData.total}개</span>
         </div>
         <div className="qr-grid">
           {qrItems.map((qr) => (
@@ -365,17 +400,48 @@ function QrManagementSection({ qrData, qrItems }) {
                 <a href={qr.target_url} target="_blank" rel="noreferrer">
                   {qr.target_url}
                 </a>
+                <form action={setQrSubjectAction} className="qr-match-form">
+                  <input type="hidden" name="qrId" value={qr.id} />
+                  <label>
+                    관리대상 매칭
+                    <select name="subjectId" defaultValue={qr.subject_id || ""}>
+                      <option value="">미매칭</option>
+                      {qrData.subjects.map((subject) => (
+                        <option value={subject.id} key={subject.id}>
+                          {subject.guardian_name || subject.guardian_email || "보호자 미입력"} / {subject.name}
+                          {subject.assigned_qr_id && subject.assigned_qr_id !== qr.id
+                            ? ` - 현재 ${subject.assigned_qr_code} 배정`
+                            : ""}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <button className="primary-button compact" type="submit">
+                    {qr.subject_id ? "매칭 변경" : "매칭 저장"}
+                  </button>
+                </form>
                 <div className="qr-card-footer">
                   <em className={qr.is_active ? "active-state" : "inactive-state"}>
                     {qr.is_active ? "활성" : "비활성"}
                   </em>
-                  <form action={setQrActiveAction}>
-                    <input type="hidden" name="qrId" value={qr.id} />
-                    <input type="hidden" name="active" value={qr.is_active ? "0" : "1"} />
-                    <button className={qr.is_active ? "danger-button compact" : "activate-button"} type="submit">
-                      {qr.is_active ? "비활성화" : "활성화"}
-                    </button>
-                  </form>
+                  <div className="qr-card-actions">
+                    {qr.subject_id && (
+                      <form action={setQrSubjectAction}>
+                        <input type="hidden" name="qrId" value={qr.id} />
+                        <input type="hidden" name="subjectId" value="" />
+                        <button className="danger-button compact" type="submit">
+                          매칭 해제
+                        </button>
+                      </form>
+                    )}
+                    <form action={setQrActiveAction}>
+                      <input type="hidden" name="qrId" value={qr.id} />
+                      <input type="hidden" name="active" value={qr.is_active ? "0" : "1"} />
+                      <button className={qr.is_active ? "danger-button compact" : "activate-button"} type="submit">
+                        {qr.is_active ? "비활성화" : "활성화"}
+                      </button>
+                    </form>
+                  </div>
                 </div>
               </div>
             </article>

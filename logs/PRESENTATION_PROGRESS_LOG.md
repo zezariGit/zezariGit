@@ -980,6 +980,45 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### Verification
 - Local build succeeded.
+## 2026-06-15 - QR 필터 및 수동 매칭 기능 추가
+
+### 요구내용
+- QR 관리에서 관리대상과 매칭된 QR을 필터링해서 볼 수 있게 한다.
+- 활성/비활성 QR도 필터링할 수 있게 한다.
+- 관리자가 수동으로 QR 매칭, 변경, 해제를 할 수 있게 한다.
+
+### 반영내용
+- QR 관리 상단에 필터 추가:
+  - 매칭상태: 전체 / 관리대상 매칭됨 / 관리대상 미매칭
+  - 활성상태: 전체 / 활성 / 비활성
+- QR 통계 표시 확장:
+  - 활성
+  - 비활성
+  - 매칭
+  - 미매칭
+- 각 QR 카드에 관리대상 선택 박스 추가.
+- 각 QR 카드에 `매칭 저장` 또는 `매칭 변경` 버튼 추가.
+- 이미 매칭된 QR에는 `매칭 해제` 버튼 추가.
+- 관리대상을 다른 QR에 매칭하면 이전 QR 배정은 자동 해제되도록 처리.
+
+### 산출물
+- `deliverables/QR_MANAGEMENT.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+
+### 검증
+- 로컬 빌드 성공.
+- Turso 기준 QR 통계 조회 성공:
+  - 전체 30개
+  - 활성 30개
+  - 비활성 0개
+  - 매칭 2개
+  - 미매칭 28개
+  - 관리대상 선택 옵션 2개
+
+### 반영 시간
+- 구현, DB 조회 검증, 문서/로그 반영: 약 25분.
+
 ## 2026-06-15 - QR 관리 페이지 서버 오류 수정
 
 ### 요구내용

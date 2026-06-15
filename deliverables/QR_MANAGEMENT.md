@@ -18,12 +18,16 @@ Project: REAL_QR_FIND / zezari
    - Assigned guardian
    - Assigned managed subject
    - Active/inactive status
-4. Admin can activate or deactivate each QR.
-5. Admin can generate additional unique QR codes by entering a desired count.
-6. Public QR URLs resolve to:
+4. Admin can filter QR records by:
+   - all/matched/unmatched
+   - all/active/inactive
+5. Admin can activate or deactivate each QR.
+6. Admin can manually assign, change, or clear a QR-to-subject match.
+7. Admin can generate additional unique QR codes by entering a desired count.
+8. Public QR URLs resolve to:
    - `/find/{public_key}`
-7. When a guardian creates or edits a subject, the server assigns one available QR to that subject.
-8. If no unassigned QR remains, the server generates a new QR and assigns it.
+9. When a guardian creates or edits a subject, the server assigns one available QR to that subject if no QR is already assigned.
+10. If no unassigned QR remains, the server generates a new QR and assigns it.
 
 ## Database
 - Table: `qr_codes`
@@ -54,6 +58,8 @@ Project: REAL_QR_FIND / zezari
   - one `subjects.id` maps to one `qr_codes.subject_id`.
   - `qr_codes.subject_id` is enforced with a unique index.
   - deleted subjects release their QR assignment.
+  - manual admin assignment moves the selected subject from any previous QR to the newly selected QR.
+  - manual clear sets `qr_codes.guardian_id` and `qr_codes.subject_id` back to `NULL`.
 - Duplicate prevention:
   - The server checks both `code` and `public_key` before insert.
   - Generation retries on collision.
@@ -71,3 +77,5 @@ Project: REAL_QR_FIND / zezari
 - Turso `qr_codes` table created.
 - 30 initial QR records inserted.
 - Public route `/find/[key]` is included in the Next.js build output.
+- QR filter stats verified against Turso.
+- Subject option list verified against Turso.

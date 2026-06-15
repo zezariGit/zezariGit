@@ -78,3 +78,14 @@ Create a clean Korean public-service style system flow diagram for "REAL_QR_FIND
 
 ### Notes
 - Use for explaining the one-subject-one-QR assignment rule and the push notification path from public QR page to guardian device.
+
+## 2026-06-15 - Admin QR Filtering And Manual Matching
+
+### Purpose
+- Presentation diagram for the administrator's QR filtering and manual QR-to-subject matching controls.
+
+### Prompt
+Create a clean Korean public-service style admin workflow diagram for "REAL_QR_FIND" QR management. Show an admin page with filters for "전체/매칭됨/미매칭" and "전체/활성/비활성", QR cards with QR image, unique code, URL, active state, assigned guardian, and assigned managed subject. Show controls for "매칭 저장", "매칭 변경", "매칭 해제", and "활성화/비활성화". Include a Turso database relationship where one QR can be assigned to one managed subject, and changing a match moves the subject away from the old QR. Use white surfaces, civic blue accents, green active states, red inactive states, and clear database arrows. Avoid real personal data.
+
+### Notes
+- Use for explaining the manual operations administrators can perform after QR generation.

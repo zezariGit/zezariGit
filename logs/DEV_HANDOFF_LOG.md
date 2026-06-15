@@ -1638,6 +1638,67 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Changed Files
 - `logs/DEV_HANDOFF_LOG.md`
 - `logs/PRESENTATION_PROGRESS_LOG.md`
+## 2026-06-15 20:45 KST - QR Admin Filtering And Manual Matching
+
+### User Request
+- In QR management, add filters to view:
+  - QR codes matched with managed subjects.
+  - active/inactive QR codes.
+- Add manual QR matching features:
+  - assign
+  - change
+  - clear/unmatch
+
+### Reflected Work
+- Added QR admin filters:
+  - `match=all|matched|unmatched`
+  - `active=all|active|inactive`
+- Added QR stats:
+  - total
+  - active
+  - inactive
+  - matched
+  - unmatched
+  - filtered count
+- Added subject option list to QR admin data.
+- Added admin server action:
+  - `setQrSubjectAction`
+- Added DB function:
+  - `setQrSubject`
+- Manual matching behavior:
+  - selecting a subject and saving assigns that subject to the selected QR.
+  - if that subject was already assigned to another QR, the previous QR is cleared first.
+  - `매칭 해제` clears `guardian_id` and `subject_id` on the QR.
+- Updated QR admin cards with:
+  - matching select box.
+  - `매칭 저장` / `매칭 변경` button.
+  - `매칭 해제` button for assigned QR codes.
+
+### Files Changed
+- `lib/db.js`
+- `app/admin/actions.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `deliverables/QR_MANAGEMENT.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- Turso QR stats query succeeded:
+  - total QR: 30
+  - active QR: 30
+  - inactive QR: 0
+  - matched QR: 2
+  - unmatched QR: 28
+  - subject options: 2
+
+### Notes
+- No database migration required; this uses existing `qr_codes.guardian_id` and `qr_codes.subject_id`.
+- The uploaded screenshot folder under `.codex-remote-attachments/` remains untracked and was not included.
+
 ## 2026-06-15 20:30 KST - Fix QR Admin Server Error
 
 ### User Request
