@@ -2177,3 +2177,29 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `https://zezari.vercel.app` returned HTTP 200.
 - `https://zezari.vercel.app/admin?section=qr&assignQr=test` returned HTTP 200.
 - Unauthenticated admin route showed the admin login gate.
+
+## 2026-06-16 KST - Mobile Dashboard Managed Card Alignment
+
+### User Request
+- On mobile dashboard, managed subject cards are visually asymmetric.
+- Align the cards so the layout is balanced and consistently ordered.
+
+### Reflected Work
+- Updated mobile-only dashboard card CSS under `@media (max-width: 560px)`.
+- Managed subject cards now use:
+  - top row: photo column + subject information column.
+  - bottom row: status badge + advertisement button in two equal columns.
+- Increased mobile card padding/gap for consistent spacing.
+- Set mobile photo size to `58px`.
+- Made status badge and advertisement button full-width within their equal action columns.
+- Added empty-card fallback alignment for the direct status badge case.
+
+### Files Changed
+- `app/globals.css`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- Local `http://localhost:3000/` returned HTTP 200.
+- In-app browser verification was attempted, but the Browser plugin reported `iab` unavailable in this session.
