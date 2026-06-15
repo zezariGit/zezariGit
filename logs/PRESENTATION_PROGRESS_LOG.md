@@ -980,6 +980,27 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### Verification
 - Local build succeeded.
+## 2026-06-15 - QR 관리 페이지 서버 오류 수정
+
+### 요구내용
+- QR 관리 페이지로 들어가면 `This page couldn't load` 서버 오류가 발생한다.
+
+### 원인
+- QR 관리 목록 조회 SQL에서 `created_at` 컬럼명을 테이블명 없이 사용했다.
+- QR, 보호자, 관리대상 테이블이 모두 `created_at`을 가지고 있어 DB가 어떤 컬럼인지 판단하지 못했다.
+
+### 반영내용
+- QR 관리 목록 정렬 기준을 `q.created_at`, `q.code`로 명확히 지정했다.
+
+### 검증
+- 오류 SQL 재현 확인.
+- 수정 SQL 실행 성공:
+  - QR 30건 조회 성공.
+- 로컬 빌드 성공.
+
+### 반영 시간
+- 원인 확인, 수정, 검증, 로그 기록: 약 10분.
+
 ## 2026-06-15 - QR/푸시 기능 운영 배포 완료
 
 ### 배포 결과

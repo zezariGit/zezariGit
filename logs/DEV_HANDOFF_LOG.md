@@ -1638,6 +1638,43 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Changed Files
 - `logs/DEV_HANDOFF_LOG.md`
 - `logs/PRESENTATION_PROGRESS_LOG.md`
+## 2026-06-15 20:30 KST - Fix QR Admin Server Error
+
+### User Request
+- User reported that opening the QR management page shows a Next.js server error page:
+  - `This page couldn't load`
+  - `A server error occurred. Reload to try again.`
+
+### Root Cause
+- `getQrAdminData()` joins:
+  - `qr_codes q`
+  - `subjects s`
+  - `guardians g`
+- The SQL ordered by unqualified `created_at`.
+- Multiple joined tables contain `created_at`, so SQLite/Turso returned:
+  - `ambiguous column name: created_at`
+
+### Fix
+- Updated QR admin query ordering from:
+  - `ORDER BY created_at DESC, code ASC`
+- To:
+  - `ORDER BY q.created_at DESC, q.code ASC`
+
+### Files Changed
+- `lib/db.js`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- Direct Turso SQL reproduction confirmed the original failure.
+- Direct Turso SQL after the fix succeeded:
+  - `rows=30`
+- `npm run build` succeeded.
+
+### Notes
+- No database migration required.
+- The uploaded screenshot under `.codex-remote-attachments/` was not added to Git.
+
 ## 2026-06-15 20:18 KST - Deployment Completion For Subject QR Push Alerts
 
 ### Completion Update
