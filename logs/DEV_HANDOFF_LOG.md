@@ -2099,6 +2099,21 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Local `http://localhost:3000/admin?section=ads` returned HTTP 200 and showed the admin login gate when unauthenticated.
 - In-app browser verification was attempted, but the Browser plugin reported `iab` unavailable in this session.
 
+### Deployment
+- GitHub commit:
+  - `72d32ec Add subject advertising management foundation`
+- GitHub push:
+  - `main` pushed to `https://github.com/zezariGit/zezariGit.git`
+- Vercel production deployment:
+  - `https://zezari-3n7rdvupv-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- `https://zezari.vercel.app` returned HTTP 200.
+- `https://zezari.vercel.app/admin?section=ads` returned HTTP 200.
+- Unauthenticated admin ads route showed the admin login gate.
+
 ### Notes For Next AI
 - Meta API is not connected yet.
 - Advertisement payment is not connected yet.

@@ -1243,6 +1243,11 @@ This file is the cumulative presentation-ready project log. It is written so the
 - Turso 광고 테이블 생성 확인.
 - 기본 광고 일 단가 10,000원 확인.
 - 현재 광고 진행 데이터 0건 확인.
+- 운영 배포 완료:
+  - `https://zezari.vercel.app`
+- 운영 경로 확인:
+  - `/` 정상 응답.
+  - `/admin?section=ads` 정상 응답.
 
 ### 반영 시간
 - 설계, 구현, DB 확인, 문서/로그 반영: 약 35분.
