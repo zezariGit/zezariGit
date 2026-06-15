@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { isAdminSession } from "../../lib/admin";
 import { authOptions } from "../../lib/auth";
@@ -44,6 +45,8 @@ export async function setQrSubjectAction(formData) {
 
   await setQrSubject(formData);
   revalidatePath("/admin");
+  const returnTo = String(formData.get("returnTo") || "").trim();
+  if (returnTo) redirect(returnTo);
 }
 
 export async function setGuardianAdminAction(formData) {

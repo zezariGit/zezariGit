@@ -15,6 +15,10 @@
   box-sizing: border-box;
 }
 
+*:where(h1, h2, h3, p, span, strong, a, button, label, input, select) {
+  min-width: 0;
+}
+
 html,
 body {
   min-height: 100%;
@@ -1656,6 +1660,15 @@ textarea:focus {
   border: 0.5px solid var(--c-success-border);
 }
 
+.activate-button,
+.danger-button.compact,
+.primary-button.compact,
+.admin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .onboarding-page {
   background:
     linear-gradient(180deg, rgba(214, 234, 248, 0.72), rgba(247, 248, 250, 1));
@@ -1773,13 +1786,13 @@ textarea:focus {
 
 .qr-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   gap: var(--space-md);
 }
 
 .qr-card {
   display: grid;
-  grid-template-columns: 120px minmax(0, 1fr);
+  grid-template-columns: 124px minmax(0, 1fr);
   gap: var(--space-md);
   padding: var(--space-md);
   border: 0.5px solid var(--c-border);
@@ -1856,10 +1869,7 @@ textarea:focus {
 }
 
 .qr-match-tools {
-  display: grid;
-  gap: var(--space-xs);
-  padding-top: var(--space-xs);
-  border-top: 0.5px solid var(--c-border);
+  display: none;
 }
 
 .qr-match-search-form {
@@ -1906,6 +1916,129 @@ textarea:focus {
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--space-xs);
+}
+
+.qr-card-actions .activate-button,
+.qr-card-actions .danger-button,
+.qr-card-actions .primary-button {
+  width: auto;
+  min-width: 104px;
+  margin-top: 0;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.qr-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: var(--space-lg);
+  background: rgba(15, 23, 42, 0.48);
+}
+
+.qr-modal {
+  width: min(100%, 720px);
+  max-height: min(760px, calc(100vh - 48px));
+  overflow: auto;
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.22);
+}
+
+.qr-modal-header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  align-items: flex-start;
+}
+
+.qr-modal-header h2,
+.qr-modal-header p {
+  margin: 0;
+}
+
+.qr-modal-header h2 {
+  color: var(--c-text);
+  font-size: 1.35rem;
+}
+
+.qr-modal-header p:last-child {
+  margin-top: 6px;
+  color: var(--c-text-muted);
+  line-height: 1.45;
+}
+
+.qr-modal-summary {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: var(--space-sm);
+  align-items: center;
+  padding: var(--space-sm);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-primary-light);
+}
+
+.qr-modal-summary img {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+}
+
+.qr-modal-summary strong,
+.qr-modal-summary span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.qr-modal-summary span {
+  margin-top: 4px;
+  color: var(--c-text-muted);
+}
+
+.qr-modal-search-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  gap: var(--space-sm);
+  align-items: end;
+}
+
+.qr-modal-results {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.qr-modal-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-sm);
+  align-items: center;
+  padding: var(--space-sm);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+}
+
+.qr-modal-result strong,
+.qr-modal-result span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.qr-modal-result span {
+  margin-top: 3px;
+  color: var(--c-text-muted);
+  font-size: 0.88rem;
 }
 
 .admin-user-grid {
@@ -2093,6 +2226,9 @@ button:disabled:hover {
   .qr-match-form,
   .qr-match-search-form,
   .qr-match-result,
+  .qr-modal-search-form,
+  .qr-modal-result,
+  .qr-modal-summary,
   .find-profile,
   .find-contact-grid {
     grid-template-columns: 1fr;
@@ -2109,5 +2245,14 @@ button:disabled:hover {
 
   .qr-card-actions {
     justify-content: flex-start;
+  }
+
+  .qr-modal-backdrop {
+    align-items: stretch;
+    padding: var(--space-sm);
+  }
+
+  .qr-modal-header {
+    display: grid;
   }
 }

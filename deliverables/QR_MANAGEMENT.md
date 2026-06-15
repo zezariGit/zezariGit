@@ -23,10 +23,13 @@ Project: REAL_QR_FIND / zezari
    - all/active/inactive
 5. Admin can activate or deactivate each QR.
 6. Admin can manually assign, change, or clear a QR-to-subject match.
-   - Instead of a full select box, each QR card provides a search form.
-   - Admin can search by guardian name/email and managed subject name.
+   - Instead of a full select box, unmatched QR cards show one `매칭대상 조회` button.
+   - The button opens one modal popup for guardian/subject search.
+   - The modal disables the main screen visually while open so multiple card-level searches do not compete for attention.
+   - Admin can search by guardian name/email and managed subject name inside the modal.
    - Search results only include subjects that are not currently matched to any QR.
    - A subject already matched to a QR appears only after its existing match is cleared.
+   - Matched QR cards hide `매칭대상 조회` and show only `매칭 해제` for matching control.
 7. Admin can generate additional unique QR codes by entering a desired count.
 8. Public QR URLs resolve to:
    - `/find/{public_key}`

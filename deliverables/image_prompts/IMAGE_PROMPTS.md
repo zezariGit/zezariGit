@@ -100,3 +100,14 @@ Create a clean Korean public-service style product workflow diagram for "REAL_QR
 
 ### Notes
 - Use for presenting the reason search replaced the large select box.
+
+## 2026-06-15 - QR Matching Modal UX
+
+### Purpose
+- Presentation or UI design reference for the cleaner modal-based QR matching workflow.
+
+### Prompt
+Create a polished Korean public-service admin UI mockup for "REAL_QR_FIND" QR management. Show QR cards with clean aligned text, QR image, active/inactive state, and simple action buttons. For an unmatched QR card, show only a "매칭대상 조회" button. When clicked, show a centered modal overlay with the background dimmed and disabled. Inside the modal, show guardian search input, managed subject search input, a "조회" button, and a list of only unmatched managed subjects with "선택 매칭" buttons. For a matched QR card, hide the matching lookup button and show only "매칭 해제". Use restrained Korean government-style UI, white panels, civic blue accents, green active states, red inactive states, clear spacing, and no overflowing text. Avoid real personal data.
+
+### Notes
+- Use for refining the QR management UX and explaining why only one modal should be open at a time.

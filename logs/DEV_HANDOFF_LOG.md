@@ -1638,6 +1638,51 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Changed Files
 - `logs/DEV_HANDOFF_LOG.md`
 - `logs/PRESENTATION_PROGRESS_LOG.md`
+## 2026-06-15 21:25 KST - QR Matching Modal UX Cleanup
+
+### User Request
+- Current `보호자 조회` / `관리대상 조회` text and alignment in QR cards is not clean.
+- Change QR matching logic:
+  - For unmatched QR, show only `[매칭대상 조회]`.
+  - Clicking it opens a popup.
+  - Popup searches unmatched managed subjects and lets admin select one.
+  - While popup is open, main screen should be disabled visually.
+  - Avoid multiple popups/search panels.
+  - For matched QR, hide the lookup button and show only `매칭 해제`.
+- Improve overflowing/misaligned text where noticed.
+
+### Reflected Work
+- Replaced inline QR-card search fields with a single modal workflow.
+- Unmatched QR cards show `매칭대상 조회`.
+- Matched QR cards show only `매칭 해제` for matching control.
+- Modal search includes:
+  - guardian name/email input.
+  - managed subject name input.
+  - unmatched subject result list.
+  - `선택 매칭` action.
+- Main screen is covered by modal backdrop while the modal is open.
+- Only one modal can be represented because the state is held in one `assignQr` query parameter.
+- Added safer text wrapping/min-width rules and wider QR card grid to reduce text overflow.
+- Kept QR image download behavior.
+- Kept guardian-side assigned QR display.
+
+### Files Changed
+- `lib/db.js`
+- `app/admin/actions.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `deliverables/QR_MANAGEMENT.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+
+### Notes
+- No DB migration required.
+- The modal is server-rendered through query parameters rather than client-only state, so refresh/back navigation remains predictable.
+
 ## 2026-06-15 21:05 KST - QR Match Search, Download, Guardian QR Visibility
 
 ### User Request
