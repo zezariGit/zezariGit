@@ -851,6 +851,16 @@ This file is the cumulative presentation-ready project log. It is written so the
 - Prepare API requires login.
 - Fail redirect page opens.
 - Toss payment window was not tested because Toss keys were not detected in the saved environment.
+
+### Completion Update
+- GitHub commit:
+  - `a550f63 Add Toss subscription payment foundation`
+- Production URL:
+  - `https://zezari.vercel.app`
+- Verified:
+  - Subscription prepare API is deployed and requires login.
+  - Toss fail page opens.
+  - PWA cache version updated to `zezari-v11`.
 - Turso seed result:
   - 30 total QR records
   - 30 active QR records

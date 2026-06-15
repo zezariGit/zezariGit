@@ -491,6 +491,18 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Test billing auth with Toss test card flow.
 - Add advertisement payment flow after subscription payment is confirmed.
 
+### Completion Update
+- GitHub commit:
+  - `a550f63 Add Toss subscription payment foundation`
+- Vercel production deployment:
+  - `https://zezari-3ppmbunvm-zezari.vercel.app`
+- Public alias:
+  - `https://zezari.vercel.app`
+- Production verification:
+  - `POST /api/payments/toss/subscription/prepare` returned HTTP 401 while logged out.
+  - `/payments/toss/subscription/fail` returned HTTP 200 and displayed the expected failure message.
+  - `/sw.js` includes cache version `zezari-v11`.
+
 ## 2026-06-12 22:48 KST - Git Repository Initialized and Pushed to GitHub
 
 ### User Request
