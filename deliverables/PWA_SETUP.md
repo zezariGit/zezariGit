@@ -30,12 +30,13 @@ Project: REAL_QR_FIND / zezari
 - Background color: `#f6f8f7`
 
 ## Service Worker
-- Current cache name: `zezari-v12`
+- Current cache name: `zezari-v13`
 - Caches app shell:
   - `/`
   - `/manifest.webmanifest`
 - Uses network-first behavior for GET requests.
 - Excludes `/api/auth` routes from service worker handling to avoid interfering with OAuth login.
+- Handles Web Push notifications and opens the app when a notification is clicked.
 
 ## Install UI
 - Android/Desktop Chrome:

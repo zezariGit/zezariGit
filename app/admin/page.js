@@ -359,6 +359,8 @@ function QrManagementSection({ qrData, qrItems }) {
                 <div>
                   <strong>{qr.code}</strong>
                   <span>{qr.public_key}</span>
+                  <span>보호자: {qr.guardian_name || "미배정"}</span>
+                  <span>관리대상: {qr.subject_name || "미배정"}</span>
                 </div>
                 <a href={qr.target_url} target="_blank" rel="noreferrer">
                   {qr.target_url}

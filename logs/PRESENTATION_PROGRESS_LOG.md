@@ -980,3 +980,38 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### Verification
 - Local build succeeded.
+## 2026-06-15 - QR별 관리대상 매칭 및 보호자 푸시 알림
+
+### 요구내용
+- QR을 찍으면 연결되는 페이지에 보호자가 등록한 관리대상 정보가 나오게 한다.
+- 관리대상별로 QR 코드를 매칭한다.
+- 보호자 1명당 관리대상 최대 4명이므로 보호자당 최대 4개 QR이 배정될 수 있다.
+- QR 접근 페이지에서 관리대상 정보와 보호자 연락처, 주소 등 기본정보를 보여준다.
+- `보호자에게 알리기` 버튼을 눌러 로그인되어 있는 보호자에게 `{관리대상 이름}을 찾았습니다` 푸시 메시지를 보낸다.
+
+### 반영내용
+- 관리대상 저장 시 자동으로 미배정 QR 1개를 배정하도록 구현.
+- 기존 관리대상 1명에게 기존 QR 1개를 마이그레이션으로 배정.
+- 공개 QR 페이지를 실제 대상자/보호자 정보 표시 화면으로 확장.
+- 공개 QR 페이지에 `보호자에게 알리기` 버튼 추가.
+- 보호자 대시보드에 `푸시 알림 켜기` 버튼 추가.
+- 브라우저 Web Push 구독 정보를 DB에 저장하는 API 추가.
+- QR 알림 API가 보호자의 등록된 기기로 푸시 알림을 보내도록 구현.
+- 관리자 QR 화면에서 각 QR의 배정 보호자/관리대상을 확인할 수 있게 개선.
+- Vercel 운영/개발 환경에 VAPID 푸시 키 등록 완료.
+
+### 산출물
+- `deliverables/PUSH_NOTIFICATION_SETUP.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/QR_MANAGEMENT.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+
+### 검증
+- 로컬 빌드 성공.
+- 공개 QR 찾기 페이지 HTTP 200 확인.
+- `보호자에게 알리기` 버튼 표시 확인.
+- 푸시 공개키 API 설정 완료 확인.
+- 알림 API는 정상 응답했으며, 현재 등록된 보호자 푸시 기기가 없어 전송 수는 0건.
+
+### 반영 시간
+- 설계, 구현, DB 마이그레이션, 환경변수 등록, 검증, 문서화: 약 45분.

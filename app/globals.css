@@ -1870,10 +1870,92 @@ button:disabled:hover {
   overflow-wrap: anywhere;
 }
 
+.push-action-wrap {
+  display: grid;
+  gap: 6px;
+}
+
+.push-message {
+  margin: 0;
+  color: var(--c-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  text-align: right;
+}
+
+.find-profile {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: var(--space-md);
+  align-items: center;
+  padding: var(--space-md);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-md);
+  background: var(--c-primary-light);
+}
+
+.find-profile-photo {
+  width: 112px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: 50%;
+  background: var(--c-info-bg);
+}
+
+.find-profile-photo span {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--c-primary-dark);
+  box-shadow: 0 40px 0 14px var(--c-primary-dark);
+  transform: translateY(-10px);
+}
+
+.find-profile-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.find-profile-info {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.find-profile-info span {
+  display: block;
+  color: var(--c-text);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.find-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.find-notify-wrap {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.find-notify-message {
+  margin: 0;
+  color: var(--c-text-muted);
+  line-height: 1.5;
+}
+
 @media (max-width: 720px) {
   .qr-create-panel,
   .qr-create-form,
-  .qr-card {
+  .qr-card,
+  .find-profile,
+  .find-contact-grid {
     grid-template-columns: 1fr;
   }
 

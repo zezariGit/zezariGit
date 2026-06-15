@@ -20,6 +20,7 @@ Stores one guardian profile per logged-in Google user.
 | `login_id` | TEXT | Guardian-chosen app ID |
 | `password_hash` | TEXT | PBKDF2 password hash, never plaintext |
 | `phone` | TEXT | Contact phone number |
+| `address` | TEXT | Guardian contact address shown on assigned QR find page |
 | `email` | TEXT | Contact email |
 | `is_active` | INTEGER | `1` active, `0` inactive |
 | `is_admin` | INTEGER | `1` DB administrator, `0` normal guardian |
@@ -53,7 +54,22 @@ Stores QR codes and the unique public strings used as the final segment of peopl
 | `code` | TEXT | Unique administrator-facing QR code label, e.g. `ZRF-XXXX-XXXX` |
 | `public_key` | TEXT | Unique URL-safe string used in `/find/{public_key}` |
 | `target_url` | TEXT | Full generated finding URL at creation time |
+| `guardian_id` | TEXT | Assigned guardian ID, nullable until a subject is matched |
+| `subject_id` | TEXT | Assigned subject ID, unique and nullable |
 | `is_active` | INTEGER | `1` active, `0` inactive |
+| `created_at` | TEXT | Created timestamp |
+| `updated_at` | TEXT | Updated timestamp |
+
+### push_subscriptions
+
+Stores browser push subscriptions for logged-in guardians.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | TEXT | Primary key |
+| `guardian_id` | TEXT | Guardian receiving push notifications |
+| `endpoint` | TEXT | Browser push endpoint, unique |
+| `subscription_json` | TEXT | Full Push API subscription JSON |
 | `created_at` | TEXT | Created timestamp |
 | `updated_at` | TEXT | Updated timestamp |
 
@@ -105,7 +121,12 @@ Stores administrator-managed subscription plan prices.
 - Admin users can list guardians and activate/deactivate them.
 - Admin users can grant or revoke DB admin role for registered guardians.
 - Admin users can list QR codes, generate additional unique QR codes, and activate/deactivate each QR.
-- Public find pages can read QR status by `public_key` without login, but guardian/subject personal data is not exposed in this phase.
+- Public find pages can read QR status by `public_key` without login.
+- When a QR is assigned to a subject, the public find page shows subject basic information and guardian contact information so the finder can respond.
+- Each subject receives one QR assignment. Because each guardian can register up to 4 subjects, one guardian can have up to 4 assigned QR codes.
+- Logged-in guardians can register a browser push subscription from the dashboard.
+- Public find pages can call the notification API to send a push message to the assigned guardian.
+- Privacy note: public QR pages intentionally expose configured subject/contact fields. Before production launch, add explicit guardian consent and a field-level exposure policy.
 - Logged-in guardians can start Toss Payments subscription billing from the dashboard.
 - Subscription is marked active only after server-side Toss billing API succeeds.
 - Logged-in guardians can pause/resume their own subscription service state.
@@ -125,6 +146,7 @@ Stores administrator-managed subscription plan prices.
   - `qr_codes`
   - `subscriptions`
   - `subscription_plans`
+  - `push_subscriptions`
 
 ## Dashboard Flow
 - Logged-in guardians enter the dashboard route first.

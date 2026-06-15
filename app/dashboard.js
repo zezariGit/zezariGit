@@ -1,5 +1,6 @@
 import { deleteSubjectAction, saveGuardianAction, saveSubjectAction } from "./actions";
 import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
+import PushNotificationButton from "./push-notification-button";
 import TossSubscriptionButton from "./toss-subscription-button";
 import { isAdminSession } from "../lib/admin";
 
@@ -50,6 +51,7 @@ export default function GuardianDashboard({
                 관리자 페이지
               </a>
             )}
+            <PushNotificationButton />
             <LogoutButton />
           </div>
         </header>
@@ -235,6 +237,10 @@ function GuardianForm({ guardian, session }) {
               <label>
                 연락받을 전화번호
                 <input name="phone" defaultValue={guardian.phone || ""} required />
+              </label>
+              <label className="full-field">
+                주소
+                <input name="address" defaultValue={guardian.address || ""} placeholder="보호자 주소" />
               </label>
               <label className="full-field">
                 이메일

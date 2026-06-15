@@ -1638,3 +1638,92 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Changed Files
 - `logs/DEV_HANDOFF_LOG.md`
 - `logs/PRESENTATION_PROGRESS_LOG.md`
+## 2026-06-15 20:09 KST - Subject-Matched QR Find Page And Guardian Push Notification
+
+### User Request
+- QR scan page should show the guardian's registered managed subject.
+- QR codes should be matched per managed subject.
+- One guardian can register up to 4 subjects, therefore up to 4 assigned QR codes per guardian.
+- The public QR page should show subject information plus guardian contact/address/basic information.
+- Add a `보호자에게 알리기` button that sends a push notification to the logged-in guardian with `{관리대상 이름}을 찾았습니다`.
+
+### Reflected Work
+- Added guardian address storage:
+  - `guardians.address`
+  - dashboard guardian profile form address field.
+- Added subject-to-QR assignment:
+  - `qr_codes.guardian_id`
+  - `qr_codes.subject_id`
+  - unique index on `qr_codes.subject_id`.
+- Updated subject save/delete logic:
+  - saving a subject assigns one available QR.
+  - if no unassigned QR exists, the server generates one and assigns it.
+  - deleting a subject releases its QR assignment.
+- Updated admin QR management:
+  - QR cards now show assigned guardian and assigned managed subject.
+- Updated public QR find page:
+  - unknown QR, inactive QR, unassigned QR, and assigned QR states.
+  - assigned QR page shows subject name/photo/birth date/gender/status.
+  - assigned QR page shows guardian name/phone/email/address.
+  - added `보호자에게 알리기` action.
+- Added Web Push support:
+  - browser push registration button on the guardian dashboard.
+  - VAPID public-key API.
+  - push subscription save API.
+  - public QR notify API.
+  - service worker push and notification-click handlers.
+- Added Vercel environment variables:
+  - `VAPID_PUBLIC_KEY`
+  - `VAPID_PRIVATE_KEY`
+  - `VAPID_SUBJECT`
+
+### Files Changed
+- `.env.example`
+- `package.json`
+- `package-lock.json`
+- `lib/db.js`
+- `lib/push.js`
+- `app/dashboard.js`
+- `app/push-notification-button.js`
+- `app/find/[key]/page.js`
+- `app/find/[key]/notify-button.js`
+- `app/api/push/public-key/route.js`
+- `app/api/push/subscribe/route.js`
+- `app/api/find/[key]/notify/route.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `public/sw.js`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/QR_MANAGEMENT.md`
+- `deliverables/PUSH_NOTIFICATION_SETUP.md`
+- `deliverables/PWA_SETUP.md`
+- `deliverables/README.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+
+### Database Migration Result
+- Columns added:
+  - `guardians.address`
+  - `qr_codes.guardian_id`
+  - `qr_codes.subject_id`
+- Table added:
+  - `push_subscriptions`
+- Existing subjects found: 1
+- Existing subjects newly assigned to QR: 1
+- QR total: 30
+- QR assigned: 1
+- QR unassigned: 29
+- Push subscriptions: 0
+
+### Verification
+- `npm run build` succeeded.
+- Local `/find/{assigned-public-key}` returned HTTP 200.
+- Local find page contained `보호자에게 알리기`.
+- Local `/api/push/public-key` returned configured public key.
+- Local notify API returned HTTP 200 with `sent=0`, `total=0`.
+  - This is expected until a guardian enables push notifications from a browser/app.
+- Local `/sw.js` includes cache version `zezari-v13` and push handler.
+
+### Notes For Next AI
+- Do not print or commit `.env.local`; VAPID keys are secrets except the public key.
+- Public QR pages now intentionally expose selected subject and guardian contact fields. Before real personal-data launch, add consent, field-level visibility controls, and notify endpoint rate limiting.
+- Guardian must click `푸시 알림 켜기` once on each device/browser before push can be delivered.

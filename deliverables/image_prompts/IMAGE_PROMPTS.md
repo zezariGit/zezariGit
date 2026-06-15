@@ -67,3 +67,14 @@ Create a clean Korean public-service style product flow diagram for "REAL_QR_FIN
 
 ### Notes
 - Use for explaining that plan prices are controlled by admin and service pause/resume is separate from billing-key deletion.
+
+## 2026-06-15 - Subject QR Matching And Guardian Push Alert
+
+### Purpose
+- Presentation diagram for matching one QR code to each managed subject and sending guardian push alerts from the public find page.
+
+### Prompt
+Create a clean Korean public-service style system flow diagram for "REAL_QR_FIND" showing a guardian with up to four managed subjects, each subject matched to one unique QR code. Show a finder scanning `/find/{unique-key}`, viewing the managed subject profile and guardian contact information, then pressing "보호자에게 알리기". Show the server sending a Web Push notification to the logged-in guardian's installed web app with the message "{관리대상 이름}을 찾았습니다". Include Turso tables `subjects`, `guardians`, `qr_codes`, and `push_subscriptions`, with arrows showing one subject to one QR assignment. Use white surfaces, civic blue accents, green active states, and clear privacy/security symbols. Avoid real personal information.
+
+### Notes
+- Use for explaining the one-subject-one-QR assignment rule and the push notification path from public QR page to guardian device.

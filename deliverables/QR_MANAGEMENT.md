@@ -15,11 +15,15 @@ Project: REAL_QR_FIND / zezari
    - QR label code
    - Unique public string
    - Public finding URL
+   - Assigned guardian
+   - Assigned managed subject
    - Active/inactive status
 4. Admin can activate or deactivate each QR.
 5. Admin can generate additional unique QR codes by entering a desired count.
 6. Public QR URLs resolve to:
    - `/find/{public_key}`
+7. When a guardian creates or edits a subject, the server assigns one available QR to that subject.
+8. If no unassigned QR remains, the server generates a new QR and assigns it.
 
 ## Database
 - Table: `qr_codes`
@@ -39,12 +43,17 @@ Project: REAL_QR_FIND / zezari
 ## Current Public Page Behavior
 - Unknown key: shows an unregistered QR message.
 - Inactive key: shows a disabled QR message.
-- Active key: confirms the QR is valid and active.
-- Subject matching, missing-person report intake, and guardian notification are reserved for the next implementation stage.
+- Active but unassigned key: shows a not-yet-connected QR message.
+- Active assigned key: shows the managed subject information, guardian contact fields, and a `보호자에게 알리기` button.
+- The notify button sends a Web Push message to the logged-in guardian's registered browser/app devices.
 
 ## Admin Controls
 - Initial seed: 30 active QR records.
 - Additional creation: 1 to 200 records per request.
+- Subject matching:
+  - one `subjects.id` maps to one `qr_codes.subject_id`.
+  - `qr_codes.subject_id` is enforced with a unique index.
+  - deleted subjects release their QR assignment.
 - Duplicate prevention:
   - The server checks both `code` and `public_key` before insert.
   - Generation retries on collision.

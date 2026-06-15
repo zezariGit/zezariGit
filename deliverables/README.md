@@ -18,6 +18,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `UI_STYLE_GUIDE.md`: gov-style design base and future page styling rules.
 - `QR_MANAGEMENT.md`: QR generation, unique URL strings, admin activation, and public find URL behavior.
 - `TOSS_PAYMENTS_SETUP.md`: Toss Payments subscription payment foundation and callback flow.
+- `PUSH_NOTIFICATION_SETUP.md`: guardian browser push registration and QR find-page notification flow.
 
 ## Planned Deliverables
 - Requirements specification
