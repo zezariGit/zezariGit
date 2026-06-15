@@ -1670,10 +1670,20 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Direct Turso SQL after the fix succeeded:
   - `rows=30`
 - `npm run build` succeeded.
+- GitHub commit:
+  - `826b239 Fix QR admin query ordering`
+- Production deployment:
+  - `https://zezari-cysx2egfr-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+- Production route checks:
+  - `/` returned HTTP 200.
+  - `/admin?section=qr` returned HTTP 200 when logged out and showed the admin login gate.
 
 ### Notes
 - No database migration required.
 - The uploaded screenshot under `.codex-remote-attachments/` was not added to Git.
+- The actual QR admin data query was verified directly against Turso because the page requires an authenticated admin session.
 
 ## 2026-06-15 20:18 KST - Deployment Completion For Subject QR Push Alerts
 

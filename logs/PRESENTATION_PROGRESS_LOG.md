@@ -997,6 +997,13 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 수정 SQL 실행 성공:
   - QR 30건 조회 성공.
 - 로컬 빌드 성공.
+- GitHub 반영:
+  - `826b239 Fix QR admin query ordering`
+- 운영 배포 완료:
+  - `https://zezari.vercel.app`
+- 운영 경로 확인:
+  - `/` 정상 응답.
+  - `/admin?section=qr` 비로그인 상태에서 관리자 로그인 화면 정상 응답.
 
 ### 반영 시간
 - 원인 확인, 수정, 검증, 로그 기록: 약 10분.
