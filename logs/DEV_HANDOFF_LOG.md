@@ -2162,3 +2162,18 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Local `http://localhost:3000/` returned HTTP 200.
 - Local `http://localhost:3000/admin?section=qr&assignQr=test` returned HTTP 200 and showed the admin login gate when unauthenticated.
 - In-app browser verification was attempted, but the Browser plugin reported `iab` unavailable in this session.
+
+### Deployment
+- GitHub commit:
+  - `e6d2176 Add shared modal scroll lock`
+- GitHub push:
+  - `main` pushed to `https://github.com/zezariGit/zezariGit.git`
+- Vercel production deployment:
+  - `https://zezari-b5zfen3my-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- `https://zezari.vercel.app` returned HTTP 200.
+- `https://zezari.vercel.app/admin?section=qr&assignQr=test` returned HTTP 200.
+- Unauthenticated admin route showed the admin login gate.
