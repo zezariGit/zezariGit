@@ -9,6 +9,7 @@ import { getDashboardData } from "../lib/db";
 export default async function HomePage({ searchParams }) {
   const resolvedSearchParams = await searchParams;
   const activeTab = resolvedSearchParams?.tab === "info" ? "info" : "dashboard";
+  const adSubjectId = resolvedSearchParams?.adSubject || "";
   const notice = resolvedSearchParams?.notice || "";
   const noticeType = resolvedSearchParams?.noticeType || "success";
   const session = await getServerSession(authOptions);
@@ -18,7 +19,7 @@ export default async function HomePage({ searchParams }) {
     const dashboardData = await getDashboardData(session);
     return (
       <>
-        <GuardianDashboard {...dashboardData} session={session} activeTab={activeTab} />
+        <GuardianDashboard {...dashboardData} session={session} activeTab={activeTab} adSubjectId={adSubjectId} />
         <StatusToast message={notice} type={noticeType} />
       </>
     );

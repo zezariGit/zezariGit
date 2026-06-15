@@ -2030,3 +2030,77 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Do not print or commit `.env.local`; VAPID keys are secrets except the public key.
 - Public QR pages now intentionally expose selected subject and guardian contact fields. Before real personal-data launch, add consent, field-level visibility controls, and notify endpoint rate limiting.
 - Guardian must click `푸시 알림 켜기` once on each device/browser before push can be delivered.
+
+## 2026-06-15 23:39 KST - Subject Advertisement Foundation
+
+### User Request
+- Add an `(광고)` button per managed subject on the guardian dashboard.
+- Clicking the button should open a popup/modal and disable the main screen behind it.
+- Modal should let the guardian set advertisement period and advertisement region.
+- Amount should be calculated from the configured daily rate and selected period.
+- Running ads should support pause and end controls.
+- Add an admin advertisement tab.
+- Admin should set the daily advertisement unit price.
+- Admin should view user advertisement progress in a grid.
+- Meta API credentials/details will be provided later; prepare the internal foundation first.
+
+### Reflected Work
+- Added DB tables:
+  - `ad_settings`
+  - `subject_ads`
+- Added default advertising daily rate:
+  - `10000` KRW
+- Extended dashboard data query with latest ad state per subject.
+- Added server-side ad actions:
+  - create subject ad
+  - pause subject ad
+  - resume subject ad
+  - end subject ad
+- Added dashboard per-subject `광고` button.
+- Added client modal with:
+  - region input
+  - start/end date inputs
+  - inclusive day count
+  - daily rate
+  - calculated total amount
+  - active/paused state controls
+- Added admin `광고 관리` tab.
+- Added admin daily-rate form.
+- Added admin ad progress grid.
+- Reserved Meta API fields:
+  - `meta_campaign_id`
+  - `meta_status`
+
+### Files Changed
+- `lib/db.js`
+- `app/actions.js`
+- `app/dashboard.js`
+- `app/ad-campaign-modal.js`
+- `app/page.js`
+- `app/admin/actions.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `deliverables/ADVERTISING_SETUP.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/README.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Database Verification
+- Turso advertising schema creation verified.
+- Current values:
+  - `ad_settings.default.daily_rate`: `10000`
+  - `subject_ads` row count: `0`
+
+### Verification
+- `npm run build` succeeded.
+- Local `http://localhost:3000/` returned HTTP 200.
+- Local `http://localhost:3000/admin?section=ads` returned HTTP 200 and showed the admin login gate when unauthenticated.
+- In-app browser verification was attempted, but the Browser plugin reported `iab` unavailable in this session.
+
+### Notes For Next AI
+- Meta API is not connected yet.
+- Advertisement payment is not connected yet.
+- Current `subject_ads.status` values used by UI are `active`, `paused`, `ready`, and `ended`.
+- A subject cannot create another running ad while it has a `ready`, `active`, or `paused` ad.

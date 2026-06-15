@@ -111,3 +111,14 @@ Create a polished Korean public-service admin UI mockup for "REAL_QR_FIND" QR ma
 
 ### Notes
 - Use for refining the QR management UX and explaining why only one modal should be open at a time.
+
+## 2026-06-15 - Subject Advertisement Modal And Admin Pricing
+
+### Purpose
+- Presentation diagram for subject-level advertisement requests, daily-rate pricing, and future Meta API integration.
+
+### Prompt
+Create a clean Korean public-service style product and system workflow diagram for "REAL_QR_FIND" advertisement management. Show a guardian dashboard with four managed subject cards, each having an "광고" button. Show one centered modal overlay with the background dimmed and disabled, containing advertising region, start date, end date, calculated days, admin daily rate, and total estimated amount. Show active advertisement controls "일시정지", "광고 재개", and "광고끝내기". On the admin side, show an "광고 관리" tab where the daily advertising unit price is edited and a grid lists user advertisement progress by guardian, managed subject, region, period, amount, status, and Meta API pending state. Include Turso tables `ad_settings` and `subject_ads`, plus a future Meta API box connected by dashed arrows. Use restrained Korean government-style UI, white panels, civic blue accents, green active states, yellow paused states, red ended states, and no real personal data.
+
+### Notes
+- Use when explaining that the current implementation prepares internal ad status and pricing before Meta API credentials are connected.

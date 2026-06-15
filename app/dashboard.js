@@ -1,4 +1,13 @@
-import { deleteSubjectAction, saveGuardianAction, saveSubjectAction } from "./actions";
+import {
+  createSubjectAdAction,
+  deleteSubjectAction,
+  endSubjectAdAction,
+  pauseSubjectAdAction,
+  resumeSubjectAdAction,
+  saveGuardianAction,
+  saveSubjectAction,
+} from "./actions";
+import AdCampaignModal from "./ad-campaign-modal";
 import FormSubmitButton from "./form-submit-button";
 import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
 import PushNotificationButton from "./push-notification-button";
@@ -14,10 +23,13 @@ export default async function GuardianDashboard({
   subjects,
   subscription,
   subscriptionPlans = [],
+  adDailyRate = 0,
   session,
   activeTab = "dashboard",
+  adSubjectId = "",
 }) {
   const subjectsWithQr = await withSubjectQrImages(subjects);
+  const selectedAdSubject = subjectsWithQr.find((subject) => subject.id === adSubjectId) || null;
   const emptySlots = Array.from({ length: Math.max(0, 4 - subjectsWithQr.length) });
   const guardianComplete = Boolean(
     guardian.name && guardian.login_id && guardian.password_hash && guardian.phone && guardian.email
@@ -83,6 +95,8 @@ export default async function GuardianDashboard({
             subjects={subjectsWithQr}
             subscription={subscription}
             subscriptionPlans={subscriptionPlans}
+            adDailyRate={adDailyRate}
+            selectedAdSubject={selectedAdSubject}
           />
         ) : (
           <InfoTab guardian={guardian} session={session} subjects={subjectsWithQr} emptySlots={emptySlots} />
@@ -98,7 +112,15 @@ export default async function GuardianDashboard({
   );
 }
 
-function DashboardTab({ guardian, guardianComplete, subjects, subscription, subscriptionPlans }) {
+function DashboardTab({
+  guardian,
+  guardianComplete,
+  subjects,
+  subscription,
+  subscriptionPlans,
+  adDailyRate,
+  selectedAdSubject,
+}) {
   if (!guardianComplete) {
     return (
       <section className="dashboard-panel setup-panel">
@@ -119,6 +141,16 @@ function DashboardTab({ guardian, guardianComplete, subjects, subscription, subs
         subscription={subscription}
         subscriptionPlans={subscriptionPlans}
       />
+      {selectedAdSubject && (
+        <AdCampaignModal
+          subject={selectedAdSubject}
+          dailyRate={adDailyRate}
+          createAction={createSubjectAdAction}
+          pauseAction={pauseSubjectAdAction}
+          resumeAction={resumeSubjectAdAction}
+          endAction={endSubjectAdAction}
+        />
+      )}
       <section className="dashboard-panel summary-panel">
         <div className="panel-heading">
           <h2>관리대상 요약</h2>
@@ -180,10 +212,16 @@ function StatusDashboard({ guardian, subjects, subscription, subscriptionPlans }
                   <strong>{subject.name}</strong>
                   <span>{formatDate(subject.birth_date)}</span>
                   {subject.qr_code && <span>QR: {subject.qr_code}</span>}
+                  {subject.ad_status && <span>광고: {adStatusLabel(subject.ad_status)}</span>}
                 </div>
-                <span className={`status-badge ${statusClass(subject.status)}`}>
-                  {subject.status || "문제없음"}
-                </span>
+                <div className="managed-actions">
+                  <span className={`status-badge ${statusClass(subject.status)}`}>
+                    {subject.status || "문제없음"}
+                  </span>
+                  <a className="managed-ad-button" href={`/?tab=dashboard&adSubject=${encodeURIComponent(subject.id)}`}>
+                    광고
+                  </a>
+                </div>
               </article>
             ) : (
               <article className="managed-card empty-managed" key={`empty-${index}`}>
@@ -353,6 +391,14 @@ function statusClass(status) {
   if (status === "찾는중") return "searching";
   if (status === "QR활성화필요") return "qr-needed";
   return "safe";
+}
+
+function adStatusLabel(status) {
+  if (status === "active") return "광고중";
+  if (status === "paused") return "일시정지";
+  if (status === "ready") return "준비중";
+  if (status === "ended") return "종료";
+  return "연동 대기";
 }
 
 async function withSubjectQrImages(subjects) {

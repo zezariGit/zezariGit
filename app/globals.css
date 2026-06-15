@@ -470,6 +470,179 @@ a {
   line-height: 1.35;
 }
 
+.managed-actions {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+
+.managed-ad-button {
+  min-width: 76px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  border: 1px solid var(--c-primary-border);
+  border-radius: 6px;
+  background: var(--c-primary-light);
+  color: var(--c-primary-dark);
+  font-size: 12px;
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.managed-ad-button:hover {
+  background: var(--c-accent-light);
+  text-decoration: none;
+}
+
+.ad-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: var(--space-lg);
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.ad-modal {
+  width: min(100%, 560px);
+  max-height: min(760px, calc(100vh - 48px));
+  overflow: auto;
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.22);
+}
+
+.ad-modal-header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  align-items: flex-start;
+}
+
+.ad-modal-header h2,
+.ad-modal-header p {
+  margin: 0;
+}
+
+.ad-modal-header h2 {
+  color: var(--c-text);
+  font-size: 1.35rem;
+}
+
+.ad-modal-header p:last-child {
+  margin-top: 6px;
+  color: var(--c-text-muted);
+  line-height: 1.45;
+}
+
+.ad-request-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.ad-quote {
+  display: grid;
+  gap: 4px;
+  padding: var(--space-md);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-md);
+  background: var(--c-primary-light);
+}
+
+.ad-quote strong {
+  color: var(--c-primary-dark);
+  font-size: 1.25rem;
+}
+
+.ad-quote span {
+  color: var(--c-text-muted);
+  font-size: 0.9rem;
+}
+
+.ad-current-panel {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-primary-light);
+}
+
+.ad-current-summary {
+  display: grid;
+  gap: 6px;
+}
+
+.ad-current-summary strong {
+  color: var(--c-primary-dark);
+  font-size: 1.3rem;
+}
+
+.ad-current-summary span {
+  color: var(--c-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.ad-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.ad-state-actions .activate-button,
+.ad-state-actions .danger-button {
+  width: auto;
+  margin-top: 0;
+}
+
+.ad-status-pill {
+  width: fit-content;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-style: normal;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.ad-status-pill.active {
+  border: 0.5px solid var(--c-success-border);
+  background: var(--c-success-bg);
+  color: var(--c-success);
+}
+
+.ad-status-pill.paused {
+  border: 0.5px solid var(--c-warn-border);
+  background: var(--c-warn-bg);
+  color: var(--c-warn);
+}
+
+.ad-status-pill.ready {
+  border: 0.5px solid var(--c-info-border);
+  background: var(--c-info-bg);
+  color: var(--c-info);
+}
+
+.ad-status-pill.ended {
+  border: 0.5px solid var(--c-border);
+  background: #eef1f0;
+  color: var(--c-text-muted);
+}
+
 .payment-result-page {
   min-height: 100vh;
   display: grid;
@@ -557,6 +730,57 @@ a {
   gap: 6px;
   color: var(--c-text);
   font-weight: 500;
+}
+
+.ad-rate-form {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) auto;
+  align-items: end;
+  gap: var(--space-xs);
+}
+
+.ad-rate-form label {
+  color: var(--c-text);
+  font-weight: 500;
+}
+
+.admin-ad-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-md);
+}
+
+.admin-ad-card {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+}
+
+.admin-ad-main,
+.admin-ad-meta {
+  display: grid;
+  gap: 5px;
+}
+
+.admin-ad-main strong,
+.admin-ad-main span,
+.admin-ad-meta span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.admin-ad-main strong {
+  color: var(--c-text);
+  font-size: 1rem;
+}
+
+.admin-ad-main span,
+.admin-ad-meta span {
+  color: var(--c-text-muted);
+  font-size: 0.9rem;
 }
 
 .bell-icon {
@@ -2295,6 +2519,8 @@ button:disabled:hover {
   .qr-modal-search-form,
   .qr-modal-result,
   .qr-modal-summary,
+  .ad-request-form,
+  .ad-rate-form,
   .find-profile,
   .find-contact-grid {
     grid-template-columns: 1fr;
@@ -2319,6 +2545,15 @@ button:disabled:hover {
   }
 
   .qr-modal-header {
+    display: grid;
+  }
+
+  .ad-modal-backdrop {
+    align-items: stretch;
+    padding: var(--space-sm);
+  }
+
+  .ad-modal-header {
     display: grid;
   }
 }

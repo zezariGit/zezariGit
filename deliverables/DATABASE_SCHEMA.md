@@ -113,6 +113,42 @@ Stores administrator-managed subscription plan prices.
 | `created_at` | TEXT | Created timestamp |
 | `updated_at` | TEXT | Updated timestamp |
 
+### ad_settings
+
+Stores administrator-managed advertising pricing.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | TEXT | Primary key, current singleton row is `default` |
+| `daily_rate` | INTEGER | Advertising daily unit price in KRW |
+| `currency` | TEXT | Currency, currently `KRW` |
+| `created_at` | TEXT | Created timestamp |
+| `updated_at` | TEXT | Updated timestamp |
+
+### subject_ads
+
+Stores advertisement requests and status by managed subject.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | TEXT | Primary key |
+| `guardian_id` | TEXT | Guardian who owns the subject |
+| `subject_id` | TEXT | Managed subject being advertised |
+| `region` | TEXT | User-entered advertising region |
+| `start_date` | TEXT | Advertising start date |
+| `end_date` | TEXT | Advertising end date |
+| `days` | INTEGER | Inclusive advertising day count |
+| `daily_rate` | INTEGER | Daily rate captured at request time |
+| `amount` | INTEGER | `days * daily_rate` |
+| `currency` | TEXT | Currency, currently `KRW` |
+| `status` | TEXT | `ready`, `active`, `paused`, `ended` |
+| `meta_campaign_id` | TEXT | Reserved Meta API campaign identifier |
+| `meta_status` | TEXT | Reserved Meta API status, currently `meta_api_pending` |
+| `paused_at` | TEXT | Last pause timestamp |
+| `ended_at` | TEXT | End timestamp |
+| `created_at` | TEXT | Created timestamp |
+| `updated_at` | TEXT | Updated timestamp |
+
 ## Access Rules
 - Dashboard data is loaded only after social login.
 - A guardian can only query/update subjects where `subjects.guardian_id` belongs to the logged-in guardian.
@@ -136,6 +172,12 @@ Stores administrator-managed subscription plan prices.
 - Subscription is marked active only after server-side Toss billing API succeeds.
 - Logged-in guardians can pause/resume their own subscription service state.
 - Admin users can edit 1/3/6-month subscription option prices.
+- Logged-in guardians can open an advertisement modal per managed subject.
+- Advertisement request amount is calculated from admin daily rate and selected inclusive date range.
+- Logged-in guardians can pause, resume, or end only their own subject advertisements.
+- Admin users can edit the global advertisement daily rate.
+- Admin users can list advertisement progress by guardian and managed subject.
+- Meta API fields are reserved but external Meta calls are not connected yet.
 
 ## Upload Rules
 - Photo file must be an image.
@@ -152,6 +194,8 @@ Stores administrator-managed subscription plan prices.
   - `subscriptions`
   - `subscription_plans`
   - `push_subscriptions`
+  - `ad_settings`
+  - `subject_ads`
 
 ## Dashboard Flow
 - Logged-in guardians enter the dashboard route first.

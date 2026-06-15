@@ -6,6 +6,7 @@ import StatusToast from "../status-toast";
 import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
 import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
 import {
+  getAdminAdsData,
   getAdminData,
   getAdminSubscriptionPlansData,
   getAdminUsersData,
@@ -16,6 +17,7 @@ import {
   generateQrCodesAction,
   setGuardianActiveAction,
   setGuardianAdminAction,
+  setAdDailyRateAction,
   setQrActiveAction,
   setQrSubjectAction,
   setSubscriptionPlanPriceAction,
@@ -55,7 +57,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["qr", "admins", "payments"].includes(resolvedSearchParams?.section)
+  const activeSection = ["qr", "admins", "payments", "ads"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "guardians";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -70,6 +72,7 @@ export default async function AdminPage({ searchParams }) {
   const qrData = activeSection === "qr" ? await getQrAdminData(qrFilters) : null;
   const adminUsersData = activeSection === "admins" ? await getAdminUsersData() : null;
   const paymentData = activeSection === "payments" ? await getAdminSubscriptionPlansData() : null;
+  const adsData = activeSection === "ads" ? await getAdminAdsData() : null;
   const qrItems = qrData ? await withQrImages(qrData.qrCodes) : [];
   const title =
     activeSection === "qr"
@@ -78,7 +81,9 @@ export default async function AdminPage({ searchParams }) {
         ? "관리자 관리"
         : activeSection === "payments"
           ? "결제 관리"
-          : "보호자 관리";
+          : activeSection === "ads"
+            ? "광고 관리"
+            : "보호자 관리";
   const description =
     activeSection === "qr"
       ? "사람찾기 URL로 연결되는 QR 코드와 고유 문자열을 생성하고 활성 상태를 관리합니다."
@@ -86,7 +91,9 @@ export default async function AdminPage({ searchParams }) {
         ? "가입된 보호자 사용자에게 관리자 역할을 부여하거나 회수합니다."
         : activeSection === "payments"
           ? "구독 옵션별 기간과 가격을 관리합니다."
-          : "보호자를 활성화/비활성화하고, 선택한 보호자의 관리대상 4명을 조회합니다.";
+          : activeSection === "ads"
+            ? "광고 일 단가를 설정하고 사용자별 광고 진행사항을 조회합니다."
+            : "보호자를 활성화/비활성화하고, 선택한 보호자의 관리대상 4명을 조회합니다.";
 
   return (
     <main className="admin-page">
@@ -118,6 +125,9 @@ export default async function AdminPage({ searchParams }) {
           <a className={activeSection === "payments" ? "active" : ""} href="/admin?section=payments">
             결제 관리
           </a>
+          <a className={activeSection === "ads" ? "active" : ""} href="/admin?section=ads">
+            광고 관리
+          </a>
         </nav>
 
         {activeSection === "qr" ? (
@@ -126,12 +136,80 @@ export default async function AdminPage({ searchParams }) {
           <AdminRoleManagementSection adminUsersData={adminUsersData} />
         ) : activeSection === "payments" ? (
           <PaymentManagementSection paymentData={paymentData} />
+        ) : activeSection === "ads" ? (
+          <AdManagementSection adsData={adsData} />
         ) : (
           <GuardianManagementSection adminData={adminData} />
         )}
       </section>
       <StatusToast message={notice} type={noticeType} />
     </main>
+  );
+}
+
+function AdManagementSection({ adsData }) {
+  const { setting, ads } = adsData;
+  const activeCount = ads.filter((ad) => ad.status === "active").length;
+  const pausedCount = ads.filter((ad) => ad.status === "paused").length;
+
+  return (
+    <div className="qr-admin-stack">
+      <section className="admin-panel qr-create-panel">
+        <div>
+          <div className="panel-heading">
+            <h2>광고 일 단가</h2>
+            <span>{formatCurrency(setting.daily_rate)}</span>
+          </div>
+          <p className="empty-text">사용자가 선택한 광고기간 일수에 이 단가를 곱해 예상 금액을 산정합니다.</p>
+        </div>
+        <form className="ad-rate-form" action={setAdDailyRateAction}>
+          <input type="hidden" name="returnTo" value="/admin?section=ads" />
+          <label>
+            일 단가
+            <input name="dailyRate" type="number" min="0" step="100" defaultValue={setting.daily_rate} />
+          </label>
+          <FormSubmitButton pendingText="저장중">
+            저장
+          </FormSubmitButton>
+        </form>
+        <div className="qr-stats" aria-label="광고 상태 요약">
+          <span>전체 {ads.length}건</span>
+          <span>광고중 {activeCount}건</span>
+          <span>일시정지 {pausedCount}건</span>
+        </div>
+      </section>
+
+      <section className="admin-panel">
+        <div className="panel-heading">
+          <h2>사용자별 광고 진행사항</h2>
+          <span>{ads.length}건</span>
+        </div>
+        <div className="admin-ad-grid">
+          {ads.map((ad) => (
+            <article className="admin-ad-card" key={ad.id}>
+              <div className="admin-ad-main">
+                <strong>{ad.subject_name || "관리대상 미입력"}</strong>
+                <span>{ad.guardian_name || ad.guardian_email || ad.guardian_google_email || "보호자 미입력"}</span>
+                <span>{ad.guardian_phone || "전화번호 미입력"}</span>
+              </div>
+              <div className="admin-ad-meta">
+                <em className={`ad-status-pill ${ad.status}`}>{adStatusLabel(ad.status)}</em>
+                <span>{ad.region}</span>
+                <span>
+                  {formatDate(ad.start_date)} ~ {formatDate(ad.end_date)}
+                </span>
+                <span>
+                  {ad.days}일 / {formatCurrency(ad.amount)}
+                </span>
+                <span>일 단가 {formatCurrency(ad.daily_rate)}</span>
+                <span>Meta API: {ad.meta_campaign_id || ad.meta_status || "연동 대기"}</span>
+              </div>
+            </article>
+          ))}
+          {ads.length === 0 && <p className="empty-text">등록된 광고 진행사항이 없습니다.</p>}
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -577,10 +655,22 @@ function formatDate(value) {
   return String(value).replaceAll("-", ".");
 }
 
+function formatCurrency(value) {
+  return `${Number(value || 0).toLocaleString("ko-KR")}원`;
+}
+
 function statusClass(status) {
   if (status === "찾는중") return "searching";
   if (status === "QR활성화필요") return "qr-needed";
   return "safe";
+}
+
+function adStatusLabel(status) {
+  if (status === "active") return "광고중";
+  if (status === "paused") return "일시정지";
+  if (status === "ready") return "준비중";
+  if (status === "ended") return "종료";
+  return "연동 대기";
 }
 
 function isBaseAdminUser(user) {
