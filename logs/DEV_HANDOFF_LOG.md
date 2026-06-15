@@ -1638,6 +1638,58 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Changed Files
 - `logs/DEV_HANDOFF_LOG.md`
 - `logs/PRESENTATION_PROGRESS_LOG.md`
+## 2026-06-15 21:05 KST - QR Match Search, Download, Guardian QR Visibility
+
+### User Request
+- In QR management, the subject select box will become difficult as users grow.
+- Replace it with a button/search flow to find guardians and managed subjects by name.
+- Already matched managed subjects must not appear in search results.
+- A matched subject should appear only after its QR match is cleared.
+- Clicking a QR image in QR management should download it.
+- Matched QR codes should also be visible to the guardian in the user screen.
+
+### Reflected Work
+- Replaced the large QR subject select box with a per-QR search flow:
+  - guardian name/email input.
+  - managed subject name input.
+  - `대상 조회` button.
+  - search results shown only for the selected QR card.
+- Search result rules:
+  - only subjects with no current QR match are returned.
+  - already matched subjects are excluded by `LEFT JOIN qr_codes ... WHERE q.id IS NULL`.
+  - a subject becomes searchable again only after `매칭 해제`.
+- Added `선택 매칭` buttons for each search result.
+- Kept `매칭 해제` and active/inactive controls.
+- Added QR image download in admin QR cards:
+  - click the QR image to download `{QR코드}.png`.
+- Added guardian-side QR visibility:
+  - dashboard/status list shows assigned QR code.
+  - information screen subject card shows QR image, QR code, active state, find URL, and image download link.
+- Updated dashboard subject query to include assigned QR metadata.
+
+### Files Changed
+- `lib/db.js`
+- `app/admin/page.js`
+- `app/dashboard.js`
+- `app/globals.css`
+- `deliverables/QR_MANAGEMENT.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- Turso unmatched subject search succeeded:
+  - unmatched candidates: 0
+  - this is expected because the current 2 subjects are already matched.
+- Turso guardian subject QR join succeeded:
+  - 2 subject rows returned with QR code/public key.
+
+### Notes
+- No DB migration required.
+- The uploaded attachment folder remains untracked.
+
 ## 2026-06-15 20:45 KST - QR Admin Filtering And Manual Matching
 
 ### User Request

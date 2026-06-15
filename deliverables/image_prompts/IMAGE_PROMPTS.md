@@ -89,3 +89,14 @@ Create a clean Korean public-service style admin workflow diagram for "REAL_QR_F
 
 ### Notes
 - Use for explaining the manual operations administrators can perform after QR generation.
+
+## 2026-06-15 - QR Search Matching And Guardian QR Download
+
+### Purpose
+- Presentation diagram for improved QR matching search and guardian-side assigned QR visibility.
+
+### Prompt
+Create a clean Korean public-service style product workflow diagram for "REAL_QR_FIND" showing an admin QR management page where each QR card has a "대상 조회" search flow. Show the admin typing guardian name/email and managed subject name, viewing only unmatched managed subjects, selecting one, and assigning it to the QR. Show that already matched subjects do not appear until "매칭 해제" is used. Also show QR images being clickable/downloadable in the admin page and visible/downloadable in the guardian user screen for matched subjects. Use white surfaces, civic blue accents, green matched states, gray unmatched states, red inactive states, and Turso database relationship arrows. Avoid real personal data.
+
+### Notes
+- Use for presenting the reason search replaced the large select box.

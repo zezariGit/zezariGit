@@ -1,13 +1,14 @@
 import { deleteSubjectAction, saveGuardianAction, saveSubjectAction } from "./actions";
 import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
 import PushNotificationButton from "./push-notification-button";
+import QRCode from "qrcode";
 import TossSubscriptionButton from "./toss-subscription-button";
 import { isAdminSession } from "../lib/admin";
 
 const genders = ["남성", "여성", "기타"];
 const statuses = ["문제없음", "찾는중", "QR활성화필요"];
 
-export default function GuardianDashboard({
+export default async function GuardianDashboard({
   guardian,
   subjects,
   subscription,
@@ -15,7 +16,8 @@ export default function GuardianDashboard({
   session,
   activeTab = "dashboard",
 }) {
-  const emptySlots = Array.from({ length: Math.max(0, 4 - subjects.length) });
+  const subjectsWithQr = await withSubjectQrImages(subjects);
+  const emptySlots = Array.from({ length: Math.max(0, 4 - subjectsWithQr.length) });
   const guardianComplete = Boolean(
     guardian.name && guardian.login_id && guardian.password_hash && guardian.phone && guardian.email
   );
@@ -77,12 +79,12 @@ export default function GuardianDashboard({
           <DashboardTab
             guardian={guardian}
             guardianComplete={guardianComplete}
-            subjects={subjects}
+            subjects={subjectsWithQr}
             subscription={subscription}
             subscriptionPlans={subscriptionPlans}
           />
         ) : (
-          <InfoTab guardian={guardian} session={session} subjects={subjects} emptySlots={emptySlots} />
+          <InfoTab guardian={guardian} session={session} subjects={subjectsWithQr} emptySlots={emptySlots} />
         )}
 
         <div className="install-area dashboard-install">
@@ -176,6 +178,7 @@ function StatusDashboard({ guardian, subjects, subscription, subscriptionPlans }
                 <div className="managed-info">
                   <strong>{subject.name}</strong>
                   <span>{formatDate(subject.birth_date)}</span>
+                  {subject.qr_code && <span>QR: {subject.qr_code}</span>}
                 </div>
                 <span className={`status-badge ${statusClass(subject.status)}`}>
                   {subject.status || "문제없음"}
@@ -313,6 +316,21 @@ function SubjectForm({ subject }) {
         </div>
       </form>
 
+      {subject?.qr_code && (
+        <div className="subject-qr-panel">
+          <a href={subject.qr_image} download={`${subject.qr_code}.png`} title={`${subject.qr_code} QR 이미지 다운로드`}>
+            <img src={subject.qr_image} alt={`${subject.name} QR 코드`} />
+          </a>
+          <div>
+            <strong>{subject.qr_code}</strong>
+            <span>{subject.qr_is_active ? "활성 QR" : "비활성 QR"}</span>
+            <a href={subject.qr_target_url} target="_blank" rel="noreferrer">
+              {subject.qr_target_url}
+            </a>
+          </div>
+        </div>
+      )}
+
       {isExisting && (
         <form action={deleteSubjectAction}>
           <input type="hidden" name="subjectId" value={subject.id} />
@@ -334,4 +352,23 @@ function statusClass(status) {
   if (status === "찾는중") return "searching";
   if (status === "QR활성화필요") return "qr-needed";
   return "safe";
+}
+
+async function withSubjectQrImages(subjects) {
+  return Promise.all(
+    subjects.map(async (subject) => {
+      if (!subject.qr_target_url) return subject;
+      return {
+        ...subject,
+        qr_image: await QRCode.toDataURL(subject.qr_target_url, {
+          margin: 1,
+          width: 144,
+          color: {
+            dark: "#1f2d3d",
+            light: "#ffffff",
+          },
+        }),
+      };
+    })
+  );
 }

@@ -23,6 +23,10 @@ Project: REAL_QR_FIND / zezari
    - all/active/inactive
 5. Admin can activate or deactivate each QR.
 6. Admin can manually assign, change, or clear a QR-to-subject match.
+   - Instead of a full select box, each QR card provides a search form.
+   - Admin can search by guardian name/email and managed subject name.
+   - Search results only include subjects that are not currently matched to any QR.
+   - A subject already matched to a QR appears only after its existing match is cleared.
 7. Admin can generate additional unique QR codes by entering a desired count.
 8. Public QR URLs resolve to:
    - `/find/{public_key}`
@@ -60,6 +64,10 @@ Project: REAL_QR_FIND / zezari
   - deleted subjects release their QR assignment.
   - manual admin assignment moves the selected subject from any previous QR to the newly selected QR.
   - manual clear sets `qr_codes.guardian_id` and `qr_codes.subject_id` back to `NULL`.
+  - manual search excludes already matched subjects using `LEFT JOIN qr_codes ... WHERE q.id IS NULL`.
+- QR image download:
+  - Admin can click the QR image to download a PNG.
+  - Guardian can view and download assigned QR images from the user information screen.
 - Duplicate prevention:
   - The server checks both `code` and `public_key` before insert.
   - Generation retries on collision.
@@ -79,3 +87,5 @@ Project: REAL_QR_FIND / zezari
 - Public route `/find/[key]` is included in the Next.js build output.
 - QR filter stats verified against Turso.
 - Subject option list verified against Turso.
+- Unmatched subject search verified against Turso.
+- Guardian subject QR join verified against Turso.

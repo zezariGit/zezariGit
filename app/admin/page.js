@@ -56,6 +56,9 @@ export default async function AdminPage({ searchParams }) {
   const qrFilters = {
     match: resolvedSearchParams?.match || "all",
     active: resolvedSearchParams?.active || "all",
+    assignQr: resolvedSearchParams?.assignQr || "",
+    guardianQuery: resolvedSearchParams?.guardianQuery || "",
+    subjectQuery: resolvedSearchParams?.subjectQuery || "",
   };
   const adminData = activeSection === "guardians" ? await getAdminData(selectedGuardianId) : null;
   const qrData = activeSection === "qr" ? await getQrAdminData(qrFilters) : null;
@@ -388,7 +391,9 @@ function QrManagementSection({ qrData, qrItems }) {
           {qrItems.map((qr) => (
             <article className="qr-card" key={qr.id}>
               <div className="qr-image-wrap">
-                <img src={qr.image} alt={`${qr.code} QR 코드`} />
+                <a href={qr.image} download={`${qr.code}.png`} title={`${qr.code} QR 이미지 다운로드`}>
+                  <img src={qr.image} alt={`${qr.code} QR 코드`} />
+                </a>
               </div>
               <div className="qr-card-body">
                 <div>
@@ -400,26 +405,60 @@ function QrManagementSection({ qrData, qrItems }) {
                 <a href={qr.target_url} target="_blank" rel="noreferrer">
                   {qr.target_url}
                 </a>
-                <form action={setQrSubjectAction} className="qr-match-form">
-                  <input type="hidden" name="qrId" value={qr.id} />
-                  <label>
-                    관리대상 매칭
-                    <select name="subjectId" defaultValue={qr.subject_id || ""}>
-                      <option value="">미매칭</option>
-                      {qrData.subjects.map((subject) => (
-                        <option value={subject.id} key={subject.id}>
-                          {subject.guardian_name || subject.guardian_email || "보호자 미입력"} / {subject.name}
-                          {subject.assigned_qr_id && subject.assigned_qr_id !== qr.id
-                            ? ` - 현재 ${subject.assigned_qr_code} 배정`
-                            : ""}
-                        </option>
+                <div className="qr-match-tools">
+                  <form action="/admin" className="qr-match-search-form">
+                    <input type="hidden" name="section" value="qr" />
+                    <input type="hidden" name="match" value={qrData.filters.match} />
+                    <input type="hidden" name="active" value={qrData.filters.active} />
+                    <input type="hidden" name="assignQr" value={qr.id} />
+                    <label>
+                      보호자 조회
+                      <input
+                        name="guardianQuery"
+                        defaultValue={qrData.matchSearch.qrId === qr.id ? qrData.matchSearch.guardianQuery : ""}
+                        placeholder="보호자 이름/이메일"
+                      />
+                    </label>
+                    <label>
+                      관리대상 조회
+                      <input
+                        name="subjectQuery"
+                        defaultValue={qrData.matchSearch.qrId === qr.id ? qrData.matchSearch.subjectQuery : ""}
+                        placeholder="관리대상 이름"
+                      />
+                    </label>
+                    <button className="primary-button compact" type="submit">
+                      대상 조회
+                    </button>
+                  </form>
+
+                  {qrData.matchSearch.qrId === qr.id && (
+                    <div className="qr-match-results">
+                      {qrData.matchCandidates.map((subject) => (
+                        <form action={setQrSubjectAction} className="qr-match-result" key={subject.id}>
+                          <input type="hidden" name="qrId" value={qr.id} />
+                          <input type="hidden" name="subjectId" value={subject.id} />
+                          <div>
+                            <strong>{subject.name}</strong>
+                            <span>
+                              {subject.guardian_name ||
+                                subject.guardian_email ||
+                                subject.guardian_google_email ||
+                                "보호자 미입력"}
+                            </span>
+                            <span>{formatDate(subject.birth_date)}</span>
+                          </div>
+                          <button className="activate-button" type="submit">
+                            선택 매칭
+                          </button>
+                        </form>
                       ))}
-                    </select>
-                  </label>
-                  <button className="primary-button compact" type="submit">
-                    {qr.subject_id ? "매칭 변경" : "매칭 저장"}
-                  </button>
-                </form>
+                      {qrData.matchCandidates.length === 0 && (
+                        <p className="empty-text">조회된 미매칭 관리대상이 없습니다. 이미 매칭된 대상은 매칭 해제 후 조회됩니다.</p>
+                      )}
+                    </div>
+                  )}
+                </div>
                 <div className="qr-card-footer">
                   <em className={qr.is_active ? "active-state" : "inactive-state"}>
                     {qr.is_active ? "활성" : "비활성"}
