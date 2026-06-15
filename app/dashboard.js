@@ -1,4 +1,5 @@
 import { deleteSubjectAction, saveGuardianAction, saveSubjectAction } from "./actions";
+import FormSubmitButton from "./form-submit-button";
 import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
 import PushNotificationButton from "./push-notification-button";
 import QRCode from "qrcode";
@@ -249,9 +250,9 @@ function GuardianForm({ guardian, session }) {
                 이메일
                 <input name="email" type="email" defaultValue={guardian.email || session.user?.email || ""} required />
               </label>
-              <button className="action" type="submit">
+              <FormSubmitButton className="action" pendingText="저장중">
                 보호자 정보 저장
-              </button>
+              </FormSubmitButton>
             </form>
   );
 }
@@ -310,9 +311,9 @@ function SubjectForm({ subject }) {
             사진 업로드
             <input name="photo" type="file" accept="image/*" />
           </label>
-          <button className="action" type="submit">
+          <FormSubmitButton className="action" pendingText={isExisting ? "수정중" : "저장중"}>
             {isExisting ? "대상자 정보 수정" : "대상자 추가"}
-          </button>
+          </FormSubmitButton>
         </div>
       </form>
 
@@ -334,9 +335,9 @@ function SubjectForm({ subject }) {
       {isExisting && (
         <form action={deleteSubjectAction}>
           <input type="hidden" name="subjectId" value={subject.id} />
-          <button className="danger-button" type="submit">
+          <FormSubmitButton className="danger-button" pendingText="삭제중">
             삭제
-          </button>
+          </FormSubmitButton>
         </form>
       )}
     </article>

@@ -71,6 +71,10 @@ Project: REAL_QR_FIND / zezari
 - QR image download:
   - Admin can click the QR image to download a PNG.
   - Guardian can view and download assigned QR images from the user information screen.
+- Feedback:
+  - Query buttons show an inline progress indicator while submitting.
+  - Save/update/delete/match actions return to the page with a bottom status message.
+  - Failure cases return an error-style bottom message when handled by the server action.
 - Duplicate prevention:
   - The server checks both `code` and `public_key` before insert.
   - Generation retries on collision.

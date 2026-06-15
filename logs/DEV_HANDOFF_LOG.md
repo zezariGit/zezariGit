@@ -1638,6 +1638,67 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Changed Files
 - `logs/DEV_HANDOFF_LOG.md`
 - `logs/PRESENTATION_PROGRESS_LOG.md`
+## 2026-06-15 21:45 KST - Global Save/Search Feedback
+
+### User Request
+- When saving or querying, there is no clear sense that the action completed.
+- Show bottom messages such as:
+  - `저장되었습니다`
+  - `수정되었습니다`
+  - `필수값을 입력해주세요`
+- Add progress bars when querying.
+- Apply this across the app.
+
+### Reflected Work
+- Added shared client component:
+  - `app/form-submit-button.js`
+  - Uses `useFormStatus` to show pending state and an inline progress bar.
+- Added shared client component:
+  - `app/status-toast.js`
+  - Shows fixed bottom success/error messages.
+  - Auto-hides after a short delay.
+- Updated user server actions:
+  - guardian save redirects with success/error notice.
+  - subject save redirects with success/error notice.
+  - subject delete redirects with success/error notice.
+- Updated admin server actions:
+  - guardian activation.
+  - QR generation.
+  - QR active/inactive.
+  - QR match/unmatch.
+  - admin role update.
+  - subscription price update.
+- Updated major forms/buttons to use the shared submit button.
+- Added inline progress bars for query forms such as QR filters and QR modal search.
+- Added bottom toast rendering on:
+  - home/user dashboard page.
+  - admin page.
+- Added CSS for:
+  - `.pending-button`
+  - `.button-progress`
+  - `.status-toast`
+
+### Files Changed
+- `app/form-submit-button.js`
+- `app/status-toast.js`
+- `app/actions.js`
+- `app/admin/actions.js`
+- `app/page.js`
+- `app/dashboard.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `deliverables/QR_MANAGEMENT.md`
+- `deliverables/README.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+
+### Notes
+- Browser-native required fields still prevent submission before server action runs.
+- Server-side validation failures that reach server actions now redirect with error-style notice where handled.
+
 ## 2026-06-15 21:25 KST - QR Matching Modal UX Cleanup
 
 ### User Request

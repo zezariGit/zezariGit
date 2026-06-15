@@ -1,6 +1,8 @@
 import { getServerSession } from "next-auth";
 import QRCode from "qrcode";
+import FormSubmitButton from "../form-submit-button";
 import { LogoutButton, SocialLoginButtons } from "../auth-actions";
+import StatusToast from "../status-toast";
 import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
 import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
 import {
@@ -23,6 +25,8 @@ export default async function AdminPage({ searchParams }) {
   const session = await getServerSession(authOptions);
   const resolvedSearchParams = await searchParams;
   const enabledProviders = getConfiguredProviderIds();
+  const notice = resolvedSearchParams?.notice || "";
+  const noticeType = resolvedSearchParams?.noticeType || "success";
 
   if (!session) {
     return (
@@ -32,6 +36,7 @@ export default async function AdminPage({ searchParams }) {
           <p>관리자 페이지를 사용하려면 등록된 소셜 계정 로그인이 필요합니다.</p>
           <SocialLoginButtons enabledProviders={enabledProviders} />
         </section>
+        <StatusToast message={notice} type={noticeType} />
       </main>
     );
   }
@@ -45,6 +50,7 @@ export default async function AdminPage({ searchParams }) {
           <p>등록된 관리자 이메일만 관리자 페이지에 접근할 수 있습니다.</p>
           <LogoutButton />
         </section>
+        <StatusToast message={notice} type={noticeType} />
       </main>
     );
   }
@@ -124,6 +130,7 @@ export default async function AdminPage({ searchParams }) {
           <GuardianManagementSection adminData={adminData} />
         )}
       </section>
+      <StatusToast message={notice} type={noticeType} />
     </main>
   );
 }
@@ -147,13 +154,14 @@ function PaymentManagementSection({ paymentData }) {
               </div>
               <form action={setSubscriptionPlanPriceAction} className="payment-plan-form">
                 <input type="hidden" name="months" value={plan.months} />
+                <input type="hidden" name="returnTo" value="/admin?section=payments" />
                 <label>
                   가격
                   <input name="amount" type="number" min="0" step="100" defaultValue={plan.amount} />
                 </label>
-                <button className="primary-button compact" type="submit">
+                <FormSubmitButton pendingText="저장중">
                   저장
-                </button>
+                </FormSubmitButton>
               </form>
             </article>
           ))}
@@ -215,13 +223,14 @@ function AdminRoleManagementSection({ adminUsersData }) {
                 <form action={setGuardianAdminAction}>
                   <input type="hidden" name="guardianId" value={user.id} />
                   <input type="hidden" name="admin" value={dbAdmin ? "0" : "1"} />
-                  <button
+                  <input type="hidden" name="returnTo" value="/admin?section=admins" />
+                  <FormSubmitButton
                     className={dbAdmin ? "danger-button compact" : "activate-button"}
                     disabled={baseAdmin}
-                    type="submit"
+                    pendingText={dbAdmin ? "회수중" : "부여중"}
                   >
                     {baseAdmin ? "기본관리자 유지" : dbAdmin ? "관리자 회수" : "관리자 부여"}
-                  </button>
+                  </FormSubmitButton>
                 </form>
               </article>
             );
@@ -279,12 +288,13 @@ function GuardianManagementSection({ adminData }) {
               <form action={setGuardianActiveAction}>
                 <input type="hidden" name="guardianId" value={selectedGuardian.id} />
                 <input type="hidden" name="active" value={selectedGuardian.is_active ? "0" : "1"} />
-                <button
+                <input type="hidden" name="returnTo" value={`/admin?guardian=${selectedGuardian.id}`} />
+                <FormSubmitButton
                   className={selectedGuardian.is_active ? "danger-button compact" : "activate-button"}
-                  type="submit"
+                  pendingText={selectedGuardian.is_active ? "비활성화중" : "활성화중"}
                 >
                   {selectedGuardian.is_active ? "비활성화" : "활성화"}
-                </button>
+                </FormSubmitButton>
               </form>
             </div>
 
@@ -347,9 +357,10 @@ function QrManagementSection({ qrData, qrItems }) {
         <form className="qr-create-form" action={generateQrCodesAction}>
           <label htmlFor="qr-count">추가 개수</label>
           <input id="qr-count" type="number" name="count" min="1" max="200" defaultValue="10" />
-          <button className="primary-button compact" type="submit">
+          <input type="hidden" name="returnTo" value={buildQrListUrl(qrData)} />
+          <FormSubmitButton pendingText="생성중">
             생성
-          </button>
+          </FormSubmitButton>
         </form>
         <div className="qr-stats" aria-label="QR 상태 요약">
           <span>활성 {qrData.activeCount}개</span>
@@ -378,9 +389,9 @@ function QrManagementSection({ qrData, qrItems }) {
               <option value="inactive">비활성</option>
             </select>
           </label>
-          <button className="primary-button compact" type="submit">
+          <FormSubmitButton pendingText="조회중">
             필터 적용
-          </button>
+          </FormSubmitButton>
           <a className="admin-link" href="/admin?section=qr">
             초기화
           </a>
@@ -424,18 +435,22 @@ function QrManagementSection({ qrData, qrItems }) {
                       <form action={setQrSubjectAction}>
                         <input type="hidden" name="qrId" value={qr.id} />
                         <input type="hidden" name="subjectId" value="" />
-                        <input type="hidden" name="returnTo" value="/admin?section=qr" />
-                        <button className="danger-button compact" type="submit">
+                        <input type="hidden" name="returnTo" value={buildQrListUrl(qrData)} />
+                        <FormSubmitButton className="danger-button compact" pendingText="해제중">
                           매칭 해제
-                        </button>
+                        </FormSubmitButton>
                       </form>
                     )}
                     <form action={setQrActiveAction}>
                       <input type="hidden" name="qrId" value={qr.id} />
                       <input type="hidden" name="active" value={qr.is_active ? "0" : "1"} />
-                      <button className={qr.is_active ? "danger-button compact" : "activate-button"} type="submit">
+                      <input type="hidden" name="returnTo" value={buildQrListUrl(qrData)} />
+                      <FormSubmitButton
+                        className={qr.is_active ? "danger-button compact" : "activate-button"}
+                        pendingText={qr.is_active ? "비활성화중" : "활성화중"}
+                      >
                         {qr.is_active ? "비활성화" : "활성화"}
-                      </button>
+                      </FormSubmitButton>
                     </form>
                   </div>
                 </div>
@@ -485,9 +500,9 @@ function QrManagementSection({ qrData, qrItems }) {
                 관리대상
                 <input name="subjectQuery" defaultValue={qrData.matchSearch.subjectQuery} placeholder="관리대상 이름" />
               </label>
-              <button className="primary-button compact" type="submit">
+              <FormSubmitButton pendingText="조회중">
                 조회
-              </button>
+              </FormSubmitButton>
             </form>
 
             <div className="qr-modal-results">
@@ -495,7 +510,7 @@ function QrManagementSection({ qrData, qrItems }) {
                 <form action={setQrSubjectAction} className="qr-modal-result" key={subject.id}>
                   <input type="hidden" name="qrId" value={selectedQr.id} />
                   <input type="hidden" name="subjectId" value={subject.id} />
-                  <input type="hidden" name="returnTo" value="/admin?section=qr" />
+                  <input type="hidden" name="returnTo" value={buildQrListUrl(qrData)} />
                   <div>
                     <strong>{subject.name}</strong>
                     <span>
@@ -506,9 +521,9 @@ function QrManagementSection({ qrData, qrItems }) {
                     </span>
                     <span>{formatDate(subject.birth_date)}</span>
                   </div>
-                  <button className="activate-button" type="submit">
+                  <FormSubmitButton className="activate-button" pendingText="매칭중">
                     선택 매칭
-                  </button>
+                  </FormSubmitButton>
                 </form>
               ))}
               {qrData.matchCandidates.length === 0 && (
@@ -528,6 +543,15 @@ function buildQrAssignUrl(qrData, qrId) {
     match: qrData.filters.match,
     active: qrData.filters.active,
     assignQr: qrId,
+  });
+  return `/admin?${params.toString()}`;
+}
+
+function buildQrListUrl(qrData) {
+  const params = new URLSearchParams({
+    section: "qr",
+    match: qrData.filters.match,
+    active: qrData.filters.active,
   });
   return `/admin?${params.toString()}`;
 }
