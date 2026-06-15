@@ -1015,6 +1015,13 @@ This file is the cumulative presentation-ready project log. It is written so the
   - 매칭 2개
   - 미매칭 28개
   - 관리대상 선택 옵션 2개
+- GitHub 반영:
+  - `23381c1 Add QR admin filters and manual matching`
+- 운영 배포 완료:
+  - `https://zezari.vercel.app`
+- 운영 경로 확인:
+  - `/admin?section=qr&match=matched&active=active` 정상 응답.
+  - 서버 오류 문구 없음.
 
 ### 반영 시간
 - 구현, DB 조회 검증, 문서/로그 반영: 약 25분.

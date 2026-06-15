@@ -1694,6 +1694,16 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - matched QR: 2
   - unmatched QR: 28
   - subject options: 2
+- GitHub commit:
+  - `23381c1 Add QR admin filters and manual matching`
+- Production deployment:
+  - `https://zezari-8i1pmuv6h-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+- Production route checks:
+  - `/admin?section=qr&match=matched&active=active` returned HTTP 200 while logged out and showed the admin login gate.
+  - Server error text was not present.
+  - `/` returned HTTP 200.
 
 ### Notes
 - No database migration required; this uses existing `qr_codes.guardian_id` and `qr_codes.subject_id`.
