@@ -980,6 +980,26 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### Verification
 - Local build succeeded.
+## 2026-06-15 - QR/푸시 기능 운영 배포 완료
+
+### 배포 결과
+- GitHub 커밋:
+  - `d263b87 Add subject QR matching and guardian push alerts`
+- 운영 배포 URL:
+  - `https://zezari.vercel.app`
+
+### 운영 확인
+- 공개 QR 페이지 접속 성공.
+- `보호자에게 알리기` 버튼 표시 확인.
+- 보호자 정보 영역 표시 확인.
+- 푸시 공개키 API 설정 완료 확인.
+- 알림 API 정상 응답 확인.
+- 서비스워커 `zezari-v13` 및 푸시 핸들러 반영 확인.
+
+### 참고
+- 현재 푸시 전송 수는 0건이다.
+- 이유: 보호자가 실제 기기/브라우저에서 `푸시 알림 켜기`를 아직 누르지 않았기 때문이다.
+
 ## 2026-06-15 - QR별 관리대상 매칭 및 보호자 푸시 알림
 
 ### 요구내용

@@ -1638,6 +1638,33 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Changed Files
 - `logs/DEV_HANDOFF_LOG.md`
 - `logs/PRESENTATION_PROGRESS_LOG.md`
+## 2026-06-15 20:18 KST - Deployment Completion For Subject QR Push Alerts
+
+### Completion Update
+- GitHub commit:
+  - `d263b87 Add subject QR matching and guardian push alerts`
+- GitHub push:
+  - `main` pushed to `https://github.com/zezariGit/zezariGit.git`
+- Vercel deployment:
+  - `https://zezari-i4cugzoy3-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- `https://zezari.vercel.app/find/{assigned-public-key}` returned HTTP 200.
+- Production find page includes `보호자에게 알리기`.
+- Production find page includes guardian information section.
+- `https://zezari.vercel.app/api/push/public-key` returned HTTP 200.
+- Push configuration is active and public key is present.
+- Production notify API returned HTTP 200 with `sent=0`, `total=0`.
+  - Expected because no guardian browser/device has registered push subscription yet.
+- `https://zezari.vercel.app/sw.js` returned HTTP 200.
+- Service worker includes cache version `zezari-v13` and push handler.
+
+### Verification Limitation
+- In-app browser automation was attempted but the Browser plugin reported `iab` unavailable in this session.
+- Build, local HTTP, DB migration, Vercel environment, deployment, and production HTTP checks completed successfully.
+
 ## 2026-06-15 20:09 KST - Subject-Matched QR Find Page And Guardian Push Notification
 
 ### User Request
