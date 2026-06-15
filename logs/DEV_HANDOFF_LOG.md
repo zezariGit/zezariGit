@@ -2119,3 +2119,46 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Advertisement payment is not connected yet.
 - Current `subject_ads.status` values used by UI are `active`, `paused`, `ready`, and `ended`.
 - A subject cannot create another running ad while it has a `ready`, `active`, or `paused` ad.
+
+## 2026-06-16 KST - Shared Modal Close Placement And Background Scroll Lock
+
+### User Request
+- Move close buttons to the lower area for all popups.
+- When the advertisement popup is open, prevent the mobile background page from scrolling by touch.
+- While a popup is open, background buttons and links should not be clickable.
+- Apply this commonly to all popups and future popups.
+
+### Reflected Work
+- Added shared client component:
+  - `app/modal-scroll-lock.js`
+- `ModalScrollLock` behavior:
+  - adds `modal-open` to `html` and `body`.
+  - fixes the body at the current scroll position.
+  - disables document/body scroll.
+  - blocks `touchmove` outside `[data-modal-surface]`.
+  - restores the original scroll position when the popup closes.
+- Updated current popups:
+  - advertisement modal
+  - QR matching modal
+- Moved current popup close buttons from header to lower `.modal-footer`.
+- Added shared modal classes:
+  - `.modal-backdrop`
+  - `.modal-surface`
+  - `.modal-footer`
+  - `.modal-close-button`
+- Updated `deliverables/UI_STYLE_GUIDE.md` with future modal/popup guidance.
+
+### Files Changed
+- `app/modal-scroll-lock.js`
+- `app/ad-campaign-modal.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `deliverables/UI_STYLE_GUIDE.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- Local `http://localhost:3000/` returned HTTP 200.
+- Local `http://localhost:3000/admin?section=qr&assignQr=test` returned HTTP 200 and showed the admin login gate when unauthenticated.
+- In-app browser verification was attempted, but the Browser plugin reported `iab` unavailable in this session.

@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import QRCode from "qrcode";
 import FormSubmitButton from "../form-submit-button";
 import { LogoutButton, SocialLoginButtons } from "../auth-actions";
+import ModalScrollLock from "../modal-scroll-lock";
 import StatusToast from "../status-toast";
 import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
 import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
@@ -540,17 +541,15 @@ function QrManagementSection({ qrData, qrItems }) {
       </section>
 
       {selectedQr && !selectedQr.subject_id && (
-        <section className="qr-modal-backdrop" aria-label="QR 매칭 대상 조회">
-          <div className="qr-modal">
+        <section className="modal-backdrop qr-modal-backdrop" aria-label="QR 매칭 대상 조회" role="dialog" aria-modal="true">
+          <ModalScrollLock />
+          <div className="modal-surface qr-modal" data-modal-surface>
             <div className="qr-modal-header">
               <div>
                 <p className="intro-kicker">QR 매칭</p>
                 <h2>매칭대상 조회</h2>
                 <p>{selectedQr.code}에 연결할 미매칭 관리대상을 선택합니다.</p>
               </div>
-              <a className="plain-button" href="/admin?section=qr">
-                닫기
-              </a>
             </div>
 
             <div className="qr-modal-summary">
@@ -607,6 +606,11 @@ function QrManagementSection({ qrData, qrItems }) {
               {qrData.matchCandidates.length === 0 && (
                 <p className="empty-text">조회된 미매칭 관리대상이 없습니다. 기존 매칭을 해제하면 다시 조회됩니다.</p>
               )}
+            </div>
+            <div className="modal-footer">
+              <a className="plain-button modal-close-button" href="/admin?section=qr">
+                닫기
+              </a>
             </div>
           </div>
         </section>

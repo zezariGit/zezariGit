@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import FormSubmitButton from "./form-submit-button";
+import ModalScrollLock from "./modal-scroll-lock";
 
 const statusLabels = {
   active: "광고중",
@@ -28,17 +29,15 @@ export default function AdCampaignModal({
   if (!subject) return null;
 
   return (
-    <section className="ad-modal-backdrop" aria-label="광고 신청">
-      <div className="ad-modal">
+    <section className="modal-backdrop ad-modal-backdrop" aria-label="광고 신청" role="dialog" aria-modal="true">
+      <ModalScrollLock />
+      <div className="modal-surface ad-modal" data-modal-surface>
         <div className="ad-modal-header">
           <div>
             <p className="intro-kicker">광고</p>
             <h2>{subject.name} 광고 관리</h2>
             <p>Meta API 연동 전까지 광고 신청과 진행 상태를 서비스 DB에 저장합니다.</p>
           </div>
-          <a className="plain-button" href="/?tab=dashboard">
-            닫기
-          </a>
         </div>
 
         {activeAd ? (
@@ -120,6 +119,11 @@ export default function AdCampaignModal({
             </FormSubmitButton>
           </form>
         )}
+        <div className="modal-footer">
+          <a className="plain-button modal-close-button" href="/?tab=dashboard">
+            닫기
+          </a>
+        </div>
       </div>
     </section>
   );

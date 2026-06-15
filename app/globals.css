@@ -31,6 +31,16 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+html.modal-open,
+body.modal-open {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body.modal-open {
+  touch-action: none;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -498,6 +508,7 @@ a {
   text-decoration: none;
 }
 
+.modal-backdrop,
 .ad-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -506,8 +517,11 @@ a {
   place-items: center;
   padding: var(--space-lg);
   background: rgba(15, 23, 42, 0.5);
+  overscroll-behavior: contain;
+  touch-action: none;
 }
 
+.modal-surface,
 .ad-modal {
   width: min(100%, 560px);
   max-height: min(760px, calc(100vh - 48px));
@@ -519,6 +533,26 @@ a {
   border-radius: var(--radius-lg);
   background: var(--c-surface);
   box-shadow: 0 24px 80px rgba(15, 23, 42, 0.22);
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+  padding-top: var(--space-sm);
+  border-top: 0.5px solid var(--c-border);
+}
+
+.modal-close-button {
+  min-height: 38px;
+  align-items: center;
+  padding: 0 var(--space-md);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
 }
 
 .ad-modal-header {
@@ -2222,11 +2256,13 @@ textarea:focus {
 .qr-modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 60;
   display: grid;
   place-items: center;
   padding: var(--space-lg);
   background: rgba(15, 23, 42, 0.48);
+  overscroll-behavior: contain;
+  touch-action: none;
 }
 
 .qr-modal {
@@ -2539,6 +2575,7 @@ button:disabled:hover {
     justify-content: flex-start;
   }
 
+  .modal-backdrop,
   .qr-modal-backdrop {
     align-items: stretch;
     padding: var(--space-sm);

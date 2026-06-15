@@ -1251,3 +1251,35 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - 설계, 구현, DB 확인, 문서/로그 반영: 약 35분.
+
+## 2026-06-16 - 팝업 공통 닫기 버튼 및 배경 스크롤 잠금 개선
+
+### 요구내용
+- 모든 팝업의 닫기 버튼을 아래쪽에 구현한다.
+- 광고 팝업이 떠 있을 때 휴대폰 터치로 뒤쪽 메인화면이 스크롤되지 않게 한다.
+- 팝업이 떠 있을 때 뒤쪽 메인화면 버튼도 눌리지 않게 한다.
+- 현재 팝업뿐 아니라 향후 만들어질 팝업에도 공통적으로 적용한다.
+
+### 반영내용
+- 공통 팝업 스크롤 잠금 컴포넌트 `ModalScrollLock` 추가.
+- 팝업이 열리면 현재 스크롤 위치를 유지한 채 body를 고정하도록 구현.
+- 팝업 표면 밖의 모바일 `touchmove` 이벤트를 차단하도록 구현.
+- 공통 팝업 CSS 클래스 추가:
+  - `.modal-backdrop`
+  - `.modal-surface`
+  - `.modal-footer`
+  - `.modal-close-button`
+- 광고 팝업 닫기 버튼을 하단으로 이동.
+- QR 매칭 팝업 닫기 버튼을 하단으로 이동.
+- 향후 팝업 구현 규칙을 `deliverables/UI_STYLE_GUIDE.md`에 기록.
+
+### 산출물
+- `deliverables/UI_STYLE_GUIDE.md`
+
+### 검증
+- 로컬 빌드 성공.
+- `/` HTTP 200 확인.
+- `/admin?section=qr&assignQr=test` HTTP 200 확인.
+
+### 반영 시간
+- 구현, 검증, 문서/로그 반영: 약 20분.

@@ -53,6 +53,17 @@ Project: REAL_QR_FIND / zezari
 - App-specific custom classes should use the `--c-*` tokens from `gov-style.css`.
 - Avoid introducing unrelated color palettes unless the product direction changes.
 
+## Modal / Popup Guidance
+- All modal popups should use the shared modal structure:
+  - `.modal-backdrop`
+  - `.modal-surface`
+  - `.modal-footer`
+  - `ModalScrollLock`
+- The close button should be placed in the lower `.modal-footer`, not in the modal header.
+- While a modal is open, the background page must not scroll on desktop or mobile touch devices.
+- While a modal is open, background buttons and links must not be clickable.
+- The modal body may scroll internally when its own content is taller than the viewport.
+
 ## PWA Theme
 - Manifest and viewport theme color were updated to the gov-style primary blue:
   - `#2e86c1`
