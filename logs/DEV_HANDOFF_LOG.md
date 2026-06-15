@@ -639,6 +639,19 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Confirm paused subscriptions are excluded when future recurring billing scheduler is added.
 - Add billing-key/card cancellation if the service needs full subscription cancellation rather than app-level pause.
 
+### Completion Update
+- GitHub commit:
+  - `7e595ed Add subscription plans and pause resume`
+- Vercel production deployment:
+  - `https://zezari-9eawm8ulk-zezari.vercel.app`
+- Public alias:
+  - `https://zezari.vercel.app`
+- Production verification:
+  - `POST /api/subscription/status` returned HTTP 401 while logged out.
+  - `POST /api/payments/toss/subscription/prepare` returned HTTP 401 while logged out.
+  - `/admin?section=payments` returned HTTP 200 and showed the admin login gate while logged out.
+  - `/sw.js` includes cache version `zezari-v12`.
+
 ## 2026-06-12 22:48 KST - Git Repository Initialized and Pushed to GitHub
 
 ### User Request

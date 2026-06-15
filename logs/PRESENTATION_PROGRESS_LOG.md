@@ -933,6 +933,17 @@ This file is the cumulative presentation-ready project log. It is written so the
   - 3 subscription plans seeded.
 - Local unauthenticated APIs return login-required.
 - Local admin payment route opens and shows login gate while logged out.
+
+### Completion Update
+- GitHub commit:
+  - `7e595ed Add subscription plans and pause resume`
+- Production URL:
+  - `https://zezari.vercel.app`
+- Verified:
+  - Subscription status API is deployed and requires login.
+  - Subscription prepare API is deployed and requires login.
+  - Admin payment route opens and requires admin login.
+  - PWA cache version updated to `zezari-v12`.
 - Turso seed result:
   - 30 total QR records
   - 30 active QR records
