@@ -1,11 +1,12 @@
 import { deleteSubjectAction, saveGuardianAction, saveSubjectAction } from "./actions";
 import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
+import TossSubscriptionButton from "./toss-subscription-button";
 import { isAdminSession } from "../lib/admin";
 
 const genders = ["남성", "여성", "기타"];
 const statuses = ["문제없음", "찾는중", "QR활성화필요"];
 
-export default function GuardianDashboard({ guardian, subjects, session, activeTab = "dashboard" }) {
+export default function GuardianDashboard({ guardian, subjects, subscription, session, activeTab = "dashboard" }) {
   const emptySlots = Array.from({ length: Math.max(0, 4 - subjects.length) });
   const guardianComplete = Boolean(
     guardian.name && guardian.login_id && guardian.password_hash && guardian.phone && guardian.email
@@ -64,7 +65,12 @@ export default function GuardianDashboard({ guardian, subjects, session, activeT
         </nav>
 
         {isDashboard ? (
-          <DashboardTab guardian={guardian} guardianComplete={guardianComplete} subjects={subjects} />
+          <DashboardTab
+            guardian={guardian}
+            guardianComplete={guardianComplete}
+            subjects={subjects}
+            subscription={subscription}
+          />
         ) : (
           <InfoTab guardian={guardian} session={session} subjects={subjects} emptySlots={emptySlots} />
         )}
@@ -79,7 +85,7 @@ export default function GuardianDashboard({ guardian, subjects, session, activeT
   );
 }
 
-function DashboardTab({ guardian, guardianComplete, subjects }) {
+function DashboardTab({ guardian, guardianComplete, subjects, subscription }) {
   if (!guardianComplete) {
     return (
       <section className="dashboard-panel setup-panel">
@@ -94,7 +100,7 @@ function DashboardTab({ guardian, guardianComplete, subjects }) {
 
   return (
     <>
-      <StatusDashboard guardian={guardian} subjects={subjects} />
+      <StatusDashboard guardian={guardian} subjects={subjects} subscription={subscription} />
       <section className="dashboard-panel summary-panel">
         <div className="panel-heading">
           <h2>관리대상 요약</h2>
@@ -130,8 +136,9 @@ function InfoTab({ guardian, session, subjects, emptySlots }) {
   );
 }
 
-function StatusDashboard({ guardian, subjects }) {
+function StatusDashboard({ guardian, subjects, subscription }) {
   const slots = Array.from({ length: 4 }, (_, index) => subjects[index] || null);
+  const subscribed = subscription?.status === "active";
 
   return (
     <section className="status-dashboard" aria-label="관리대상 현재 상태">
@@ -139,6 +146,7 @@ function StatusDashboard({ guardian, subjects }) {
         <div className="status-phone-top">
           <span className="bell-icon" aria-hidden="true">!</span>
           <h2>현재 상태</h2>
+          <TossSubscriptionButton subscribed={subscribed} />
         </div>
         <div className="managed-list">
           {slots.map((subject, index) =>

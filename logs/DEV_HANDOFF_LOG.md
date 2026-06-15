@@ -379,6 +379,118 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - Kakao/Naver buttons show setup-needed state.
   - `/sw.js` includes cache version `zezari-v10`.
 
+## 2026-06-15 00:35 KST - Toss Payments Subscription Foundation
+
+### User Request
+- Connect Toss Payments for subscription payments and future advertisement payments.
+- Use the Toss Payments v2 LLM quick reference documentation.
+- Test keys are expected under `// tosspayments` in `env.txt`.
+- First task:
+  - Add a `구독결제하기` button next to the `현재 상태` text on the dashboard.
+  - After payment completes, show `구독중`.
+
+### Documentation Consulted
+- Toss Payments LLM Quick Reference:
+  - V2 is preferred by default.
+  - Subscription/recurring/billing maps to auto-billing.
+  - Secret key must stay server-only; client key is browser-only.
+  - Server must finalize payment state.
+- Toss Payments auto-billing guide:
+  - Client calls `requestBillingAuth`.
+  - Success redirect returns `authKey` and `customerKey`.
+  - Server issues billing key with `/v1/billing/authorizations/issue`.
+  - Server approves recurring payment with `/v1/billing/{billingKey}`.
+
+### Reflected Work
+- Added Toss Payments environment placeholders:
+  - `TOSS_CLIENT_KEY`
+  - `TOSS_SECRET_KEY`
+  - `TOSS_SUBSCRIPTION_AMOUNT`
+  - `TOSS_SUBSCRIPTION_ORDER_NAME`
+- Added server-side Toss API helper:
+  - `lib/toss-payments.js`
+  - Supports `TOSS_CLIENT_KEY/TOSS_SECRET_KEY`
+  - Also supports legacy aliases `TOSSPAYMENTS_CLIENT_KEY/TOSSPAYMENTS_SECRET_KEY`
+- Added `subscriptions` table.
+- Added subscription data to dashboard data loading.
+- Added dashboard subscription button:
+  - File: `app/toss-subscription-button.js`
+  - Loads Toss V2 SDK from `https://js.tosspayments.com/v2/standard`
+  - Calls prepare API
+  - Starts billing auth with `payment.requestBillingAuth`
+- Added prepare API:
+  - `POST /api/payments/toss/subscription/prepare`
+  - Requires login
+  - Creates or reuses guardian subscription record
+  - Returns client key only when Toss keys are configured
+- Added redirect pages:
+  - `/payments/toss/subscription/success`
+  - `/payments/toss/subscription/fail`
+- Success page server behavior:
+  - Requires login.
+  - Validates subscription by `customerKey`.
+  - Calls Toss billing key issue API.
+  - Calls Toss billing payment API for first subscription payment.
+  - Marks subscription as `active`.
+- Dashboard display behavior:
+  - Not active: `구독결제하기`
+  - Active: `구독중`
+- Updated PWA cache version:
+  - `zezari-v11`
+- Added official deliverable:
+  - `deliverables/TOSS_PAYMENTS_SETUP.md`
+
+### Environment Note
+- Masked scan of `env.txt` did not show Toss Payments variable names at runtime.
+- The file may not have been saved, or variable names may not be in `KEY=value` format yet.
+- Current code is ready for:
+  - `TOSS_CLIENT_KEY`
+  - `TOSS_SECRET_KEY`
+
+### Database Details
+- New table: `subscriptions`
+- Migration result:
+  - Existing subscriptions: `0`
+
+### Files Changed
+- `.env.example`
+- `lib/db.js`
+- `lib/toss-payments.js`
+- `app/dashboard.js`
+- `app/toss-subscription-button.js`
+- `app/api/payments/toss/subscription/prepare/route.js`
+- `app/payments/toss/subscription/success/page.js`
+- `app/payments/toss/subscription/fail/page.js`
+- `app/globals.css`
+- `public/sw.js`
+- `deliverables/TOSS_PAYMENTS_SETUP.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/PWA_SETUP.md`
+- `deliverables/README.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` completed successfully.
+- Build output includes:
+  - `/api/payments/toss/subscription/prepare`
+  - `/payments/toss/subscription/success`
+  - `/payments/toss/subscription/fail`
+- Local production server checks:
+  - Unauthenticated prepare API returned HTTP 401.
+  - Fail page returned HTTP 200 and displayed the expected failure message.
+- Actual Toss payment window was not tested because Toss keys were not visible in the loaded environment.
+
+### Time Spent
+- Toss docs review, subscription schema, server API, dashboard button, callback pages, migration, verification, and documentation: approximately 50 minutes.
+
+### Next Actions
+- Confirm `env.txt` is saved with Toss variables.
+- Add Toss keys to Vercel Production/Development environment variables.
+- Test billing auth with Toss test card flow.
+- Add advertisement payment flow after subscription payment is confirmed.
+
 ## 2026-06-12 22:48 KST - Git Repository Initialized and Pushed to GitHub
 
 ### User Request

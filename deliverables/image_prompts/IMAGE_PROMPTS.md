@@ -45,3 +45,14 @@ Create a clean Korean public-service style architecture diagram for "REAL_QR_FIN
 
 ### Notes
 - Use when presenting the expanded login/signup foundation.
+
+## 2026-06-15 - Toss Payments Subscription Flow
+
+### Purpose
+- Presentation diagram for the first Toss Payments subscription payment flow.
+
+### Prompt
+Create a clean Korean civic-tech architecture diagram for "REAL_QR_FIND" Toss Payments subscription billing. Show a logged-in guardian dashboard with a "구독결제하기" button next to "현재 상태", the browser loading Toss Payments V2 SDK with a client key, card billing authentication, redirect to success/fail URLs, server-side secret key API calls to issue a billing key and approve the first subscription payment, and the Turso `subscriptions` table updating to `구독중`. Use white cards, public-service blue accents, Toss Payments blue, secure server/database icons, and clear arrows. Avoid real card data, real secrets, or personal information.
+
+### Notes
+- Use for explaining why the secret key stays on the server and why subscription status is updated only after server-side Toss API success.

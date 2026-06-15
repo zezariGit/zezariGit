@@ -809,6 +809,48 @@ This file is the cumulative presentation-ready project log. It is written so the
   - Google provider is active.
   - Kakao/Naver buttons are visible but disabled until credentials are added.
   - PWA cache version updated to `zezari-v10`.
+
+## 2026-06-15 - Toss Payments Subscription Button
+
+### Request
+- Start Toss Payments integration for subscription payment and future advertisement payment.
+- First, add a subscription payment button next to `현재 상태` on the dashboard.
+- After payment completes, show `구독중`.
+
+### Reflected Content
+- Added Toss Payments subscription payment foundation.
+- Added `구독결제하기` button next to the dashboard `현재 상태` title.
+- Added `구독중` status badge after successful subscription payment.
+- Added server-side Toss API flow:
+  - Billing key issue.
+  - First subscription billing approval.
+  - DB status update to active.
+- Added success/fail redirect pages.
+- Added subscription database table.
+- Added Toss Payments setup deliverable.
+
+### Result
+- The dashboard now has the subscription payment entry point.
+- The backend is ready to store subscription state and mark a guardian as subscribed after server-side Toss payment success.
+- Toss keys still need to be visible in environment variables before the real test payment window can be opened.
+
+### Time Spent
+- Toss docs review, DB schema, button UI, API routes, callback pages, migration, verification, and documentation: approximately 50 minutes.
+
+### Output
+- `app/toss-subscription-button.js`
+- `app/api/payments/toss/subscription/prepare/route.js`
+- `app/payments/toss/subscription/success/page.js`
+- `app/payments/toss/subscription/fail/page.js`
+- `lib/toss-payments.js`
+- `deliverables/TOSS_PAYMENTS_SETUP.md`
+
+### Verification
+- Local build succeeded.
+- Turso `subscriptions` table was created.
+- Prepare API requires login.
+- Fail redirect page opens.
+- Toss payment window was not tested because Toss keys were not detected in the saved environment.
 - Turso seed result:
   - 30 total QR records
   - 30 active QR records

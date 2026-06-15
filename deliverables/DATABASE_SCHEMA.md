@@ -57,6 +57,28 @@ Stores QR codes and the unique public strings used as the final segment of peopl
 | `created_at` | TEXT | Created timestamp |
 | `updated_at` | TEXT | Updated timestamp |
 
+### subscriptions
+
+Stores Toss Payments subscription/billing state for a guardian.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | TEXT | Primary key |
+| `guardian_id` | TEXT | Unique guardian ID |
+| `customer_key` | TEXT | Toss billing customer key mapped to the guardian |
+| `billing_key` | TEXT | Toss billing key, server-side only |
+| `status` | TEXT | `ready`, `active`, `failed`, etc. |
+| `plan_name` | TEXT | Subscription plan identifier |
+| `amount` | INTEGER | Subscription amount in KRW |
+| `currency` | TEXT | Currency, currently `KRW` |
+| `last_order_id` | TEXT | Last Toss billing order ID |
+| `last_payment_key` | TEXT | Last Toss payment key |
+| `last_payment_status` | TEXT | Last Toss payment status |
+| `error_code` | TEXT | Last Toss or app error code |
+| `error_message` | TEXT | Last Toss or app error message |
+| `created_at` | TEXT | Created timestamp |
+| `updated_at` | TEXT | Updated timestamp |
+
 ## Access Rules
 - Dashboard data is loaded only after social login.
 - A guardian can only query/update subjects where `subjects.guardian_id` belongs to the logged-in guardian.
@@ -66,6 +88,8 @@ Stores QR codes and the unique public strings used as the final segment of peopl
 - Admin users can grant or revoke DB admin role for registered guardians.
 - Admin users can list QR codes, generate additional unique QR codes, and activate/deactivate each QR.
 - Public find pages can read QR status by `public_key` without login, but guardian/subject personal data is not exposed in this phase.
+- Logged-in guardians can start Toss Payments subscription billing from the dashboard.
+- Subscription is marked active only after server-side Toss billing API succeeds.
 
 ## Upload Rules
 - Photo file must be an image.
@@ -79,6 +103,7 @@ Stores QR codes and the unique public strings used as the final segment of peopl
   - `guardians`
   - `subjects`
   - `qr_codes`
+  - `subscriptions`
 
 ## Dashboard Flow
 - Logged-in guardians enter the dashboard route first.
