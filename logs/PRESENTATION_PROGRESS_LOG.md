@@ -861,6 +861,31 @@ This file is the cumulative presentation-ready project log. It is written so the
   - Subscription prepare API is deployed and requires login.
   - Toss fail page opens.
   - PWA cache version updated to `zezari-v11`.
+
+## 2026-06-15 - Toss Test Keys Reflected
+
+### Request
+- In `env.txt`, under `// tosspayments`, use the first value as the Toss client key and the second value as the Toss secret key.
+- Reflect those test keys so they can be changed later.
+
+### Reflected Content
+- Applied the first Toss value as `TOSS_CLIENT_KEY`.
+- Applied the second Toss value as `TOSS_SECRET_KEY`.
+- Updated local `.env.local`.
+- Added both keys to Vercel Production and Development as encrypted environment variables.
+- Redeployed production.
+
+### Result
+- The deployed app now has Toss Payments test keys configured.
+- The subscription payment button can proceed to the Toss flow for logged-in users.
+- Future key changes only require replacing environment variable values.
+
+### Time Spent
+- Environment reflection, Vercel setup, redeployment, and verification: approximately 15 minutes.
+
+### Verification
+- Local build succeeded.
+- Production prepare API remains protected and returns login-required while logged out.
 - Turso seed result:
   - 30 total QR records
   - 30 active QR records

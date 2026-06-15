@@ -503,6 +503,49 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - `/payments/toss/subscription/fail` returned HTTP 200 and displayed the expected failure message.
   - `/sw.js` includes cache version `zezari-v11`.
 
+## 2026-06-15 00:55 KST - Toss Test Keys Reflected
+
+### User Request
+- In `env.txt`, under `// tosspayments`, the first value is the client key and the second value is the secret key.
+- Read those values and reflect them.
+- These are test keys and should remain changeable later.
+
+### Reflected Work
+- Read `env.txt` without printing secret values.
+- Interpreted Toss raw values as:
+  - First value: `TOSS_CLIENT_KEY`
+  - Second value: `TOSS_SECRET_KEY`
+  - Third raw value: unused for the current subscription flow.
+- Updated local `.env.local`:
+  - `TOSS_CLIENT_KEY=***`
+  - `TOSS_SECRET_KEY=***`
+- Added encrypted Vercel environment variables:
+  - Production:
+    - `TOSS_CLIENT_KEY`
+    - `TOSS_SECRET_KEY`
+  - Development:
+    - `TOSS_CLIENT_KEY`
+    - `TOSS_SECRET_KEY`
+- Redeployed production so the new Toss keys are active.
+
+### Verification
+- `npm run build` completed successfully after local env reflection.
+- Vercel deployment completed:
+  - `https://zezari-182hb05ms-zezari.vercel.app`
+- Public alias updated:
+  - `https://zezari.vercel.app`
+- Production check:
+  - `POST /api/payments/toss/subscription/prepare` returned HTTP 401 while logged out, which confirms the route is live and protected.
+
+### Time Spent
+- Local env reflection, Vercel env setup, deployment, verification, and logging: approximately 15 minutes.
+
+### Future Change Rule
+- To change Toss test/production keys later, update:
+  - `.env.local` for local testing.
+  - Vercel `TOSS_CLIENT_KEY` and `TOSS_SECRET_KEY` for deployed environments.
+- No source code change is needed when only replacing keys.
+
 ## 2026-06-12 22:48 KST - Git Repository Initialized and Pushed to GitHub
 
 ### User Request
