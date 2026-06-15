@@ -2203,3 +2203,16 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `npm run build` succeeded.
 - Local `http://localhost:3000/` returned HTTP 200.
 - In-app browser verification was attempted, but the Browser plugin reported `iab` unavailable in this session.
+
+### Deployment
+- GitHub commit:
+  - `a8e2234 Align mobile dashboard subject cards`
+- GitHub push:
+  - `main` pushed to `https://github.com/zezariGit/zezariGit.git`
+- Vercel production deployment:
+  - `https://zezari-bowlbyf11-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- `https://zezari.vercel.app` returned HTTP 200.

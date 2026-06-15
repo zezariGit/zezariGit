@@ -1309,6 +1309,10 @@ This file is the cumulative presentation-ready project log. It is written so the
 ### 검증
 - 로컬 빌드 성공.
 - `/` HTTP 200 확인.
+- 운영 배포 완료:
+  - `https://zezari.vercel.app`
+- 운영 경로 확인:
+  - `/` 정상 응답.
 
 ### 반영 시간
 - 구현, 검증, 로그 반영: 약 15분.
