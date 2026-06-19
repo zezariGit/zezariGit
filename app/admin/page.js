@@ -9,6 +9,7 @@ import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
 import {
   getAdminAdsData,
   getAdminData,
+  getAdminProductsData,
   getAdminSubscriptionPlansData,
   getAdminUsersData,
   getQrAdminData,
@@ -19,6 +20,7 @@ import {
   setGuardianActiveAction,
   setGuardianAdminAction,
   setAdDailyRateAction,
+  setProductCatalogItemAction,
   setQrActiveAction,
   setQrSubjectAction,
   setSubscriptionPlanPriceAction,
@@ -58,7 +60,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["qr", "admins", "payments", "ads"].includes(resolvedSearchParams?.section)
+  const activeSection = ["qr", "admins", "payments", "products", "ads"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "guardians";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -73,6 +75,7 @@ export default async function AdminPage({ searchParams }) {
   const qrData = activeSection === "qr" ? await getQrAdminData(qrFilters) : null;
   const adminUsersData = activeSection === "admins" ? await getAdminUsersData() : null;
   const paymentData = activeSection === "payments" ? await getAdminSubscriptionPlansData() : null;
+  const productsData = activeSection === "products" ? await getAdminProductsData() : null;
   const adsData = activeSection === "ads" ? await getAdminAdsData() : null;
   const qrItems = qrData ? await withQrImages(qrData.qrCodes) : [];
   const title =
@@ -82,9 +85,11 @@ export default async function AdminPage({ searchParams }) {
         ? "관리자 관리"
         : activeSection === "payments"
           ? "결제 관리"
-          : activeSection === "ads"
-            ? "광고 관리"
-            : "보호자 관리";
+          : activeSection === "products"
+            ? "상품 관리"
+            : activeSection === "ads"
+              ? "광고 관리"
+              : "보호자 관리";
   const description =
     activeSection === "qr"
       ? "사람찾기 URL로 연결되는 QR 코드와 고유 문자열을 생성하고 활성 상태를 관리합니다."
@@ -92,9 +97,11 @@ export default async function AdminPage({ searchParams }) {
         ? "가입된 보호자 사용자에게 관리자 역할을 부여하거나 회수합니다."
         : activeSection === "payments"
           ? "구독 옵션별 기간과 가격을 관리합니다."
-          : activeSection === "ads"
-            ? "광고 일 단가를 설정하고 사용자별 광고 진행사항을 조회합니다."
-            : "보호자를 활성화/비활성화하고, 선택한 보호자의 관리대상 4명을 조회합니다.";
+          : activeSection === "products"
+            ? "사용자 상품 선택 화면에 노출되는 상품 이미지, 가격, 활성 상태를 관리합니다."
+            : activeSection === "ads"
+              ? "광고 일 단가를 설정하고 사용자별 광고 진행사항을 조회합니다."
+              : "보호자를 활성화/비활성화하고, 선택한 보호자의 관리대상 4명을 조회합니다.";
 
   return (
     <main className="admin-page">
@@ -126,6 +133,9 @@ export default async function AdminPage({ searchParams }) {
           <a className={activeSection === "payments" ? "active" : ""} href="/admin?section=payments">
             결제 관리
           </a>
+          <a className={activeSection === "products" ? "active" : ""} href="/admin?section=products">
+            상품 관리
+          </a>
           <a className={activeSection === "ads" ? "active" : ""} href="/admin?section=ads">
             광고 관리
           </a>
@@ -137,6 +147,8 @@ export default async function AdminPage({ searchParams }) {
           <AdminRoleManagementSection adminUsersData={adminUsersData} />
         ) : activeSection === "payments" ? (
           <PaymentManagementSection paymentData={paymentData} />
+        ) : activeSection === "products" ? (
+          <ProductManagementSection productsData={productsData} />
         ) : activeSection === "ads" ? (
           <AdManagementSection adsData={adsData} />
         ) : (
@@ -240,6 +252,74 @@ function PaymentManagementSection({ paymentData }) {
                 </label>
                 <FormSubmitButton pendingText="저장중">
                   저장
+                </FormSubmitButton>
+              </form>
+            </article>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function ProductManagementSection({ productsData }) {
+  const { products } = productsData;
+
+  return (
+    <div className="qr-admin-stack">
+      <section className="admin-panel">
+        <div className="panel-heading">
+          <h2>상품 이미지 및 가격</h2>
+          <span>{products.length}개</span>
+        </div>
+        <p className="empty-text">업로드한 상품 이미지는 사용자 상품 선택 화면에 노출됩니다. 이미지는 1MB 이하만 저장됩니다.</p>
+        <div className="product-admin-grid">
+          {products.map((product) => (
+            <article className="product-admin-card" key={product.id}>
+              <div className="product-admin-preview">
+                {product.image_data_url ? (
+                  <img src={product.image_data_url} alt={`${product.name} 상품 이미지`} />
+                ) : (
+                  <span aria-hidden="true">{productFallbackIcon(product.slug)}</span>
+                )}
+              </div>
+              <form action={setProductCatalogItemAction} className="product-admin-form">
+                <input type="hidden" name="productId" value={product.id} />
+                <input type="hidden" name="returnTo" value="/admin?section=products" />
+                <input type="hidden" name="existingImage" value={product.image_data_url || ""} />
+                <input type="hidden" name="existingImageName" value={product.image_name || ""} />
+                <label>
+                  상품명
+                  <input name="name" defaultValue={product.name || ""} required />
+                </label>
+                <label>
+                  설명
+                  <input name="description" defaultValue={product.description || ""} placeholder="상품 설명" />
+                </label>
+                <label>
+                  단독 구매 가격
+                  <input name="unitPrice" type="number" min="0" step="100" defaultValue={product.unit_price || 0} />
+                </label>
+                <label>
+                  정렬
+                  <input name="sortOrder" type="number" step="1" defaultValue={product.sort_order || 0} />
+                </label>
+                <label>
+                  상품 이미지
+                  <input name="image" type="file" accept="image/*" />
+                </label>
+                <div className="product-admin-options">
+                  <label>
+                    <input name="isActive" type="checkbox" value="1" defaultChecked={product.is_active !== 0} />
+                    <span>사용자 화면에 노출</span>
+                  </label>
+                  <label>
+                    <input name="removeImage" type="checkbox" value="1" />
+                    <span>이미지 삭제</span>
+                  </label>
+                </div>
+                <FormSubmitButton pendingText="저장중">
+                  상품 저장
                 </FormSubmitButton>
               </form>
             </article>
@@ -661,6 +741,14 @@ function formatDate(value) {
 
 function formatCurrency(value) {
   return `${Number(value || 0).toLocaleString("ko-KR")}원`;
+}
+
+function productFallbackIcon(slug) {
+  if (slug === "sticker") return "★";
+  if (slug === "bracelet") return "○";
+  if (slug === "necklace") return "◎";
+  if (slug === "keyring") return "●";
+  return "상품";
 }
 
 function statusClass(status) {

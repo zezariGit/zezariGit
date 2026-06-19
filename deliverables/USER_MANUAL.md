@@ -29,13 +29,16 @@ The manual explains the current implemented service from both user and admin per
 - Managed subject registration, update, deletion, photo upload, and status display.
 - Managed subject guardian memo/message and per-subject guardian voice recording.
 - New subject registration completion screen with assigned QR information.
+- Dashboard product purchase button opens the dedicated `/shop` product selection flow.
+- Product selection flow: admin-managed product image cards, product detail selection, quantity, managed subject selection, subscription period selection, and subscription checkout.
+- Product standalone purchase request is available only to already-subscribed guardians.
 - Subscription payment options, active state, pause, and resume.
 - Subject-level advertisement request and progress state foundation.
 - QR public find page, QR matching, download, activation, guardian message/audio playback, and guardian notification.
 - Safe-number privacy behavior: the public QR page does not expose the guardian's raw phone number.
-- Admin guardian management, admin role management, QR management, payment management, and advertisement management.
+- Admin guardian management, admin role management, QR management, payment management, product image/price management, and advertisement management.
 - Shared progress indicators and bottom status messages.
-- High-level data explanations for guardians, subjects, QR codes, subscriptions, push subscriptions, guardian notifications, and advertisements.
+- High-level data explanations for guardians, subjects, QR codes, subscriptions, products, product orders, push subscriptions, guardian notifications, and advertisements.
 - Actual screenshot examples for onboarding, login, admin login, public QR unmatched state, and public QR matched state with private information redacted.
 - Latest login redesign screenshot: `deliverables/user_manual_screenshots/login_redesign.png`.
 - Latest direct signup phone-verification screenshot: `deliverables/user_manual_screenshots/signup_phone_step.png`.

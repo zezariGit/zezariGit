@@ -1861,3 +1861,49 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - 공식 가이드 확인, 주소 검색 컴포넌트 추가, 보호자 폼 연결, 스타일/로그 반영: 약 25분.
+
+## 2026-06-19 - 상품 선택 페이지 및 관리자 상품 관리 추가
+
+### 요구내용
+- 대시보드에서 `구독결제하기` 버튼과 상단 구독 기간/가격 선택 박스를 제거한다.
+- 기존 `상품 구매` 버튼을 새 상품 선택 페이지로 연결한다.
+- 상품 선택 화면은 첨부 화면의 구성만 참고하고, 스타일은 프로젝트 CSS 기준으로 만든다.
+- 상품은 관리자가 업로드한 이미지로 구성한다.
+- 상품 선택 후 대상자를 선택하고, 구독기간을 선택하면 기간별 구독 결제로 진행한다.
+- 상품 단독 구매는 이미 구독중인 고객만 선택할 수 있게 한다.
+
+### 반영내용
+- 대시보드 현재 상태 상단의 구독 결제 UI를 제거했다.
+- 대시보드 `상품 구매` 버튼을 `/shop`으로 연결했다.
+- `/shop` 상품 선택 페이지를 추가했다.
+- 상품 선택 후 상세 화면에서 디자인, 수량, 대상자, 구독기간을 선택할 수 있게 구성했다.
+- 상품 단독 구매 탭은 구독중 상태에서만 선택 가능하게 제한했다.
+- 관리자 페이지에 `상품 관리` 메뉴를 추가했다.
+- 관리자는 상품명, 설명, 이미지, 단독 구매 가격, 노출 여부, 정렬 순서를 관리할 수 있다.
+- `products`, `product_orders` 테이블을 추가하고 기본 상품 4종을 시드하도록 구성했다.
+- 구독 결제 준비 시 상품/대상자/수량 선택값을 주문 초안으로 저장하도록 했다.
+- 상품 단독 구매 요청 저장 API를 추가했다.
+
+### 산출물
+- `app/shop/page.js`
+- `app/shop-checkout-client.js`
+- `app/api/products/orders/route.js`
+- `app/api/payments/toss/subscription/prepare/route.js`
+- `app/admin/page.js`
+- `app/admin/actions.js`
+- `app/dashboard.js`
+- `app/globals.css`
+- `lib/db.js`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/USER_MANUAL.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### 검증
+- 로컬 빌드 성공.
+- 빌드 결과에서 `/shop` 및 `/api/products/orders` 라우트 생성 확인.
+- 별도 로컬 빌드 서버에서 `/shop` HTTP 200 응답 확인.
+- 별도 로컬 빌드 서버에서 `/admin?section=products` HTTP 200 응답 확인.
+
+### 반영 시간
+- DB 모델, 관리자 상품 관리, 사용자 상품 선택 화면, 결제 준비 연결, 문서/로그 반영: 약 70분.

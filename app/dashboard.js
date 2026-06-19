@@ -17,7 +17,6 @@ import PushNotificationButton from "./push-notification-button";
 import QRCode from "qrcode";
 import SocialSignupCompletion from "./social-signup-completion";
 import SubjectVoiceRecorder from "./subject-voice-recorder";
-import TossSubscriptionButton from "./toss-subscription-button";
 import { isAdminSession } from "../lib/admin";
 
 const genders = ["남성", "여성", "기타"];
@@ -193,8 +192,6 @@ function DashboardTab({
       <StatusDashboard
         guardian={guardian}
         subjects={subjects}
-        subscription={subscription}
-        subscriptionPlans={subscriptionPlans}
       />
       {selectedAdSubject && (
         <AdCampaignModal
@@ -376,7 +373,7 @@ function SubjectsInfoTab({ subjects, emptySlots, registeredSubject }) {
   );
 }
 
-function StatusDashboard({ guardian, subjects, subscription, subscriptionPlans }) {
+function StatusDashboard({ guardian, subjects }) {
   const slots = Array.from({ length: 4 }, (_, index) => subjects[index] || null);
 
   return (
@@ -385,7 +382,6 @@ function StatusDashboard({ guardian, subjects, subscription, subscriptionPlans }
         <div className="status-phone-top">
           <span className="bell-icon" aria-hidden="true">!</span>
           <h2>현재 상태</h2>
-          <TossSubscriptionButton subscription={subscription} plans={subscriptionPlans} />
         </div>
         <div className="managed-list">
           {slots.map((subject, index) =>
@@ -432,7 +428,7 @@ function StatusDashboard({ guardian, subjects, subscription, subscriptionPlans }
             <span aria-hidden="true">!</span>
             실종신고
           </a>
-          <a href="/?tab=subjects#subjects-info">
+          <a href="/shop">
             <span aria-hidden="true">B</span>
             상품 구매
           </a>

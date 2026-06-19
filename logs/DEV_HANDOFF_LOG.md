@@ -2112,6 +2112,73 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
 
+## 2026-06-19 KST - Product Shop Flow And Admin Product Catalog
+
+### User Request
+- Remove the dashboard `구독결제하기` button and top subscription period/price select box.
+- Connect the existing dashboard `상품 구매` button to a new product page.
+- Build a product selection page based on the supplied screenshots, using the screenshots as structure references only and keeping the project's existing CSS language.
+- Products should be based on images uploaded by an admin.
+- After selecting a product, users choose a target subject and subscription period.
+- Standalone product purchase should be selectable only by already-subscribed customers.
+
+### Reflected Work
+- Removed the dashboard top subscription payment/select UI from `StatusDashboard`.
+- Changed the dashboard `상품 구매` quick action to `/shop`.
+- Added product catalog tables:
+  - `products`
+  - `product_orders`
+- Seeded default product rows:
+  - 스티커
+  - 팔찌
+  - 목걸이
+  - 키링
+- Added admin product management:
+  - product image upload
+  - product name/description
+  - standalone unit price
+  - active/hidden toggle
+  - display sort order
+- Added `/shop` product selection page.
+- Added product checkout/detail client:
+  - design choice placeholders
+  - quantity stepper
+  - target subject selection
+  - subscription period selection
+  - standalone purchase tab gated by active subscription
+- Updated subscription prepare API so `/shop` subscription checkout records product selection as a `product_orders` row with `subscription_pending`.
+- Added standalone product order API:
+  - `POST /api/products/orders`
+  - stores `standalone_requested` only when the guardian has an active subscription.
+- Added project-style CSS for shop and admin product catalog screens.
+- Updated local user manual index and database schema deliverable.
+
+### Files Changed
+- `app/admin/actions.js`
+- `app/admin/page.js`
+- `app/api/payments/toss/subscription/prepare/route.js`
+- `app/api/products/orders/route.js`
+- `app/dashboard.js`
+- `app/globals.css`
+- `app/shop/page.js`
+- `app/shop-checkout-client.js`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/USER_MANUAL.md`
+- `lib/db.js`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `git diff --check` passed.
+- `npm run build` succeeded.
+- Build output includes:
+  - `/shop`
+  - `/api/products/orders`
+- Temporary local production server on port `3001` returned HTTP 200 for:
+  - `http://127.0.0.1:3001/shop`
+  - `http://127.0.0.1:3001/admin?section=products`
+- Temporary verification server was stopped after route checks.
+
 ## 2026-06-19 KST - My Page Corner Icon And Guardian Notification Inbox
 
 ### User Request

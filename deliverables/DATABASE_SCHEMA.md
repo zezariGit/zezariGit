@@ -135,6 +135,42 @@ Stores administrator-managed subscription plan prices.
 | `created_at` | TEXT | Created timestamp |
 | `updated_at` | TEXT | Updated timestamp |
 
+### products
+
+Stores administrator-managed products shown on the user product selection page.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | TEXT | Primary key, seeded as `product-sticker`, `product-bracelet`, `product-necklace`, `product-keyring` |
+| `slug` | TEXT | Unique product slug |
+| `name` | TEXT | Product display name |
+| `description` | TEXT | Optional admin-entered product description |
+| `image_data_url` | TEXT | Admin-uploaded product image data URL |
+| `image_name` | TEXT | Uploaded image filename |
+| `unit_price` | INTEGER | Standalone product unit price in KRW |
+| `is_active` | INTEGER | `1` visible to users, `0` hidden |
+| `sort_order` | INTEGER | Product display order |
+| `created_at` | TEXT | Created timestamp |
+| `updated_at` | TEXT | Updated timestamp |
+
+### product_orders
+
+Stores product selections and standalone purchase requests.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | TEXT | Primary key |
+| `guardian_id` | TEXT | Guardian placing the selection/order |
+| `subject_id` | TEXT | Managed subject linked to the product |
+| `product_id` | TEXT | Selected product |
+| `quantity` | INTEGER | Selected quantity |
+| `order_type` | TEXT | `subscription` or `standalone` |
+| `plan_months` | INTEGER | Subscription period when `order_type = subscription` |
+| `amount` | INTEGER | Standalone expected product amount |
+| `status` | TEXT | `subscription_pending` or `standalone_requested` |
+| `created_at` | TEXT | Created timestamp |
+| `updated_at` | TEXT | Updated timestamp |
+
 ### ad_settings
 
 Stores administrator-managed advertising pricing.
@@ -195,7 +231,11 @@ Stores advertisement requests and status by managed subject.
 - Public find pages can call the notification API to send a push message to the assigned guardian.
 - The push notification message is also stored in `guardian_notifications` so the guardian can review messages from the top-left bell notification panel.
 - Privacy note: public QR pages intentionally expose configured subject/contact fields. Raw guardian phone numbers are private; before production launch, connect a real safe-number provider and add explicit guardian consent and a field-level exposure policy.
-- Logged-in guardians can start Toss Payments subscription billing from the dashboard.
+- Dashboard no longer starts new subscription billing directly; the dashboard product purchase button now opens `/shop`.
+- Logged-in guardians select a product, target subject, quantity, and subscription period from `/shop`.
+- A subscription checkout from `/shop` stores the product selection as a `product_orders` row with `subscription_pending`.
+- Product standalone purchase requests are only accepted for guardians with `subscriptions.status = active`.
+- Admin users can manage product images, prices, activation state, and display order from the admin product management section.
 - Subscription is marked active only after server-side Toss billing API succeeds.
 - Logged-in guardians can pause/resume their own subscription service state.
 - Admin users can edit 1/3/6-month subscription option prices.
@@ -220,6 +260,8 @@ Stores advertisement requests and status by managed subject.
   - `qr_codes`
   - `subscriptions`
   - `subscription_plans`
+  - `products`
+  - `product_orders`
   - `push_subscriptions`
   - `guardian_notifications`
   - `ad_settings`

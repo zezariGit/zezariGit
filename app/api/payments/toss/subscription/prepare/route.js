@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "../../../../../../lib/auth";
-import { prepareSubscriptionForGuardian } from "../../../../../../lib/db";
+import { prepareSubscriptionForGuardian, saveProductOrderDraft } from "../../../../../../lib/db";
 import { getTossCallbackUrls, getTossClientKey, isTossConfigured } from "../../../../../../lib/toss-payments";
 
 export async function POST(request) {
@@ -12,6 +12,15 @@ export async function POST(request) {
 
   const body = await request.json().catch(() => ({}));
   const planMonths = Number(body?.planMonths || 1);
+  if (body?.productId) {
+    await saveProductOrderDraft(session, {
+      productId: body.productId,
+      subjectId: body.subjectId,
+      quantity: body.quantity,
+      orderType: "subscription",
+      planMonths,
+    });
+  }
   const { guardian, subscription, plan } = await prepareSubscriptionForGuardian(session, planMonths);
   const configured = isTossConfigured();
   const { successUrl, failUrl } = getTossCallbackUrls();
