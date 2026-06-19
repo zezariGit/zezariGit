@@ -1546,3 +1546,15 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - 화면/API/DB/문서/검증 반영: 약 55분.
+
+### 운영 반영
+- GitHub commit:
+  - `f6dad88 Add direct guardian signup flow`
+- Vercel production deployment:
+  - `https://zezari-aoit7tb7g-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### 운영 검증
+- `https://zezari.vercel.app/?signup=1`에서 회원가입 화면 확인.
+- 회원가입 API 필수값 검증 응답 확인.

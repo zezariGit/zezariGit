@@ -2189,6 +2189,21 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Time Spent
 - Signup UI/API/schema implementation, build, screenshot check, API validation, and documentation/log update: approximately 55 minutes.
 
+### Deployment
+- GitHub commit:
+  - `f6dad88 Add direct guardian signup flow`
+- GitHub push:
+  - `main` pushed to `https://github.com/zezariGit/zezariGit.git`
+- Vercel production deployment:
+  - `https://zezari-aoit7tb7g-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- `https://zezari.vercel.app/?signup=1` loaded the signup screen and `.signup-card` was found.
+- Production screenshot captured at `.next/prod-signup-phone-step.png`.
+- `POST https://zezari.vercel.app/api/signup/guardian` with missing values returned HTTP 400 with a Korean validation message.
+
 ## 2026-06-19 KST - Login/Signup Screen Redesign And Credentials Login
 
 ### User Request
