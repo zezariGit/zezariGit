@@ -2174,6 +2174,21 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Time Spent
 - UI restructuring, notification storage/API/service-worker wiring, documentation, and build verification: approximately 40 minutes.
 
+### Deployment
+- GitHub commit:
+  - `7c98dd4 Move my page to corner actions and add notification inbox`
+- GitHub push:
+  - `main` pushed to `https://github.com/zezariGit/zezariGit.git`
+- Vercel production deployment:
+  - `https://zezari-itn02cnr3-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- `https://zezari.vercel.app` returned HTTP 200.
+- `https://zezari-itn02cnr3-zezari.vercel.app` returned HTTP 200.
+- `https://zezari.vercel.app/api/notifications` returned HTTP 401 when unauthenticated, confirming the notification inbox API is session-protected.
+
 ## 2026-06-19 KST - Direct Guardian Signup Flow
 
 ### User Request

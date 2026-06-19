@@ -1766,3 +1766,15 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - UI 위치 변경, 알림 저장/조회 API, 서비스워커 연동, 문서/로그 반영: 약 40분.
+
+### 운영 반영
+- GitHub commit:
+  - `7c98dd4 Move my page to corner actions and add notification inbox`
+- Vercel production deployment:
+  - `https://zezari-itn02cnr3-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### 운영 검증
+- 운영 메인 페이지 정상 응답 확인.
+- 알림 API는 비로그인 상태에서 401을 반환해 로그인 보호가 적용된 것을 확인.
