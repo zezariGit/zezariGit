@@ -55,7 +55,8 @@ Project: REAL_QR_FIND / zezari
 - Unknown key: shows an unregistered QR message.
 - Inactive key: shows a disabled QR message.
 - Active but unassigned key: shows a not-yet-connected QR message.
-- Active assigned key: shows the managed subject information, guardian contact fields, and a `보호자에게 알리기` button.
+- Active assigned key: shows the managed subject information, configured guardian response fields, and a `보호자에게 알리기` button.
+- The public QR page does not show the guardian's raw phone number. It shows `guardians.safe_phone` as `안심번호`, or `안심번호 준비중` if no safe number has been issued yet.
 - The notify button sends a Web Push message to the logged-in guardian's registered browser/app devices.
 
 ## Admin Controls

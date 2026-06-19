@@ -12,6 +12,7 @@ Project: REAL_QR_FIND
 
 ## Implemented Stack
 - Next.js on Vercel.
+- NextAuth Credentials provider for guardian ID/password login.
 - NextAuth OAuth providers:
   - Google
   - Kakao
@@ -19,6 +20,23 @@ Project: REAL_QR_FIND
 - JWT session strategy.
 - Turso remains configured for application data after login is confirmed.
 - Providers are registered only when both client ID and client secret are present in the environment.
+- Apple login icon is displayed as a prepared UI placeholder, but backend Apple OAuth is not connected yet.
+
+## Current Login Screen
+- After the three-page onboarding flow, the logged-out user sees a compact login screen.
+- Login screen elements:
+  - Title: `로그인`
+  - `아이디` input
+  - `비밀번호` input
+  - `자동로그인` checkbox
+  - `비밀번호 찾기` helper action
+  - Main `로그인` button
+  - `또는` divider
+  - SNS icon login row: Kakao, Naver, Google, Apple
+  - Bottom signup helper: `계정이 없으신가요? 회원가입`
+- `자동로그인` currently remembers the guardian login ID only. Passwords are never saved in browser storage.
+- `회원가입` remains SNS-first: a first social login creates the account flow/profile basis.
+- Guardian ID/password login works after the guardian profile has saved `아이디` and `비밀번호`.
 
 ## Google Cloud Console Requirements
 
@@ -128,8 +146,10 @@ NAVER_CLIENT_SECRET=your-naver-client-secret
 ## Implemented Routes
 - `/`
   - Shows login state.
-  - Shows Google, Kakao, and Naver login buttons when logged out.
+  - Shows the onboarding flow first unless the user selected `다시보지 않기`.
+  - Shows guardian ID/password login and Kakao, Naver, Google, Apple icon buttons when logged out.
   - Buttons are disabled until the corresponding provider keys are configured.
+  - Apple is a UI placeholder until Apple OAuth is implemented.
   - Shows the guardian dashboard when logged in.
 - `/api/auth/[...nextauth]`
   - Handles NextAuth routes.

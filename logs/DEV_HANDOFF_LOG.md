@@ -2111,14 +2111,206 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
+
+## 2026-06-19 KST - Login/Signup Screen Redesign And Credentials Login
+
+### User Request
+- After the three-page service introduction, show a login/signup screen like the provided reference image.
+- Required visible elements:
+  - `로그인` title.
+  - ID and password inputs.
+  - Auto-login checkbox and forgot-password action.
+  - Purple primary login button.
+  - `또는` divider.
+  - Kakao, Naver, Google, Apple SNS icons.
+  - `계정이 없으신가요? 회원가입`.
+
+### Reflected Work
+- Replaced the logged-out social-only home panel with `LoginAuthPanel`.
+- Added a NextAuth Credentials provider for guardian ID/password login.
+- Added database helper `authenticateGuardianCredentials(loginId, password)`.
+- Kept Google/Kakao/Naver OAuth login available as icon buttons.
+- Added Apple icon as a prepared UI placeholder; Apple OAuth backend is not connected yet.
+- `자동로그인` remembers only the login ID in browser storage. Passwords are not saved locally.
+- Added inline status messages for missing required values, login failure, forgot-password preparation, and signup guidance.
+- Added compact mobile-first CSS matching the provided reference layout.
+
+### Files Changed
+- `app/page.js`
+- `app/auth-actions.js`
+- `app/globals.css`
+- `lib/auth.js`
+- `lib/db.js`
+- `deliverables/AUTH_SETUP.md`
+- `deliverables/USER_MANUAL.md`
+- `deliverables/user_manual_screenshots/login_redesign.png`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- Local `http://localhost:3000` returned HTTP 200.
+- Mobile viewport screenshot `375x667` captured successfully.
+- Screenshot saved at `deliverables/user_manual_screenshots/login_redesign.png`.
+
+### Notes
+- Guardian ID/password login works after the guardian profile has saved `아이디` and `비밀번호`.
+- First-time signup remains SNS-first in the current product flow.
+- Apple login requires future Apple OAuth provider setup and environment values.
+
+### Time Spent
+- Implementation, build verification, screenshot review, and documentation/log update: approximately 35 minutes.
 - `https://zezari.vercel.app/admin?section=ads` returned HTTP 200.
 - Unauthenticated admin ads route showed the admin login gate.
+
+## 2026-06-16 KST - Integrated User Manual Created
+
+### User Request
+- Create a user manual from the continuously maintained request/reflection logs, source code, and official deliverables.
+- Include screen explanations, button functions, and queried/saved data descriptions.
+- Produce the manual as a Google Docs document.
+- Exclude sensitive values from `env.txt`, `.env.local`, and other secret-bearing files.
+
+### Reflected Work
+- Created Google Docs document:
+  - `REAL_QR_FIND 사용자 통합 설명서`
+  - `https://docs.google.com/document/d/1DdcqFv79lcAj4eCuiXaOTsJmpTKWtvBRErWJsoAidEM`
+- Built the manual from:
+  - `logs/DEV_HANDOFF_LOG.md`
+  - `logs/PRESENTATION_PROGRESS_LOG.md`
+  - existing files in `deliverables/`
+  - implementation source in `app/` and `lib/`
+- Documented the current user and admin flows:
+  - social signup/login
+  - PWA installation
+  - onboarding
+  - guardian dashboard
+  - guardian and managed subject information entry
+  - subscription payment
+  - advertisement foundation
+  - public QR find page
+  - QR matching/download/activation
+  - admin guardian, QR, role, payment, and advertisement management
+  - shared progress indicators and bottom status messages
+- Added local deliverable index:
+  - `deliverables/USER_MANUAL.md`
+- Updated deliverable index:
+  - `deliverables/README.md`
+
+### Files Changed
+- `deliverables/USER_MANUAL.md`
+- `deliverables/README.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- Google Docs connector readback confirmed:
+  - native Google Doc title is `REAL_QR_FIND 사용자 통합 설명서`
+  - document content was inserted
+  - main title uses `TITLE`
+  - section headings use `HEADING_1`
+  - key sections such as guardian dashboard, QR management, admin management, FAQ, and maintenance rules are present
+- Sensitive environment values were not read into or copied into the manual.
+
+### Time Spent
+- Source/log review, manual composition, Google Docs creation, connector readback verification, and local documentation updates: approximately 35 minutes.
+
+### Notes For Next AI
+- The Google Docs document is now the primary user-facing manual.
+- Keep `deliverables/USER_MANUAL.md` as the local pointer and maintenance note.
+- Future feature work should update the Google Docs manual when user-visible screens, buttons, or data behavior change.
+
+## 2026-06-16 KST - User Manual Screenshot Examples Added
+
+### User Request
+- Add actual screen screenshots to the user manual for screens, buttons, and major features.
+
+### Reflected Work
+- Started local Next.js dev server for capture:
+  - `http://localhost:3000`
+- Installed Playwright Chromium browser binaries outside the repository cache so screenshots could be captured.
+- Captured actual local UI screenshots into:
+  - `deliverables/user_manual_screenshots/01_onboarding.png`
+  - `deliverables/user_manual_screenshots/02_admin_login.png`
+  - `deliverables/user_manual_screenshots/03_public_qr_unregistered.png`
+  - `deliverables/user_manual_screenshots/04_login.png`
+  - `deliverables/user_manual_screenshots/05_public_qr_unmatched.png`
+  - `deliverables/user_manual_screenshots/06_public_qr_matched_redacted.png`
+- Inserted the following selected screenshots into the Google Docs manual under `21. 실제 화면 예시`:
+  - onboarding first screen
+  - social login screen
+  - admin login screen
+  - public QR unmatched state
+  - public QR matched state with private information redacted
+- Did not insert the raw matched QR screenshot because it may contain subject and guardian private information.
+- Deleted the raw matched QR screenshot after generating the redacted copy so private information is not retained in the deliverables folder.
+
+### Files Changed
+- `deliverables/USER_MANUAL.md`
+- `deliverables/user_manual_screenshots/`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- Playwright captured the screenshots from the running local app.
+- Google Docs connector readback confirmed:
+  - `21. 실제 화면 예시` heading exists.
+  - five image objects were inserted as `inlineObjectElement`.
+  - captions are present for all five inserted screenshots.
+
+### Limitations
+- The in-app Browser plugin reported `Browser is not available: iab`, so Playwright CLI was used as the fallback capture path.
+- Guardian dashboard and authenticated admin tab screenshots were not captured because they require a real logged-in guardian/admin browser session.
+
+### Time Spent
+- Screenshot capture, privacy redaction, Google Docs image insertion, verification, and logging: approximately 35 minutes.
 
 ### Notes For Next AI
 - Meta API is not connected yet.
 - Advertisement payment is not connected yet.
 - Current `subject_ads.status` values used by UI are `active`, `paused`, `ready`, and `ended`.
 - A subject cannot create another running ad while it has a `ready`, `active`, or `paused` ad.
+
+## 2026-06-16 KST - Public QR Safe Phone Privacy
+
+### User Request
+- Do not expose the guardian's real phone number on the QR public page.
+- Use a safe/relay phone number concept instead.
+
+### Reflected Work
+- Added `guardians.safe_phone` to the database schema.
+- Updated schema migration logic so existing Turso databases receive `safe_phone` if missing.
+- Added optional `안심번호` input to the guardian information form.
+- Updated `/find/[key]` public QR page:
+  - no longer selects `guardians.phone`.
+  - shows `안심번호` instead of `연락처`.
+  - displays `guardians.safe_phone` when present.
+  - displays `안심번호 준비중` when no safe number has been issued.
+- Updated official schema and QR management deliverables.
+- Updated Google Docs user manual wording for public QR phone privacy.
+
+### Files Changed
+- `lib/db.js`
+- `app/dashboard.js`
+- `app/find/[key]/page.js`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/QR_MANAGEMENT.md`
+- `deliverables/USER_MANUAL.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- Turso `guardians.safe_phone` column exists.
+- Local public QR page returned HTTP 200.
+- Local public QR page includes `안심번호` and `안심번호 준비중`.
+- Local public QR page no longer includes the `연락처` label.
+
+### Important Limitation
+- This is the privacy-safe application foundation. A real callable safe number still requires integration with a telecom/ARS/safe-number provider that issues relay numbers and forwards calls to the guardian's private phone number.
+
+### Time Spent
+- Schema update, public QR privacy change, form update, verification, and documentation: approximately 30 minutes.
 
 ## 2026-06-16 KST - Shared Modal Close Placement And Background Scroll Lock
 

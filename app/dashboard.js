@@ -280,6 +280,14 @@ function GuardianForm({ guardian, session }) {
                 연락받을 전화번호
                 <input name="phone" defaultValue={guardian.phone || ""} required />
               </label>
+              <label>
+                안심번호
+                <input
+                  name="safePhone"
+                  defaultValue={guardian.safe_phone || ""}
+                  placeholder="안심번호 발급 후 입력"
+                />
+              </label>
               <label className="full-field">
                 주소
                 <input name="address" defaultValue={guardian.address || ""} placeholder="보호자 주소" />

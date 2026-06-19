@@ -1316,3 +1316,149 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - 구현, 검증, 로그 반영: 약 15분.
+
+## 2026-06-16 - 사용자 통합 설명서 생성
+
+### 요구내용
+- 지금까지 관리된 요청사항과 반영내역 관리 파일, 전체 소스, 결과물을 기준으로 사용자 설명서를 만든다.
+- 화면, 버튼 기능, 조회 데이터 설명을 포함한다.
+- 보호자 사용자와 관리자 사용자가 모두 이해할 수 있는 통합 설명서로 만든다.
+- Google Docs 문서로 만든다.
+
+### 반영내용
+- Google Docs 문서 `REAL_QR_FIND 사용자 통합 설명서`를 생성했다.
+- 설명서에 다음 내용을 정리했다.
+  - 서비스 개요와 사용 환경.
+  - Google/Kakao/Naver 로그인 구조.
+  - 앱 설치와 온보딩 흐름.
+  - 보호자 대시보드와 정보입력 화면.
+  - 관리대상 등록/수정/삭제, 사진 업로드, 상태 표시.
+  - 구독 결제, 일시정지, 재개.
+  - 광고 신청/관리 기반 기능.
+  - QR 찾기 공개 페이지와 보호자 알림.
+  - 관리자 보호자 관리, QR 관리, 관리자 관리, 결제 관리, 광고 관리.
+  - 저장/조회 진행 표시와 하단 완료/오류 메시지.
+  - 주요 데이터 항목 설명.
+- 로컬 산출물 `deliverables/USER_MANUAL.md`를 추가해 Google Docs 링크와 유지관리 기준을 남겼다.
+- 민감한 환경변수와 키 값은 문서에 포함하지 않았다.
+
+### 산출물
+- Google Docs:
+  - https://docs.google.com/document/d/1DdcqFv79lcAj4eCuiXaOTsJmpTKWtvBRErWJsoAidEM
+- `deliverables/USER_MANUAL.md`
+- `deliverables/README.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### 검증
+- Google Docs 커넥터로 문서를 다시 읽어 제목, 본문, 주요 장 제목 스타일 적용을 확인했다.
+- 현재 구현된 화면과 버튼 기준으로 설명서를 구성했다.
+- 미구현 또는 설정 필요 항목은 준비/설정 필요 상태로 구분했다.
+
+### 반영 시간
+- 소스/로그 검토, 설명서 작성, Google Docs 생성, 검증, 산출물/로그 반영: 약 35분.
+
+## 2026-06-16 - 사용자 설명서 실제 화면 스크린샷 추가
+
+### 요구내용
+- 사용자 설명서에 화면, 버튼, 주요 기능별 실제 화면 스크린샷을 넣는다.
+
+### 반영내용
+- 로컬 앱을 실행해 실제 화면을 캡처했다.
+- Google Docs 설명서에 `21. 실제 화면 예시` 섹션을 추가했다.
+- 다음 화면 이미지를 삽입했다.
+  - 온보딩 첫 화면.
+  - 소셜 로그인 화면.
+  - 관리자 로그인 화면.
+  - 미매칭 QR 공개 화면.
+  - 매칭 완료 QR 공개 화면 개인정보 가림본.
+- 매칭 완료 QR 화면은 보호자 연락처와 관리대상 정보가 노출될 수 있어 민감 영역을 가린 이미지로 삽입했다.
+- 원본 및 삽입용 스크린샷 파일은 `deliverables/user_manual_screenshots/`에 저장했다.
+
+### 산출물
+- Google Docs:
+  - https://docs.google.com/document/d/1DdcqFv79lcAj4eCuiXaOTsJmpTKWtvBRErWJsoAidEM
+- `deliverables/USER_MANUAL.md`
+- `deliverables/user_manual_screenshots/`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### 검증
+- Google Docs 커넥터로 문서를 다시 읽어 `21. 실제 화면 예시` 섹션과 이미지 5개가 삽입된 것을 확인했다.
+- 캡션 5개가 문서에 표시되는 것을 확인했다.
+
+### 남은 사항
+- 보호자 대시보드와 관리자 내부 탭 화면은 실제 로그인 세션이 필요하므로, 로그인된 브라우저 상태에서 추가 캡처가 필요하다.
+
+### 반영 시간
+- 캡처, 개인정보 가림, Google Docs 이미지 삽입, 검증, 로그 반영: 약 35분.
+
+## 2026-06-16 - QR 공개 페이지 안심번호 적용
+
+### 요구내용
+- QR 페이지에서 보호자의 실제 전화번호가 그대로 노출되지 않게 한다.
+- 보호자 전화번호를 안심번호 방식으로 보여주고 싶다.
+
+### 반영내용
+- 보호자 테이블에 `safe_phone` 안심번호 컬럼을 추가했다.
+- 기존 DB에도 `safe_phone` 컬럼이 자동 추가되도록 스키마 보정 로직을 반영했다.
+- 보호자 정보입력 화면에 선택 입력값 `안심번호`를 추가했다.
+- QR 공개 페이지에서 실제 전화번호 `phone`을 더 이상 조회하지 않도록 수정했다.
+- QR 공개 페이지의 `연락처` 표시를 `안심번호`로 변경했다.
+- 안심번호가 아직 없으면 `안심번호 준비중`으로 표시한다.
+- Google Docs 사용자 설명서에도 원 전화번호 비공개 및 안심번호 표시 기준을 반영했다.
+
+### 산출물
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/QR_MANAGEMENT.md`
+- `deliverables/USER_MANUAL.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### 검증
+- 로컬 빌드 성공.
+- Turso `guardians.safe_phone` 컬럼 존재 확인.
+- 로컬 QR 공개 페이지 정상 응답 확인.
+- QR 공개 페이지에서 `안심번호`와 `안심번호 준비중` 표시 확인.
+- QR 공개 페이지에서 기존 `연락처` 라벨이 표시되지 않는 것 확인.
+
+### 남은 사항
+- 실제 전화 연결이 되는 안심번호는 통신사/ARS/안심번호 사업자 연동이 필요하다.
+- 현재 반영은 실제 번호를 공개하지 않는 앱 기반 개인정보 보호 구조다.
+
+### 반영 시간
+- 스키마, 화면, QR 공개 페이지, 검증, 문서/로그 반영: 약 30분.
+
+## 2026-06-19 - 로그인/가입 화면 리디자인
+
+### 요구내용
+- 3페이지 서비스 소개 이후 첨부 예시와 같은 로그인/가입 화면을 보여준다.
+- 아이디, 비밀번호, 자동로그인, 비밀번호 찾기, 로그인 버튼, SNS 아이콘, 회원가입 문구를 구성한다.
+
+### 반영내용
+- 메인 로그인 화면을 예시 이미지와 유사한 모바일 중심 레이아웃으로 변경했다.
+- 보호자가 저장한 아이디/비밀번호로 로그인할 수 있도록 Credentials 로그인 구조를 추가했다.
+- Kakao, Naver, Google은 기존 SNS 로그인 흐름을 아이콘 버튼으로 표시한다.
+- Apple 아이콘은 UI 자리만 준비했으며 실제 OAuth 연동은 추후 작업 항목이다.
+- 자동로그인은 비밀번호를 저장하지 않고 아이디만 기억하는 방식으로 구현했다.
+- 필수값 누락, 로그인 실패, 비밀번호 찾기 준비중, 회원가입 안내 메시지를 화면에서 보여준다.
+
+### 산출물
+- `app/page.js`
+- `app/auth-actions.js`
+- `app/globals.css`
+- `lib/auth.js`
+- `lib/db.js`
+- `deliverables/AUTH_SETUP.md`
+- `deliverables/USER_MANUAL.md`
+- `deliverables/user_manual_screenshots/login_redesign.png`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### 검증
+- 로컬 빌드 성공.
+- 로컬 메인 페이지 정상 응답 확인.
+- 모바일 화면 기준 로그인 화면 스크린샷 캡처 완료.
+
+### 반영 시간
+- 구현, 빌드 검증, 화면 캡처, 문서/로그 반영: 약 35분.

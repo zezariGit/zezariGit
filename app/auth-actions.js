@@ -6,43 +6,179 @@ import { useEffect, useState } from "react";
 const socialProviders = [
   {
     id: "google",
-    label: "Google로 계속하기",
+    label: "Google",
     className: "google-action",
     Logo: GoogleLogo,
   },
   {
     id: "kakao",
-    label: "카카오로 계속하기",
+    label: "Kakao",
     className: "kakao-action",
     Logo: KakaoLogo,
   },
   {
     id: "naver",
-    label: "네이버로 계속하기",
+    label: "Naver",
     className: "naver-action",
     Logo: NaverLogo,
   },
 ];
 
-export function SocialLoginButtons({ enabledProviders = [] }) {
-  const enabled = new Set(enabledProviders);
+export function LoginAuthPanel({ enabledProviders = [], authError = "" }) {
+  const [loginId, setLoginId] = useState("");
+  const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(authError ? "아이디 또는 비밀번호를 확인해 주세요." : "");
+
+  useEffect(() => {
+    const savedLoginId = window.localStorage.getItem("zezari:remember-login-id") || "";
+    if (savedLoginId) {
+      setLoginId(savedLoginId);
+      setRemember(true);
+    }
+  }, []);
+
+  const submitCredentials = async (event) => {
+    event.preventDefault();
+    if (!loginId.trim() || !password) {
+      setMessage("아이디와 비밀번호를 입력해 주세요.");
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+    if (remember) {
+      window.localStorage.setItem("zezari:remember-login-id", loginId.trim());
+    } else {
+      window.localStorage.removeItem("zezari:remember-login-id");
+    }
+
+    const result = await signIn("credentials", {
+      loginId: loginId.trim(),
+      password,
+      redirect: false,
+      callbackUrl: "/",
+    });
+
+    if (result?.ok) {
+      window.location.href = result.url || "/";
+      return;
+    }
+
+    setLoading(false);
+    setMessage("아이디 또는 비밀번호를 확인해 주세요.");
+  };
 
   return (
-    <div className="social-login-stack">
-      {socialProviders.map(({ id, label, className, Logo }) => {
+    <section className="auth-panel login-card" aria-label="로그인">
+      <h1 className="login-title">로그인</h1>
+
+      <form className="credentials-login-form" onSubmit={submitCredentials}>
+        <label className="visually-hidden" htmlFor="login-id">
+          아이디
+        </label>
+        <input
+          id="login-id"
+          name="loginId"
+          value={loginId}
+          onChange={(event) => setLoginId(event.target.value)}
+          placeholder="아이디"
+          type="text"
+          autoComplete="username"
+        />
+
+        <label className="visually-hidden" htmlFor="login-password">
+          비밀번호
+        </label>
+        <input
+          id="login-password"
+          name="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder="비밀번호"
+          type="password"
+          autoComplete="current-password"
+        />
+
+        <div className="login-options">
+          <label className="remember-login">
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(event) => setRemember(event.target.checked)}
+            />
+            <span>자동로그인</span>
+          </label>
+          <button
+            className="link-button"
+            type="button"
+            onClick={() => setMessage("비밀번호 찾기는 준비중입니다. SNS 로그인 또는 관리자 문의를 이용해 주세요.")}
+          >
+            비밀번호 찾기
+          </button>
+        </div>
+
+        <button className="login-submit" type="submit" disabled={loading}>
+          {loading ? "로그인 중" : "로그인"}
+        </button>
+      </form>
+
+      {message && <p className="login-message" role="status">{message}</p>}
+
+      <div className="login-divider">
+        <span>또는</span>
+      </div>
+
+      <p className="sns-login-title">SNS 계정으로 간편 로그인</p>
+      <SocialLoginButtons enabledProviders={enabledProviders} variant="icons" />
+
+      <div className="signup-helper">
+        <span>계정이 없으신가요?</span>
+        <button
+          className="signup-link"
+          type="button"
+          onClick={() => setMessage("회원가입은 SNS 계정으로 처음 로그인하면 자동으로 시작됩니다.")}
+        >
+          회원가입
+        </button>
+      </div>
+
+      <div className="install-area">
+        <PwaInstallPrompt />
+      </div>
+    </section>
+  );
+}
+
+export function SocialLoginButtons({ enabledProviders = [], variant = "stack" }) {
+  return <SocialLoginButtonsInner enabledProviders={enabledProviders} variant={variant} />;
+}
+
+function SocialLoginButtonsInner({ enabledProviders = [], variant = "stack" }) {
+  const enabled = new Set(enabledProviders);
+  const providers = variant === "icons"
+    ? [socialProviders[1], socialProviders[2], socialProviders[0], appleProvider]
+    : socialProviders;
+
+  return (
+    <div className={variant === "icons" ? "social-icon-row" : "social-login-stack"}>
+      {providers.map(({ id, label, fullLabel, className, Logo }) => {
         const configured = enabled.has(id);
+        const disabled = id === "apple" || !configured;
 
         return (
           <button
-            className={`action social-action ${className}`}
+            className={variant === "icons" ? `social-icon-button ${className}` : `action social-action ${className}`}
             type="button"
             key={id}
-            onClick={() => configured && signIn(id)}
-            disabled={!configured}
-            title={configured ? label : "환경변수 설정 후 사용할 수 있습니다."}
+            onClick={() => !disabled && signIn(id)}
+            disabled={disabled}
+            title={configured ? `${label}로 계속하기` : `${label} 설정 필요`}
+            aria-label={configured ? `${label}로 계속하기` : `${label} 설정 필요`}
           >
             <Logo />
-            <span>{configured ? label : `${label} - 설정 필요`}</span>
+            {variant !== "icons" && <span>{configured ? `${label}로 계속하기` : `${fullLabel || label} - 설정 필요`}</span>}
           </button>
         );
       })}
@@ -165,6 +301,24 @@ function NaverLogo() {
   return (
     <svg className="social-logo" viewBox="0 0 24 24" aria-hidden="true">
       <path fill="#ffffff" d="M7 6h3.85l3.3 4.78V6H17v12h-3.85l-3.3-4.78V18H7V6z" />
+    </svg>
+  );
+}
+
+const appleProvider = {
+  id: "apple",
+  label: "Apple",
+  className: "apple-action",
+  Logo: AppleLogo,
+};
+
+function AppleLogo() {
+  return (
+    <svg className="social-logo" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.9-1.5-.1-2.8.9-3.6.9-.7 0-1.9-.9-3.1-.8-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.6.8 1.2 1.8 2.5 3.1 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8 2.2-1.2 3-2.4c.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9ZM14 5.7c.7-.8 1.1-1.9 1-3-.9 0-2 .6-2.7 1.4-.6.7-1.1 1.8-1 2.9 1 .1 2-.5 2.7-1.3Z"
+      />
     </svg>
   );
 }

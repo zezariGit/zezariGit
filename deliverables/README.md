@@ -20,6 +20,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `TOSS_PAYMENTS_SETUP.md`: Toss Payments subscription payment foundation and callback flow.
 - `PUSH_NOTIFICATION_SETUP.md`: guardian browser push registration and QR find-page notification flow.
 - `ADVERTISING_SETUP.md`: dashboard subject advertisement modal, admin daily rate, advertisement progress foundation, and Meta API preparation.
+- `USER_MANUAL.md`: Google Docs user manual link, coverage, and maintenance rule.
 - Current UI feedback pattern: submit buttons show inline progress bars, and server actions show bottom status messages via `notice` query parameters.
 
 ## Planned Deliverables

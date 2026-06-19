@@ -19,7 +19,8 @@ Stores one guardian profile per logged-in Google user.
 | `name` | TEXT | Guardian name |
 | `login_id` | TEXT | Guardian-chosen app ID |
 | `password_hash` | TEXT | PBKDF2 password hash, never plaintext |
-| `phone` | TEXT | Contact phone number |
+| `phone` | TEXT | Private guardian contact phone number, not shown on public QR pages |
+| `safe_phone` | TEXT | Public QR page safe/relay phone number, nullable until issued |
 | `address` | TEXT | Guardian contact address shown on assigned QR find page |
 | `email` | TEXT | Contact email |
 | `is_active` | INTEGER | `1` active, `0` inactive |
@@ -163,11 +164,12 @@ Stores advertisement requests and status by managed subject.
 - Manual match search only returns subjects with no current QR assignment.
 - Logged-in guardians can view assigned QR code details for their own subjects.
 - Public find pages can read QR status by `public_key` without login.
-- When a QR is assigned to a subject, the public find page shows subject basic information and guardian contact information so the finder can respond.
+- When a QR is assigned to a subject, the public find page shows subject basic information and configured guardian response fields so the finder can respond.
+- Public QR pages must not expose `guardians.phone`; they show `guardians.safe_phone` as the safe/relay number when available, or `안심번호 준비중` when not available.
 - Each subject receives one QR assignment. Because each guardian can register up to 4 subjects, one guardian can have up to 4 assigned QR codes.
 - Logged-in guardians can register a browser push subscription from the dashboard.
 - Public find pages can call the notification API to send a push message to the assigned guardian.
-- Privacy note: public QR pages intentionally expose configured subject/contact fields. Before production launch, add explicit guardian consent and a field-level exposure policy.
+- Privacy note: public QR pages intentionally expose configured subject/contact fields. Raw guardian phone numbers are private; before production launch, connect a real safe-number provider and add explicit guardian consent and a field-level exposure policy.
 - Logged-in guardians can start Toss Payments subscription billing from the dashboard.
 - Subscription is marked active only after server-side Toss billing API succeeds.
 - Logged-in guardians can pause/resume their own subscription service state.

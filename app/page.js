@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { PwaInstallPrompt, SocialLoginButtons } from "./auth-actions";
+import { LoginAuthPanel } from "./auth-actions";
 import GuardianDashboard from "./dashboard";
 import OnboardingGate from "./onboarding-gate";
 import StatusToast from "./status-toast";
@@ -12,6 +12,7 @@ export default async function HomePage({ searchParams }) {
   const adSubjectId = resolvedSearchParams?.adSubject || "";
   const notice = resolvedSearchParams?.notice || "";
   const noticeType = resolvedSearchParams?.noticeType || "success";
+  const authError = resolvedSearchParams?.error || "";
   const session = await getServerSession(authOptions);
   const enabledProviders = getConfiguredProviderIds();
 
@@ -27,20 +28,7 @@ export default async function HomePage({ searchParams }) {
 
   const loginPanel = (
     <main className="page">
-      <section className="auth-panel" aria-label="소셜 로그인">
-        <div className="app-mark" aria-hidden="true">Z</div>
-        <h1 className="brand">zezari</h1>
-        <p className="status">
-          {session
-            ? "소셜 계정으로 연결되었습니다."
-            : "소셜 계정으로 가입하거나 로그인하세요."}
-        </p>
-
-        <SocialLoginButtons enabledProviders={enabledProviders} />
-        <div className="install-area">
-          <PwaInstallPrompt />
-        </div>
-      </section>
+      <LoginAuthPanel enabledProviders={enabledProviders} authError={authError} />
     </main>
   );
 

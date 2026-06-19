@@ -44,7 +44,7 @@ export default async function FindPage({ params }) {
         <section className="find-shell">
           <p className="intro-kicker">QR 확인 완료</p>
           <h1>아직 관리대상과 연결되지 않은 QR입니다</h1>
-          <p>보호자가 관리대상을 등록하면 이 QR에서 대상자 정보와 보호자 연락처를 확인할 수 있습니다.</p>
+          <p>보호자가 관리대상을 등록하면 이 QR에서 대상자 정보와 보호자 안심번호를 확인할 수 있습니다.</p>
           <div className="find-key-box">
             <span>QR 코드</span>
             <strong>{data.code}</strong>
@@ -77,8 +77,8 @@ export default async function FindPage({ params }) {
             <strong>{data.guardian_name || "이름 미입력"}</strong>
           </div>
           <div className="find-key-box">
-            <span>연락처</span>
-            <strong>{data.phone || "전화번호 미입력"}</strong>
+            <span>안심번호</span>
+            <strong>{data.safe_phone || "안심번호 준비중"}</strong>
           </div>
           <div className="find-key-box">
             <span>이메일</span>
