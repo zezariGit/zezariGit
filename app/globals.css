@@ -2961,6 +2961,28 @@ button:disabled:hover {
   box-shadow: 0 16px 44px rgba(21, 32, 28, 0.08);
 }
 
+.subject-edit-card {
+  width: min(100%, 760px);
+  padding: var(--space-lg);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.subject-edit-card .subject-registration-form {
+  padding-top: 0;
+}
+
+.subject-edit-card .subject-form-top {
+  justify-items: start;
+  text-align: left;
+}
+
+.subject-edit-card .subject-avatar-picker {
+  justify-self: start;
+}
+
 .phone-notch {
   position: absolute;
   top: 10px;
@@ -3062,7 +3084,7 @@ button:disabled:hover {
 .target-field {
   gap: 4px;
   color: #111827;
-  font-size: 0;
+  font-size: 13px;
 }
 
 .target-field span {
@@ -3084,6 +3106,8 @@ button:disabled:hover {
   border: 1.5px solid #111827;
   border-radius: 13px;
   color: #111827;
+  font-size: 14px;
+  line-height: 1.35;
 }
 
 .target-field textarea {

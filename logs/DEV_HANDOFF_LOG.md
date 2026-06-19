@@ -2361,6 +2361,32 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `https://zezari.vercel.app` returned HTTP 200.
 - `https://zezari.vercel.app/find/test-public-key` returned HTTP 200.
 
+## 2026-06-19 KST - Subject Edit Form Style Fix
+
+### User Request
+- The managed subject edit page does not need to follow the mockup phone style.
+- Current styling made name, birth date, and current status values display incorrectly and difficult to edit.
+- Remove the unnecessary top notch decoration above `대상자 수정`.
+
+### Reflected Work
+- Existing subject edit cards now use a normal card style instead of the phone-shaped registration card.
+- Removed the phone notch decoration from existing subject edit cards.
+- Kept the phone-style card only for new subject registration.
+- Fixed target field CSS where `font-size: 0` was inherited by inputs/selects.
+- Explicitly set input/select/textarea font size and line height for the managed subject form.
+
+### Files Changed
+- `app/dashboard.js`
+- `app/globals.css`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+
+### Time Spent
+- Style diagnosis, scoped CSS/component fix, build verification, and logs: approximately 15 minutes.
+
 ## 2026-06-19 KST - Login/Signup Screen Redesign And Credentials Login
 
 ### User Request

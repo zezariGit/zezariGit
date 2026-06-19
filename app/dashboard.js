@@ -346,13 +346,13 @@ function SubjectForm({ subject }) {
   const isExisting = Boolean(subject?.id);
 
   return (
-    <article className="subject-registration-phone">
+    <article className={isExisting ? "subject-edit-card" : "subject-registration-phone"}>
       <form action={saveSubjectAction} className="subject-registration-form">
         <input type="hidden" name="subjectId" defaultValue={subject?.id || ""} />
         <input type="hidden" name="existingPhoto" defaultValue={subject?.photo_data_url || ""} />
         <input type="hidden" name="existingPhotoName" defaultValue={subject?.photo_name || ""} />
 
-        <div className="phone-notch" aria-hidden="true" />
+        {!isExisting && <div className="phone-notch" aria-hidden="true" />}
         <div className="subject-form-top">
           <h2>{isExisting ? "대상자 수정" : "대상자 등록"}</h2>
           {isExisting && <em>수정 저장 시 QR 완료 화면은 표시되지 않습니다.</em>}
