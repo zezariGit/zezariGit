@@ -1847,5 +1847,17 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 로컬 보호자 정보 탭 정상 응답 확인.
 - 카카오 우편번호 팝업의 실제 선택 동작은 현재 세션에서 브라우저가 비활성 상태라 직접 시각 검증하지 못했다.
 
+### 운영 반영
+- GitHub commit:
+  - `f9e049e Add Kakao postcode address search`
+- Vercel production deployment:
+  - `https://zezari-i1mxasybm-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### 운영 검증
+- 운영 메인 페이지 정상 응답 확인.
+- 운영 관리자 페이지 정상 응답 확인.
+
 ### 반영 시간
 - 공식 가이드 확인, 주소 검색 컴포넌트 추가, 보호자 폼 연결, 스타일/로그 반영: 약 25분.

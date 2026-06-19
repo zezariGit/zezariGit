@@ -2875,6 +2875,20 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Local `http://127.0.0.1:3000/?tab=guardian` returned HTTP 200.
 - Browser popup interaction with Kakao Postcode could not be visually exercised in this session because the in-app browser was unavailable.
 
+### Deployment
+- GitHub commit:
+  - `f9e049e Add Kakao postcode address search`
+- GitHub push:
+  - `main` pushed to `https://github.com/zezariGit/zezariGit.git`
+- Vercel production deployment:
+  - `https://zezari-i1mxasybm-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- `https://zezari.vercel.app/` returned HTTP 200.
+- `https://zezari.vercel.app/admin` returned HTTP 200.
+
 ## 2026-06-16 KST - Mobile Dashboard Managed Card Alignment
 
 ### User Request
