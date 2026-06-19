@@ -1905,5 +1905,18 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 별도 로컬 빌드 서버에서 `/shop` HTTP 200 응답 확인.
 - 별도 로컬 빌드 서버에서 `/admin?section=products` HTTP 200 응답 확인.
 
+### 운영 반영
+- GitHub commit:
+  - `8cfd778 Add product shop flow`
+- Vercel production deployment:
+  - `https://zezari-31xgubkr0-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### 운영 검증
+- 운영 메인 페이지 정상 응답 확인.
+- 운영 상품 선택 페이지 정상 응답 확인.
+- 운영 관리자 상품 관리 페이지 정상 응답 확인.
+
 ### 반영 시간
 - DB 모델, 관리자 상품 관리, 사용자 상품 선택 화면, 결제 준비 연결, 문서/로그 반영: 약 70분.

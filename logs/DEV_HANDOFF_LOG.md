@@ -2179,6 +2179,21 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - `http://127.0.0.1:3001/admin?section=products`
 - Temporary verification server was stopped after route checks.
 
+### Deployment
+- GitHub commit:
+  - `8cfd778 Add product shop flow`
+- GitHub push:
+  - `main` pushed to `https://github.com/zezariGit/zezariGit.git`
+- Vercel production deployment:
+  - `https://zezari-31xgubkr0-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- `https://zezari.vercel.app/` returned HTTP 200.
+- `https://zezari.vercel.app/shop` returned HTTP 200.
+- `https://zezari.vercel.app/admin?section=products` returned HTTP 200.
+
 ## 2026-06-19 KST - My Page Corner Icon And Guardian Notification Inbox
 
 ### User Request
