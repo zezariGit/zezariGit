@@ -2387,6 +2387,46 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Time Spent
 - Style diagnosis, scoped CSS/component fix, build verification, and logs: approximately 15 minutes.
 
+## 2026-06-19 KST - My Page Tab And Subject Form Style Unification
+
+### User Request
+- Make new subject registration use the same style as subject edit.
+- Move `로그아웃` and `푸시 알림 켜짐` controls into a new My Page.
+- Build My Page in a structure similar to the attached reference, while following the current project CSS style.
+
+### Reflected Work
+- Added a fourth user tab:
+  - `/?tab=my`
+- Updated tab parsing to support `my`.
+- Removed push notification and logout controls from the dashboard header.
+- Added `MyPageTab` with:
+  - profile avatar placeholder.
+  - guardian information summary.
+  - primary managed subject summary.
+  - subscription/payment status summary.
+  - push notification setting.
+  - admin page shortcut for admins.
+  - customer support/menu links.
+  - logout button.
+- Changed dashboard quick action `내 정보` to open `/?tab=my`.
+- Changed new subject registration form to use the same normal card style as subject edit.
+- Removed phone-shaped registration card styling from the new subject form while keeping the QR registration-complete screen unchanged.
+- Updated My Page CSS using existing project tokens and restrained card/list styling.
+
+### Files Changed
+- `app/page.js`
+- `app/dashboard.js`
+- `app/globals.css`
+- `deliverables/USER_MANUAL.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+
+### Time Spent
+- Tab update, My Page UI, subject form style unification, build verification, and logs: approximately 35 minutes.
+
 ## 2026-06-19 KST - Login/Signup Screen Redesign And Credentials Login
 
 ### User Request

@@ -14,7 +14,9 @@ export default async function HomePage({ searchParams }) {
       ? "guardian"
       : requestedTab === "subjects"
         ? "subjects"
-        : "dashboard";
+        : requestedTab === "my"
+          ? "my"
+          : "dashboard";
   const adSubjectId = resolvedSearchParams?.adSubject || "";
   const registeredSubjectId = resolvedSearchParams?.registered || "";
   const notice = resolvedSearchParams?.notice || "";

@@ -23,6 +23,7 @@ The manual explains the current implemented service from both user and admin per
 - SNS first-login signup completion flow: incomplete social accounts must fill the same guardian signup information before entering the dashboard; SNS name/email values are prefilled when available.
 - PWA installation and onboarding flow.
 - Guardian dashboard and separated user tabs: dashboard, guardian information, and managed subject information.
+- My Page tab for account summary, guardian/subject overview, push notification setting, support links, and logout.
 - Managed subject registration, update, deletion, photo upload, and status display.
 - Managed subject guardian memo/message and per-subject guardian voice recording.
 - New subject registration completion screen with assigned QR information.

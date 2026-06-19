@@ -43,6 +43,7 @@ export default async function GuardianDashboard({
   const isDashboard = activeTab === "dashboard";
   const isGuardianTab = activeTab === "guardian";
   const isSubjectsTab = activeTab === "subjects";
+  const isMyTab = activeTab === "my";
 
   return (
     <main className="dashboard-page">
@@ -57,7 +58,9 @@ export default async function GuardianDashboard({
                   : "회원가입 정보를 입력해 주세요"
                 : isGuardianTab
                   ? "보호자정보"
-                  : "관리대상정보"}
+                  : isSubjectsTab
+                    ? "관리대상정보"
+                    : "마이페이지"}
             </h1>
             <p className="dashboard-subtitle">
               {isDashboard
@@ -66,18 +69,10 @@ export default async function GuardianDashboard({
                   : "SNS 계정에서 확인된 정보는 미리 채워두었습니다. 필수 정보를 입력하면 바로 서비스를 사용할 수 있습니다."
                 : isGuardianTab
                   ? "보호자 연락처, 주소, 안심번호 등 기본 정보를 입력하고 수정합니다."
-                  : "관리대상 등록, 보호자 메시지, 음성 안내, QR 배정 정보를 관리합니다."}
+                  : isSubjectsTab
+                    ? "관리대상 등록, 보호자 메시지, 음성 안내, QR 배정 정보를 관리합니다."
+                    : "계정 정보, 알림 설정, 고객 지원, 로그아웃을 관리합니다."}
             </p>
-          </div>
-          <div className="dashboard-header-actions">
-            <span className="session-email">{session.user?.email}</span>
-            {admin && (
-              <a className="admin-link" href="/admin">
-                관리자 페이지
-              </a>
-            )}
-            <PushNotificationButton />
-            <LogoutButton />
           </div>
         </header>
 
@@ -108,6 +103,9 @@ export default async function GuardianDashboard({
           <a className={isSubjectsTab ? "active" : ""} href="/?tab=subjects">
             관리대상정보
           </a>
+          <a className={isMyTab ? "active" : ""} href="/?tab=my">
+            마이페이지
+          </a>
         </nav>
 
         {isDashboard ? (
@@ -122,6 +120,8 @@ export default async function GuardianDashboard({
           />
         ) : isGuardianTab ? (
           <GuardianInfoTab guardian={guardian} session={session} />
+        ) : isMyTab ? (
+          <MyPageTab guardian={guardian} subjects={subjectsWithQr} subscription={subscription} session={session} admin={admin} />
         ) : (
           <SubjectsInfoTab subjects={subjectsWithQr} emptySlots={emptySlots} registeredSubject={registeredSubject} />
         )}
@@ -194,6 +194,98 @@ function GuardianInfoTab({ guardian, session }) {
       <h2 id="guardian-info">보호자 정보</h2>
       <GuardianForm guardian={guardian} session={session} />
     </section>
+  );
+}
+
+function MyPageTab({ guardian, subjects, subscription, session, admin }) {
+  const primarySubject = subjects[0] || null;
+  const subscriptionLabel = subscription?.status === "active"
+    ? "구독중"
+    : subscription?.status === "paused"
+      ? "일시정지"
+      : subscription?.status === "ready"
+        ? "결제대기"
+        : "미구독";
+
+  return (
+    <section className="my-page-panel" aria-label="마이페이지">
+      <h2>내 정보</h2>
+      <div className="my-profile-avatar" aria-hidden="true">
+        <span />
+      </div>
+
+      <div className="my-page-section">
+        <div className="my-section-heading">
+          <h3>보호자 정보</h3>
+          <a href="/?tab=guardian">정보 수정 &gt;</a>
+        </div>
+        <InfoRow label="이름" value={guardian.name || "이름 미입력"} />
+        <InfoRow label="비밀번호" value={guardian.password_hash ? "********" : "미설정"} />
+        <InfoRow label="연락처" value={guardian.phone || "연락처 미입력"} />
+        <InfoRow label="수령인" value={guardian.name || "이름 미입력"} actionLabel="주소록관리 >" href="/?tab=guardian" />
+        <InfoRow label="주소" value={guardian.address || "주소 미입력"} />
+        <InfoRow label="연락처" value={guardian.safe_phone ? `안심번호 ${guardian.safe_phone}` : "안심번호 준비중"} />
+      </div>
+
+      <div className="my-page-section">
+        <div className="my-section-heading">
+          <h3>대상자 정보</h3>
+          <a href="/?tab=subjects">정보 수정 &gt;</a>
+        </div>
+        {primarySubject ? (
+          <>
+            <InfoRow label="이름" value={primarySubject.name || "이름 미입력"} />
+            <InfoRow label="성별" value={primarySubject.gender || "성별 미입력"} />
+            <InfoRow label="생년월일" value={formatDate(primarySubject.birth_date)} />
+            <InfoRow label="보호자 메시지" value={primarySubject.guardian_message || "메시지 미입력"} />
+            <InfoRow label="사진" value={primarySubject.photo_name || (primarySubject.photo_data_url ? "사진 등록됨" : "사진 미등록")} />
+          </>
+        ) : (
+          <p className="my-empty-text">등록된 관리대상이 없습니다.</p>
+        )}
+        {subjects.length > 1 && <p className="my-empty-text">외 {subjects.length - 1}명은 관리대상정보에서 확인할 수 있습니다.</p>}
+      </div>
+
+      <div className="my-page-section">
+        <h3>부가 정보</h3>
+        <InfoRow label="결제 및 구독 현황" value={subscriptionLabel} />
+        <InfoRow label="제자리 서비스 소개" value="QR 안심 서비스" />
+        <div className="my-action-row">
+          <span>푸시 알림</span>
+          <PushNotificationButton />
+        </div>
+        {admin && (
+          <a className="my-menu-link" href="/admin">
+            관리자 페이지
+          </a>
+        )}
+      </div>
+
+      <div className="my-page-section">
+        <h3>고객 지원</h3>
+        <a className="my-menu-link" href="/?tab=my">공지사항 및 FAQ</a>
+        <a className="my-menu-link" href="/?tab=my">고객센터</a>
+        <a className="my-menu-link" href="/?tab=my">의견 남기기</a>
+        <a className="my-menu-link" href="/?tab=my">이용약관</a>
+        <a className="my-menu-link" href="/?tab=my">개인정보처리방침</a>
+      </div>
+
+      <div className="my-page-section my-logout-section">
+        <LogoutButton />
+      </div>
+
+      <p className="my-session-email">{session.user?.email || guardian.email || guardian.google_email || ""}</p>
+    </section>
+  );
+}
+
+function InfoRow({ label, value, actionLabel = "", href = "" }) {
+  return (
+    <div className="my-info-row">
+      <strong>{label}</strong>
+      <span>{value || "-"}</span>
+      {href && <a href={href}>{actionLabel}</a>}
+    </div>
   );
 }
 
@@ -281,7 +373,7 @@ function StatusDashboard({ guardian, subjects, subscription, subscriptionPlans }
             <span aria-hidden="true">B</span>
             상품 구매
           </a>
-          <a href="/?tab=guardian#guardian-info">
+          <a href="/?tab=my">
             <span aria-hidden="true">M</span>
             내 정보
           </a>
@@ -346,13 +438,12 @@ function SubjectForm({ subject }) {
   const isExisting = Boolean(subject?.id);
 
   return (
-    <article className={isExisting ? "subject-edit-card" : "subject-registration-phone"}>
+    <article className="subject-edit-card">
       <form action={saveSubjectAction} className="subject-registration-form">
         <input type="hidden" name="subjectId" defaultValue={subject?.id || ""} />
         <input type="hidden" name="existingPhoto" defaultValue={subject?.photo_data_url || ""} />
         <input type="hidden" name="existingPhotoName" defaultValue={subject?.photo_name || ""} />
 
-        {!isExisting && <div className="phone-notch" aria-hidden="true" />}
         <div className="subject-form-top">
           <h2>{isExisting ? "대상자 수정" : "대상자 등록"}</h2>
           {isExisting && <em>수정 저장 시 QR 완료 화면은 표시되지 않습니다.</em>}

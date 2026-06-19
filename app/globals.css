@@ -780,7 +780,7 @@ a {
 
 .dashboard-menu {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   margin: 0 0 22px;
   padding: 6px;
@@ -2917,7 +2917,141 @@ button:disabled:hover {
 }
 
 .dashboard-menu {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.my-page-panel {
+  width: min(100%, 420px);
+  display: grid;
+  gap: 14px;
+  margin: 0 auto;
+  padding: var(--space-lg);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.my-page-panel h2 {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.my-profile-avatar {
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  justify-self: center;
+  overflow: hidden;
+  border: 2px solid #111827;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.my-profile-avatar span {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #000000;
+  box-shadow: 0 30px 0 14px #000000;
+  transform: translateY(-8px);
+}
+
+.my-page-section {
+  display: grid;
+  gap: 7px;
+  padding-top: 9px;
+  border-top: 2px solid #3f4643;
+}
+
+.my-page-section h3,
+.my-section-heading h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 0.98rem;
+  font-weight: 900;
+}
+
+.my-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.my-section-heading a,
+.my-info-row a {
+  color: var(--c-primary-dark);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.my-info-row {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  color: #111827;
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.my-info-row strong {
+  font-weight: 900;
+}
+
+.my-info-row span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.my-empty-text,
+.my-session-email {
+  margin: 0;
+  color: var(--c-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.my-action-row {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+}
+
+.my-action-row > span {
+  color: #111827;
+  font-size: 0.85rem;
+  font-weight: 900;
+}
+
+.my-action-row .push-action-wrap {
+  justify-items: stretch;
+}
+
+.my-action-row .admin-link,
+.my-logout-section .action {
+  width: 100%;
+}
+
+.my-menu-link {
+  color: #111827;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.my-logout-section {
+  padding-bottom: 0;
+}
+
+.my-session-email {
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .guardian-info-panel {
