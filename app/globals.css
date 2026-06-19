@@ -3303,6 +3303,31 @@ button:disabled:hover {
   margin: 0 auto;
 }
 
+.postcode-address-field {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.postcode-address-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-xs);
+  align-items: center;
+}
+
+.postcode-search-button {
+  min-height: 42px;
+  padding: 0 var(--space-md);
+  white-space: nowrap;
+}
+
+.field-helper {
+  margin: 0;
+  color: var(--c-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
 .subjects-workspace {
   display: grid;
   gap: var(--space-md);
@@ -3903,5 +3928,9 @@ button:disabled:hover {
 
   .my-section-heading {
     align-items: flex-start;
+  }
+
+  .postcode-address-row {
+    grid-template-columns: 1fr;
   }
 }

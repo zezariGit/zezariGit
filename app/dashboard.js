@@ -9,6 +9,7 @@ import {
 } from "./actions";
 import AdCampaignModal from "./ad-campaign-modal";
 import FormSubmitButton from "./form-submit-button";
+import KakaoPostcodeAddress from "./kakao-postcode-address";
 import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
 import ModalScrollLock from "./modal-scroll-lock";
 import NotificationBell from "./notification-bell";
@@ -483,7 +484,7 @@ function GuardianForm({ guardian, session }) {
               </label>
               <label className="full-field">
                 주소
-                <input name="address" defaultValue={guardian.address || ""} placeholder="보호자 주소" />
+                <KakaoPostcodeAddress defaultValue={guardian.address || ""} />
               </label>
               <label className="full-field">
                 이메일

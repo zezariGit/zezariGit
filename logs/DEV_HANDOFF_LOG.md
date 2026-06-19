@@ -2836,6 +2836,45 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `https://zezari.vercel.app/` returned HTTP 200.
 - `https://zezari.vercel.app/admin` returned HTTP 200.
 
+## 2026-06-19 KST - Kakao Postcode Guardian Address Input
+
+### User Request
+- Use Kakao Postcode service in the guardian information page so guardians can search and input their address.
+- User supplied Kakao Postcode guide URL:
+  - `https://postcode.map.kakao.com/guide?utm_source=chatgpt.com#usage`
+
+### Source Notes
+- Official Kakao Postcode guide says the service does not require a key, has no usage limit, and can be loaded with `postcode.v2.js`.
+- The implementation uses the official `new kakao.Postcode({ oncomplete }).open()` flow.
+
+### Reflected Work
+- Added client component:
+  - `app/kakao-postcode-address.js`
+- The component lazily loads Kakao's postcode script only when the user clicks `주소 검색`.
+- On address selection, the component fills the existing guardian `address` form field with:
+  - postcode
+  - road/jibun base address
+  - optional extra road address text when available
+- The user can still manually edit the same address input to add detail address text.
+- Integrated the component into `GuardianForm` on the guardian information tab.
+- Added project-style CSS for the address search row, button, helper text, and mobile layout.
+- Updated the user manual local index coverage note.
+
+### Files Changed
+- `app/kakao-postcode-address.js`
+- `app/dashboard.js`
+- `app/globals.css`
+- `deliverables/USER_MANUAL.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `git diff --check` passed.
+- `npm run build` succeeded.
+- Local `http://127.0.0.1:3000/` returned HTTP 200.
+- Local `http://127.0.0.1:3000/?tab=guardian` returned HTTP 200.
+- Browser popup interaction with Kakao Postcode could not be visually exercised in this session because the in-app browser was unavailable.
+
 ## 2026-06-16 KST - Mobile Dashboard Managed Card Alignment
 
 ### User Request

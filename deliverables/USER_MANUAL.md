@@ -23,6 +23,7 @@ The manual explains the current implemented service from both user and admin per
 - SNS first-login signup completion flow: incomplete social accounts must fill the same guardian signup information before entering the dashboard; SNS name/email values are prefilled when available.
 - PWA installation and onboarding flow.
 - Guardian dashboard and separated user tabs: dashboard, guardian information, and managed subject information.
+- Guardian information address input with Kakao Postcode search; selected postcode/basic address is saved in the existing guardian address field and can be edited with detail address text.
 - Top-right My Page person icon with hover tooltip for account summary, guardian/subject overview, push notification setting, support links, and logout.
 - Top-left bell icon notification panel for finder push messages stored per guardian.
 - Managed subject registration, update, deletion, photo upload, and status display.
