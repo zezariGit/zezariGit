@@ -3231,5 +3231,71 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - `https://zezari.vercel.app/account/payment-methods` -> `/`
   - `https://zezari.vercel.app/account/ads` -> `/`
 
+## 2026-06-20 KST - Online Missing Report Selector
+
+### User Request
+- Dashboard `실종신고` currently moves to `관리대상정보`; replace it with a dedicated online missing report page.
+- Create a target selection screen based on the provided reference.
+- Replace existing subject state set with four states:
+  - `상품구매필요`
+  - `QR활성화필요`
+  - `안전`
+  - `찾는중`
+- Implement behavior by subject state:
+  - `상품구매필요`: cannot select; show alert and product purchase link guidance.
+  - `QR활성화필요`: cannot select; show alert explaining QR activation is required.
+  - `안전`: move to online missing ad flow, reusing existing Meta ad request modal.
+  - `찾는중`: move to ad dashboard.
+
+### Reflected Work
+- Added protected route:
+  - `/missing-report`
+- Added client selector component:
+  - `app/missing-report/missing-report-selector.js`
+- Dashboard quick action `실종신고` now links to `/missing-report`.
+- Subject status options in the subject form are now:
+  - `상품구매필요`
+  - `QR활성화필요`
+  - `안전`
+  - `찾는중`
+- Old `문제없음` status is normalized to `안전` in display helpers and in schema startup migration.
+- New subjects default to `상품구매필요`.
+- Product payment completion transitions eligible subjects from `상품구매필요` to `QR활성화필요`.
+- QR activation transitions eligible subjects to `안전`.
+- Admin and public QR pages now display normalized status labels.
+- Added project-style CSS for the missing report page and `상품구매필요` status badge.
+
+### Files Changed
+- `app/missing-report/page.js`
+- `app/missing-report/missing-report-selector.js`
+- `app/dashboard.js`
+- `app/admin/page.js`
+- `app/find/[key]/page.js`
+- `app/globals.css`
+- `lib/db.js`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded locally.
+- `git diff --check` passed, with only existing CRLF conversion warnings from Git.
+- Local `http://localhost:3001/` returned HTTP 200.
+- Local `http://localhost:3001/missing-report` returned expected unauthenticated redirect to `/`.
+- In-app browser verification was not available in this session.
+
+### Deployment
+- GitHub commit:
+  - `710c79d Add online missing report selector`
+- GitHub push:
+  - `main` pushed to `https://github.com/zezariGit/zezariGit.git`
+- Vercel production deployment:
+  - `https://zezari-cixce9b8q-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- `https://zezari.vercel.app/` returned HTTP 200.
+- `https://zezari.vercel.app/missing-report` returned expected unauthenticated redirect to `/`.
+
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.

@@ -2078,3 +2078,60 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - 마이페이지 링크 추가, 계정 하위 페이지 4개 생성, DB 스키마/액션 추가, 스타일 정리, 배포/검증: 약 45분.
+
+## 2026-06-20 - 온라인 실종신고 대상자 선택 기능
+
+### 요구내용
+- 대시보드의 `실종신고` 버튼이 현재 `관리대상정보`로 이동하는 흐름을 새 실종신고 페이지로 변경한다.
+- 첨부 화면을 참고해 “어떤 대상자를 찾고 계신가요?” 대상자 선택 화면을 만든다.
+- 대상자 상태를 4가지로 재구성한다.
+  - 상품구매필요
+  - QR활성화필요
+  - 안전
+  - 찾는중
+- 상태별 동작을 다르게 구성한다.
+  - 상품구매필요: 선택 불가, 상품 구매 필요 경고와 상품구매 페이지 링크 안내.
+  - QR활성화필요: 선택 불가, 상품 내 QR 활성화 필요 경고.
+  - 안전: 온라인 실종 광고 신청 화면으로 이동.
+  - 찾는중: 광고 대시보드로 이동.
+
+### 반영내용
+- `/missing-report` 신규 페이지를 만들었다.
+- 대시보드 하단 `실종신고` 버튼을 `/missing-report`로 연결했다.
+- 관리대상정보의 현재 상태 선택값을 새 4개 상태로 변경했다.
+- 기존 `문제없음` 상태는 `안전`으로 정규화되도록 처리했다.
+- 신규 대상자는 기본적으로 `상품구매필요` 상태가 되도록 변경했다.
+- 상품 결제 완료 후 대상자가 `QR활성화필요`로 전환되도록 연결했다.
+- QR 활성화 완료 후 대상자가 `안전`으로 전환되도록 연결했다.
+- 관리자 화면과 QR 공개 페이지도 새 상태명이 표시되도록 맞췄다.
+- 프로젝트 CSS 기준으로 대상자 선택 카드, 상태 배지, 경고 안내, 다음 버튼 스타일을 추가했다.
+
+### 산출물
+- `app/missing-report/page.js`
+- `app/missing-report/missing-report-selector.js`
+- `app/dashboard.js`
+- `app/admin/page.js`
+- `app/find/[key]/page.js`
+- `app/globals.css`
+- `lib/db.js`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### 검증
+- 로컬 빌드 성공.
+- CSS 차이 검사 통과.
+- 로컬 메인 페이지 정상 응답 확인.
+- 로컬 `/missing-report`가 비로그인 상태에서 `/`로 정상 이동하는 것 확인.
+- 운영 메인 페이지 정상 응답 확인.
+- 운영 `/missing-report`가 비로그인 상태에서 `/`로 정상 이동하는 것 확인.
+
+### 운영 반영
+- GitHub commit:
+  - `710c79d Add online missing report selector`
+- Vercel production deployment:
+  - `https://zezari-cixce9b8q-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### 반영 시간
+- 실종신고 페이지 생성, 상태 체계 변경, 결제/QR 활성화 상태 전환 연결, 배포/검증: 약 55분.
