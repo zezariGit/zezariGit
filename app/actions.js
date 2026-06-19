@@ -10,7 +10,9 @@ import {
   deleteSubject,
   endSubjectAd,
   pauseSubjectAd,
+  registerGuardianCoupon,
   resumeSubjectAd,
+  saveGuardianPaymentMethod,
   saveGuardianProfile,
   saveSubject,
 } from "../lib/db";
@@ -115,6 +117,30 @@ export async function activateQrAction(formData) {
     redirect(withNotice(`/find/${publicKey}`, error.message || "QR 활성화에 실패했습니다.", "error"));
   }
   redirect(withNotice(`/find/${publicKey}`, "QR 코드가 활성화되었습니다. 오늘부터 구독기간이 시작됩니다."));
+}
+
+export async function registerCouponAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error("로그인이 필요합니다.");
+  try {
+    await registerGuardianCoupon(session, formData);
+    revalidatePath("/account/coupons");
+  } catch (error) {
+    redirect(withNotice("/account/coupons", error.message || "쿠폰을 등록하지 못했습니다.", "error"));
+  }
+  redirect(withNotice("/account/coupons", "쿠폰이 등록되었습니다."));
+}
+
+export async function savePaymentMethodAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error("로그인이 필요합니다.");
+  try {
+    await saveGuardianPaymentMethod(session, formData);
+    revalidatePath("/account/payment-methods");
+  } catch (error) {
+    redirect(withNotice("/account/payment-methods", error.message || "결제수단을 저장하지 못했습니다.", "error"));
+  }
+  redirect(withNotice("/account/payment-methods", "결제수단 표시 정보가 저장되었습니다."));
 }
 
 function withNotice(path, message, type = "success") {

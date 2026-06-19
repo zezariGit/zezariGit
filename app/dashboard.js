@@ -285,8 +285,11 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
 
       <div className="my-page-section">
         <h3>부가 정보</h3>
-        <InfoRow label="결제 및 구독 현황" value={subscriptionLabel} />
+        <InfoRow label="결제 및 구독 현황" value={subscriptionLabel} actionLabel="상세보기 >" href="/account/billing" />
         <InfoRow label="제자리 서비스 소개" value="QR 안심 서비스" />
+        <a className="my-menu-link" href="/account/coupons">쿠폰함</a>
+        <a className="my-menu-link" href="/account/payment-methods">결제수단</a>
+        <a className="my-menu-link" href="/account/ads">광고 대시보드</a>
         <div className="my-action-row">
           <span>푸시 알림</span>
           <PushNotificationButton />

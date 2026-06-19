@@ -4559,6 +4559,367 @@ button:disabled:hover {
   font-size: 0.86rem;
 }
 
+.account-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: start center;
+  padding: var(--space-lg);
+  background: var(--c-bg);
+}
+
+.account-panel {
+  width: min(100%, 760px);
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.account-topbar {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.account-topbar h1 {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.account-back-link,
+.account-plus-mark {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: 50%;
+  background: var(--c-primary-light);
+  color: var(--c-primary-dark);
+  font-size: 1.55rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.account-topbar-action {
+  justify-self: end;
+}
+
+.account-section {
+  display: grid;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 0.5px solid var(--c-border);
+}
+
+.account-section h2,
+.payment-method-form h2 {
+  margin: 0;
+  color: var(--c-primary-dark);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.account-subject-list,
+.account-history-list,
+.coupon-list,
+.payment-method-list,
+.ad-dashboard-list {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.account-subject-card,
+.account-history-card,
+.coupon-card,
+.payment-method-card,
+.ad-dashboard-card {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+}
+
+.account-subject-card {
+  grid-template-columns: 70px minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.account-subject-avatar {
+  width: 58px;
+  height: 58px;
+  overflow: hidden;
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: 50%;
+  background: var(--c-primary-light);
+  object-fit: cover;
+}
+
+.account-subject-avatar.empty {
+  display: grid;
+  place-items: center;
+}
+
+.account-subject-avatar.empty span {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--c-primary);
+  box-shadow: 0 23px 0 10px var(--c-primary);
+  transform: translateY(-7px);
+}
+
+.account-subject-card strong,
+.account-history-card strong,
+.coupon-card strong,
+.payment-method-card strong,
+.ad-dashboard-card strong {
+  display: block;
+  color: var(--c-text);
+  font-size: 0.95rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.account-subject-card span,
+.account-history-card span,
+.coupon-card span,
+.payment-method-card span,
+.ad-dashboard-card dd,
+.ad-dashboard-card dt {
+  color: var(--c-text-muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.account-subject-card a {
+  color: var(--c-primary-dark);
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.account-history-card,
+.coupon-card,
+.payment-method-card {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.payment-method-card {
+  grid-template-columns: 74px minmax(0, 1fr) auto;
+}
+
+.account-history-card > div:last-child {
+  text-align: right;
+}
+
+.account-menu-list {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.account-menu-list a {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-sm);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-weight: 800;
+}
+
+.account-menu-list a:hover {
+  border-color: var(--c-primary-border);
+  background: var(--c-primary-light);
+  color: var(--c-primary-dark);
+  text-decoration: none;
+}
+
+.account-empty-text {
+  margin: 0;
+  color: var(--c-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.coupon-register-form,
+.payment-method-form {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-md);
+  background: var(--c-primary-light);
+}
+
+.coupon-register-form label,
+.payment-method-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--c-text);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.coupon-register-form > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-xs);
+}
+
+.coupon-card.used {
+  background: #f3f4f6;
+  color: var(--c-text-muted);
+  opacity: 0.72;
+}
+
+.payment-method-brand {
+  width: 62px;
+  min-height: 42px;
+  display: grid;
+  place-items: center;
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--c-primary-dark);
+  font-size: 0.74rem;
+  font-weight: 900;
+}
+
+.payment-method-form p {
+  margin: 0;
+  color: var(--c-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.payment-default-check {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.payment-default-check input {
+  width: auto;
+}
+
+.ad-dashboard-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.ad-dashboard-filters a {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border: 0.5px solid var(--c-border);
+  border-radius: 999px;
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.ad-dashboard-filters a.active {
+  border-color: var(--c-primary-border);
+  background: var(--c-primary);
+  color: #fff;
+}
+
+.ad-dashboard-card {
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: start;
+}
+
+.ad-dashboard-thumb {
+  width: 84px;
+  height: 84px;
+  overflow: hidden;
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-primary-light);
+  object-fit: cover;
+}
+
+.ad-dashboard-thumb.empty {
+  display: grid;
+  place-items: center;
+  color: var(--c-primary-dark);
+  font-weight: 900;
+}
+
+.ad-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  margin-bottom: 6px;
+}
+
+.ad-status-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #eef6ff;
+  color: var(--c-primary-dark);
+  font-size: 0.76rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.ad-status-badge.ended {
+  background: #f3f4f6;
+  color: var(--c-text-muted);
+}
+
+.ad-status-badge.paused {
+  background: #fff7ed;
+  color: #b45309;
+}
+
+.ad-dashboard-card dl {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 3px 8px;
+  margin: 0;
+}
+
+.ad-dashboard-card dt {
+  font-weight: 800;
+}
+
+.ad-dashboard-card dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.ad-dashboard-notes {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--c-primary-dark);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
 @media (max-width: 720px) {
   .qr-create-panel,
   .qr-create-form,
@@ -4641,6 +5002,35 @@ button:disabled:hover {
 
   .shop-summary-panel {
     width: min(100%, 460px);
+  }
+
+  .account-page {
+    padding: var(--space-sm);
+  }
+
+  .account-panel {
+    padding: var(--space-md);
+  }
+
+  .account-subject-card,
+  .account-history-card,
+  .coupon-card,
+  .payment-method-card,
+  .ad-dashboard-card,
+  .coupon-register-form > div {
+    grid-template-columns: 1fr;
+  }
+
+  .account-history-card > div:last-child {
+    text-align: left;
+  }
+
+  .ad-card-heading {
+    align-items: flex-start;
+  }
+
+  .ad-dashboard-card dl {
+    grid-template-columns: 1fr;
   }
 
   .product-choice-grid {
