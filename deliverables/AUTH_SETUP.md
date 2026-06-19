@@ -35,7 +35,11 @@ Project: REAL_QR_FIND
   - SNS icon login row: Kakao, Naver, Google, Apple
   - Bottom signup helper: `계정이 없으신가요? 회원가입`
 - `자동로그인` currently remembers the guardian login ID only. Passwords are never saved in browser storage.
-- `회원가입` remains SNS-first: a first social login creates the account flow/profile basis.
+- `회원가입` opens the direct guardian signup flow:
+  - Step 1: phone number verification.
+  - Step 2: guardian basic information input.
+  - Step 3: signup completion with `대상자 등록하기` and `대시보드 바로가기`.
+- Phone verification is currently implemented in test mode. It shows a temporary code in the screen message until a real SMS provider is connected.
 - Guardian ID/password login works after the guardian profile has saved `아이디` and `비밀번호`.
 
 ## Google Cloud Console Requirements
@@ -148,9 +152,14 @@ NAVER_CLIENT_SECRET=your-naver-client-secret
   - Shows login state.
   - Shows the onboarding flow first unless the user selected `다시보지 않기`.
   - Shows guardian ID/password login and Kakao, Naver, Google, Apple icon buttons when logged out.
+  - Supports direct signup view through the `회원가입` button or `/?signup=1`.
   - Buttons are disabled until the corresponding provider keys are configured.
   - Apple is a UI placeholder until Apple OAuth is implemented.
   - Shows the guardian dashboard when logged in.
+- `/api/signup/guardian`
+  - Creates a guardian account before login.
+  - Validates phone format, birth date, app ID format, password strength, duplicate app ID, duplicate phone, and required terms agreement.
+  - Stores PBKDF2 password hash only; plaintext passwords are never stored.
 - `/api/auth/[...nextauth]`
   - Handles NextAuth routes.
   - Includes provider callback routes:

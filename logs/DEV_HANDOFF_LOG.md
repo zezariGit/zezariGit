@@ -2112,6 +2112,83 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
 
+## 2026-06-19 KST - Direct Guardian Signup Flow
+
+### User Request
+- For first-time visitors who are not signed up, add a signup process like the provided reference.
+- Signup process:
+  - phone verification.
+  - guardian basic information input.
+  - signup completion.
+- Push the work to GitHub automatically after implementation.
+
+### Reflected Work
+- Added a direct signup mode inside the logged-out auth panel.
+- The `회원가입` button now opens the signup flow instead of only showing an 안내 message.
+- Added direct route support for `/?signup=1` to open the signup screen after onboarding is skipped.
+- Signup step 1:
+  - phone number input.
+  - test-mode verification code request.
+  - five-digit verification input.
+  - verification timer display.
+- Signup step 2:
+  - guardian name.
+  - birth date.
+  - verified phone number.
+  - app login ID.
+  - app password.
+  - required privacy/service agreement checkboxes.
+- Signup step 3:
+  - completion screen.
+  - `대상자 등록하기` signs in and moves to `/?tab=info#subjects-info`.
+  - `대시보드 바로가기` signs in and moves to `/?tab=dashboard`.
+- Added `POST /api/signup/guardian`.
+- Added guardian DB fields:
+  - `birth_date`
+  - `phone_verified_at`
+  - `terms_privacy_agreed_at`
+  - `terms_service_agreed_at`
+- Added `createGuardianSignup` server-side validation:
+  - required fields.
+  - phone format.
+  - birth date format.
+  - login ID format.
+  - strong password.
+  - duplicate login ID.
+  - duplicate phone.
+  - required terms agreement.
+- Passwords continue to be stored only as PBKDF2 hashes.
+- Guardian dashboard completeness no longer requires email, because the new reference signup flow does not collect email.
+- Guardian profile editing now preserves/edits guardian birth date.
+
+### Files Changed
+- `app/page.js`
+- `app/auth-actions.js`
+- `app/api/signup/guardian/route.js`
+- `app/dashboard.js`
+- `app/globals.css`
+- `lib/db.js`
+- `deliverables/AUTH_SETUP.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/USER_MANUAL.md`
+- `deliverables/user_manual_screenshots/signup_phone_step.png`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- Local `http://localhost:3000/?signup=1` returned HTTP 200.
+- Playwright screenshot found `.signup-card` and captured the phone verification screen.
+- Screenshot saved at `deliverables/user_manual_screenshots/signup_phone_step.png`.
+- `POST /api/signup/guardian` with missing values returned HTTP 400 with a Korean validation message.
+
+### Important Limitation
+- Phone verification is currently test mode: the verification code is displayed in the page message.
+- Before real production identity verification, connect an SMS provider and move code generation/verification to server-side storage.
+
+### Time Spent
+- Signup UI/API/schema implementation, build, screenshot check, API validation, and documentation/log update: approximately 55 minutes.
+
 ## 2026-06-19 KST - Login/Signup Screen Redesign And Credentials Login
 
 ### User Request

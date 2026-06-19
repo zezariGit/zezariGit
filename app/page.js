@@ -13,6 +13,7 @@ export default async function HomePage({ searchParams }) {
   const notice = resolvedSearchParams?.notice || "";
   const noticeType = resolvedSearchParams?.noticeType || "success";
   const authError = resolvedSearchParams?.error || "";
+  const authMode = resolvedSearchParams?.signup === "1" ? "signup" : "login";
   const session = await getServerSession(authOptions);
   const enabledProviders = getConfiguredProviderIds();
 
@@ -28,7 +29,7 @@ export default async function HomePage({ searchParams }) {
 
   const loginPanel = (
     <main className="page">
-      <LoginAuthPanel enabledProviders={enabledProviders} authError={authError} />
+      <LoginAuthPanel enabledProviders={enabledProviders} authError={authError} initialMode={authMode} />
     </main>
   );
 

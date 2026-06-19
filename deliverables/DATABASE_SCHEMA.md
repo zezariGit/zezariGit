@@ -22,6 +22,10 @@ Stores one guardian profile per logged-in Google user.
 | `phone` | TEXT | Private guardian contact phone number, not shown on public QR pages |
 | `safe_phone` | TEXT | Public QR page safe/relay phone number, nullable until issued |
 | `address` | TEXT | Guardian contact address shown on assigned QR find page |
+| `birth_date` | TEXT | Guardian birth date captured during direct signup or profile edit |
+| `phone_verified_at` | TEXT | Timestamp when phone verification was completed during direct signup |
+| `terms_privacy_agreed_at` | TEXT | Timestamp for required privacy collection/use agreement |
+| `terms_service_agreed_at` | TEXT | Timestamp for required service terms agreement |
 | `email` | TEXT | Contact email |
 | `is_active` | INTEGER | `1` active, `0` inactive |
 | `is_admin` | INTEGER | `1` DB administrator, `0` normal guardian |
@@ -151,7 +155,9 @@ Stores advertisement requests and status by managed subject.
 | `updated_at` | TEXT | Updated timestamp |
 
 ## Access Rules
-- Dashboard data is loaded only after social login.
+- Dashboard data is loaded only after social login or guardian ID/password login.
+- New guardians can sign up before login through the direct signup flow: phone verification step, profile input step, and completion step.
+- Direct signup stores guardian name, phone, birth date, app login ID, password hash, phone verification timestamp, and required terms agreement timestamps.
 - A guardian can only query/update subjects where `subjects.guardian_id` belongs to the logged-in guardian.
 - Server-side save logic limits each guardian to 4 subjects.
 - Subject status is stored per subject and shown on the guardian dashboard.

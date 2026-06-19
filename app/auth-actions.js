@@ -24,12 +24,29 @@ const socialProviders = [
   },
 ];
 
-export function LoginAuthPanel({ enabledProviders = [], authError = "" }) {
+export function LoginAuthPanel({ enabledProviders = [], authError = "", initialMode = "login" }) {
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState(initialMode === "signup" ? "signup" : "login");
   const [message, setMessage] = useState(authError ? "아이디 또는 비밀번호를 확인해 주세요." : "");
+  const [signupStep, setSignupStep] = useState("phone");
+  const [signup, setSignup] = useState({
+    phone: "",
+    name: "",
+    birthDate: "",
+    loginId: "",
+    password: "",
+    privacyAgreed: false,
+    serviceAgreed: false,
+  });
+  const [verificationCode, setVerificationCode] = useState("");
+  const [codeInput, setCodeInput] = useState(["", "", "", "", ""]);
+  const [verifiedPhone, setVerifiedPhone] = useState("");
+  const [signupLoading, setSignupLoading] = useState(false);
+  const [signupCredentials, setSignupCredentials] = useState(null);
+  const [codeSeconds, setCodeSeconds] = useState(0);
 
   useEffect(() => {
     const savedLoginId = window.localStorage.getItem("zezari:remember-login-id") || "";
@@ -38,6 +55,14 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "" }) {
       setRemember(true);
     }
   }, []);
+
+  useEffect(() => {
+    if (codeSeconds <= 0) return undefined;
+    const timer = window.setInterval(() => {
+      setCodeSeconds((current) => Math.max(0, current - 1));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [codeSeconds]);
 
   const submitCredentials = async (event) => {
     event.preventDefault();
@@ -69,6 +94,273 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "" }) {
     setLoading(false);
     setMessage("아이디 또는 비밀번호를 확인해 주세요.");
   };
+
+  const updateSignup = (key, value) => {
+    setSignup((current) => ({ ...current, [key]: value }));
+  };
+
+  const openSignup = () => {
+    setMode("signup");
+    setSignupStep("phone");
+    setMessage("");
+  };
+
+  const closeSignup = () => {
+    setMode("login");
+    setSignupStep("phone");
+    setMessage("");
+  };
+
+  const requestVerificationCode = () => {
+    const digits = signup.phone.replace(/\D/g, "");
+    if (!/^01[016789]\d{7,8}$/.test(digits)) {
+      setMessage("휴대폰 번호를 정확히 입력해 주세요.");
+      return;
+    }
+
+    const nextCode = String(Math.floor(10000 + Math.random() * 90000));
+    setVerificationCode(nextCode);
+    setCodeInput(["", "", "", "", ""]);
+    setVerifiedPhone("");
+    setCodeSeconds(180);
+    setMessage(`테스트 인증코드 ${nextCode}를 입력해 주세요. 실제 문자 발송은 SMS 연동 후 교체됩니다.`);
+  };
+
+  const updateCodeInput = (index, value) => {
+    const digit = value.replace(/\D/g, "").slice(-1);
+    setCodeInput((current) => current.map((item, itemIndex) => (itemIndex === index ? digit : item)));
+    if (digit) {
+      const next = document.getElementById(`signup-code-${index + 1}`);
+      next?.focus();
+    }
+  };
+
+  const verifyCode = () => {
+    if (!verificationCode || codeSeconds <= 0) {
+      setMessage("인증코드를 다시 받아 주세요.");
+      return;
+    }
+    if (codeInput.join("") !== verificationCode) {
+      setMessage("인증코드가 일치하지 않습니다.");
+      return;
+    }
+
+    setVerifiedPhone(signup.phone);
+    setSignupStep("profile");
+    setMessage("휴대폰 인증이 완료되었습니다.");
+  };
+
+  const submitSignup = async (event) => {
+    event.preventDefault();
+    if (!verifiedPhone) {
+      setSignupStep("phone");
+      setMessage("휴대폰 인증을 먼저 완료해 주세요.");
+      return;
+    }
+
+    setSignupLoading(true);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/signup/guardian", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...signup,
+          phone: verifiedPhone,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data.ok) {
+        setMessage(data.message || "회원가입 정보를 확인해 주세요.");
+        setSignupLoading(false);
+        return;
+      }
+
+      setSignupCredentials({ loginId: signup.loginId, password: signup.password });
+      setSignupLoading(false);
+      setSignupStep("done");
+      setMessage("");
+    } catch {
+      setMessage("회원가입 처리 중 오류가 발생했습니다.");
+      setSignupLoading(false);
+    }
+  };
+
+  const signInAfterSignup = async (destination) => {
+    if (!signupCredentials) return;
+    setSignupLoading(true);
+    const result = await signIn("credentials", {
+      loginId: signupCredentials.loginId,
+      password: signupCredentials.password,
+      redirect: false,
+      callbackUrl: destination,
+    });
+
+    if (result?.ok) {
+      window.location.href = destination;
+      return;
+    }
+
+    setSignupLoading(false);
+    setMessage("가입은 완료되었습니다. 로그인 화면에서 다시 로그인해 주세요.");
+  };
+
+  if (mode === "signup") {
+    return (
+      <section className="auth-panel signup-card" aria-label="회원가입">
+        {signupStep !== "done" && (
+          <button className="signup-back-button" type="button" onClick={signupStep === "phone" ? closeSignup : () => setSignupStep("phone")}>
+            <span aria-hidden="true">‹</span>
+            <span className="visually-hidden">이전</span>
+          </button>
+        )}
+
+        {signupStep === "phone" && (
+          <div className="signup-step">
+            <h1 className="login-title">회원가입</h1>
+            <div className="signup-copy">
+              <strong>휴대폰 번호를 입력해주세요</strong>
+              <p>보호자 본인확인과 알림 보호를 위해 사용됩니다.</p>
+            </div>
+
+            <label className="signup-field">
+              <span>휴대폰 번호</span>
+              <input
+                value={signup.phone}
+                onChange={(event) => updateSignup("phone", event.target.value)}
+                placeholder="010 - 1234 - 5678"
+                inputMode="tel"
+              />
+            </label>
+            <button className="login-submit" type="button" onClick={requestVerificationCode}>
+              인증코드 받기
+            </button>
+
+            <div className="signup-separator" />
+
+            <div className="code-heading">
+              <strong>인증번호 입력</strong>
+              <span>{formatTimer(codeSeconds)}</span>
+            </div>
+            <div className="verification-code-row">
+              {codeInput.map((value, index) => (
+                <input
+                  id={`signup-code-${index}`}
+                  key={index}
+                  value={value}
+                  onChange={(event) => updateCodeInput(index, event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Backspace" && !value && index > 0) {
+                      document.getElementById(`signup-code-${index - 1}`)?.focus();
+                    }
+                  }}
+                  inputMode="numeric"
+                  maxLength={1}
+                  aria-label={`${index + 1}번째 인증번호`}
+                />
+              ))}
+            </div>
+            <button className="login-submit" type="button" onClick={verifyCode}>
+              확인
+            </button>
+            <button className="signup-link centered-link" type="button" onClick={requestVerificationCode}>
+              인증번호가 오지 않았나요? 재전송
+            </button>
+          </div>
+        )}
+
+        {signupStep === "profile" && (
+          <form className="signup-step compact-signup-form" onSubmit={submitSignup}>
+            <h1 className="login-title">회원가입</h1>
+            <div className="signup-copy">
+              <strong>기본 정보를 입력해주세요</strong>
+              <p>정확한 서비스 이용을 위해 필수 정보를 입력해주세요.</p>
+            </div>
+
+            <label className="signup-field">
+              <span>이름</span>
+              <input value={signup.name} onChange={(event) => updateSignup("name", event.target.value)} placeholder="홍길동" required />
+            </label>
+            <label className="signup-field">
+              <span>생년월일</span>
+              <input value={signup.birthDate} onChange={(event) => updateSignup("birthDate", event.target.value)} type="date" required />
+            </label>
+            <label className="signup-field phone-with-badge">
+              <span>휴대폰 번호</span>
+              <input value={verifiedPhone} readOnly />
+              <em>인증완료</em>
+            </label>
+            <label className="signup-field">
+              <span>아이디</span>
+              <input
+                value={signup.loginId}
+                onChange={(event) => updateSignup("loginId", event.target.value)}
+                placeholder="zezari_mom"
+                autoComplete="username"
+                required
+              />
+            </label>
+            <label className="signup-field">
+              <span>비밀번호</span>
+              <input
+                value={signup.password}
+                onChange={(event) => updateSignup("password", event.target.value)}
+                type="password"
+                placeholder="8~16자 영문, 숫자, 특수문자"
+                autoComplete="new-password"
+                required
+              />
+              <small>8~16자, 영문, 숫자, 특수문자 포함</small>
+            </label>
+
+            <div className="terms-box">
+              <strong>필수동의</strong>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={signup.privacyAgreed}
+                  onChange={(event) => updateSignup("privacyAgreed", event.target.checked)}
+                />
+                <span>개인정보 수집 및 이용 동의 (필수)</span>
+                <button type="button">자세히</button>
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={signup.serviceAgreed}
+                  onChange={(event) => updateSignup("serviceAgreed", event.target.checked)}
+                />
+                <span>서비스 이용 약관 동의 (필수)</span>
+                <button type="button">자세히</button>
+              </label>
+            </div>
+
+            <button className="login-submit" type="submit" disabled={signupLoading}>
+              {signupLoading ? "처리중" : "다음"}
+            </button>
+          </form>
+        )}
+
+        {signupStep === "done" && (
+          <div className="signup-step signup-complete">
+            <div className="complete-mark" aria-hidden="true">✓</div>
+            <h1>회원가입이 완료되었습니다!</h1>
+            <p>zezari 서비스에 오신 것을 환영합니다. 소중한 가족의 안전을 함께 지켜요.</p>
+            <button className="login-submit" type="button" disabled={signupLoading} onClick={() => signInAfterSignup("/?tab=info#subjects-info")}>
+              대상자 등록하기
+            </button>
+            <button className="outline-login-button" type="button" disabled={signupLoading} onClick={() => signInAfterSignup("/?tab=dashboard")}>
+              대시보드 바로가기
+            </button>
+          </div>
+        )}
+
+        {message && <p className="login-message" role="status">{message}</p>}
+      </section>
+    );
+  }
 
   return (
     <section className="auth-panel login-card" aria-label="로그인">
@@ -138,7 +430,7 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "" }) {
         <button
           className="signup-link"
           type="button"
-          onClick={() => setMessage("회원가입은 SNS 계정으로 처음 로그인하면 자동으로 시작됩니다.")}
+          onClick={openSignup}
         >
           회원가입
         </button>
@@ -261,6 +553,13 @@ export function PwaInstallPrompt() {
   }
 
   return <p className="install-note">브라우저 메뉴에서 앱 설치를 사용할 수 있습니다.</p>;
+}
+
+function formatTimer(seconds) {
+  const safeSeconds = Math.max(0, Number(seconds || 0));
+  const minutes = String(Math.floor(safeSeconds / 60)).padStart(2, "0");
+  const rest = String(safeSeconds % 60).padStart(2, "0");
+  return `${minutes}:${rest}`;
 }
 
 function GoogleLogo() {

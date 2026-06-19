@@ -71,6 +71,239 @@ a {
   box-shadow: none;
 }
 
+.signup-card {
+  position: relative;
+  width: min(100%, 360px);
+  min-height: 560px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.signup-back-button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  background: transparent;
+  color: #111827;
+  cursor: pointer;
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.signup-step {
+  display: grid;
+  gap: 12px;
+  padding-top: 2px;
+}
+
+.signup-copy {
+  display: grid;
+  gap: 4px;
+  margin: 10px 0 4px;
+  color: #111827;
+}
+
+.signup-copy strong {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.signup-copy p {
+  margin: 0;
+  color: #111827;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.signup-field {
+  display: grid;
+  gap: 5px;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.signup-field input {
+  width: 100%;
+  min-height: 37px;
+  border: 1.5px solid #111827;
+  border-radius: 12px;
+  padding: 0 12px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 14px;
+  outline: none;
+}
+
+.signup-field input:focus {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(107, 74, 203, 0.16);
+}
+
+.signup-field small {
+  color: #4b5563;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.signup-separator {
+  height: 1.5px;
+  margin: 8px 0;
+  background: #9ca3af;
+}
+
+.code-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #111827;
+  font-size: 12px;
+}
+
+.code-heading span {
+  color: #6750b8;
+  font-weight: 800;
+}
+
+.verification-code-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.verification-code-row input {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1.5px solid #111827;
+  border-radius: 13px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.centered-link {
+  justify-self: center;
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+.compact-signup-form {
+  gap: 8px;
+}
+
+.phone-with-badge {
+  position: relative;
+}
+
+.phone-with-badge input {
+  padding-right: 78px;
+}
+
+.phone-with-badge em {
+  position: absolute;
+  right: 8px;
+  bottom: 7px;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: #eef7f1;
+  color: #176b5b;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.terms-box {
+  display: grid;
+  gap: 6px;
+  margin-top: 2px;
+  color: #111827;
+  font-size: 11px;
+}
+
+.terms-box strong {
+  font-size: 12px;
+}
+
+.terms-box label {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.terms-box input {
+  width: 14px;
+  height: 14px;
+  accent-color: #111827;
+}
+
+.terms-box button {
+  border: 0;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 10px;
+  text-decoration: underline;
+}
+
+.signup-complete {
+  min-height: 520px;
+  align-content: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.complete-mark {
+  width: 92px;
+  height: 92px;
+  display: grid;
+  place-items: center;
+  justify-self: center;
+  border-radius: 50%;
+  background: #6750b8;
+  color: #ffffff;
+  font-size: 62px;
+  font-weight: 900;
+}
+
+.signup-complete h1 {
+  margin: 4px 0 0;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.signup-complete p {
+  width: min(100%, 260px);
+  justify-self: center;
+  margin: 0 0 12px;
+  color: #111827;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.outline-login-button {
+  min-height: 46px;
+  border: 1.5px solid #111827;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.outline-login-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
 .login-title {
   margin: 0 0 18px;
   text-align: center;
@@ -1991,6 +2224,14 @@ body {
 }
 
 .login-card {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.signup-card {
   padding: 0;
   border: 0;
   border-radius: 0;

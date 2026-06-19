@@ -1490,3 +1490,59 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - GitHub 푸시, 운영 배포, 별칭 수정, 검증: 약 15분.
+
+## 2026-06-19 - 최초 방문자 회원가입 플로우 추가
+
+### 요구내용
+- 회원가입하지 않은 최초 방문자가 첨부 예시와 같은 과정을 거쳐 가입 정보를 입력하게 한다.
+- 단계는 휴대폰 인증, 기본정보 입력, 회원가입 완료로 구성한다.
+- 구현 후 GitHub에도 자동 푸시한다.
+
+### 반영내용
+- 로그인 화면의 `회원가입` 버튼을 누르면 회원가입 화면으로 전환되게 했다.
+- `/?signup=1` 주소로도 회원가입 화면을 직접 열 수 있게 했다.
+- 휴대폰 인증 화면을 추가했다.
+  - 휴대폰 번호 입력.
+  - 인증코드 받기.
+  - 5자리 인증번호 입력.
+  - 남은 시간 표시.
+- 기본정보 입력 화면을 추가했다.
+  - 이름.
+  - 생년월일.
+  - 인증된 휴대폰 번호.
+  - 아이디.
+  - 비밀번호.
+  - 개인정보 수집 및 이용 동의.
+  - 서비스 이용 약관 동의.
+- 회원가입 완료 화면을 추가했다.
+  - 대상자 등록하기.
+  - 대시보드 바로가기.
+- 로그인 전 보호자 계정을 생성하는 API를 추가했다.
+- 보호자 DB에 생년월일, 휴대폰 인증 완료 시각, 필수 약관 동의 시각을 저장하도록 확장했다.
+- 새 회원가입 화면은 이메일을 받지 않으므로, 대시보드 사용 완료 기준에서 이메일 필수 조건을 제외했다.
+
+### 산출물
+- `app/page.js`
+- `app/auth-actions.js`
+- `app/api/signup/guardian/route.js`
+- `app/dashboard.js`
+- `app/globals.css`
+- `lib/db.js`
+- `deliverables/AUTH_SETUP.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/USER_MANUAL.md`
+- `deliverables/user_manual_screenshots/signup_phone_step.png`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### 검증
+- 로컬 빌드 성공.
+- 로컬 회원가입 화면 정상 응답 확인.
+- 회원가입 휴대폰 인증 화면 스크린샷 캡처 완료.
+- 회원가입 API 필수값 검증 메시지 확인.
+
+### 남은 사항
+- 현재 휴대폰 인증은 테스트 모드이며, 실제 문자 발송은 SMS 사업자 연동이 필요하다.
+
+### 반영 시간
+- 화면/API/DB/문서/검증 반영: 약 55분.

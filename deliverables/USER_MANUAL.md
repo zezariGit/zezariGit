@@ -19,6 +19,7 @@ The manual explains the current implemented service from both user and admin per
 
 - Social signup/login with Google, Kakao, and Naver button states.
 - Login/signup screen redesigned with guardian ID/password fields, auto-login checkbox, forgot-password helper, and SNS icon row.
+- Direct guardian signup flow: phone verification, basic information input, signup completion, and post-signup navigation to subject registration or dashboard.
 - PWA installation and onboarding flow.
 - Guardian dashboard and information entry.
 - Managed subject registration, update, deletion, photo upload, and status display.
@@ -31,6 +32,7 @@ The manual explains the current implemented service from both user and admin per
 - High-level data explanations for guardians, subjects, QR codes, subscriptions, push subscriptions, and advertisements.
 - Actual screenshot examples for onboarding, login, admin login, public QR unmatched state, and public QR matched state with private information redacted.
 - Latest login redesign screenshot: `deliverables/user_manual_screenshots/login_redesign.png`.
+- Latest direct signup phone-verification screenshot: `deliverables/user_manual_screenshots/signup_phone_step.png`.
 
 ## Screenshot Assets
 
@@ -56,3 +58,7 @@ Never store live environment values, API keys, tokens, test secrets, or user pri
 ## Current Privacy Note
 
 The guardian's private `phone` value remains available for authenticated owner/admin workflows, but the public QR page uses `safe_phone` only. If no safe number has been issued yet, the public page shows `안심번호 준비중`.
+
+## Current Signup Note
+
+Direct signup currently uses a test-mode phone verification code displayed on the page. Replace this with a real SMS provider before production identity verification is considered complete.

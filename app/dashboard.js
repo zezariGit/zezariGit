@@ -32,7 +32,7 @@ export default async function GuardianDashboard({
   const selectedAdSubject = subjectsWithQr.find((subject) => subject.id === adSubjectId) || null;
   const emptySlots = Array.from({ length: Math.max(0, 4 - subjectsWithQr.length) });
   const guardianComplete = Boolean(
-    guardian.name && guardian.login_id && guardian.password_hash && guardian.phone && guardian.email
+    guardian.name && guardian.login_id && guardian.password_hash && guardian.phone
   );
   const guardianActive = guardian.is_active !== 0;
   const admin = isAdminSession(session) || Number(guardian.is_admin || 0) === 1;
@@ -279,6 +279,10 @@ function GuardianForm({ guardian, session }) {
               <label>
                 연락받을 전화번호
                 <input name="phone" defaultValue={guardian.phone || ""} required />
+              </label>
+              <label>
+                생년월일
+                <input name="birthDate" type="date" defaultValue={guardian.birth_date || ""} />
               </label>
               <label>
                 안심번호
