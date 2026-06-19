@@ -1595,3 +1595,15 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - 구현, 빌드 검증, 문서/로그 반영: 약 35분.
+
+### 운영 반영
+- GitHub commit:
+  - `3763156 Require signup completion after SNS login`
+- Vercel production deployment:
+  - `https://zezari-fyig126f5-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### 운영 검증
+- 운영 메인 페이지 정상 응답 확인.
+- 로그인되지 않은 상태에서 SNS 가입완성 API 호출 시 401 응답 확인.

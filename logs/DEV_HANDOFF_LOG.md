@@ -2255,6 +2255,20 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Time Spent
 - Authenticated SNS signup completion implementation, build verification, and documentation/log update: approximately 35 minutes.
 
+### Deployment
+- GitHub commit:
+  - `3763156 Require signup completion after SNS login`
+- GitHub push:
+  - `main` pushed to `https://github.com/zezariGit/zezariGit.git`
+- Vercel production deployment:
+  - `https://zezari-fyig126f5-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- `https://zezari.vercel.app` returned HTTP 200.
+- Unauthenticated `POST https://zezari.vercel.app/api/signup/complete` returned HTTP 401 with `로그인이 필요합니다.`
+
 ## 2026-06-19 KST - Login/Signup Screen Redesign And Credentials Login
 
 ### User Request
