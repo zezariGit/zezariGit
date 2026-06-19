@@ -60,6 +60,8 @@ When a new screen, button, database-backed field, admin function, or public user
 
 Never store live environment values, API keys, tokens, test secrets, or user private credentials in the manual or logs.
 
+Screenshots supplied during planning are structure references. Final UI styling should follow the project's shared CSS system and gov-style visual language unless the user explicitly asks for an exact visual copy.
+
 ## Current Privacy Note
 
 The guardian's private `phone` value remains available for authenticated owner/admin workflows, but the public QR page uses `safe_phone` only. If no safe number has been issued yet, the public page shows `안심번호 준비중`.

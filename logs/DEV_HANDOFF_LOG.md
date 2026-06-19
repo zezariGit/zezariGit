@@ -2790,6 +2790,38 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `https://zezari.vercel.app/admin?section=qr&assignQr=test` returned HTTP 200.
 - Unauthenticated admin route showed the admin login gate.
 
+## 2026-06-19 KST - My Page Style Alignment Rule
+
+### User Request
+- My Page currently feels visually inconsistent with the rest of the project.
+- Future screenshots should be used as layout/structure references only.
+- Final styling should follow the project's current CSS system instead of copying screenshot visuals literally.
+
+### Reflected Work
+- Restyled the My Page panel to match the project card/panel language:
+  - wider content panel
+  - project primary border and card shadow
+  - lighter section dividers
+  - softer primary-colored profile avatar
+  - project-colored section headings
+  - aligned information rows
+  - hover states for menu links
+- Added mobile responsive handling so My Page rows collapse cleanly on narrow screens.
+- Recorded the screenshot interpretation rule for future UI work.
+
+### Files Changed
+- `app/globals.css`
+- `deliverables/USER_MANUAL.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `git diff --check` passed.
+- `npm run build` succeeded.
+- Local `http://127.0.0.1:3000/?panel=my` returned HTTP 200.
+- Local `http://127.0.0.1:3000/admin` returned HTTP 200.
+- In-app browser verification was attempted, but the Browser plugin reported `iab` unavailable in this session.
+
 ## 2026-06-16 KST - Mobile Dashboard Managed Card Alignment
 
 ### User Request
