@@ -2174,6 +2174,20 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Temporary local production server on port `3001` returned HTTP 200 for:
   - `/`
   - `/shop`
+
+### Deployment
+- GitHub commit:
+  - `a10b693 Unify guardian tab styling`
+- GitHub push:
+  - `main` pushed to `https://github.com/zezariGit/zezariGit.git`
+- Vercel production deployment:
+  - `https://zezari-fmjo05wud-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- `https://zezari.vercel.app/` returned HTTP 200.
+- `https://zezari.vercel.app/shop` returned HTTP 200.
 - Build output includes:
   - `/shop`
   - `/api/products/orders`
