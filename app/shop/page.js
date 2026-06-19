@@ -15,7 +15,7 @@ export default async function ShopPage({ searchParams }) {
   const notice = params?.notice || "";
   const noticeType = params?.noticeType || "success";
   const selectedProductId = params?.product || "";
-  const [{ subjects, subscription, subscriptionPlans }, products] = await Promise.all([
+  const [{ guardian, subjects, subscription, subscriptionPlans }, products] = await Promise.all([
     getDashboardData(session),
     getProducts(),
   ]);
@@ -50,6 +50,7 @@ export default async function ShopPage({ searchParams }) {
           subjects={subjects}
           plans={subscriptionPlans}
           subscription={subscription}
+          guardian={guardian}
         />
       )}
       <StatusToast message={notice} type={noticeType} />

@@ -1,9 +1,11 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../../lib/auth";
 import {
+  getProductOrderById,
   getSubscriptionByCustomerKey,
   markSubscriptionActive,
   markSubscriptionFailed,
+  markSubscriptionReady,
 } from "../../../../../lib/db";
 import { approveSubscriptionBilling, issueBillingKey } from "../../../../../lib/toss-payments";
 
@@ -14,6 +16,7 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
   const params = await searchParams;
   const authKey = String(params?.authKey || "").trim();
   const customerKey = String(params?.customerKey || "").trim();
+  const productOrderId = String(params?.productOrderId || "").trim();
 
   if (!session) {
     return <PaymentResult title="로그인이 필요합니다" message="구독 결제 완료 처리를 위해 다시 로그인해 주세요." />;
@@ -38,6 +41,24 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
       orderId,
       orderName: subscription.plan_name || process.env.TOSS_SUBSCRIPTION_ORDER_NAME || "zezari 월 구독",
     });
+
+    if (productOrderId) {
+      await markSubscriptionReady({
+        customerKey,
+        billingKey: billing.billingKey,
+        payment,
+        productOrderId,
+      });
+      const order = await getProductOrderById(productOrderId);
+
+      return (
+        <ShopComplete
+          title="주문이 완료되었습니다!"
+          message="상품을 수령하신 후, QR 코드를 활성화해야 제자리 서비스 이용이 시작됩니다."
+          order={order}
+        />
+      );
+    }
 
     await markSubscriptionActive({
       customerKey,
@@ -80,6 +101,29 @@ function PaymentResult({ title, message, actionLabel = "처음 화면", actionHr
         <p>{message}</p>
         <a className="primary-button" href={actionHref}>
           {actionLabel}
+        </a>
+      </section>
+    </main>
+  );
+}
+
+function ShopComplete({ title, message, order = null }) {
+  return (
+    <main className="shop-complete-page">
+      <section className="shop-complete-panel">
+        <div className="complete-mark" aria-hidden="true">✓</div>
+        <h1>{title}</h1>
+        <p>{message}</p>
+        {order && (
+          <div className="shop-activation-guide">
+            <span>상품 수령</span>
+            <span>QR 코드 스캔</span>
+            <span>대상자 확인</span>
+            <span>활성화 완료</span>
+          </div>
+        )}
+        <a className="shop-next-button" href="/?tab=dashboard">
+          대시보드 이동
         </a>
       </section>
     </main>

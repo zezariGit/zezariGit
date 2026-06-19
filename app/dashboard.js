@@ -581,7 +581,7 @@ function SubjectForm({ subject }) {
             </a>
             <div>
               <strong>{subject.qr_code}</strong>
-              <span>{subject.qr_is_active ? "활성 QR" : "비활성 QR"}</span>
+              <span>{subject.qr_is_active ? (subject.qr_activated_at ? "사용자 활성화 완료" : "상품 수령 후 활성화 대기") : "관리자 비활성 QR"}</span>
               <a href={subject.qr_target_url} target="_blank" rel="noreferrer">
                 {subject.qr_target_url}
               </a>

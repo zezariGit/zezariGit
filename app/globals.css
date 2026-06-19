@@ -4138,6 +4138,223 @@ button:disabled:hover {
   color: var(--c-danger, #a73931);
 }
 
+.standalone-info-panel,
+.product-preview-stack,
+.order-info-stack {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.standalone-info-panel {
+  padding: var(--space-md);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+}
+
+.product-preview-card,
+.bracelet-preview-card,
+.preview-note-card,
+.order-product-row {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+}
+
+.product-preview-card {
+  grid-template-columns: 92px minmax(0, 1fr);
+  align-items: center;
+}
+
+.product-preview-card img,
+.product-preview-card > span,
+.order-product-image img,
+.order-product-image > span {
+  width: 82px;
+  height: 82px;
+  display: grid;
+  place-items: center;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  background: var(--c-primary-light);
+  color: var(--c-primary);
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.product-preview-card strong,
+.order-product-row strong,
+.preview-note-card strong {
+  color: var(--c-text);
+  font-size: 0.98rem;
+  font-weight: 900;
+}
+
+.product-preview-card span,
+.order-product-row span,
+.preview-note-card span {
+  display: block;
+  margin-top: 4px;
+  color: var(--c-text-muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.bracelet-preview-card {
+  min-height: 150px;
+  place-items: center;
+  text-align: center;
+  background: var(--c-primary-light);
+}
+
+.bracelet-preview-card img {
+  width: min(100%, 260px);
+  height: 96px;
+  object-fit: contain;
+}
+
+.bracelet-preview-card > span:first-child {
+  color: var(--c-primary);
+  font-size: 3rem;
+  font-weight: 900;
+}
+
+.preview-note-card {
+  background: var(--c-accent-light);
+}
+
+.order-section {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.order-section h2 {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 0.92rem;
+  font-weight: 900;
+}
+
+.order-product-row {
+  grid-template-columns: 78px minmax(0, 1fr);
+  align-items: center;
+}
+
+.order-product-image img,
+.order-product-image > span {
+  width: 64px;
+  height: 64px;
+  font-size: 1.5rem;
+}
+
+.order-product-row em {
+  display: block;
+  margin-top: 5px;
+  color: var(--c-primary-dark);
+  font-style: normal;
+  font-weight: 900;
+}
+
+.shipping-address-box {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.shipping-address-box span {
+  color: var(--c-text-muted);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.shipping-address-box textarea {
+  min-height: 86px;
+  width: 100%;
+  resize: vertical;
+  padding: var(--space-sm);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  color: var(--c-text);
+  font: inherit;
+}
+
+.payment-method-list {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.payment-method-list label {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-sm);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-weight: 800;
+}
+
+.shop-complete-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-lg);
+  background: var(--c-bg);
+}
+
+.shop-complete-panel {
+  width: min(100%, 460px);
+  display: grid;
+  justify-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  text-align: center;
+  box-shadow: var(--shadow-card);
+}
+
+.shop-complete-panel h1,
+.shop-complete-panel p {
+  margin: 0;
+}
+
+.shop-activation-guide {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  background: var(--c-primary-light);
+}
+
+.shop-activation-guide span {
+  min-height: 58px;
+  display: grid;
+  place-items: center;
+  padding: var(--space-xs);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-primary-dark);
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.qr-activation-shell {
+  gap: var(--space-md);
+}
+
+.qr-activation-form {
+  display: grid;
+}
+
 .shop-summary-panel {
   padding: var(--space-md);
 }

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../lib/auth";
 import {
+  activateQrForGuardian,
   createSubjectAd,
   deleteSubject,
   endSubjectAd,
@@ -100,6 +101,20 @@ export async function endSubjectAdAction(formData) {
     redirect(withNotice("/?tab=dashboard", error.message || "광고 종료에 실패했습니다.", "error"));
   }
   redirect(withNotice("/?tab=dashboard", "광고가 종료되었습니다."));
+}
+
+export async function activateQrAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error("로그인이 필요합니다.");
+  const publicKey = String(formData.get("publicKey") || "").trim();
+  try {
+    await activateQrForGuardian(session, publicKey);
+    revalidatePath(`/find/${publicKey}`);
+    revalidatePath("/");
+  } catch (error) {
+    redirect(withNotice(`/find/${publicKey}`, error.message || "QR 활성화에 실패했습니다.", "error"));
+  }
+  redirect(withNotice(`/find/${publicKey}`, "QR 코드가 활성화되었습니다. 오늘부터 구독기간이 시작됩니다."));
 }
 
 function withNotice(path, message, type = "success") {

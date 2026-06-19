@@ -1,11 +1,20 @@
+import { getServerSession } from "next-auth";
+import { activateQrAction } from "../../actions";
+import StatusToast from "../../status-toast";
+import { authOptions } from "../../../lib/auth";
+import { getGuardianKey } from "../../../lib/db";
 import { getFindPageDataByKey } from "../../../lib/db";
 import GuardianNotifyButton from "./notify-button";
 
 export const dynamic = "force-dynamic";
 
-export default async function FindPage({ params }) {
+export default async function FindPage({ params, searchParams }) {
   const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+  const session = await getServerSession(authOptions);
   const data = await getFindPageDataByKey(resolvedParams?.key);
+  const notice = resolvedSearchParams?.notice || "";
+  const noticeType = resolvedSearchParams?.noticeType || "success";
 
   if (!data) {
     return (
@@ -18,6 +27,7 @@ export default async function FindPage({ params }) {
             처음 화면
           </a>
         </section>
+        <StatusToast message={notice} type={noticeType} />
       </main>
     );
   }
@@ -34,6 +44,7 @@ export default async function FindPage({ params }) {
             <strong>{data.public_key}</strong>
           </div>
         </section>
+        <StatusToast message={notice} type={noticeType} />
       </main>
     );
   }
@@ -50,6 +61,49 @@ export default async function FindPage({ params }) {
             <strong>{data.code}</strong>
           </div>
         </section>
+        <StatusToast message={notice} type={noticeType} />
+      </main>
+    );
+  }
+
+  if (!data.qr_activated_at) {
+    const owner = Boolean(session && getGuardianKey(session) === data.guardian_google_id);
+    return (
+      <main className="find-page">
+        <section className="find-shell qr-activation-shell">
+          <p className="intro-kicker">상품 수령 후 활성화</p>
+          <h1>{owner ? "QR 코드 활성화가 필요합니다" : "아직 활성화되지 않은 QR입니다"}</h1>
+          {owner ? (
+            <>
+              <div className="find-profile">
+                <div className="find-profile-photo">
+                  {data.photo_data_url ? <img src={data.photo_data_url} alt={`${data.subject_name} 사진`} /> : <span />}
+                </div>
+                <div className="find-profile-info">
+                  <strong>{data.subject_name}</strong>
+                  <span>{formatDate(data.birth_date)}</span>
+                  <span>해당 대상자의 QR 코드를 활성화하시겠어요?</span>
+                </div>
+              </div>
+              <form action={activateQrAction} className="qr-activation-form">
+                <input type="hidden" name="publicKey" value={data.public_key} />
+                <button className="shop-next-button" type="submit">
+                  QR 코드 활성화하기
+                </button>
+              </form>
+              <p className="find-notify-message">활성화가 완료되면 오늘부터 구독기간이 시작되고, 이 QR에서 대상자 정보가 조회됩니다.</p>
+            </>
+          ) : (
+            <>
+              <p>보호자가 상품 수령 후 QR 코드를 활성화하면 대상자 정보와 보호자 안심번호를 확인할 수 있습니다.</p>
+              <div className="find-key-box">
+                <span>QR 코드</span>
+                <strong>{data.code}</strong>
+              </div>
+            </>
+          )}
+        </section>
+        <StatusToast message={notice} type={noticeType} />
       </main>
     );
   }
@@ -105,6 +159,7 @@ export default async function FindPage({ params }) {
 
         <GuardianNotifyButton qrKey={data.public_key} />
       </section>
+      <StatusToast message={notice} type={noticeType} />
     </main>
   );
 }

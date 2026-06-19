@@ -2194,6 +2194,89 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `https://zezari.vercel.app/shop` returned HTTP 200.
 - `https://zezari.vercel.app/admin?section=products` returned HTTP 200.
 
+## 2026-06-19 KST - Product Order Steps And QR Activation Gate
+
+### User Request
+- The right-side capture area on the product selection detail screen was only an explanation for standalone purchase; remove it from the default screen and show it only when standalone purchase is selected.
+- After product selection, `다음` should show a product detail/preview page using the admin-uploaded product image/design.
+- Change the preview button text from `결제하기` to `주문정보입력`.
+- After `주문정보입력`, show shipping address and payment-method selection, then proceed with actual Toss payment.
+- After payment completion, show an order-complete page.
+- After the user receives the physical product, scanning its QR should open the target page; if the guardian is logged in, the page should show a QR activation button.
+- The subscription period should start only after QR activation.
+- QR public pages must hide managed-subject information until the QR code has been activated by the guardian.
+
+### Reflected Work
+- Rebuilt `ShopCheckoutClient` into a multi-step flow:
+  - configure product/design/quantity/subject/period
+  - product preview
+  - order information and payment method
+  - Toss payment request
+- Standalone purchase details now appear only when the user selects the standalone purchase tab.
+- Standalone purchase remains disabled unless `subscription.status === active`.
+- Added Toss product payment flow:
+  - `POST /api/payments/toss/product/prepare`
+  - `/payments/toss/product/success`
+  - `/payments/toss/product/fail`
+  - server-side `confirmPayment` using Toss Payments confirm API.
+- Subscription checkout from `/shop` now saves product order data and returns success URL containing `productOrderId`.
+- Subscription payment from shop marks subscription as `ready` and product order as `paid_waiting_activation`; it does not start the subscription period immediately.
+- Added QR activation state:
+  - `qr_codes.activated_at`
+- Added product order fields:
+  - `design_index`
+  - `shipping_address`
+  - `payment_method`
+  - `toss_order_id`
+  - `payment_key`
+  - `paid_at`
+  - `activated_at`
+- Added guardian QR activation server action:
+  - `activateQrAction`
+  - `activateQrForGuardian`
+- Public QR page behavior changed:
+  - inactive admin QR still shows unavailable state.
+  - unassigned QR still shows unmatched state.
+  - assigned but not guardian-activated QR hides subject/guardian information.
+  - owning logged-in guardian sees the activation button.
+  - activated QR shows the managed subject and guardian response information.
+- Finder push notification API now rejects QR codes that are not guardian-activated.
+- Updated database schema and user manual local deliverables.
+
+### Files Changed
+- `app/actions.js`
+- `app/api/find/[key]/notify/route.js`
+- `app/api/payments/toss/product/prepare/route.js`
+- `app/api/payments/toss/subscription/prepare/route.js`
+- `app/find/[key]/page.js`
+- `app/globals.css`
+- `app/payments/toss/product/fail/page.js`
+- `app/payments/toss/product/success/page.js`
+- `app/payments/toss/subscription/success/page.js`
+- `app/shop/page.js`
+- `app/shop-checkout-client.js`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/USER_MANUAL.md`
+- `lib/db.js`
+- `lib/toss-payments.js`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `git diff --check` passed.
+- `npm run build` succeeded.
+- Build output includes:
+  - `/api/payments/toss/product/prepare`
+  - `/payments/toss/product/success`
+  - `/payments/toss/product/fail`
+  - `/find/[key]`
+  - `/shop`
+- Temporary local production server on port `3001` returned HTTP 200 for:
+  - `/shop`
+  - `/payments/toss/product/fail`
+  - `/admin?section=products`
+- Browser payment flow could not be fully completed in this session because Toss checkout requires interactive external payment approval.
+
 ## 2026-06-19 KST - My Page Corner Icon And Guardian Notification Inbox
 
 ### User Request

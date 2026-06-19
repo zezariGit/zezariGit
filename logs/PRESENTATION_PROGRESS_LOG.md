@@ -1920,3 +1920,55 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - DB 모델, 관리자 상품 관리, 사용자 상품 선택 화면, 결제 준비 연결, 문서/로그 반영: 약 70분.
+
+## 2026-06-19 - 상품 주문 단계화 및 QR 활성화 게이트 적용
+
+### 요구내용
+- 상품 선택 후 화면에서 상품 단독구매 설명 영역은 기본 화면에서 제거한다.
+- 상품 단독구매 설명은 `상품 단독 구매`를 눌렀을 때만 보이게 한다.
+- `다음` 버튼을 누르면 선택한 상품의 상세/미리보기 페이지가 나오게 한다.
+- 상세/미리보기 페이지의 버튼은 `결제하기`가 아니라 `주문정보입력`으로 표시한다.
+- 주문정보입력 후 배송지와 결제방법을 선택하고 실제 Toss 결제를 진행한다.
+- 결제 완료 후 주문 완료 페이지를 보여준다.
+- 상품 수령 후 QR을 스캔하면 보호자가 로그인된 경우 QR 활성화 버튼을 제공한다.
+- QR 활성화 시 실제 구독기간이 시작되게 한다.
+- 활성화되지 않은 QR 공개 페이지에서는 관리대상 정보가 보이지 않게 한다.
+
+### 반영내용
+- 상품 구매 화면을 `선택 -> 미리보기 -> 주문정보입력/결제 -> 완료` 단계로 재구성했다.
+- 상품 단독 구매 요약/설명은 단독 구매 탭을 선택했을 때만 표시되도록 변경했다.
+- 상품 미리보기 화면에 관리자 업로드 상품 이미지를 기반으로 한 주문 미리보기를 추가했다.
+- `주문정보입력` 버튼을 추가하고, 다음 단계에서 배송지와 결제방법을 입력받도록 했다.
+- Toss 일반 상품 결제 준비/성공/실패 라우트를 추가했다.
+- 구독 결제 성공 시 바로 구독기간을 시작하지 않고 `ready` 상태로 보관하도록 했다.
+- QR 코드에 보호자 활성화 시각 `activated_at`을 추가했다.
+- 보호자가 상품 수령 후 QR 페이지에서 활성화하면 QR 공개와 구독기간 시작이 동시에 처리되도록 했다.
+- 활성화 전 QR 공개 페이지는 대상자/보호자 정보를 숨기고 안내 화면만 보여주도록 변경했다.
+- 활성화 전 QR에서는 보호자에게 알리기 API도 호출되지 않게 제한했다.
+
+### 산출물
+- `app/shop-checkout-client.js`
+- `app/api/payments/toss/product/prepare/route.js`
+- `app/payments/toss/product/success/page.js`
+- `app/payments/toss/product/fail/page.js`
+- `app/payments/toss/subscription/success/page.js`
+- `app/find/[key]/page.js`
+- `app/api/find/[key]/notify/route.js`
+- `app/actions.js`
+- `app/globals.css`
+- `lib/db.js`
+- `lib/toss-payments.js`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/USER_MANUAL.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### 검증
+- CSS 차이 검사 통과.
+- 로컬 빌드 성공.
+- 빌드 결과에서 상품 결제 준비/성공/실패 라우트와 `/shop`, `/find/[key]` 라우트 생성 확인.
+- 별도 로컬 빌드 서버에서 `/shop`, `/payments/toss/product/fail`, `/admin?section=products` HTTP 200 응답 확인.
+- Toss 결제창 최종 승인 단계는 외부 결제 상호작용이 필요해 자동 완료 검증하지 못했다.
+
+### 반영 시간
+- 구매 단계 재구성, Toss 상품 결제 라우트, QR 활성화 정책, 공개 페이지 정보 보호, 문서/로그 반영: 약 80분.

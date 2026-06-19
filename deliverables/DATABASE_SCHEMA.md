@@ -65,6 +65,7 @@ Stores QR codes and the unique public strings used as the final segment of peopl
 | `guardian_id` | TEXT | Assigned guardian ID, nullable until a subject is matched |
 | `subject_id` | TEXT | Assigned subject ID, unique and nullable |
 | `is_active` | INTEGER | `1` active, `0` inactive |
+| `activated_at` | TEXT | Guardian activation timestamp after physical product receipt |
 | `created_at` | TEXT | Created timestamp |
 | `updated_at` | TEXT | Updated timestamp |
 
@@ -166,8 +167,15 @@ Stores product selections and standalone purchase requests.
 | `quantity` | INTEGER | Selected quantity |
 | `order_type` | TEXT | `subscription` or `standalone` |
 | `plan_months` | INTEGER | Subscription period when `order_type = subscription` |
-| `amount` | INTEGER | Standalone expected product amount |
-| `status` | TEXT | `subscription_pending` or `standalone_requested` |
+| `design_index` | INTEGER | Selected design index on the product detail screen |
+| `shipping_address` | TEXT | Delivery address entered during order information step |
+| `payment_method` | TEXT | Selected Toss payment method, currently `CARD` |
+| `toss_order_id` | TEXT | Toss order ID used for payment request |
+| `payment_key` | TEXT | Toss payment key after successful payment |
+| `amount` | INTEGER | Expected payment amount |
+| `status` | TEXT | `payment_pending`, `paid`, `paid_waiting_activation`, or `activated` |
+| `paid_at` | TEXT | Payment completion timestamp |
+| `activated_at` | TEXT | QR/service activation timestamp |
 | `created_at` | TEXT | Created timestamp |
 | `updated_at` | TEXT | Updated timestamp |
 
@@ -223,7 +231,10 @@ Stores advertisement requests and status by managed subject.
 - Manual match search only returns subjects with no current QR assignment.
 - Logged-in guardians can view assigned QR code details for their own subjects.
 - Public find pages can read QR status by `public_key` without login.
-- When a QR is assigned to a subject, the public find page shows subject basic information and configured guardian response fields so the finder can respond.
+- When a QR is assigned to a subject but `qr_codes.activated_at` is empty, the public find page hides managed-subject information.
+- Only the logged-in owning guardian can activate an assigned QR from the public QR page after receiving the physical product.
+- QR activation sets `qr_codes.activated_at`; if the guardian has a paid subscription in `ready` status, activation starts the subscription period.
+- When a QR is assigned and activated, the public find page shows subject basic information and configured guardian response fields so the finder can respond.
 - Subject records can include a guardian message and guardian recorded audio. The public QR page shows/plays those values when present.
 - Public QR pages must not expose `guardians.phone`; they show `guardians.safe_phone` as the safe/relay number when available, or `안심번호 준비중` when not available.
 - Each subject receives one QR assignment. Because each guardian can register up to 4 subjects, one guardian can have up to 4 assigned QR codes.
@@ -233,8 +244,9 @@ Stores advertisement requests and status by managed subject.
 - Privacy note: public QR pages intentionally expose configured subject/contact fields. Raw guardian phone numbers are private; before production launch, connect a real safe-number provider and add explicit guardian consent and a field-level exposure policy.
 - Dashboard no longer starts new subscription billing directly; the dashboard product purchase button now opens `/shop`.
 - Logged-in guardians select a product, target subject, quantity, and subscription period from `/shop`.
-- A subscription checkout from `/shop` stores the product selection as a `product_orders` row with `subscription_pending`.
-- Product standalone purchase requests are only accepted for guardians with `subscriptions.status = active`.
+- A subscription checkout from `/shop` stores the product selection as a `product_orders` row with `payment_pending`.
+- Subscription payment completion from `/shop` stores the order as `paid_waiting_activation`; the subscription remains `ready` until QR activation.
+- Product standalone purchase is only accepted for guardians with `subscriptions.status = active` and uses Toss product payment confirmation.
 - Admin users can manage product images, prices, activation state, and display order from the admin product management section.
 - Subscription is marked active only after server-side Toss billing API succeeds.
 - Logged-in guardians can pause/resume their own subscription service state.

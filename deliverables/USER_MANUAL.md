@@ -30,11 +30,14 @@ The manual explains the current implemented service from both user and admin per
 - Managed subject guardian memo/message and per-subject guardian voice recording.
 - New subject registration completion screen with assigned QR information.
 - Dashboard product purchase button opens the dedicated `/shop` product selection flow.
-- Product selection flow: admin-managed product image cards, product detail selection, quantity, managed subject selection, subscription period selection, and subscription checkout.
-- Product standalone purchase request is available only to already-subscribed guardians.
+- Product selection flow: admin-managed product image cards, design/quantity/managed subject/subscription period selection, product preview, order information entry, shipping address, payment method, and Toss checkout.
+- Product standalone purchase details are shown only after the subscribed guardian selects the standalone purchase tab.
+- Product standalone purchase uses Toss product payment and is available only to already-subscribed guardians.
+- Product subscription payment from the shop remains pending/ready until the guardian receives the physical product and activates the QR code.
 - Subscription payment options, active state, pause, and resume.
 - Subject-level advertisement request and progress state foundation.
-- QR public find page, QR matching, download, activation, guardian message/audio playback, and guardian notification.
+- QR public find page, QR matching, download, guardian activation after product receipt, guardian message/audio playback, and guardian notification.
+- Public QR pages hide managed-subject information until the owning guardian activates the QR code.
 - Safe-number privacy behavior: the public QR page does not expose the guardian's raw phone number.
 - Admin guardian management, admin role management, QR management, payment management, product image/price management, and advertisement management.
 - Shared progress indicators and bottom status messages.
