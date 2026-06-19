@@ -81,6 +81,20 @@ Stores browser push subscriptions for logged-in guardians.
 | `created_at` | TEXT | Created timestamp |
 | `updated_at` | TEXT | Updated timestamp |
 
+### guardian_notifications
+
+Stores push notification message history for each logged-in guardian.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | TEXT | Primary key |
+| `guardian_id` | TEXT | Guardian who can read this notification |
+| `title` | TEXT | Notification title, e.g. `{관리대상 이름}을 찾았습니다` |
+| `body` | TEXT | Notification body message |
+| `url` | TEXT | Related app or QR find URL |
+| `read_at` | TEXT | Read timestamp, nullable until the guardian opens the notification panel |
+| `created_at` | TEXT | Created timestamp |
+
 ### subscriptions
 
 Stores Toss Payments subscription/billing state for a guardian.
@@ -179,6 +193,7 @@ Stores advertisement requests and status by managed subject.
 - Each subject receives one QR assignment. Because each guardian can register up to 4 subjects, one guardian can have up to 4 assigned QR codes.
 - Logged-in guardians can register a browser push subscription from the dashboard.
 - Public find pages can call the notification API to send a push message to the assigned guardian.
+- The push notification message is also stored in `guardian_notifications` so the guardian can review messages from the top-left bell notification panel.
 - Privacy note: public QR pages intentionally expose configured subject/contact fields. Raw guardian phone numbers are private; before production launch, connect a real safe-number provider and add explicit guardian consent and a field-level exposure policy.
 - Logged-in guardians can start Toss Payments subscription billing from the dashboard.
 - Subscription is marked active only after server-side Toss billing API succeeds.
@@ -206,6 +221,7 @@ Stores advertisement requests and status by managed subject.
   - `subscriptions`
   - `subscription_plans`
   - `push_subscriptions`
+  - `guardian_notifications`
   - `ad_settings`
   - `subject_ads`
 

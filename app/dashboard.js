@@ -10,6 +10,8 @@ import {
 import AdCampaignModal from "./ad-campaign-modal";
 import FormSubmitButton from "./form-submit-button";
 import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
+import ModalScrollLock from "./modal-scroll-lock";
+import NotificationBell from "./notification-bell";
 import PushNotificationButton from "./push-notification-button";
 import QRCode from "qrcode";
 import SocialSignupCompletion from "./social-signup-completion";
@@ -28,6 +30,7 @@ export default async function GuardianDashboard({
   adDailyRate = 0,
   session,
   activeTab = "dashboard",
+  showMyPage = false,
   adSubjectId = "",
   registeredSubjectId = "",
 }) {
@@ -43,11 +46,27 @@ export default async function GuardianDashboard({
   const isDashboard = activeTab === "dashboard";
   const isGuardianTab = activeTab === "guardian";
   const isSubjectsTab = activeTab === "subjects";
-  const isMyTab = activeTab === "my";
+  const currentTab = isGuardianTab ? "guardian" : isSubjectsTab ? "subjects" : "dashboard";
+  const myPageHref = `/?tab=${currentTab}&panel=my`;
+  const closeMyPageHref = `/?tab=${currentTab}`;
 
   return (
     <main className="dashboard-page">
-      <section className="dashboard-shell">
+      <section className={`dashboard-shell${guardianComplete && guardianActive ? " has-corner" : ""}`}>
+        {guardianComplete && guardianActive && (
+          <div className="dashboard-corner-bar" aria-label="사용자 빠른 메뉴">
+            <NotificationBell />
+            <a
+              className="corner-icon-button my-page-corner-link"
+              href={myPageHref}
+              aria-label="마이페이지"
+              title="마이페이지"
+              data-tooltip="마이페이지"
+            >
+              <PersonIcon />
+            </a>
+          </div>
+        )}
         <header className="dashboard-header">
           <div>
             <p className="intro-kicker">{guardianComplete ? "보호자 대시보드" : "정보 입력"}</p>
@@ -60,7 +79,7 @@ export default async function GuardianDashboard({
                   ? "보호자정보"
                   : isSubjectsTab
                     ? "관리대상정보"
-                    : "마이페이지"}
+                    : "보호자 대시보드"}
             </h1>
             <p className="dashboard-subtitle">
               {isDashboard
@@ -71,7 +90,7 @@ export default async function GuardianDashboard({
                   ? "보호자 연락처, 주소, 안심번호 등 기본 정보를 입력하고 수정합니다."
                   : isSubjectsTab
                     ? "관리대상 등록, 보호자 메시지, 음성 안내, QR 배정 정보를 관리합니다."
-                    : "계정 정보, 알림 설정, 고객 지원, 로그아웃을 관리합니다."}
+                    : "로그인한 보호자에게 등록된 관리대상과 현재 상태를 확인할 수 있습니다."}
             </p>
           </div>
         </header>
@@ -103,10 +122,21 @@ export default async function GuardianDashboard({
           <a className={isSubjectsTab ? "active" : ""} href="/?tab=subjects">
             관리대상정보
           </a>
-          <a className={isMyTab ? "active" : ""} href="/?tab=my">
-            마이페이지
-          </a>
         </nav>
+
+        {showMyPage && (
+          <section className="modal-backdrop my-page-backdrop" aria-label="마이페이지" role="dialog" aria-modal="true">
+            <ModalScrollLock />
+            <MyPageTab
+              guardian={guardian}
+              subjects={subjectsWithQr}
+              subscription={subscription}
+              session={session}
+              admin={admin}
+              closeHref={closeMyPageHref}
+            />
+          </section>
+        )}
 
         {isDashboard ? (
           <DashboardTab
@@ -120,8 +150,6 @@ export default async function GuardianDashboard({
           />
         ) : isGuardianTab ? (
           <GuardianInfoTab guardian={guardian} session={session} />
-        ) : isMyTab ? (
-          <MyPageTab guardian={guardian} subjects={subjectsWithQr} subscription={subscription} session={session} admin={admin} />
         ) : (
           <SubjectsInfoTab subjects={subjectsWithQr} emptySlots={emptySlots} registeredSubject={registeredSubject} />
         )}
@@ -197,7 +225,7 @@ function GuardianInfoTab({ guardian, session }) {
   );
 }
 
-function MyPageTab({ guardian, subjects, subscription, session, admin }) {
+function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref = "" }) {
   const primarySubject = subjects[0] || null;
   const subscriptionLabel = subscription?.status === "active"
     ? "구독중"
@@ -208,8 +236,19 @@ function MyPageTab({ guardian, subjects, subscription, session, admin }) {
         : "미구독";
 
   return (
-    <section className="my-page-panel" aria-label="마이페이지">
-      <h2>내 정보</h2>
+    <section
+      className={`my-page-panel${closeHref ? " my-page-modal" : ""}`}
+      aria-label="마이페이지"
+      data-modal-surface={closeHref ? "" : undefined}
+    >
+      <div className="my-page-title-row">
+        <h2>내 정보</h2>
+        {closeHref && (
+          <a className="my-page-close-button" href={closeHref} aria-label="마이페이지 닫기">
+            닫기
+          </a>
+        )}
+      </div>
       <div className="my-profile-avatar" aria-hidden="true">
         <span />
       </div>
@@ -263,11 +302,11 @@ function MyPageTab({ guardian, subjects, subscription, session, admin }) {
 
       <div className="my-page-section">
         <h3>고객 지원</h3>
-        <a className="my-menu-link" href="/?tab=my">공지사항 및 FAQ</a>
-        <a className="my-menu-link" href="/?tab=my">고객센터</a>
-        <a className="my-menu-link" href="/?tab=my">의견 남기기</a>
-        <a className="my-menu-link" href="/?tab=my">이용약관</a>
-        <a className="my-menu-link" href="/?tab=my">개인정보처리방침</a>
+        <a className="my-menu-link" href="/?panel=my">공지사항 및 FAQ</a>
+        <a className="my-menu-link" href="/?panel=my">고객센터</a>
+        <a className="my-menu-link" href="/?panel=my">의견 남기기</a>
+        <a className="my-menu-link" href="/?panel=my">이용약관</a>
+        <a className="my-menu-link" href="/?panel=my">개인정보처리방침</a>
       </div>
 
       <div className="my-page-section my-logout-section">
@@ -276,6 +315,29 @@ function MyPageTab({ guardian, subjects, subscription, session, admin }) {
 
       <p className="my-session-email">{session.user?.email || guardian.email || guardian.google_email || ""}</p>
     </section>
+  );
+}
+
+function PersonIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
+      <path
+        d="M4.5 20a7.5 7.5 0 0 1 15 0"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
+    </svg>
   );
 }
 
@@ -373,7 +435,7 @@ function StatusDashboard({ guardian, subjects, subscription, subscriptionPlans }
             <span aria-hidden="true">B</span>
             상품 구매
           </a>
-          <a href="/?tab=my">
+          <a href="/?tab=dashboard&panel=my">
             <span aria-hidden="true">M</span>
             내 정보
           </a>

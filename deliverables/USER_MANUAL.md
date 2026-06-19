@@ -23,7 +23,8 @@ The manual explains the current implemented service from both user and admin per
 - SNS first-login signup completion flow: incomplete social accounts must fill the same guardian signup information before entering the dashboard; SNS name/email values are prefilled when available.
 - PWA installation and onboarding flow.
 - Guardian dashboard and separated user tabs: dashboard, guardian information, and managed subject information.
-- My Page tab for account summary, guardian/subject overview, push notification setting, support links, and logout.
+- Top-right My Page person icon with hover tooltip for account summary, guardian/subject overview, push notification setting, support links, and logout.
+- Top-left bell icon notification panel for finder push messages stored per guardian.
 - Managed subject registration, update, deletion, photo upload, and status display.
 - Managed subject guardian memo/message and per-subject guardian voice recording.
 - New subject registration completion screen with assigned QR information.
@@ -33,7 +34,7 @@ The manual explains the current implemented service from both user and admin per
 - Safe-number privacy behavior: the public QR page does not expose the guardian's raw phone number.
 - Admin guardian management, admin role management, QR management, payment management, and advertisement management.
 - Shared progress indicators and bottom status messages.
-- High-level data explanations for guardians, subjects, QR codes, subscriptions, push subscriptions, and advertisements.
+- High-level data explanations for guardians, subjects, QR codes, subscriptions, push subscriptions, guardian notifications, and advertisements.
 - Actual screenshot examples for onboarding, login, admin login, public QR unmatched state, and public QR matched state with private information redacted.
 - Latest login redesign screenshot: `deliverables/user_manual_screenshots/login_redesign.png`.
 - Latest direct signup phone-verification screenshot: `deliverables/user_manual_screenshots/signup_phone_step.png`.

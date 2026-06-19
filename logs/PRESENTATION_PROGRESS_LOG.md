@@ -1731,3 +1731,38 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - 탭 추가, 마이페이지 UI 구성, 대상자 폼 스타일 통일, 빌드 검증, 로그 반영: 약 35분.
+
+## 2026-06-19 - 마이페이지 상단 아이콘 분리 및 알림함 추가
+
+### 요구내용
+- 마이페이지를 탭에 놓지 않고 화면 오른쪽 위 사람 모양 아이콘으로 배치한다.
+- 사람 모양 아이콘에 마우스를 올리면 `마이페이지` 설명이 보이게 한다.
+- 화면 왼쪽 위에는 종 모양 아이콘을 배치한다.
+- 종 아이콘에서 푸시알림으로 오는 메시지를 확인할 수 있게 한다.
+
+### 반영내용
+- 사용자 탭은 `대시보드`, `보호자정보`, `관리대상정보` 3개로 재정리했다.
+- 마이페이지는 우측 상단 사람 아이콘 클릭 시 오버레이로 열리게 했다.
+- 기존 `?tab=my` 주소는 호환을 위해 대시보드에서 마이페이지 오버레이를 열도록 유지했다.
+- 좌측 상단 종 아이콘에 알림 목록, 읽지 않은 알림 수, 새로고침 기능을 추가했다.
+- `보호자에게 알리기` 푸시 메시지를 `guardian_notifications` 테이블에 저장하도록 했다.
+- 열린 앱 화면은 서비스워커 푸시 수신 시 알림 목록을 갱신한다.
+
+### 산출물
+- `app/dashboard.js`
+- `app/page.js`
+- `app/notification-bell.js`
+- `app/api/notifications/route.js`
+- `app/globals.css`
+- `lib/db.js`
+- `lib/push.js`
+- `public/sw.js`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/PUSH_NOTIFICATION_SETUP.md`
+- `deliverables/USER_MANUAL.md`
+
+### 검증
+- 로컬 빌드 성공.
+
+### 반영 시간
+- UI 위치 변경, 알림 저장/조회 API, 서비스워커 연동, 문서/로그 반영: 약 40분.

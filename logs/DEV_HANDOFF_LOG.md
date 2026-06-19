@@ -2112,6 +2112,68 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
 
+## 2026-06-19 KST - My Page Corner Icon And Guardian Notification Inbox
+
+### User Request
+- Remove My Page from the main user tab menu.
+- Place a person-shaped My Page icon at the top-right of the user screen.
+- Show a hover tooltip saying `마이페이지` on the person icon.
+- Place a bell icon at the top-left of the user screen.
+- Show push notification messages from the bell icon.
+- Keep the bell and person icon visually opposed: bell on the left, person on the right.
+
+### Reflected Work
+- Removed the visible `마이페이지` tab from the guardian menu.
+- Kept the three main user tabs:
+  - `대시보드`
+  - `보호자정보`
+  - `관리대상정보`
+- Added top utility controls for completed/active guardian accounts:
+  - left: bell icon notification panel.
+  - right: person icon My Page launcher.
+- Added CSS hover tooltip for the person icon using `data-tooltip="마이페이지"`.
+- Changed My Page to open as a modal overlay through `?panel=my`.
+- Kept old `?tab=my` URL compatibility by opening the same My Page overlay on the dashboard.
+- Reused `ModalScrollLock` so the background page is not selectable/scrollable while My Page is open.
+- Added `app/notification-bell.js`:
+  - loads recent guardian notifications from `/api/notifications`.
+  - shows unread count.
+  - opens a notification popover.
+  - marks notifications read when opened.
+  - refreshes when the service worker receives a push message.
+- Added `/api/notifications`:
+  - `GET`: return logged-in guardian notification messages.
+  - `POST { action: "mark-read" }`: mark logged-in guardian notifications as read.
+- Added `guardian_notifications` DB table:
+  - stores title/body/url/read state per guardian.
+- Updated push send flow:
+  - when a finder clicks `보호자에게 알리기`, the server stores an in-app notification before Web Push delivery.
+  - Web Push payload includes notification metadata.
+  - the service worker broadcasts `ZEZARI_PUSH_MESSAGE` to open app windows.
+- Changed dashboard quick action `내 정보` to open `/?tab=dashboard&panel=my`.
+- Updated service worker cache name to `zezari-v14`.
+
+### Files Changed
+- `app/dashboard.js`
+- `app/page.js`
+- `app/notification-bell.js`
+- `app/api/notifications/route.js`
+- `app/globals.css`
+- `lib/db.js`
+- `lib/push.js`
+- `public/sw.js`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/PUSH_NOTIFICATION_SETUP.md`
+- `deliverables/USER_MANUAL.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+
+### Time Spent
+- UI restructuring, notification storage/API/service-worker wiring, documentation, and build verification: approximately 40 minutes.
+
 ## 2026-06-19 KST - Direct Guardian Signup Flow
 
 ### User Request

@@ -1,4 +1,4 @@
-const CACHE_NAME = "zezari-v13";
+const CACHE_NAME = "zezari-v14";
 const APP_SHELL = ["/", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
@@ -46,10 +46,22 @@ self.addEventListener("push", (event) => {
     badge: "/icons/icon-192.png",
     data: {
       url: data.url || "/",
+      notificationId: data.notificationId || "",
     },
   };
 
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(
+    Promise.all([
+      self.registration.showNotification(title, options),
+      broadcastPushMessage({
+        title,
+        body: data.body || "",
+        url: data.url || "/",
+        notificationId: data.notificationId || "",
+        createdAt: data.createdAt || new Date().toISOString(),
+      }),
+    ])
+  );
 });
 
 self.addEventListener("notificationclick", (event) => {
@@ -68,3 +80,15 @@ self.addEventListener("notificationclick", (event) => {
     })
   );
 });
+
+async function broadcastPushMessage(payload) {
+  const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+  await Promise.all(
+    clients.map((client) =>
+      client.postMessage({
+        type: "ZEZARI_PUSH_MESSAGE",
+        payload,
+      })
+    )
+  );
+}

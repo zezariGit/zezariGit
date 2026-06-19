@@ -1,0 +1,163 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+export default function NotificationBell() {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [notifications, setNotifications] = useState([]);
+
+  const unreadCount = useMemo(
+    () => notifications.filter((notification) => !notification.read_at).length,
+    [notifications]
+  );
+
+  const loadNotifications = useCallback(async () => {
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/notifications", {
+        cache: "no-store",
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data?.message || "알림을 조회하지 못했습니다.");
+      }
+      setNotifications(Array.isArray(data.notifications) ? data.notifications : []);
+    } catch (error) {
+      setMessage(error.message || "알림을 조회하지 못했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const markRead = useCallback(async () => {
+    try {
+      const response = await fetch("/api/notifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "mark-read" }),
+      });
+      if (!response.ok) return;
+      const readAt = new Date().toISOString();
+      setNotifications((items) =>
+        items.map((item) => ({
+          ...item,
+          read_at: item.read_at || readAt,
+        }))
+      );
+    } catch {
+      // The next refresh will recover the read state.
+    }
+  }, []);
+
+  useEffect(() => {
+    loadNotifications();
+  }, [loadNotifications]);
+
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !navigator.serviceWorker) return undefined;
+
+    const handleMessage = (event) => {
+      if (event.data?.type !== "ZEZARI_PUSH_MESSAGE") return;
+      loadNotifications();
+    };
+
+    navigator.serviceWorker.addEventListener("message", handleMessage);
+    return () => navigator.serviceWorker.removeEventListener("message", handleMessage);
+  }, [loadNotifications]);
+
+  const toggleOpen = async () => {
+    const nextOpen = !open;
+    setOpen(nextOpen);
+    if (nextOpen) {
+      await loadNotifications();
+      await markRead();
+    }
+  };
+
+  return (
+    <div className="notification-bell-wrap">
+      <button
+        className="corner-icon-button notification-bell-button"
+        type="button"
+        onClick={toggleOpen}
+        aria-label="푸시 알림"
+        aria-expanded={open}
+        title="푸시 알림"
+      >
+        <BellIcon />
+        {unreadCount > 0 && (
+          <span className="notification-count" aria-label={`읽지 않은 알림 ${unreadCount}개`}>
+            {unreadCount > 9 ? "9+" : unreadCount}
+          </span>
+        )}
+      </button>
+
+      {open && (
+        <div className="notification-popover" role="dialog" aria-label="푸시 알림 메시지">
+          <div className="notification-popover-header">
+            <strong>알림</strong>
+            <button type="button" onClick={loadNotifications} disabled={loading}>
+              {loading ? "조회중" : "새로고침"}
+            </button>
+          </div>
+
+          {message && <p className="notification-message">{message}</p>}
+
+          {notifications.length === 0 ? (
+            <p className="notification-empty">아직 수신된 푸시 메시지가 없습니다.</p>
+          ) : (
+            <ul className="notification-list">
+              {notifications.map((notification) => (
+                <li key={notification.id} className={notification.read_at ? "" : "unread"}>
+                  <strong>{notification.title || "REAL_QR_FIND 알림"}</strong>
+                  {notification.body && <span>{notification.body}</span>}
+                  <time dateTime={notification.created_at}>{formatNotificationTime(notification.created_at)}</time>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BellIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M18 9.7V15l1.7 2.2a.8.8 0 0 1-.6 1.3H4.9a.8.8 0 0 1-.6-1.3L6 15V9.7a6 6 0 0 1 12 0Z"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
+      <path
+        d="M9.8 20a2.3 2.3 0 0 0 4.4 0"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="2"
+      />
+    </svg>
+  );
+}
+
+function formatNotificationTime(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}

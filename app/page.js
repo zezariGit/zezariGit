@@ -14,9 +14,8 @@ export default async function HomePage({ searchParams }) {
       ? "guardian"
       : requestedTab === "subjects"
         ? "subjects"
-        : requestedTab === "my"
-          ? "my"
-          : "dashboard";
+        : "dashboard";
+  const showMyPage = resolvedSearchParams?.panel === "my" || requestedTab === "my";
   const adSubjectId = resolvedSearchParams?.adSubject || "";
   const registeredSubjectId = resolvedSearchParams?.registered || "";
   const notice = resolvedSearchParams?.notice || "";
@@ -34,6 +33,7 @@ export default async function HomePage({ searchParams }) {
           {...dashboardData}
           session={session}
           activeTab={activeTab}
+          showMyPage={showMyPage}
           adSubjectId={adSubjectId}
           registeredSubjectId={registeredSubjectId}
         />

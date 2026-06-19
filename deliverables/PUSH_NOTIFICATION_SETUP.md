@@ -15,7 +15,9 @@ Project: REAL_QR_FIND / zezari
 5. Finder scans an assigned QR and opens `/find/{public_key}`.
 6. Finder clicks `보호자에게 알리기`.
 7. Server loads the assigned subject and guardian from `qr_codes`.
-8. Server sends Web Push to the guardian's registered browser/app devices.
+8. Server stores the message in `guardian_notifications`.
+9. Server sends Web Push to the guardian's registered browser/app devices.
+10. The guardian can open the top-left bell icon in the dashboard to view received notification messages.
 
 ## Environment Variables
 - `VAPID_PUBLIC_KEY`
@@ -26,6 +28,8 @@ Project: REAL_QR_FIND / zezari
 
 ## Files
 - `app/push-notification-button.js`
+- `app/notification-bell.js`
+- `app/api/notifications/route.js`
 - `app/api/push/public-key/route.js`
 - `app/api/push/subscribe/route.js`
 - `app/api/find/[key]/notify/route.js`
@@ -38,6 +42,9 @@ Project: REAL_QR_FIND / zezari
 - Table: `push_subscriptions`
 - One guardian can have multiple push subscriptions across devices/browsers.
 - Expired push endpoints are removed when the push provider returns 404 or 410.
+- Table: `guardian_notifications`
+- Each finder notification is saved by guardian so it can be shown in the in-app bell notification panel.
+- Opening the bell panel marks stored notifications as read.
 
 ## Limits And Next Hardening
 - Current notify endpoint is public because QR find pages are public.
