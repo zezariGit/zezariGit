@@ -3151,5 +3151,85 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Production alias:
   - `https://zezari.vercel.app`
 
+## 2026-06-20 KST - Account Billing, Coupons, Payment Methods, and Ad Dashboard
+
+### User Request
+- Add a new page linked from My Page for `결제 및 구독 현황`.
+- Add `쿠폰함` to My Page and create the coupon page.
+- Add `결제수단` to My Page and allow users to pre-enter payment method display information.
+- Add `광고 대시보드` to My Page and create the ad dashboard page.
+- Use the uploaded screenshots as structure references only; keep styling aligned with the project's existing CSS.
+
+### Reflected Work
+- Added account routes:
+  - `/account/billing`
+  - `/account/coupons`
+  - `/account/payment-methods`
+  - `/account/ads`
+- Added shared account UI helpers in `app/account/account-ui.js`.
+- Updated My Page `부가 정보` to link to:
+  - payment/subscription status
+  - coupon box
+  - payment methods
+  - ad dashboard
+- Added DB tables:
+  - `guardian_coupons`
+  - `guardian_payment_methods`
+- Added DB query/mutation functions for:
+  - guardian billing and recent product order history
+  - guardian coupons
+  - guardian payment method display metadata
+  - guardian ad dashboard rows
+- Added server actions:
+  - `registerCouponAction`
+  - `savePaymentMethodAction`
+- Payment method handling intentionally stores only safe display metadata:
+  - provider
+  - nickname
+  - last 4 digits
+  - default flag
+  - no full card number, CVC, or raw payment credentials
+- The ad dashboard reads existing `subject_ads` data and exposes filters for all/running/done.
+- Added project-token-based CSS for all new account pages.
+
+### Files Changed
+- `app/account/account-ui.js`
+- `app/account/billing/page.js`
+- `app/account/coupons/page.js`
+- `app/account/payment-methods/page.js`
+- `app/account/ads/page.js`
+- `app/actions.js`
+- `app/dashboard.js`
+- `app/globals.css`
+- `lib/db.js`
+
+### Verification
+- `npm run build` succeeded locally.
+- `git diff --check` passed, with only existing CRLF conversion warnings from Git.
+- Local protected routes returned expected unauthenticated redirects:
+  - `/account/billing` -> `/`
+  - `/account/coupons` -> `/`
+  - `/account/payment-methods` -> `/`
+  - `/account/ads` -> `/`
+- In-app browser verification could not be used because the Browser plugin reported `iab` unavailable in this session.
+
+### Deployment
+- GitHub commit:
+  - `f78ae48 Add account billing and utility pages`
+- GitHub push:
+  - `main` pushed to `https://github.com/zezariGit/zezariGit.git`
+- Vercel production deployment:
+  - `https://zezari-hojnijdb8-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- `https://zezari.vercel.app/` returned HTTP 200.
+- Protected account routes returned expected unauthenticated redirects:
+  - `https://zezari.vercel.app/account/billing` -> `/`
+  - `https://zezari.vercel.app/account/coupons` -> `/`
+  - `https://zezari.vercel.app/account/payment-methods` -> `/`
+  - `https://zezari.vercel.app/account/ads` -> `/`
+
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.

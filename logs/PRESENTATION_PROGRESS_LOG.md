@@ -2025,3 +2025,56 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - 사용자 탭 공통 스타일 정리, 대시보드 사진 확대, 반응형 보정, 로그 반영: 약 20분.
+
+## 2026-06-20 - 마이페이지 계정 관리 메뉴 확장
+
+### 요구내용
+- 마이페이지에 `결제 및 구독 현황` 링크를 추가하고 새 페이지를 만든다.
+- 마이페이지에 `쿠폰함`을 추가하고 쿠폰 등록/조회 화면을 만든다.
+- 마이페이지에 `결제수단`을 추가하고 사용자가 결제수단 표시 정보를 미리 입력할 수 있게 한다.
+- 마이페이지에 `광고 대시보드` 항목을 추가하고 광고 상태를 조회할 수 있는 페이지를 만든다.
+- 첨부 화면은 구성만 참고하고, 스타일은 현재 프로젝트의 CSS 기준으로 통일한다.
+
+### 반영내용
+- 마이페이지 부가 정보에 다음 링크를 추가했다.
+  - 결제 및 구독 현황
+  - 쿠폰함
+  - 결제수단
+  - 광고 대시보드
+- `/account/billing` 페이지를 추가해 관리대상별 구독 상태와 최근 상품 결제 내역을 조회할 수 있게 했다.
+- `/account/coupons` 페이지를 추가해 쿠폰 번호 등록, 사용가능 쿠폰, 사용완료 쿠폰 영역을 구성했다.
+- `/account/payment-methods` 페이지를 추가해 카드사/별칭/끝 4자리/기본 여부 같은 안전한 표시 정보만 저장하도록 했다.
+- `/account/ads` 페이지를 추가해 광고 전체/광고중/광고완료 필터와 광고 카드 목록을 구성했다.
+- 쿠폰과 결제수단 표시 정보를 DB로 관리하기 위해 `guardian_coupons`, `guardian_payment_methods` 테이블을 추가했다.
+- 전체 화면은 기존 카드형 패널, 버튼, 테두리, 색상 토큰을 사용해 프로젝트 스타일로 맞췄다.
+
+### 산출물
+- `app/account/account-ui.js`
+- `app/account/billing/page.js`
+- `app/account/coupons/page.js`
+- `app/account/payment-methods/page.js`
+- `app/account/ads/page.js`
+- `app/actions.js`
+- `app/dashboard.js`
+- `app/globals.css`
+- `lib/db.js`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### 검증
+- 로컬 빌드 성공.
+- CSS 차이 검사 통과.
+- 로컬 환경에서 새 계정 보호 라우트가 비로그인 상태에서 `/`로 정상 이동하는 것 확인.
+- 운영 배포 후 메인 페이지 HTTP 200 확인.
+- 운영 환경에서 새 계정 보호 라우트가 비로그인 상태에서 `/`로 정상 이동하는 것 확인.
+
+### 운영 반영
+- GitHub commit:
+  - `f78ae48 Add account billing and utility pages`
+- Vercel production deployment:
+  - `https://zezari-hojnijdb8-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### 반영 시간
+- 마이페이지 링크 추가, 계정 하위 페이지 4개 생성, DB 스키마/액션 추가, 스타일 정리, 배포/검증: 약 45분.
