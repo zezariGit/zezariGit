@@ -20,6 +20,7 @@ The manual explains the current implemented service from both user and admin per
 - Social signup/login with Google, Kakao, and Naver button states.
 - Login/signup screen redesigned with guardian ID/password fields, auto-login checkbox, forgot-password helper, and SNS icon row.
 - Direct guardian signup flow: phone verification, basic information input, signup completion, and post-signup navigation to subject registration or dashboard.
+- SNS first-login signup completion flow: incomplete social accounts must fill the same guardian signup information before entering the dashboard; SNS name/email values are prefilled when available.
 - PWA installation and onboarding flow.
 - Guardian dashboard and information entry.
 - Managed subject registration, update, deletion, photo upload, and status display.

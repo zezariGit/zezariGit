@@ -39,6 +39,9 @@ Project: REAL_QR_FIND
   - Step 1: phone number verification.
   - Step 2: guardian basic information input.
   - Step 3: signup completion with `대상자 등록하기` and `대시보드 바로가기`.
+- SNS first login also uses the same guardian signup completion flow when the account is not complete yet.
+- When SNS provider data includes name or email, those values are prefilled in the signup information step.
+- Existing complete guardians go directly to the dashboard after SNS login.
 - Phone verification is currently implemented in test mode. It shows a temporary code in the screen message until a real SMS provider is connected.
 - Guardian ID/password login works after the guardian profile has saved `아이디` and `비밀번호`.
 
@@ -160,6 +163,10 @@ NAVER_CLIENT_SECRET=your-naver-client-secret
   - Creates a guardian account before login.
   - Validates phone format, birth date, app ID format, password strength, duplicate app ID, duplicate phone, and required terms agreement.
   - Stores PBKDF2 password hash only; plaintext passwords are never stored.
+- `/api/signup/complete`
+  - Completes signup information for an already authenticated SNS user.
+  - Uses the current session's guardian row and updates name, phone, birth date, email, app ID, password hash, phone verification timestamp, and required terms timestamps.
+  - Rejects unauthenticated requests.
 - `/api/auth/[...nextauth]`
   - Handles NextAuth routes.
   - Includes provider callback routes:

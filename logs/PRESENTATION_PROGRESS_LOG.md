@@ -1558,3 +1558,40 @@ This file is the cumulative presentation-ready project log. It is written so the
 ### 운영 검증
 - `https://zezari.vercel.app/?signup=1`에서 회원가입 화면 확인.
 - 회원가입 API 필수값 검증 응답 확인.
+
+## 2026-06-19 - SNS 최초 로그인 회원가입 정보 입력 적용
+
+### 요구내용
+- 현재는 `회원가입` 버튼을 눌렀을 때만 가입정보를 입력받는다.
+- Kakao, Naver, Google 등 SNS 간편로그인을 눌렀을 때도 최초 가입자라면 가입정보를 입력받게 한다.
+- SNS에서 넘어온 이름/이메일 등이 있으면 미리 채운다.
+- 이미 가입된 사용자는 대시보드로 바로 이동한다.
+
+### 반영내용
+- SNS 로그인 후 보호자 정보가 미완성인 경우 대시보드 대신 회원가입 정보 입력 화면을 먼저 보여주게 했다.
+- SNS에서 생성된 보호자 이름과 이메일을 기본정보 입력 화면에 미리 채운다.
+- 가입정보가 이미 완성된 보호자는 기존처럼 바로 대시보드로 이동한다.
+- 로그인된 SNS 사용자의 가입정보를 저장하는 API를 추가했다.
+- 현재 SNS 보호자 레코드에 휴대폰, 생년월일, 아이디, 비밀번호 해시, 약관동의, 휴대폰 인증시각을 저장한다.
+- 뒤로가기 버튼은 로그인 화면으로 돌아갈 수 있도록 로그아웃 처리한다.
+
+### 산출물
+- `app/dashboard.js`
+- `app/social-signup-completion.js`
+- `app/api/signup/complete/route.js`
+- `app/globals.css`
+- `lib/db.js`
+- `deliverables/AUTH_SETUP.md`
+- `deliverables/USER_MANUAL.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### 검증
+- 로컬 빌드 성공.
+- 빌드 결과에서 `/api/signup/complete` 라우트 생성 확인.
+
+### 남은 사항
+- SNS 가입완성 플로우의 휴대폰 인증도 현재는 테스트 모드이며 실제 문자 발송은 SMS 사업자 연동이 필요하다.
+
+### 반영 시간
+- 구현, 빌드 검증, 문서/로그 반영: 약 35분.

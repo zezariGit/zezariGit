@@ -2204,6 +2204,57 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Production screenshot captured at `.next/prod-signup-phone-step.png`.
 - `POST https://zezari.vercel.app/api/signup/guardian` with missing values returned HTTP 400 with a Korean validation message.
 
+## 2026-06-19 KST - SNS First Login Signup Completion
+
+### User Request
+- Direct signup currently asks for signup information only when the `회원가입` button is pressed.
+- When a user presses an SNS simple-login button, first-time users should also enter signup information.
+- If the SNS provider returns values such as name, prefill those fields.
+- Existing signed-up users should go directly to the dashboard.
+
+### Reflected Work
+- Added authenticated SNS signup completion screen:
+  - `app/social-signup-completion.js`
+- Incomplete logged-in guardians now see the signup completion flow before dashboard navigation.
+- Existing complete guardians continue to see the dashboard immediately.
+- SNS-provided guardian name and email are used as initial values in the information input step.
+- Added authenticated signup completion API:
+  - `POST /api/signup/complete`
+- Added DB helper:
+  - `completeGuardianSignup(session, payload)`
+- The completion API updates the current SNS guardian row with:
+  - name
+  - phone
+  - birth date
+  - email
+  - app login ID
+  - PBKDF2 password hash
+  - phone verification timestamp
+  - required terms timestamps
+- Duplicate app ID and duplicate phone checks exclude the current guardian row.
+- The first-step back button signs out and returns to the login page, avoiding a loop back into the same incomplete signup page.
+
+### Files Changed
+- `app/dashboard.js`
+- `app/social-signup-completion.js`
+- `app/api/signup/complete/route.js`
+- `app/globals.css`
+- `lib/db.js`
+- `deliverables/AUTH_SETUP.md`
+- `deliverables/USER_MANUAL.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- Build output includes `POST /api/signup/complete` route.
+
+### Important Limitation
+- SNS signup completion still uses test-mode phone verification until a real SMS provider is connected.
+
+### Time Spent
+- Authenticated SNS signup completion implementation, build verification, and documentation/log update: approximately 35 minutes.
+
 ## 2026-06-19 KST - Login/Signup Screen Redesign And Credentials Login
 
 ### User Request

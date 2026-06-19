@@ -12,6 +12,7 @@ import FormSubmitButton from "./form-submit-button";
 import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
 import PushNotificationButton from "./push-notification-button";
 import QRCode from "qrcode";
+import SocialSignupCompletion from "./social-signup-completion";
 import TossSubscriptionButton from "./toss-subscription-button";
 import { isAdminSession } from "../lib/admin";
 
@@ -48,14 +49,14 @@ export default async function GuardianDashboard({
               {isDashboard
                 ? guardianComplete
                   ? `안녕하세요, ${guardian.name}님!`
-                  : "대시보드 준비가 필요합니다"
+                  : "회원가입 정보를 입력해 주세요"
                 : "정보입력"}
             </h1>
             <p className="dashboard-subtitle">
               {isDashboard
                 ? guardianComplete
                   ? "로그인한 보호자에게 등록된 관리대상과 현재 상태를 확인할 수 있습니다."
-                  : "보호자 정보 입력을 완료하면 대시보드에서 관리대상을 바로 조회할 수 있습니다."
+                  : "SNS 계정에서 확인된 정보는 미리 채워두었습니다. 필수 정보를 입력하면 바로 서비스를 사용할 수 있습니다."
                 : "보호자 정보와 관리대상 정보를 입력하고 수정합니다."}
             </p>
           </div>
@@ -79,6 +80,15 @@ export default async function GuardianDashboard({
         ) : (
           <>
 
+        {!guardianComplete ? (
+          <>
+            <SocialSignupCompletion guardian={guardian} session={session} />
+            <div className="install-area dashboard-install">
+              <PwaInstallPrompt />
+            </div>
+          </>
+        ) : (
+          <>
         <nav className="dashboard-menu" aria-label="보호자 메뉴">
           <a className={isDashboard ? "active" : ""} href="/?tab=dashboard">
             대시보드
@@ -105,6 +115,8 @@ export default async function GuardianDashboard({
         <div className="install-area dashboard-install">
           <PwaInstallPrompt />
         </div>
+          </>
+        )}
           </>
         )}
       </section>

@@ -82,6 +82,12 @@ a {
   box-shadow: none;
 }
 
+.dashboard-signup-panel {
+  display: grid;
+  place-items: center;
+  padding: 20px 0 8px;
+}
+
 .signup-back-button {
   position: absolute;
   top: 0;
