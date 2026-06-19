@@ -2171,6 +2171,9 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Verification
 - `git diff --check` passed.
 - `npm run build` succeeded.
+- Temporary local production server on port `3001` returned HTTP 200 for:
+  - `/`
+  - `/shop`
 - Build output includes:
   - `/shop`
   - `/api/products/orders`
@@ -2292,6 +2295,34 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `https://zezari.vercel.app/shop` returned HTTP 200.
 - `https://zezari.vercel.app/payments/toss/product/fail` returned HTTP 200.
 - `https://zezari.vercel.app/admin?section=products` returned HTTP 200.
+
+## 2026-06-19 KST - Unify Guardian User Tab Styles
+
+### User Request
+- The user-facing tabs `대시보드`, `보호자정보`, and `관리대상정보` have inconsistent styling.
+- Unify all three tabs using the `관리대상정보` style as the baseline.
+- On the dashboard, make managed subject photos about 1.7x larger.
+
+### Reflected Work
+- Added CSS overrides so the dashboard status panel, guardian information panel, summary/setup panels, and subject information heading share the same card style:
+  - `width: min(100%, 760px)`
+  - `var(--radius-md)` radius
+  - `0.5px` project border
+  - `var(--shadow-card)` card shadow
+  - left-aligned card headers matching subject edit cards
+- Removed the remaining phone-mockup feel from the dashboard status panel by overriding the heavy border and narrow width.
+- Increased dashboard managed subject photo size from the earlier ~48-58px range to ~82-88px depending on viewport.
+- Updated managed subject cards to use wider grid columns and larger card height so the larger photo fits cleanly.
+- Added mobile-specific alignment so enlarged photos and action buttons do not overflow.
+
+### Files Changed
+- `app/globals.css`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `git diff --check` passed.
+- `npm run build` succeeded.
 
 ## 2026-06-19 KST - My Page Corner Icon And Guardian Notification Inbox
 
