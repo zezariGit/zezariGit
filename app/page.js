@@ -8,8 +8,15 @@ import { getDashboardData } from "../lib/db";
 
 export default async function HomePage({ searchParams }) {
   const resolvedSearchParams = await searchParams;
-  const activeTab = resolvedSearchParams?.tab === "info" ? "info" : "dashboard";
+  const requestedTab = resolvedSearchParams?.tab || "dashboard";
+  const activeTab =
+    requestedTab === "guardian" || requestedTab === "info"
+      ? "guardian"
+      : requestedTab === "subjects"
+        ? "subjects"
+        : "dashboard";
   const adSubjectId = resolvedSearchParams?.adSubject || "";
+  const registeredSubjectId = resolvedSearchParams?.registered || "";
   const notice = resolvedSearchParams?.notice || "";
   const noticeType = resolvedSearchParams?.noticeType || "success";
   const authError = resolvedSearchParams?.error || "";
@@ -21,7 +28,13 @@ export default async function HomePage({ searchParams }) {
     const dashboardData = await getDashboardData(session);
     return (
       <>
-        <GuardianDashboard {...dashboardData} session={session} activeTab={activeTab} adSubjectId={adSubjectId} />
+        <GuardianDashboard
+          {...dashboardData}
+          session={session}
+          activeTab={activeTab}
+          adSubjectId={adSubjectId}
+          registeredSubjectId={registeredSubjectId}
+        />
         <StatusToast message={notice} type={noticeType} />
       </>
     );

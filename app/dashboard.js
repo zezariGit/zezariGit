@@ -13,6 +13,7 @@ import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
 import PushNotificationButton from "./push-notification-button";
 import QRCode from "qrcode";
 import SocialSignupCompletion from "./social-signup-completion";
+import SubjectVoiceRecorder from "./subject-voice-recorder";
 import TossSubscriptionButton from "./toss-subscription-button";
 import { isAdminSession } from "../lib/admin";
 
@@ -28,16 +29,20 @@ export default async function GuardianDashboard({
   session,
   activeTab = "dashboard",
   adSubjectId = "",
+  registeredSubjectId = "",
 }) {
   const subjectsWithQr = await withSubjectQrImages(subjects);
   const selectedAdSubject = subjectsWithQr.find((subject) => subject.id === adSubjectId) || null;
   const emptySlots = Array.from({ length: Math.max(0, 4 - subjectsWithQr.length) });
+  const registeredSubject = subjectsWithQr.find((subject) => subject.id === registeredSubjectId) || null;
   const guardianComplete = Boolean(
     guardian.name && guardian.login_id && guardian.password_hash && guardian.phone
   );
   const guardianActive = guardian.is_active !== 0;
   const admin = isAdminSession(session) || Number(guardian.is_admin || 0) === 1;
-  const isDashboard = activeTab !== "info";
+  const isDashboard = activeTab === "dashboard";
+  const isGuardianTab = activeTab === "guardian";
+  const isSubjectsTab = activeTab === "subjects";
 
   return (
     <main className="dashboard-page">
@@ -50,14 +55,18 @@ export default async function GuardianDashboard({
                 ? guardianComplete
                   ? `안녕하세요, ${guardian.name}님!`
                   : "회원가입 정보를 입력해 주세요"
-                : "정보입력"}
+                : isGuardianTab
+                  ? "보호자정보"
+                  : "관리대상정보"}
             </h1>
             <p className="dashboard-subtitle">
               {isDashboard
                 ? guardianComplete
                   ? "로그인한 보호자에게 등록된 관리대상과 현재 상태를 확인할 수 있습니다."
                   : "SNS 계정에서 확인된 정보는 미리 채워두었습니다. 필수 정보를 입력하면 바로 서비스를 사용할 수 있습니다."
-                : "보호자 정보와 관리대상 정보를 입력하고 수정합니다."}
+                : isGuardianTab
+                  ? "보호자 연락처, 주소, 안심번호 등 기본 정보를 입력하고 수정합니다."
+                  : "관리대상 등록, 보호자 메시지, 음성 안내, QR 배정 정보를 관리합니다."}
             </p>
           </div>
           <div className="dashboard-header-actions">
@@ -93,8 +102,11 @@ export default async function GuardianDashboard({
           <a className={isDashboard ? "active" : ""} href="/?tab=dashboard">
             대시보드
           </a>
-          <a className={!isDashboard ? "active" : ""} href="/?tab=info">
-            정보입력
+          <a className={isGuardianTab ? "active" : ""} href="/?tab=guardian">
+            보호자정보
+          </a>
+          <a className={isSubjectsTab ? "active" : ""} href="/?tab=subjects">
+            관리대상정보
           </a>
         </nav>
 
@@ -108,8 +120,10 @@ export default async function GuardianDashboard({
             adDailyRate={adDailyRate}
             selectedAdSubject={selectedAdSubject}
           />
+        ) : isGuardianTab ? (
+          <GuardianInfoTab guardian={guardian} session={session} />
         ) : (
-          <InfoTab guardian={guardian} session={session} subjects={subjectsWithQr} emptySlots={emptySlots} />
+          <SubjectsInfoTab subjects={subjectsWithQr} emptySlots={emptySlots} registeredSubject={registeredSubject} />
         )}
 
         <div className="install-area dashboard-install">
@@ -138,8 +152,8 @@ function DashboardTab({
       <section className="dashboard-panel setup-panel">
         <h2>정보 입력이 필요합니다</h2>
         <p>대시보드를 사용하려면 보호자 정보를 먼저 입력해 주세요.</p>
-        <a className="action" href="/?tab=info">
-          정보입력으로 이동
+        <a className="action" href="/?tab=guardian">
+          보호자정보로 이동
         </a>
       </section>
     );
@@ -174,27 +188,36 @@ function DashboardTab({
   );
 }
 
-function InfoTab({ guardian, session, subjects, emptySlots }) {
+function GuardianInfoTab({ guardian, session }) {
   return (
-    <div className="dashboard-grid info-grid">
-      <section className="dashboard-panel info-panel">
-        <h2 id="guardian-info">보호자 정보</h2>
-        <GuardianForm guardian={guardian} session={session} />
-      </section>
+    <section className="dashboard-panel info-panel guardian-info-panel">
+      <h2 id="guardian-info">보호자 정보</h2>
+      <GuardianForm guardian={guardian} session={session} />
+    </section>
+  );
+}
 
-      <section className="dashboard-panel info-panel">
-        <div className="panel-heading">
-          <h2 id="subjects-info">관리대상 정보</h2>
-          <span>{subjects.length}/4명</span>
+function SubjectsInfoTab({ subjects, emptySlots, registeredSubject }) {
+  if (registeredSubject) {
+    return <SubjectRegistrationComplete subject={registeredSubject} />;
+  }
+
+  return (
+    <section className="subjects-workspace">
+      <div className="panel-heading subjects-heading">
+        <div>
+          <h2 id="subjects-info">대상자 등록</h2>
+          <p>보호자 1명당 최대 4명까지 등록할 수 있습니다.</p>
         </div>
-        <div className="subject-list">
-          {subjects.map((subject) => (
-            <SubjectForm key={subject.id} subject={subject} />
-          ))}
-          {emptySlots.length > 0 && <SubjectForm />}
-        </div>
-      </section>
-    </div>
+        <span>{subjects.length}/4명</span>
+      </div>
+      <div className="subject-list">
+        {subjects.map((subject) => (
+          <SubjectForm key={subject.id} subject={subject} />
+        ))}
+        {emptySlots.length > 0 && <SubjectForm />}
+      </div>
+    </section>
   );
 }
 
@@ -250,15 +273,15 @@ function StatusDashboard({ guardian, subjects, subscription, subscriptionPlans }
           )}
         </div>
         <div className="quick-actions">
-          <a href="/?tab=info#subjects-info">
+          <a href="/?tab=subjects#subjects-info">
             <span aria-hidden="true">!</span>
             실종신고
           </a>
-          <a href="/?tab=info#subjects-info">
+          <a href="/?tab=subjects#subjects-info">
             <span aria-hidden="true">B</span>
             상품 구매
           </a>
-          <a href="/?tab=info#guardian-info">
+          <a href="/?tab=guardian#guardian-info">
             <span aria-hidden="true">M</span>
             내 정보
           </a>
@@ -323,44 +346,56 @@ function SubjectForm({ subject }) {
   const isExisting = Boolean(subject?.id);
 
   return (
-    <article className="subject-card">
-      <form action={saveSubjectAction} className="subject-form">
+    <article className="subject-registration-phone">
+      <form action={saveSubjectAction} className="subject-registration-form">
         <input type="hidden" name="subjectId" defaultValue={subject?.id || ""} />
         <input type="hidden" name="existingPhoto" defaultValue={subject?.photo_data_url || ""} />
         <input type="hidden" name="existingPhotoName" defaultValue={subject?.photo_name || ""} />
 
-        <div className="subject-photo">
-          {subject?.photo_data_url ? (
-            <img src={subject.photo_data_url} alt={`${subject.name} 사진`} />
-          ) : (
-            <span>사진</span>
-          )}
+        <div className="phone-notch" aria-hidden="true" />
+        <div className="subject-form-top">
+          <h2>{isExisting ? "대상자 수정" : "대상자 등록"}</h2>
+          {isExisting && <em>수정 저장 시 QR 완료 화면은 표시되지 않습니다.</em>}
         </div>
 
-        <div className="subject-fields">
-          <label>
-            이름
+        <label className="subject-avatar-picker">
+          <span className="subject-avatar-preview">
+            {subject?.photo_data_url ? (
+              <img src={subject.photo_data_url} alt={`${subject.name} 사진`} />
+            ) : (
+              <span aria-hidden="true" />
+            )}
+          </span>
+          <span className="camera-chip" aria-hidden="true">사진</span>
+          <input name="photo" type="file" accept="image/*" />
+        </label>
+
+        <div className="target-field-stack">
+          <label className="target-field">
+            <span>이름</span>
             <input name="subjectName" defaultValue={subject?.name || ""} required />
           </label>
-          <label>
-            생년월일
+          <label className="target-field">
+            <span>생년월일</span>
             <input name="birthDate" type="date" defaultValue={subject?.birth_date || ""} required />
           </label>
-          <label>
-            성별
-            <select name="gender" defaultValue={subject?.gender || ""} required>
-              <option value="" disabled>
-                선택
-              </option>
-              {genders.map((gender) => (
-                <option value={gender} key={gender}>
-                  {gender}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            현재 상태
+          <fieldset className="target-gender-field">
+            <legend>성별</legend>
+            {genders.map((gender) => (
+              <label key={gender}>
+                <input
+                  type="radio"
+                  name="gender"
+                  value={gender}
+                  defaultChecked={(subject?.gender || "") === gender}
+                  required
+                />
+                <span>{gender.replace("성", "")}</span>
+              </label>
+            ))}
+          </fieldset>
+          <label className="target-field">
+            <span>현재 상태</span>
             <select name="status" defaultValue={subject?.status || "문제없음"} required>
               {statuses.map((status) => (
                 <option value={status} key={status}>
@@ -369,30 +404,45 @@ function SubjectForm({ subject }) {
               ))}
             </select>
           </label>
-          <label className="full-field">
-            사진 업로드
-            <input name="photo" type="file" accept="image/*" />
+          <label className="target-field target-message-field">
+            <span>보호자 메시지</span>
+            <small>대상자를 찾은 사람이 QR 페이지에서 볼 수 있는 안내 메시지입니다.</small>
+            <textarea
+              name="guardianMessage"
+              defaultValue={subject?.guardian_message || ""}
+              placeholder="저희 삼촌을 찾고 있어요. 대화가 어려울 수 있으니 연락 부탁드립니다."
+              rows={4}
+            />
           </label>
-          <FormSubmitButton className="action" pendingText={isExisting ? "수정중" : "저장중"}>
-            {isExisting ? "대상자 정보 수정" : "대상자 추가"}
-          </FormSubmitButton>
-        </div>
-      </form>
-
-      {subject?.qr_code && (
-        <div className="subject-qr-panel">
-          <a href={subject.qr_image} download={`${subject.qr_code}.png`} title={`${subject.qr_code} QR 이미지 다운로드`}>
-            <img src={subject.qr_image} alt={`${subject.name} QR 코드`} />
-          </a>
-          <div>
-            <strong>{subject.qr_code}</strong>
-            <span>{subject.qr_is_active ? "활성 QR" : "비활성 QR"}</span>
-            <a href={subject.qr_target_url} target="_blank" rel="noreferrer">
-              {subject.qr_target_url}
-            </a>
+          <div className="target-voice-field">
+            <strong>보호자 음성 사전 녹음 (선택)</strong>
+            <small>대상자를 찾았을 때 QR 페이지에서 재생할 수 있습니다.</small>
+            <SubjectVoiceRecorder
+              existingVoice={subject?.voice_data_url || ""}
+              existingName={subject?.voice_name || ""}
+            />
           </div>
         </div>
-      )}
+
+        {subject?.qr_code && (
+          <div className="subject-qr-panel">
+            <a href={subject.qr_image} download={`${subject.qr_code}.png`} title={`${subject.qr_code} QR 이미지 다운로드`}>
+              <img src={subject.qr_image} alt={`${subject.name} QR 코드`} />
+            </a>
+            <div>
+              <strong>{subject.qr_code}</strong>
+              <span>{subject.qr_is_active ? "활성 QR" : "비활성 QR"}</span>
+              <a href={subject.qr_target_url} target="_blank" rel="noreferrer">
+                {subject.qr_target_url}
+              </a>
+            </div>
+          </div>
+        )}
+
+        <FormSubmitButton className="login-submit target-submit-button" pendingText={isExisting ? "수정중" : "저장중"}>
+          {isExisting ? "수정 저장" : "다음"}
+        </FormSubmitButton>
+      </form>
 
       {isExisting && (
         <form action={deleteSubjectAction}>
@@ -403,6 +453,39 @@ function SubjectForm({ subject }) {
         </form>
       )}
     </article>
+  );
+}
+
+function SubjectRegistrationComplete({ subject }) {
+  return (
+    <section className="subject-complete-phone" aria-label="관리대상 등록 완료">
+      <div className="phone-notch" aria-hidden="true" />
+      <a className="signup-back-button subject-complete-back" href="/?tab=subjects">
+        <span aria-hidden="true">‹</span>
+        <span className="visually-hidden">관리대상정보로 돌아가기</span>
+      </a>
+      <div className="subject-complete-content">
+        <div className="complete-qr-mark">
+          {subject.qr_image ? (
+            <img src={subject.qr_image} alt={`${subject.name} 전용 QR 코드`} />
+          ) : (
+            <span aria-hidden="true">QR</span>
+          )}
+        </div>
+        <h2>등록이 완료되었습니다.</h2>
+        <p>
+          <strong>{subject.name}</strong> 대상자 전용 QR코드가 생성되었어요.
+          QR코드는 상품 구매 단계에서 확인하실 수 있습니다.
+        </p>
+        {subject.qr_code && <em>{subject.qr_code}</em>}
+        <a className="login-submit subject-complete-action" href="/?tab=dashboard">
+          상품 구매하기
+        </a>
+        <a className="outline-login-button subject-complete-action" href="/?tab=dashboard">
+          대시보드 이동하기
+        </a>
+      </div>
+    </section>
   );
 }
 

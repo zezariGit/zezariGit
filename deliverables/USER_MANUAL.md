@@ -22,11 +22,13 @@ The manual explains the current implemented service from both user and admin per
 - Direct guardian signup flow: phone verification, basic information input, signup completion, and post-signup navigation to subject registration or dashboard.
 - SNS first-login signup completion flow: incomplete social accounts must fill the same guardian signup information before entering the dashboard; SNS name/email values are prefilled when available.
 - PWA installation and onboarding flow.
-- Guardian dashboard and information entry.
+- Guardian dashboard and separated user tabs: dashboard, guardian information, and managed subject information.
 - Managed subject registration, update, deletion, photo upload, and status display.
+- Managed subject guardian memo/message and per-subject guardian voice recording.
+- New subject registration completion screen with assigned QR information.
 - Subscription payment options, active state, pause, and resume.
 - Subject-level advertisement request and progress state foundation.
-- QR public find page, QR matching, download, activation, and guardian notification.
+- QR public find page, QR matching, download, activation, guardian message/audio playback, and guardian notification.
 - Safe-number privacy behavior: the public QR page does not expose the guardian's raw phone number.
 - Admin guardian management, admin role management, QR management, payment management, and advertisement management.
 - Shared progress indicators and bottom status messages.

@@ -2269,6 +2269,84 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `https://zezari.vercel.app` returned HTTP 200.
 - Unauthenticated `POST https://zezari.vercel.app/api/signup/complete` returned HTTP 401 with `로그인이 필요합니다.`
 
+## 2026-06-19 KST - Split User Info Tabs And Subject Registration QR Completion
+
+### User Request
+- In the user page information area, separate guardian information and managed subject information.
+- Tabs should become:
+  - dashboard
+  - guardian information
+  - managed subject information
+- Redesign the managed subject input screen like the attached reference.
+- Allow guardians to enter memo/message per managed subject.
+- Allow guardians to record and save guardian voice audio per managed subject.
+- When a new managed subject is registered, match an unmatched QR already stored in DB and show a registration-complete page.
+- When editing an existing managed subject, do not show the QR registration-complete page.
+
+### Reflected Work
+- Changed main user tabs:
+  - `/?tab=dashboard`
+  - `/?tab=guardian`
+  - `/?tab=subjects`
+- Kept compatibility for old `/?tab=info` by mapping it to guardian information.
+- Split the previous combined info screen into:
+  - `GuardianInfoTab`
+  - `SubjectsInfoTab`
+- Redesigned managed subject form as a mobile phone-style registration card.
+- Added subject fields:
+  - guardian message/memo
+  - guardian voice recording data URL
+  - guardian voice recording file/display name
+- Added client component:
+  - `app/subject-voice-recorder.js`
+- Added browser MediaRecorder-based voice recording UI:
+  - record
+  - stop
+  - playback
+  - clear newly recorded audio
+- Updated subject save logic:
+  - new subject insert stores memo/audio and assigns one QR.
+  - existing subject update stores memo/audio but returns to the subject tab without showing QR completion.
+  - assigned QR metadata is returned from `assignQrToSubject`.
+- Added subject registration complete screen:
+  - shows assigned QR image/code.
+  - shows `상품 구매하기`.
+  - shows `대시보드 이동하기`.
+- Updated public QR find page:
+  - shows guardian message when present.
+  - plays guardian recorded audio when present.
+- Updated DB schema handling:
+  - `subjects.guardian_message`
+  - `subjects.voice_data_url`
+  - `subjects.voice_name`
+
+### Files Changed
+- `app/actions.js`
+- `app/dashboard.js`
+- `app/find/[key]/page.js`
+- `app/globals.css`
+- `app/page.js`
+- `app/subject-voice-recorder.js`
+- `lib/db.js`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/QR_MANAGEMENT.md`
+- `deliverables/USER_MANUAL.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- Build output still includes `/find/[key]`.
+- Build output still includes the auth and signup API routes.
+
+### Notes
+- Existing product rule remains guardian max 4 subjects. The attached mockup said max 3, but the established project requirement has been max 4.
+- Voice recording uses browser `MediaRecorder`; unsupported browsers show an in-page message.
+- Voice data is stored as an audio data URL with a 2.5MB server-side limit.
+
+### Time Spent
+- Tab split, subject UI redesign, audio recording, QR completion flow, public QR update, build verification, and documentation/log update: approximately 70 minutes.
+
 ## 2026-06-19 KST - Login/Signup Screen Redesign And Credentials Login
 
 ### User Request

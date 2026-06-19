@@ -33,8 +33,9 @@ Project: REAL_QR_FIND / zezari
 7. Admin can generate additional unique QR codes by entering a desired count.
 8. Public QR URLs resolve to:
    - `/find/{public_key}`
-9. When a guardian creates or edits a subject, the server assigns one available QR to that subject if no QR is already assigned.
-10. If no unassigned QR remains, the server generates a new QR and assigns it.
+9. When a guardian creates a new subject, the server assigns one available unmatched QR to that subject and redirects to a registration-complete QR screen.
+10. When a guardian edits an existing subject, QR assignment is preserved and the registration-complete screen is not shown.
+11. If no unassigned QR remains, the server generates a new QR and assigns it.
 
 ## Database
 - Table: `qr_codes`
@@ -55,7 +56,7 @@ Project: REAL_QR_FIND / zezari
 - Unknown key: shows an unregistered QR message.
 - Inactive key: shows a disabled QR message.
 - Active but unassigned key: shows a not-yet-connected QR message.
-- Active assigned key: shows the managed subject information, configured guardian response fields, and a `보호자에게 알리기` button.
+- Active assigned key: shows the managed subject information, configured guardian response fields, guardian message/audio when present, and a `보호자에게 알리기` button.
 - The public QR page does not show the guardian's raw phone number. It shows `guardians.safe_phone` as `안심번호`, or `안심번호 준비중` if no safe number has been issued yet.
 - The notify button sends a Web Push message to the logged-in guardian's registered browser/app devices.
 

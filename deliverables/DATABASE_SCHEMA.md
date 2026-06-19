@@ -46,6 +46,9 @@ Stores target/person records belonging to a guardian.
 | `status` | TEXT | Current status: `문제없음`, `찾는중`, `QR활성화필요` |
 | `photo_data_url` | TEXT | Uploaded image as data URL |
 | `photo_name` | TEXT | Original uploaded file name |
+| `guardian_message` | TEXT | Guardian-written message shown on the assigned public QR page |
+| `voice_data_url` | TEXT | Guardian recorded audio message as an audio data URL |
+| `voice_name` | TEXT | Stored audio display/file name |
 | `created_at` | TEXT | Created timestamp |
 | `updated_at` | TEXT | Updated timestamp |
 
@@ -171,6 +174,7 @@ Stores advertisement requests and status by managed subject.
 - Logged-in guardians can view assigned QR code details for their own subjects.
 - Public find pages can read QR status by `public_key` without login.
 - When a QR is assigned to a subject, the public find page shows subject basic information and configured guardian response fields so the finder can respond.
+- Subject records can include a guardian message and guardian recorded audio. The public QR page shows/plays those values when present.
 - Public QR pages must not expose `guardians.phone`; they show `guardians.safe_phone` as the safe/relay number when available, or `안심번호 준비중` when not available.
 - Each subject receives one QR assignment. Because each guardian can register up to 4 subjects, one guardian can have up to 4 assigned QR codes.
 - Logged-in guardians can register a browser push subscription from the dashboard.

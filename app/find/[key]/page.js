@@ -90,6 +90,19 @@ export default async function FindPage({ params }) {
           </div>
         </div>
 
+        {(data.guardian_message || data.voice_data_url) && (
+          <div className="find-guardian-message">
+            <h2>보호자 안내</h2>
+            {data.guardian_message && <p>{data.guardian_message}</p>}
+            {data.voice_data_url && (
+              <div className="find-audio-box">
+                <span>{data.voice_name || "보호자 음성 메시지"}</span>
+                <audio controls src={data.voice_data_url} />
+              </div>
+            )}
+          </div>
+        )}
+
         <GuardianNotifyButton qrKey={data.public_key} />
       </section>
     </main>

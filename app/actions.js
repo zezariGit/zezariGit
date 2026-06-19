@@ -21,21 +21,25 @@ export async function saveGuardianAction(formData) {
     await saveGuardianProfile(session, formData);
     revalidatePath("/");
   } catch (error) {
-    redirect(withNotice("/?tab=info", error.message || "필수값을 확인해주세요.", "error"));
+    redirect(withNotice("/?tab=guardian", error.message || "필수값을 확인해주세요.", "error"));
   }
-  redirect(withNotice("/?tab=info", "보호자 정보가 저장되었습니다."));
+  redirect(withNotice("/?tab=guardian", "보호자 정보가 저장되었습니다."));
 }
 
 export async function saveSubjectAction(formData) {
   const session = await getServerSession(authOptions);
   if (!session) throw new Error("로그인이 필요합니다.");
+  let result;
   try {
-    await saveSubject(session, formData);
+    result = await saveSubject(session, formData);
     revalidatePath("/");
   } catch (error) {
-    redirect(withNotice("/?tab=info", error.message || "필수값을 확인해주세요.", "error"));
+    redirect(withNotice("/?tab=subjects", error.message || "필수값을 확인해주세요.", "error"));
   }
-  redirect(withNotice("/?tab=info", "관리대상 정보가 저장되었습니다."));
+  if (result?.isNew) {
+    redirect(withNotice(`/?tab=subjects&registered=${encodeURIComponent(result.subjectId)}`, "관리대상 등록이 완료되었습니다."));
+  }
+  redirect(withNotice("/?tab=subjects", "관리대상 정보가 수정되었습니다."));
 }
 
 export async function deleteSubjectAction(formData) {
@@ -45,9 +49,9 @@ export async function deleteSubjectAction(formData) {
     await deleteSubject(session, formData);
     revalidatePath("/");
   } catch (error) {
-    redirect(withNotice("/?tab=info", error.message || "삭제하지 못했습니다.", "error"));
+    redirect(withNotice("/?tab=subjects", error.message || "삭제하지 못했습니다.", "error"));
   }
-  redirect(withNotice("/?tab=info", "관리대상 정보가 삭제되었습니다."));
+  redirect(withNotice("/?tab=subjects", "관리대상 정보가 삭제되었습니다."));
 }
 
 export async function createSubjectAdAction(formData) {
