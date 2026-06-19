@@ -1804,5 +1804,17 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 로컬 메인 화면과 관리자 화면 HTTP 200 응답 확인.
 - 인앱 브라우저 검증은 현재 세션에서 브라우저가 비활성 상태라 진행하지 못했다.
 
+### 운영 반영
+- GitHub commit:
+  - `0ef97f1 Align my page with project style`
+- Vercel production deployment:
+  - `https://zezari-d7jkov9xq-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### 운영 검증
+- 운영 메인 페이지 정상 응답 확인.
+- 운영 관리자 페이지 정상 응답 확인.
+
 ### 반영 시간
 - 마이페이지 CSS 정리, 반응형 보정, 로그 반영: 약 15분.

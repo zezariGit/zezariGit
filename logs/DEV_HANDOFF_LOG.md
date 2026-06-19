@@ -2822,6 +2822,20 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Local `http://127.0.0.1:3000/admin` returned HTTP 200.
 - In-app browser verification was attempted, but the Browser plugin reported `iab` unavailable in this session.
 
+### Deployment
+- GitHub commit:
+  - `0ef97f1 Align my page with project style`
+- GitHub push:
+  - `main` pushed to `https://github.com/zezariGit/zezariGit.git`
+- Vercel production deployment:
+  - `https://zezari-d7jkov9xq-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- `https://zezari.vercel.app/` returned HTTP 200.
+- `https://zezari.vercel.app/admin` returned HTTP 200.
+
 ## 2026-06-16 KST - Mobile Dashboard Managed Card Alignment
 
 ### User Request
