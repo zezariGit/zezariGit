@@ -1662,3 +1662,15 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - 탭 분리, 화면 개편, 음성녹음, QR 등록완료, 공개 QR 표시, 문서/로그 반영: 약 70분.
+
+### 운영 반영
+- GitHub commit:
+  - `82d5d31 Split user info tabs and add subject QR completion`
+- Vercel production deployment:
+  - `https://zezari-7wwfatpt5-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### 운영 검증
+- 운영 메인 페이지 정상 응답 확인.
+- 운영 QR 공개 페이지 샘플 경로 정상 응답 확인.

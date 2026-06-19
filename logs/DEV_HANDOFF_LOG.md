@@ -2347,6 +2347,20 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Time Spent
 - Tab split, subject UI redesign, audio recording, QR completion flow, public QR update, build verification, and documentation/log update: approximately 70 minutes.
 
+### Deployment
+- GitHub commit:
+  - `82d5d31 Split user info tabs and add subject QR completion`
+- GitHub push:
+  - `main` pushed to `https://github.com/zezariGit/zezariGit.git`
+- Vercel production deployment:
+  - `https://zezari-7wwfatpt5-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- `https://zezari.vercel.app` returned HTTP 200.
+- `https://zezari.vercel.app/find/test-public-key` returned HTTP 200.
+
 ## 2026-06-19 KST - Login/Signup Screen Redesign And Credentials Login
 
 ### User Request
