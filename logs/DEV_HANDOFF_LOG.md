@@ -2277,6 +2277,22 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - `/admin?section=products`
 - Browser payment flow could not be fully completed in this session because Toss checkout requires interactive external payment approval.
 
+### Deployment
+- GitHub commit:
+  - `332206a Add staged product payment and QR activation`
+- GitHub push:
+  - `main` pushed to `https://github.com/zezariGit/zezariGit.git`
+- Vercel production deployment:
+  - `https://zezari-4vta9rbcd-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- `https://zezari.vercel.app/` returned HTTP 200.
+- `https://zezari.vercel.app/shop` returned HTTP 200.
+- `https://zezari.vercel.app/payments/toss/product/fail` returned HTTP 200.
+- `https://zezari.vercel.app/admin?section=products` returned HTTP 200.
+
 ## 2026-06-19 KST - My Page Corner Icon And Guardian Notification Inbox
 
 ### User Request

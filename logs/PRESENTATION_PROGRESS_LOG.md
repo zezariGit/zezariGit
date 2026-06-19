@@ -1970,5 +1970,19 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 별도 로컬 빌드 서버에서 `/shop`, `/payments/toss/product/fail`, `/admin?section=products` HTTP 200 응답 확인.
 - Toss 결제창 최종 승인 단계는 외부 결제 상호작용이 필요해 자동 완료 검증하지 못했다.
 
+### 운영 반영
+- GitHub commit:
+  - `332206a Add staged product payment and QR activation`
+- Vercel production deployment:
+  - `https://zezari-4vta9rbcd-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### 운영 검증
+- 운영 메인 페이지 정상 응답 확인.
+- 운영 상품 선택 페이지 정상 응답 확인.
+- 운영 상품 결제 실패 페이지 정상 응답 확인.
+- 운영 관리자 상품 관리 페이지 정상 응답 확인.
+
 ### 반영 시간
 - 구매 단계 재구성, Toss 상품 결제 라우트, QR 활성화 정책, 공개 페이지 정보 보호, 문서/로그 반영: 약 80분.
