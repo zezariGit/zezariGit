@@ -121,7 +121,7 @@ export default async function FindPage({ params, searchParams }) {
           <div className="find-profile-info">
             <span>생년월일: {formatDate(data.birth_date)}</span>
             <span>성별: {data.gender || "-"}</span>
-            <span>현재 상태: {data.subject_status || "문제없음"}</span>
+            <span>현재 상태: {statusLabel(data.subject_status)}</span>
           </div>
         </div>
 
@@ -167,4 +167,10 @@ export default async function FindPage({ params, searchParams }) {
 function formatDate(value) {
   if (!value) return "-";
   return String(value).replaceAll("-", ".");
+}
+
+function statusLabel(status) {
+  if (status === "문제없음") return "안전";
+  if (["상품구매필요", "QR활성화필요", "안전", "찾는중"].includes(status)) return status;
+  return "상품구매필요";
 }

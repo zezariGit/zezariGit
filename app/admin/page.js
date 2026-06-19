@@ -471,7 +471,7 @@ function GuardianManagementSection({ adminData }) {
                     <strong>{subject.name}</strong>
                     <span>{formatDate(subject.birth_date)}</span>
                     <em className={`status-badge ${statusClass(subject.status)}`}>
-                      {subject.status || "문제없음"}
+                      {statusLabel(subject.status)}
                     </em>
                   </article>
                 ) : (
@@ -752,9 +752,17 @@ function productFallbackIcon(slug) {
 }
 
 function statusClass(status) {
-  if (status === "찾는중") return "searching";
-  if (status === "QR활성화필요") return "qr-needed";
+  const normalized = statusLabel(status);
+  if (normalized === "상품구매필요") return "purchase-needed";
+  if (normalized === "찾는중") return "searching";
+  if (normalized === "QR활성화필요") return "qr-needed";
   return "safe";
+}
+
+function statusLabel(status) {
+  if (status === "문제없음") return "안전";
+  if (["상품구매필요", "QR활성화필요", "안전", "찾는중"].includes(status)) return status;
+  return "상품구매필요";
 }
 
 function adStatusLabel(status) {

@@ -20,7 +20,7 @@ import SubjectVoiceRecorder from "./subject-voice-recorder";
 import { isAdminSession } from "../lib/admin";
 
 const genders = ["남성", "여성", "기타"];
-const statuses = ["문제없음", "찾는중", "QR활성화필요"];
+const statuses = ["상품구매필요", "QR활성화필요", "안전", "찾는중"];
 
 export default async function GuardianDashboard({
   guardian,
@@ -405,7 +405,7 @@ function StatusDashboard({ guardian, subjects }) {
                 </div>
                 <div className="managed-actions">
                   <span className={`status-badge ${statusClass(subject.status)}`}>
-                    {subject.status || "문제없음"}
+                    {statusLabel(subject.status)}
                   </span>
                   <a className="managed-ad-button" href={`/?tab=dashboard&adSubject=${encodeURIComponent(subject.id)}`}>
                     광고
@@ -427,7 +427,7 @@ function StatusDashboard({ guardian, subjects }) {
           )}
         </div>
         <div className="quick-actions">
-          <a href="/?tab=subjects#subjects-info">
+          <a href="/missing-report">
             <span aria-hidden="true">!</span>
             실종신고
           </a>
@@ -549,7 +549,7 @@ function SubjectForm({ subject }) {
           </fieldset>
           <label className="target-field">
             <span>현재 상태</span>
-            <select name="status" defaultValue={subject?.status || "문제없음"} required>
+            <select name="status" defaultValue={statusLabel(subject?.status || "상품구매필요")} required>
               {statuses.map((status) => (
                 <option value={status} key={status}>
                   {status}
@@ -631,7 +631,7 @@ function SubjectRegistrationComplete({ subject }) {
           QR코드는 상품 구매 단계에서 확인하실 수 있습니다.
         </p>
         {subject.qr_code && <em>{subject.qr_code}</em>}
-        <a className="login-submit subject-complete-action" href="/?tab=dashboard">
+        <a className="login-submit subject-complete-action" href="/shop">
           상품 구매하기
         </a>
         <a className="outline-login-button subject-complete-action" href="/?tab=dashboard">
@@ -648,9 +648,17 @@ function formatDate(value) {
 }
 
 function statusClass(status) {
-  if (status === "찾는중") return "searching";
-  if (status === "QR활성화필요") return "qr-needed";
+  const normalized = statusLabel(status);
+  if (normalized === "상품구매필요") return "purchase-needed";
+  if (normalized === "찾는중") return "searching";
+  if (normalized === "QR활성화필요") return "qr-needed";
   return "safe";
+}
+
+function statusLabel(status) {
+  if (status === "문제없음") return "안전";
+  if (["상품구매필요", "QR활성화필요", "안전", "찾는중"].includes(status)) return status;
+  return "상품구매필요";
 }
 
 function adStatusLabel(status) {
