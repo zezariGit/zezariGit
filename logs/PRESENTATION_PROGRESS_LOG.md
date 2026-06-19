@@ -1462,3 +1462,31 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - 구현, 빌드 검증, 화면 캡처, 문서/로그 반영: 약 35분.
+
+## 2026-06-19 - 로그인 화면 운영 배포 반영
+
+### 요구내용
+- GitHub에 푸시했는지 확인한다.
+- 운영 페이지에 새 로그인 화면이 반영되지 않은 원인을 확인한다.
+
+### 반영내용
+- 로컬 변경사항이 아직 GitHub/Vercel에 올라가지 않은 상태임을 확인했다.
+- 로그인 리디자인 변경사항을 커밋하고 GitHub `main`에 푸시했다.
+- Vercel production 배포를 직접 실행했다.
+- `zezari.vercel.app` 별칭이 이전 배포를 보고 있어 새 배포로 다시 연결했다.
+
+### 산출물
+- GitHub commit:
+  - `8c1b307 Redesign login screen`
+- Production deployment:
+  - `https://zezari-4l8f3rrua-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### 검증
+- Vercel 운영 빌드 성공.
+- `https://zezari.vercel.app`에서 새 로그인 화면 요소 `.login-card` 확인.
+- 운영 화면 캡처 성공.
+
+### 반영 시간
+- GitHub 푸시, 운영 배포, 별칭 수정, 검증: 약 15분.

@@ -2160,6 +2160,34 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Implementation, build verification, screenshot review, and documentation/log update: approximately 35 minutes.
+
+## 2026-06-19 KST - Login Redesign GitHub Push And Production Alias Fix
+
+### User Request
+- Confirm whether the login redesign was pushed to GitHub.
+- The online production page did not appear to reflect the local changes.
+
+### Reflected Work
+- Confirmed the login redesign was still local before this step.
+- Created Git commit:
+  - `8c1b307 Redesign login screen`
+- Pushed `main` to GitHub:
+  - `https://github.com/zezariGit/zezariGit.git`
+- Ran production Vercel deployment directly.
+- New production deployment:
+  - `https://zezari-4l8f3rrua-zezari.vercel.app`
+- Found that `https://zezari.vercel.app` still pointed to an older deployment.
+- Reassigned production alias:
+  - `https://zezari.vercel.app` now points to `zezari-4l8f3rrua-zezari.vercel.app`.
+
+### Verification
+- Vercel production build succeeded.
+- Playwright opened `https://zezari.vercel.app` with onboarding skipped.
+- `.login-card` was found on the production page.
+- Production screenshot captured at `.next/prod-login-redesign.png`.
+
+### Time Spent
+- Git push, production deployment, alias correction, and verification: approximately 15 minutes.
 - `https://zezari.vercel.app/admin?section=ads` returned HTTP 200.
 - Unauthenticated admin ads route showed the admin login gate.
 
