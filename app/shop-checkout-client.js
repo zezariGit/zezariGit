@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import KakaoPostcodeAddress from "./kakao-postcode-address";
 
 const TOSS_SDK_URL = "https://js.tosspayments.com/v2/standard";
 
@@ -12,6 +13,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
   const [mode, setMode] = useState("subscription");
   const [designIndex, setDesignIndex] = useState(0);
   const [shippingAddress, setShippingAddress] = useState(guardian?.address || "");
+  const [shippingAddressDetail, setShippingAddressDetail] = useState(guardian?.address_detail || "");
   const [paymentMethod, setPaymentMethod] = useState("CARD");
   const [sdkReady, setSdkReady] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -100,6 +102,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
         quantity,
         designIndex,
         shippingAddress,
+        shippingAddressDetail,
         paymentMethod,
       }),
     });
@@ -136,6 +139,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
         quantity,
         designIndex,
         shippingAddress,
+        shippingAddressDetail,
         paymentMethod,
       }),
     });
@@ -250,6 +254,8 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
             subject={selectedSubject}
             shippingAddress={shippingAddress}
             setShippingAddress={setShippingAddress}
+            shippingAddressDetail={shippingAddressDetail}
+            setShippingAddressDetail={setShippingAddressDetail}
             paymentMethod={paymentMethod}
             setPaymentMethod={setPaymentMethod}
             amount={paymentAmount}
@@ -402,6 +408,8 @@ function OrderInformation({
   subject,
   shippingAddress,
   setShippingAddress,
+  shippingAddressDetail,
+  setShippingAddressDetail,
   paymentMethod,
   setPaymentMethod,
   amount,
@@ -424,10 +432,17 @@ function OrderInformation({
 
       <section className="order-section">
         <h2>2. 배송지 선택</h2>
-        <label className="shipping-address-box">
+        <div className="shipping-address-box">
           <span>배송지</span>
-          <textarea value={shippingAddress} onChange={(event) => setShippingAddress(event.target.value)} placeholder="상품을 받을 배송지를 입력해 주세요" />
-        </label>
+          <KakaoPostcodeAddress
+            defaultValue={shippingAddress}
+            defaultDetailValue={shippingAddressDetail}
+            addressName="shippingAddress"
+            detailName="shippingAddressDetail"
+            onAddressChange={setShippingAddress}
+            onDetailChange={setShippingAddressDetail}
+          />
+        </div>
       </section>
 
       <section className="order-section">

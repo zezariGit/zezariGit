@@ -19,6 +19,7 @@ export async function POST(request) {
       quantity: body.quantity,
       designIndex: body.designIndex,
       shippingAddress: body.shippingAddress,
+      shippingAddressDetail: body.shippingAddressDetail,
       paymentMethod: body.paymentMethod,
       orderType: "standalone",
     });

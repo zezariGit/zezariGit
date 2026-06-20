@@ -3418,6 +3418,62 @@ button:disabled:hover {
   white-space: nowrap;
 }
 
+.postcode-detail-input {
+  width: 100%;
+}
+
+.postcode-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  display: grid;
+  place-items: center;
+  padding: var(--space-lg);
+  background: rgba(16, 24, 40, 0.58);
+}
+
+.postcode-modal {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: min(100%, 520px);
+  height: min(680px, calc(100dvh - 48px));
+  overflow: hidden;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.2);
+}
+
+.postcode-modal header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.postcode-modal header strong {
+  font-size: 1.05rem;
+}
+
+.postcode-modal header button {
+  min-height: 38px;
+  padding: 0 var(--space-md);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.postcode-embed {
+  min-height: 0;
+  overflow: hidden;
+  background: #fff;
+}
+
 .field-helper {
   margin: 0;
   color: var(--c-text-muted);
@@ -5298,6 +5354,14 @@ button:disabled:hover {
 
   .postcode-address-row {
     grid-template-columns: 1fr;
+  }
+
+  .postcode-modal-backdrop {
+    padding: var(--space-xs);
+  }
+
+  .postcode-modal {
+    height: calc(100dvh - (var(--space-xs) * 2));
   }
 
   .shop-page {

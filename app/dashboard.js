@@ -261,7 +261,7 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
         <InfoRow label="비밀번호" value={guardian.password_hash ? "********" : "미설정"} />
         <InfoRow label="연락처" value={guardian.phone || "연락처 미입력"} />
         <InfoRow label="수령인" value={guardian.name || "이름 미입력"} actionLabel="주소록관리 >" href="/?tab=guardian" />
-        <InfoRow label="주소" value={guardian.address || "주소 미입력"} />
+        <InfoRow label="주소" value={formatFullAddress(guardian.address, guardian.address_detail)} />
         <InfoRow label="연락처" value={guardian.safe_phone ? `안심번호 ${guardian.safe_phone}` : "안심번호 준비중"} />
       </div>
 
@@ -484,7 +484,10 @@ function GuardianForm({ guardian, session }) {
               </label>
               <label className="full-field">
                 주소
-                <KakaoPostcodeAddress defaultValue={guardian.address || ""} />
+                <KakaoPostcodeAddress
+                  defaultValue={guardian.address || ""}
+                  defaultDetailValue={guardian.address_detail || ""}
+                />
               </label>
               <label className="full-field">
                 이메일
@@ -645,6 +648,10 @@ function SubjectRegistrationComplete({ subject }) {
 function formatDate(value) {
   if (!value) return "-";
   return String(value).replaceAll("-", ".");
+}
+
+function formatFullAddress(address, detailAddress) {
+  return [address, detailAddress].filter(Boolean).join(" ") || "주소 미입력";
 }
 
 function subjectPhotoSrc(subject) {

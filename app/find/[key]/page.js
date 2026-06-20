@@ -140,7 +140,7 @@ export default async function FindPage({ params, searchParams }) {
           </div>
           <div className="find-key-box">
             <span>주소</span>
-            <strong>{data.address || "주소 미입력"}</strong>
+            <strong>{formatFullAddress(data.address, data.address_detail)}</strong>
           </div>
         </div>
 
@@ -167,6 +167,10 @@ export default async function FindPage({ params, searchParams }) {
 function formatDate(value) {
   if (!value) return "-";
   return String(value).replaceAll("-", ".");
+}
+
+function formatFullAddress(address, detailAddress) {
+  return [address, detailAddress].filter(Boolean).join(" ") || "주소 미입력";
 }
 
 function statusLabel(status) {
