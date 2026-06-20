@@ -2112,6 +2112,24 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
 
+## 2026-06-20 KST - Keep Admin Order Tab Visible
+
+### User Report
+- The administrator could not see the newly added order/shipping tab.
+
+### Root Cause and Fix
+- The tab existed in authenticated production HTML, but the admin navigation used horizontal overflow and placed the tab near the right edge.
+- Moved `주문/배송` to the second menu position immediately after `보호자 관리`.
+- Replaced horizontal scrolling with an auto-fitting grid so every admin tab wraps and remains visible at narrow widths.
+
+### Verification and Deployment
+- Local and Vercel production builds succeeded.
+- Authenticated production admin HTML returned HTTP 200.
+- Verified `주문/배송` exists and appears between `보호자 관리` and `QR 관리`.
+- GitHub commit: `7dae21c Keep admin order tab visible`
+- Vercel deployment: `https://zezari-gsj4yjnj4-zezari.vercel.app`
+- Production alias: `https://zezari.vercel.app`
+
 ## 2026-06-20 KST - Admin Order and Shipping Management
 
 ### User Request

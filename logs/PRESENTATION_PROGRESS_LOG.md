@@ -2330,3 +2330,23 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - 주문/배송 DB, 관리자 UI, 사용자 배송조회, 검증 및 배포: 약 60분.
+
+## 2026-06-20 - 관리자 주문/배송 탭 가시성 개선
+
+### 요구내용
+- 관리자페이지에서 주문/배송 관리 탭이 보이지 않는 문제를 수정한다.
+
+### 반영내용
+- 주문/배송 탭을 보호자 관리 다음 두 번째 위치로 이동했다.
+- 가로 스크롤 메뉴를 화면 폭에 따라 자동 줄바꿈되는 그리드 메뉴로 변경했다.
+- 모바일과 좁은 화면에서도 모든 관리자 메뉴가 화면 안에 표시된다.
+
+### 검증 및 운영 반영
+- 운영 관리자 인증 화면 HTTP 200.
+- 주문/배송 탭 존재 및 두 번째 배치 확인.
+- GitHub commit: `7dae21c`
+- Vercel deployment: `https://zezari-gsj4yjnj4-zezari.vercel.app`
+- 운영 주소: `https://zezari.vercel.app`
+
+### 반영 시간
+- 원인 확인, 메뉴 재배치, 반응형 메뉴 수정, 재배포 및 검증: 약 15분.
