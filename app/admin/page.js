@@ -137,6 +137,9 @@ export default async function AdminPage({ searchParams }) {
           <Link className={activeSection === "guardians" ? "active" : ""} href="/admin">
             보호자 관리
           </Link>
+          <Link className={activeSection === "orders" ? "active" : ""} href="/admin?section=orders">
+            주문/배송
+          </Link>
           <Link className={activeSection === "qr" ? "active" : ""} href="/admin?section=qr">
             QR 관리
           </Link>
@@ -148,9 +151,6 @@ export default async function AdminPage({ searchParams }) {
           </Link>
           <Link className={activeSection === "products" ? "active" : ""} href="/admin?section=products">
             상품 관리
-          </Link>
-          <Link className={activeSection === "orders" ? "active" : ""} href="/admin?section=orders">
-            주문/배송
           </Link>
           <Link className={activeSection === "ads" ? "active" : ""} href="/admin?section=ads">
             광고 관리
