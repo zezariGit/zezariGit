@@ -3297,5 +3297,57 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `https://zezari.vercel.app/` returned HTTP 200.
 - `https://zezari.vercel.app/missing-report` returned expected unauthenticated redirect to `/`.
 
+## 2026-06-20 KST - Page Navigation Performance Investigation
+
+### User Request
+- Investigate why navigation between pages and dashboard tabs feels globally slow.
+
+### Findings
+- Dashboard tabs and many internal controls use plain `<a>` links.
+  - Each click performs a full document navigation instead of retaining the current dashboard state.
+  - Personalized pages are returned with `Cache-Control: private, no-cache, no-store` and `X-Vercel-Cache: MISS`, so every navigation reaches the server.
+- `getDashboardData()` is used as a broad shared loader by the home page, shop, missing report, billing, coupon, payment method, and ad pages.
+  - It always queries guardian, subjects, QR, recent ad, subscription, plans, and ad settings.
+  - Subscription, plan, and ad-rate queries are currently sequential.
+- Subject rows are read with `SELECT s.*`.
+  - Photos and voice recordings are stored as base64 strings in Turso and fetched on every dashboard-data request.
+  - Current measured largest guardian payload: 3 subjects, about 593,509 JSON characters.
+  - Aggregate media size: photo base64 518,666 characters; voice base64 72,587 characters.
+- Turso measurements from the current environment:
+  - Initial guardian lookup/connection: about 1,199 ms.
+  - Warm sequential dashboard query set: about 187 ms.
+  - First subject join query: about 299 ms; warm subject join query: about 74-77 ms.
+- `ensureSchema()` performs runtime DDL/migration/seeding on each cold serverless instance.
+  - The normal cold path includes one schema batch, multiple `PRAGMA` checks, a status migration update, and eight sequential seed writes.
+  - This adds avoidable remote DB round trips before real page data is read.
+- Production response headers show Korean ingress at `icn1` while the server function executes in `iad1`.
+  - This adds long-distance latency before authenticated DB work starts.
+- QR generation is not a primary bottleneck.
+  - Three QR images measured about 5 ms warm and about 17 ms on the first local run.
+- Static assets are secondary:
+  - Built CSS is about 91 KB.
+  - Built JavaScript chunks total about 718 KB, but browser caching reduces repeat transfer impact.
+
+### Ranked Root Causes
+1. Full document navigation for dashboard tabs and internal links.
+2. Base64 photo/voice data included in broad `SELECT s.*` queries for pages that do not need it.
+3. Runtime schema migration/seeding during serverless cold starts.
+4. Multiple independent Turso queries executed sequentially.
+5. Vercel server function running in `iad1` for primarily Korean users.
+
+### Recommended Fix Order
+1. Convert dashboard tab changes to client-side state or Next.js `Link` navigation and add route loading feedback.
+2. Split page-specific DB loaders and select only required columns; exclude voice/photo base64 from summary pages.
+3. Move images and recordings to object storage and keep only URLs/thumbnails in Turso.
+4. Move schema migration/seeding to a deploy-time migration command.
+5. Batch or parallelize independent dashboard queries.
+6. Align Vercel function and Turso primary/read region close to Korean users.
+
+### Verification
+- Production anonymous home TTFB measured about 0.24-0.30 seconds across repeated requests, with one protected-route outlier near 0.56 seconds.
+- Production cache headers confirmed personalized dynamic responses are not CDN cached.
+- No application source was changed during this investigation.
+- In-app browser was unavailable, so authenticated click-to-render timing could not be captured directly.
+
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
