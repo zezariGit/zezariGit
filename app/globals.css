@@ -933,16 +933,52 @@ a {
   list-style: none;
 }
 
-.notification-list li {
+.notification-swipe-row {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  padding: 0;
+  border: 0.5px solid var(--c-danger-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-danger);
+}
+
+.notification-swipe-delete {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.notification-swipe-content {
+  position: relative;
   display: grid;
   gap: 4px;
   padding: 10px;
   border: 0.5px solid var(--c-border);
   border-radius: var(--radius-sm);
   background: #ffffff;
+  touch-action: pan-y;
+  user-select: none;
+  transition: transform 0.18s ease;
+  will-change: transform;
 }
 
-.notification-list li.unread {
+.notification-swipe-content.dragging {
+  transition: none;
+  cursor: grabbing;
+}
+
+.notification-swipe-content.deleting {
+  transition: transform 0.18s ease-in;
+}
+
+.notification-swipe-content.unread {
   border-color: var(--c-primary-border);
   background: var(--c-primary-light);
 }
@@ -958,6 +994,13 @@ a {
   color: var(--c-text-muted);
   font-size: 0.8rem;
   line-height: 1.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notification-swipe-content,
+  .notification-swipe-content.deleting {
+    transition-duration: 0.01ms;
+  }
 }
 
 .dashboard-header {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
@@ -52,6 +52,33 @@ export default function NotificationBell() {
       );
     } catch {
       // The next refresh will recover the read state.
+    }
+  }, []);
+
+  const deleteNotification = useCallback(async (notification) => {
+    setMessage("");
+    setNotifications((items) => items.filter((item) => item.id !== notification.id));
+
+    try {
+      const response = await fetch("/api/notifications", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: notification.id }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data?.message || "알림을 삭제하지 못했습니다.");
+      }
+    } catch (error) {
+      setNotifications((items) => {
+        if (items.some((item) => item.id === notification.id)) return items;
+        return [...items, notification].sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+      });
+      setMessage(error.message || "알림을 삭제하지 못했습니다.");
     }
   }, []);
 
@@ -114,17 +141,91 @@ export default function NotificationBell() {
           ) : (
             <ul className="notification-list">
               {notifications.map((notification) => (
-                <li key={notification.id} className={notification.read_at ? "" : "unread"}>
-                  <strong>{notification.title || "REAL_QR_FIND 알림"}</strong>
-                  {notification.body && <span>{notification.body}</span>}
-                  <time dateTime={notification.created_at}>{formatNotificationTime(notification.created_at)}</time>
-                </li>
+                <SwipeNotificationItem
+                  notification={notification}
+                  onDelete={deleteNotification}
+                  key={notification.id}
+                />
               ))}
             </ul>
           )}
         </div>
       )}
     </div>
+  );
+}
+
+function SwipeNotificationItem({ notification, onDelete }) {
+  const gesture = useRef({ pointerId: null, startX: 0, startY: 0, horizontal: false });
+  const offsetRef = useRef(0);
+  const [offset, setOffset] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const updateOffset = (value) => {
+    const limited = Math.max(-132, Math.min(132, value));
+    offsetRef.current = limited;
+    setOffset(limited);
+  };
+
+  const handlePointerDown = (event) => {
+    if (deleting || event.button > 0) return;
+    gesture.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      horizontal: false,
+    };
+    setDragging(true);
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  };
+
+  const handlePointerMove = (event) => {
+    if (!dragging || gesture.current.pointerId !== event.pointerId || deleting) return;
+    const deltaX = event.clientX - gesture.current.startX;
+    const deltaY = event.clientY - gesture.current.startY;
+    if (!gesture.current.horizontal && Math.abs(deltaY) > Math.abs(deltaX)) return;
+    if (Math.abs(deltaX) > 5) gesture.current.horizontal = true;
+    if (!gesture.current.horizontal) return;
+    event.preventDefault();
+    updateOffset(deltaX);
+  };
+
+  const finishGesture = (event, cancelled = false) => {
+    if (gesture.current.pointerId !== event.pointerId) return;
+    setDragging(false);
+    gesture.current.pointerId = null;
+
+    if (!cancelled && Math.abs(offsetRef.current) >= 72) {
+      const direction = offsetRef.current < 0 ? -1 : 1;
+      setDeleting(true);
+      offsetRef.current = direction * 420;
+      setOffset(direction * 420);
+      window.setTimeout(() => onDelete(notification), 180);
+      return;
+    }
+    updateOffset(0);
+  };
+
+  return (
+    <li className="notification-swipe-row">
+      <div className="notification-swipe-delete" aria-hidden="true">
+        <span>삭제</span>
+        <span>삭제</span>
+      </div>
+      <div
+        className={`notification-swipe-content${notification.read_at ? "" : " unread"}${dragging ? " dragging" : ""}${deleting ? " deleting" : ""}`}
+        style={{ transform: `translateX(${offset}px)` }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={(event) => finishGesture(event)}
+        onPointerCancel={(event) => finishGesture(event, true)}
+      >
+        <strong>{notification.title || "REAL_QR_FIND 알림"}</strong>
+        {notification.body && <span>{notification.body}</span>}
+        <time dateTime={notification.created_at}>{formatNotificationTime(notification.created_at)}</time>
+      </div>
+    </li>
   );
 }
 
