@@ -2112,6 +2112,53 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
 
+## 2026-06-20 KST - Kakao Address Search Fix and Detail Address Support
+
+### User Request
+- Fix the address search button that did not respond.
+- Add a separate detail-address input.
+- Carry both the base address and detail address into product-order shipping information.
+
+### Root Cause
+- The postcode component checked and instantiated `window.kakao.Postcode`.
+- The Kakao postcode bundle exposes the service as `window.daum.Postcode`, so the old readiness check never succeeded.
+- The previous popup flow could also be blocked in mobile browsers or an installed PWA after asynchronous script loading.
+
+### Reflected Work
+- Corrected the postcode namespace to `window.daum.Postcode`.
+- Replaced the popup window with a modal containing the postcode service's embedded search UI.
+- Added script preloading, a 10-second timeout, retry cleanup, loading text, and a user-facing load error.
+- Added a separate detail-address field and moved focus to it after selecting a base address.
+- Added `guardians.address_detail` and `product_orders.shipping_address_detail` with schema version `2`.
+- Connected detail-address persistence to guardian profile save and display.
+- Pre-filled checkout shipping fields from the guardian's saved base/detail address.
+- Passed both address values through subscription and standalone Toss payment preparation routes and stored them in the order draft.
+- Displayed the combined address on My Page and the activated public QR page.
+
+### Files Changed
+- `app/kakao-postcode-address.js`
+- `app/dashboard.js`
+- `app/shop-checkout-client.js`
+- `app/api/payments/toss/product/prepare/route.js`
+- `app/api/payments/toss/subscription/prepare/route.js`
+- `app/find/[key]/page.js`
+- `app/globals.css`
+- `lib/db.js`
+
+### Verification
+- `npm run build` succeeded locally and on Vercel.
+- `git diff --check` passed with only existing CRLF warnings.
+- Local app and Kakao postcode bundle both returned HTTP 200.
+- Authenticated guardian HTML contained the address-search button and `addressDetail` field.
+- Turso schema version is `2`; both detail-address columns exist.
+- Production public and authenticated guardian pages returned HTTP 200.
+- In-app browser was unavailable, so visual click automation was replaced with build, script, authenticated HTML, and DB checks.
+
+### Deployment
+- GitHub commit: `6a456f1 Fix Kakao address search and detail fields`
+- Vercel production deployment: `https://zezari-qy3k3xtve-zezari.vercel.app`
+- Production alias: `https://zezari.vercel.app`
+
 ## 2026-06-19 KST - Product Shop Flow And Admin Product Catalog
 
 ### User Request
