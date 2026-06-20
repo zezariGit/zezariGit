@@ -3435,5 +3435,54 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Cold first authenticated request remained around 2.7 seconds because the Vercel function still executes in `iad1`.
 - Function-region relocation was not forced because the current project plan's region eligibility could not be verified safely through the CLI.
 
+## 2026-06-20 KST - Swipe to Delete Notifications
+
+### User Request
+- Allow users to delete messages in the bell notification list by swiping either left or right.
+
+### Reflected Work
+- Replaced static notification rows with `SwipeNotificationItem` pointer-gesture rows.
+- Supports both left and right swipe directions.
+- Preserves vertical page/list scrolling with `touch-action: pan-y` and tracks horizontal movement only after direction detection.
+- Swipe behavior:
+  - movement is visually clamped while dragging
+  - 72px or more commits deletion
+  - shorter movement returns the row to its original position
+  - deletion animates the row out in the swipe direction
+- Added red delete background shown behind the moving row on either side.
+- Added optimistic client removal.
+  - If the API fails, the notification is restored in chronological order and an error message is displayed.
+- Added authenticated `DELETE /api/notifications` handling.
+- Added `deleteGuardianNotification(session, notificationId)`.
+  - Delete query includes both notification ID and authenticated guardian ID.
+  - A guardian cannot delete another guardian's notification.
+- Added reduced-motion CSS handling.
+
+### Files Changed
+- `app/notification-bell.js`
+- `app/api/notifications/route.js`
+- `app/globals.css`
+- `lib/db.js`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` passed with only existing CRLF warnings.
+- Local authenticated temporary notification DELETE returned HTTP 200.
+- Local DB verification returned `remaining=0`.
+- In-app browser was unavailable, so visual drag automation could not be performed.
+
+### Deployment
+- GitHub commit:
+  - `597700e Add swipe to delete notifications`
+- Vercel production deployment:
+  - `https://zezari-piy5bot3y-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- Authenticated production temporary notification DELETE returned HTTP 200.
+- Production DB verification returned `remaining=0`.
+- Test notification was removed immediately after verification.
+
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.

@@ -2226,3 +2226,41 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - Link 전환, DB 조회 분리/batch, 사진 API/캐시, 스키마 버전 처리, 배포 및 성능 검증: 약 90분.
+
+## 2026-06-20 - 알림 좌우 스와이프 삭제
+
+### 요구내용
+- 상단 종 아이콘의 알림 메시지를 왼쪽 또는 오른쪽으로 밀어서 삭제할 수 있게 한다.
+
+### 반영내용
+- 알림 행에 좌우 포인터/터치 스와이프 제스처를 추가했다.
+- 72px 이상 이동하면 삭제되고, 기준 미만이면 원위치로 돌아온다.
+- 좌우 어느 방향으로 밀어도 빨간 삭제 영역과 삭제 애니메이션이 표시된다.
+- 세로 알림 목록 스크롤은 계속 사용할 수 있도록 가로 방향 제스처만 판별한다.
+- 화면에서 먼저 제거한 뒤 API가 실패하면 알림을 복원하고 오류 메시지를 표시한다.
+- 인증된 보호자 본인의 알림만 삭제하는 DELETE API와 DB 함수를 추가했다.
+
+### 산출물
+- `app/notification-bell.js`
+- `app/api/notifications/route.js`
+- `app/globals.css`
+- `lib/db.js`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### 검증
+- 로컬 빌드 성공.
+- 로컬 임시 알림 삭제 API HTTP 200 및 DB 잔여 0건 확인.
+- 운영 임시 알림 삭제 API HTTP 200 및 DB 잔여 0건 확인.
+- 테스트 알림은 검증 직후 삭제했다.
+
+### 운영 반영
+- GitHub commit:
+  - `597700e Add swipe to delete notifications`
+- Vercel production deployment:
+  - `https://zezari-piy5bot3y-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### 반영 시간
+- 스와이프 제스처, 낙관적 삭제/복원, 보호자 소유권 확인 API, 배포 및 검증: 약 40분.
