@@ -3349,5 +3349,91 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - No application source was changed during this investigation.
 - In-app browser was unavailable, so authenticated click-to-render timing could not be captured directly.
 
+## 2026-06-20 KST - Authenticated Navigation Performance Optimization
+
+### User Request
+- Implement source changes for the previously identified navigation performance causes.
+- Push changes to GitHub and deploy them to Vercel production.
+
+### Reflected Work
+- Replaced primary internal dashboard, account, shop, missing-report, and admin anchors with Next.js `Link`.
+  - Prevents full CSS/JavaScript document boot on internal navigation.
+  - Enables App Router prefetch for visible navigation links.
+- Added `app/loading.js` and route loading progress styles.
+- Refactored `getDashboardData(session, options)`:
+  - Pages request only subjects/subscription/plans/ad settings they actually need.
+  - Subject detail fields such as voice recordings are omitted from summary pages.
+  - Guardian, subject, subscription, plan, and ad-rate reads are sent through one Turso `batch` call when needed.
+- Removed subject photo base64 from common dashboard/admin/ad/billing/missing-report queries.
+- Added authenticated, owner/admin-checked photo route:
+  - `/api/subjects/[id]/photo`
+  - `Cache-Control: private, max-age=86400, immutable`
+  - UI uses versioned photo URLs based on `subjects.updated_at`.
+- Subject updates now preserve existing photo/voice data from DB when no replacement upload is supplied.
+- Added `schema_meta` version marker (`DB_SCHEMA_VERSION = 1`).
+  - Cold serverless instances perform one version lookup.
+  - Full DDL/PRAGMA/seed migration runs only when the stored schema version is behind.
+- Added guardian-only query options to save, subscription, ad, notification, coupon, and payment-method actions.
+
+### Files Changed
+- `app/api/subjects/[id]/photo/route.js`
+- `app/loading.js`
+- `app/page.js`
+- `app/dashboard.js`
+- `app/globals.css`
+- `app/shop/page.js`
+- `app/missing-report/page.js`
+- `app/missing-report/missing-report-selector.js`
+- `app/account/account-ui.js`
+- `app/account/billing/page.js`
+- `app/account/ads/page.js`
+- `app/admin/page.js`
+- `lib/db.js`
+
+### Performance Measurements
+- Subject/common data payload:
+  - before: about 593,509 JSON characters for 3 subjects
+  - after: about 3,262 characters
+  - reduction: about 99.4%
+- Warm dashboard DB read:
+  - before: about 187 ms
+  - after option filtering/parallel read: about 41 ms
+  - reduction: about 78%
+- Final Turso batch read:
+  - about 40-42 ms warm
+  - about 2,176 JSON characters in the focused benchmark
+- Local authenticated production build:
+  - dashboard HTML about 21 KB
+  - guardian tab HTML about 18 KB
+  - guardian tab response about 47 ms
+  - warm dashboard responses about 94-136 ms after initial request
+- Photo API:
+  - authenticated JPEG response succeeded
+  - private one-day immutable cache header confirmed
+
+### Verification
+- `npm run build` succeeded after both optimization stages.
+- `git diff --check` passed with only existing CRLF warnings.
+- New `/api/subjects/[id]/photo` route is present in the Next.js build.
+- Unauthenticated photo request returned HTTP 401.
+- Authenticated local dashboard and photo requests returned HTTP 200.
+- Existing schema was marked at version `1` in Turso.
+- In-app browser was unavailable, so visual click testing was replaced with authenticated HTTP/session tests.
+
+### Deployment
+- GitHub commits:
+  - `d02c8f7 Optimize authenticated navigation performance`
+  - `4a5c16b Batch dashboard database reads`
+- Final Vercel production deployment:
+  - `https://zezari-ri40e4t5m-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### Production Verification
+- Authenticated dashboard HTML remained about 21 KB.
+- Warm authenticated dashboard total response measured about 0.42-0.73 seconds.
+- Cold first authenticated request remained around 2.7 seconds because the Vercel function still executes in `iad1`.
+- Function-region relocation was not forced because the current project plan's region eligibility could not be verified safely through the CLI.
+
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.

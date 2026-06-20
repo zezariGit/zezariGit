@@ -2167,3 +2167,62 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 분석 시간
 - 코드 추적, 운영 TTFB 측정, Turso 쿼리/데이터 크기 측정, 개선 우선순위 정리: 약 25분.
+
+## 2026-06-20 - 페이지 이동 성능 개선 구현
+
+### 요구내용
+- 분석된 페이지 이동 지연 원인을 실제 소스에서 개선한다.
+- GitHub 푸시와 Vercel 운영 배포까지 완료한다.
+
+### 반영내용
+- 대시보드, 관리자, 계정, 상품, 실종신고의 주요 내부 링크를 Next.js `Link`로 변경했다.
+- 화면 이동 중 즉시 표시되는 전역 로딩 진행 UI를 추가했다.
+- 페이지별로 필요한 데이터만 조회하도록 `getDashboardData` 옵션을 분리했다.
+- 보호자/대상자/구독/요금제/광고단가 조회를 Turso batch 1회로 통합했다.
+- 공통 조회에서 사진과 음성 base64를 제외했다.
+- 대상자 사진은 인증된 별도 API에서 제공하고 브라우저가 1일 캐시하도록 변경했다.
+- 사진 URL에 대상자 수정시각을 버전값으로 사용해 수정 시 자동 갱신되게 했다.
+- 서버리스 냉간 시작 때 전체 DB 마이그레이션을 반복하지 않도록 스키마 버전 테이블을 추가했다.
+- 저장, 구독, 광고, 알림, 쿠폰, 결제수단 액션도 보호자 최소 정보만 조회하도록 변경했다.
+
+### 개선 측정
+- 대상자 3명 기준 공통 데이터:
+  - 약 59만 문자에서 약 3천 문자로 감소
+  - 약 99.4% 감소
+- 웜 대시보드 DB 조회:
+  - 약 187ms에서 약 41ms로 감소
+  - 약 78% 감소
+- 로컬 로그인 대시보드 HTML 약 21KB.
+- 사진 API 인증/캐시 응답 정상 확인.
+- 운영 웜 로그인 대시보드 응답 약 0.42~0.73초.
+
+### 산출물
+- `app/api/subjects/[id]/photo/route.js`
+- `app/loading.js`
+- `app/page.js`
+- `app/dashboard.js`
+- `app/globals.css`
+- `app/shop/page.js`
+- `app/missing-report/page.js`
+- `app/missing-report/missing-report-selector.js`
+- `app/account/*`
+- `app/admin/page.js`
+- `lib/db.js`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### 운영 반영
+- GitHub commits:
+  - `d02c8f7 Optimize authenticated navigation performance`
+  - `4a5c16b Batch dashboard database reads`
+- Vercel production deployment:
+  - `https://zezari-ri40e4t5m-zezari.vercel.app`
+- Production alias:
+  - `https://zezari.vercel.app`
+
+### 잔여사항
+- Vercel 함수가 계속 미국 `iad1`에서 실행되어 첫 냉간 요청은 약 2초대가 남는다.
+- 프로젝트 요금제의 서울 리전 지원 여부가 확인되면 Vercel/Turso 리전 정렬을 추가 검토한다.
+
+### 반영 시간
+- Link 전환, DB 조회 분리/batch, 사진 API/캐시, 스키마 버전 처리, 배포 및 성능 검증: 약 90분.
