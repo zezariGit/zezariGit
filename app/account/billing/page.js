@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import StatusToast from "../../status-toast";
 import { authOptions } from "../../../lib/auth";
 import { getGuardianBillingData } from "../../../lib/db";
@@ -42,9 +43,9 @@ export default async function BillingPage({ searchParams }) {
         </section>
 
         <nav className="account-menu-list" aria-label="결제 관련 메뉴">
-          <a href="/account/coupons">쿠폰함</a>
-          <a href="/account/payment-methods">결제수단</a>
-          <a href="/account/ads">광고 대시보드</a>
+          <Link href="/account/coupons">쿠폰함</Link>
+          <Link href="/account/payment-methods">결제수단</Link>
+          <Link href="/account/ads">광고 대시보드</Link>
         </nav>
 
         <section className="account-section" id="payment-history">
@@ -75,8 +76,9 @@ export default async function BillingPage({ searchParams }) {
 }
 
 function SubjectAvatar({ subject }) {
-  if (subject.photo_data_url) {
-    return <img className="account-subject-avatar" src={subject.photo_data_url} alt={`${subject.name} 사진`} />;
+  const photoSrc = subject.photo_url || subject.photo_data_url;
+  if (photoSrc) {
+    return <img className="account-subject-avatar" src={photoSrc} alt={`${subject.name} 사진`} />;
   }
   return (
     <div className="account-subject-avatar empty" aria-hidden="true">

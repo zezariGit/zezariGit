@@ -15,6 +15,7 @@ import ModalScrollLock from "./modal-scroll-lock";
 import NotificationBell from "./notification-bell";
 import PushNotificationButton from "./push-notification-button";
 import QRCode from "qrcode";
+import Link from "next/link";
 import SocialSignupCompletion from "./social-signup-completion";
 import SubjectVoiceRecorder from "./subject-voice-recorder";
 import { isAdminSession } from "../lib/admin";
@@ -56,7 +57,7 @@ export default async function GuardianDashboard({
         {guardianComplete && guardianActive && (
           <div className="dashboard-corner-bar" aria-label="사용자 빠른 메뉴">
             <NotificationBell />
-            <a
+            <Link
               className="corner-icon-button my-page-corner-link"
               href={myPageHref}
               aria-label="마이페이지"
@@ -64,7 +65,7 @@ export default async function GuardianDashboard({
               data-tooltip="마이페이지"
             >
               <PersonIcon />
-            </a>
+            </Link>
           </div>
         )}
         <header className="dashboard-header">
@@ -113,15 +114,15 @@ export default async function GuardianDashboard({
         ) : (
           <>
         <nav className="dashboard-menu" aria-label="보호자 메뉴">
-          <a className={isDashboard ? "active" : ""} href="/?tab=dashboard">
+          <Link className={isDashboard ? "active" : ""} href="/?tab=dashboard">
             대시보드
-          </a>
-          <a className={isGuardianTab ? "active" : ""} href="/?tab=guardian">
+          </Link>
+          <Link className={isGuardianTab ? "active" : ""} href="/?tab=guardian">
             보호자정보
-          </a>
-          <a className={isSubjectsTab ? "active" : ""} href="/?tab=subjects">
+          </Link>
+          <Link className={isSubjectsTab ? "active" : ""} href="/?tab=subjects">
             관리대상정보
-          </a>
+          </Link>
         </nav>
 
         {showMyPage && (
@@ -180,9 +181,9 @@ function DashboardTab({
       <section className="dashboard-panel setup-panel">
         <h2>정보 입력이 필요합니다</h2>
         <p>대시보드를 사용하려면 보호자 정보를 먼저 입력해 주세요.</p>
-        <a className="action" href="/?tab=guardian">
+        <Link className="action" href="/?tab=guardian">
           보호자정보로 이동
-        </a>
+        </Link>
       </section>
     );
   }
@@ -242,9 +243,9 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
       <div className="my-page-title-row">
         <h2>내 정보</h2>
         {closeHref && (
-          <a className="my-page-close-button" href={closeHref} aria-label="마이페이지 닫기">
+          <Link className="my-page-close-button" href={closeHref} aria-label="마이페이지 닫기">
             닫기
-          </a>
+          </Link>
         )}
       </div>
       <div className="my-profile-avatar" aria-hidden="true">
@@ -254,7 +255,7 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
       <div className="my-page-section">
         <div className="my-section-heading">
           <h3>보호자 정보</h3>
-          <a href="/?tab=guardian">정보 수정 &gt;</a>
+          <Link href="/?tab=guardian">정보 수정 &gt;</Link>
         </div>
         <InfoRow label="이름" value={guardian.name || "이름 미입력"} />
         <InfoRow label="비밀번호" value={guardian.password_hash ? "********" : "미설정"} />
@@ -267,7 +268,7 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
       <div className="my-page-section">
         <div className="my-section-heading">
           <h3>대상자 정보</h3>
-          <a href="/?tab=subjects">정보 수정 &gt;</a>
+          <Link href="/?tab=subjects">정보 수정 &gt;</Link>
         </div>
         {primarySubject ? (
           <>
@@ -275,7 +276,7 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
             <InfoRow label="성별" value={primarySubject.gender || "성별 미입력"} />
             <InfoRow label="생년월일" value={formatDate(primarySubject.birth_date)} />
             <InfoRow label="보호자 메시지" value={primarySubject.guardian_message || "메시지 미입력"} />
-            <InfoRow label="사진" value={primarySubject.photo_name || (primarySubject.photo_data_url ? "사진 등록됨" : "사진 미등록")} />
+            <InfoRow label="사진" value={primarySubject.photo_name || (subjectPhotoSrc(primarySubject) ? "사진 등록됨" : "사진 미등록")} />
           </>
         ) : (
           <p className="my-empty-text">등록된 관리대상이 없습니다.</p>
@@ -287,27 +288,27 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
         <h3>부가 정보</h3>
         <InfoRow label="결제 및 구독 현황" value={subscriptionLabel} actionLabel="상세보기 >" href="/account/billing" />
         <InfoRow label="제자리 서비스 소개" value="QR 안심 서비스" />
-        <a className="my-menu-link" href="/account/coupons">쿠폰함</a>
-        <a className="my-menu-link" href="/account/payment-methods">결제수단</a>
-        <a className="my-menu-link" href="/account/ads">광고 대시보드</a>
+        <Link className="my-menu-link" href="/account/coupons">쿠폰함</Link>
+        <Link className="my-menu-link" href="/account/payment-methods">결제수단</Link>
+        <Link className="my-menu-link" href="/account/ads">광고 대시보드</Link>
         <div className="my-action-row">
           <span>푸시 알림</span>
           <PushNotificationButton />
         </div>
         {admin && (
-          <a className="my-menu-link" href="/admin">
+          <Link className="my-menu-link" href="/admin">
             관리자 페이지
-          </a>
+          </Link>
         )}
       </div>
 
       <div className="my-page-section">
         <h3>고객 지원</h3>
-        <a className="my-menu-link" href="/?panel=my">공지사항 및 FAQ</a>
-        <a className="my-menu-link" href="/?panel=my">고객센터</a>
-        <a className="my-menu-link" href="/?panel=my">의견 남기기</a>
-        <a className="my-menu-link" href="/?panel=my">이용약관</a>
-        <a className="my-menu-link" href="/?panel=my">개인정보처리방침</a>
+        <Link className="my-menu-link" href="/?panel=my">공지사항 및 FAQ</Link>
+        <Link className="my-menu-link" href="/?panel=my">고객센터</Link>
+        <Link className="my-menu-link" href="/?panel=my">의견 남기기</Link>
+        <Link className="my-menu-link" href="/?panel=my">이용약관</Link>
+        <Link className="my-menu-link" href="/?panel=my">개인정보처리방침</Link>
       </div>
 
       <div className="my-page-section my-logout-section">
@@ -347,7 +348,7 @@ function InfoRow({ label, value, actionLabel = "", href = "" }) {
     <div className="my-info-row">
       <strong>{label}</strong>
       <span>{value || "-"}</span>
-      {href && <a href={href}>{actionLabel}</a>}
+      {href && <Link href={href}>{actionLabel}</Link>}
     </div>
   );
 }
@@ -391,8 +392,8 @@ function StatusDashboard({ guardian, subjects }) {
             subject ? (
               <article className="managed-card" key={subject.id}>
                 <div className="managed-photo">
-                  {subject.photo_data_url ? (
-                    <img src={subject.photo_data_url} alt={`${subject.name} 사진`} />
+                  {subjectPhotoSrc(subject) ? (
+                    <img src={subjectPhotoSrc(subject)} alt={`${subject.name} 사진`} />
                   ) : (
                     <span aria-hidden="true" />
                   )}
@@ -407,9 +408,9 @@ function StatusDashboard({ guardian, subjects }) {
                   <span className={`status-badge ${statusClass(subject.status)}`}>
                     {statusLabel(subject.status)}
                   </span>
-                  <a className="managed-ad-button" href={`/?tab=dashboard&adSubject=${encodeURIComponent(subject.id)}`}>
+                  <Link className="managed-ad-button" href={`/?tab=dashboard&adSubject=${encodeURIComponent(subject.id)}`}>
                     광고
-                  </a>
+                  </Link>
                 </div>
               </article>
             ) : (
@@ -427,18 +428,18 @@ function StatusDashboard({ guardian, subjects }) {
           )}
         </div>
         <div className="quick-actions">
-          <a href="/missing-report">
+          <Link href="/missing-report">
             <span aria-hidden="true">!</span>
             실종신고
-          </a>
-          <a href="/shop">
+          </Link>
+          <Link href="/shop">
             <span aria-hidden="true">B</span>
             상품 구매
-          </a>
-          <a href="/?tab=dashboard&panel=my">
+          </Link>
+          <Link href="/?tab=dashboard&panel=my">
             <span aria-hidden="true">M</span>
             내 정보
-          </a>
+          </Link>
         </div>
       </div>
     </section>
@@ -503,7 +504,6 @@ function SubjectForm({ subject }) {
     <article className="subject-edit-card">
       <form action={saveSubjectAction} className="subject-registration-form">
         <input type="hidden" name="subjectId" defaultValue={subject?.id || ""} />
-        <input type="hidden" name="existingPhoto" defaultValue={subject?.photo_data_url || ""} />
         <input type="hidden" name="existingPhotoName" defaultValue={subject?.photo_name || ""} />
 
         <div className="subject-form-top">
@@ -513,8 +513,8 @@ function SubjectForm({ subject }) {
 
         <label className="subject-avatar-picker">
           <span className="subject-avatar-preview">
-            {subject?.photo_data_url ? (
-              <img src={subject.photo_data_url} alt={`${subject.name} 사진`} />
+            {subjectPhotoSrc(subject) ? (
+              <img src={subjectPhotoSrc(subject)} alt={`${subject.name} 사진`} />
             ) : (
               <span aria-hidden="true" />
             )}
@@ -613,10 +613,10 @@ function SubjectRegistrationComplete({ subject }) {
   return (
     <section className="subject-complete-phone" aria-label="관리대상 등록 완료">
       <div className="phone-notch" aria-hidden="true" />
-      <a className="signup-back-button subject-complete-back" href="/?tab=subjects">
+      <Link className="signup-back-button subject-complete-back" href="/?tab=subjects">
         <span aria-hidden="true">‹</span>
         <span className="visually-hidden">관리대상정보로 돌아가기</span>
-      </a>
+      </Link>
       <div className="subject-complete-content">
         <div className="complete-qr-mark">
           {subject.qr_image ? (
@@ -631,12 +631,12 @@ function SubjectRegistrationComplete({ subject }) {
           QR코드는 상품 구매 단계에서 확인하실 수 있습니다.
         </p>
         {subject.qr_code && <em>{subject.qr_code}</em>}
-        <a className="login-submit subject-complete-action" href="/shop">
+        <Link className="login-submit subject-complete-action" href="/shop">
           상품 구매하기
-        </a>
-        <a className="outline-login-button subject-complete-action" href="/?tab=dashboard">
+        </Link>
+        <Link className="outline-login-button subject-complete-action" href="/?tab=dashboard">
           대시보드 이동하기
-        </a>
+        </Link>
       </div>
     </section>
   );
@@ -645,6 +645,10 @@ function SubjectRegistrationComplete({ subject }) {
 function formatDate(value) {
   if (!value) return "-";
   return String(value).replaceAll("-", ".");
+}
+
+function subjectPhotoSrc(subject) {
+  return subject?.photo_url || subject?.photo_data_url || "";
 }
 
 function statusClass(status) {

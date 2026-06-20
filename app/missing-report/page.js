@@ -8,7 +8,12 @@ export default async function MissingReportPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/");
 
-  const { subjects } = await getDashboardData(session);
+  const { subjects } = await getDashboardData(session, {
+    includeSubjectDetails: false,
+    includeSubscription: false,
+    includeSubscriptionPlans: false,
+    includeAdDailyRate: false,
+  });
 
   return (
     <main className="missing-report-page">

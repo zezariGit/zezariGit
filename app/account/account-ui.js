@@ -1,7 +1,9 @@
+import Link from "next/link";
+
 export function AccountTopbar({ title, backHref = "/?panel=my", action = null }) {
   return (
     <header className="account-topbar">
-      <a className="account-back-link" href={backHref} aria-label="마이페이지로 돌아가기">‹</a>
+      <Link className="account-back-link" href={backHref} aria-label="마이페이지로 돌아가기">‹</Link>
       <h1>{title}</h1>
       <div className="account-topbar-action">{action}</div>
     </header>

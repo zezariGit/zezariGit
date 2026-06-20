@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import StatusToast from "../status-toast";
 import ShopCheckoutClient from "../shop-checkout-client";
 import { authOptions } from "../../lib/auth";
@@ -16,7 +17,10 @@ export default async function ShopPage({ searchParams }) {
   const noticeType = params?.noticeType || "success";
   const selectedProductId = params?.product || "";
   const [{ guardian, subjects, subscription, subscriptionPlans }, products] = await Promise.all([
-    getDashboardData(session),
+    getDashboardData(session, {
+      includeSubjectDetails: false,
+      includeAdDailyRate: false,
+    }),
     getProducts(),
   ]);
   const selectedProduct = products.find((product) => product.id === selectedProductId || product.slug === selectedProductId) || null;
@@ -26,18 +30,18 @@ export default async function ShopPage({ searchParams }) {
       {!selectedProduct ? (
         <section className="shop-shell">
           <header className="shop-topbar">
-            <a className="shop-back-link" href="/" aria-label="대시보드로 돌아가기">‹</a>
+            <Link className="shop-back-link" href="/" aria-label="대시보드로 돌아가기">‹</Link>
             <h1>상품 선택</h1>
             <span className="shop-help-mark" aria-hidden="true">?</span>
           </header>
 
           <div className="product-choice-grid">
             {products.map((product) => (
-              <a className="product-choice-card" href={`/shop?product=${encodeURIComponent(product.id)}`} key={product.id}>
+              <Link className="product-choice-card" href={`/shop?product=${encodeURIComponent(product.id)}`} key={product.id}>
                 <ProductVisual product={product} />
                 <strong>{product.name}</strong>
                 <span>{formatCurrency(product.unit_price)}</span>
-              </a>
+              </Link>
             ))}
             {products.length === 0 && (
               <p className="empty-text">현재 선택 가능한 상품이 없습니다. 관리자 상품 관리에서 상품을 활성화해 주세요.</p>

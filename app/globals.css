@@ -632,6 +632,49 @@ a {
   color: var(--c-danger, #a73931);
 }
 
+.route-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  grid-template-rows: 4px 1fr;
+  pointer-events: none;
+  background: rgba(246, 248, 247, 0.38);
+}
+
+.route-loading-bar {
+  width: 38%;
+  height: 4px;
+  background: var(--c-primary);
+  animation: route-loading-progress 1s ease-in-out infinite;
+}
+
+.route-loading > span {
+  align-self: start;
+  justify-self: center;
+  margin-top: 18px;
+  padding: 8px 12px;
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-primary-dark);
+  font-size: 0.84rem;
+  font-weight: 800;
+  box-shadow: var(--shadow-card);
+}
+
+@keyframes route-loading-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    width: 64%;
+  }
+  100% {
+    transform: translateX(270%);
+  }
+}
+
 .action:hover {
   background: var(--accent-strong);
 }

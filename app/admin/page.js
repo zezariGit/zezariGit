@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth";
+import Link from "next/link";
 import QRCode from "qrcode";
 import FormSubmitButton from "../form-submit-button";
 import { LogoutButton, SocialLoginButtons } from "../auth-actions";
@@ -113,32 +114,32 @@ export default async function AdminPage({ searchParams }) {
             <p>{description}</p>
           </div>
           <div className="admin-header-actions">
-            <a className="admin-link" href="/">
+            <Link className="admin-link" href="/">
               사용자 화면
-            </a>
+            </Link>
             <LogoutButton />
           </div>
         </header>
 
         <nav className="admin-menu" aria-label="관리자 메뉴">
-          <a className={activeSection === "guardians" ? "active" : ""} href="/admin">
+          <Link className={activeSection === "guardians" ? "active" : ""} href="/admin">
             보호자 관리
-          </a>
-          <a className={activeSection === "qr" ? "active" : ""} href="/admin?section=qr">
+          </Link>
+          <Link className={activeSection === "qr" ? "active" : ""} href="/admin?section=qr">
             QR 관리
-          </a>
-          <a className={activeSection === "admins" ? "active" : ""} href="/admin?section=admins">
+          </Link>
+          <Link className={activeSection === "admins" ? "active" : ""} href="/admin?section=admins">
             관리자 관리
-          </a>
-          <a className={activeSection === "payments" ? "active" : ""} href="/admin?section=payments">
+          </Link>
+          <Link className={activeSection === "payments" ? "active" : ""} href="/admin?section=payments">
             결제 관리
-          </a>
-          <a className={activeSection === "products" ? "active" : ""} href="/admin?section=products">
+          </Link>
+          <Link className={activeSection === "products" ? "active" : ""} href="/admin?section=products">
             상품 관리
-          </a>
-          <a className={activeSection === "ads" ? "active" : ""} href="/admin?section=ads">
+          </Link>
+          <Link className={activeSection === "ads" ? "active" : ""} href="/admin?section=ads">
             광고 관리
-          </a>
+          </Link>
         </nav>
 
         {activeSection === "qr" ? (
@@ -414,7 +415,7 @@ function GuardianManagementSection({ adminData }) {
         </div>
         <div className="guardian-grid">
           {guardians.map((guardian) => (
-            <a
+            <Link
               className={guardian.id === selectedGuardian?.id ? "guardian-row active" : "guardian-row"}
               href={`/admin?guardian=${guardian.id}`}
               key={guardian.id}
@@ -429,7 +430,7 @@ function GuardianManagementSection({ adminData }) {
                   {guardian.is_active ? "활성" : "비활성"}
                 </em>
               </div>
-            </a>
+            </Link>
           ))}
           {guardians.length === 0 && <p className="empty-text">등록된 보호자가 없습니다.</p>}
         </div>
@@ -462,8 +463,8 @@ function GuardianManagementSection({ adminData }) {
                 subject ? (
                   <article className="admin-subject-card" key={subject.id}>
                     <div className="admin-subject-photo">
-                      {subject.photo_data_url ? (
-                        <img src={subject.photo_data_url} alt={`${subject.name} 사진`} />
+                      {subject.photo_url || subject.photo_data_url ? (
+                        <img src={subject.photo_url || subject.photo_data_url} alt={`${subject.name} 사진`} />
                       ) : (
                         <span aria-hidden="true" />
                       )}
@@ -551,9 +552,9 @@ function QrManagementSection({ qrData, qrItems }) {
           <FormSubmitButton pendingText="조회중">
             필터 적용
           </FormSubmitButton>
-          <a className="admin-link" href="/admin?section=qr">
+          <Link className="admin-link" href="/admin?section=qr">
             초기화
-          </a>
+          </Link>
         </form>
       </section>
 
@@ -586,9 +587,9 @@ function QrManagementSection({ qrData, qrItems }) {
                   </em>
                   <div className="qr-card-actions">
                     {!qr.subject_id && (
-                      <a className="activate-button" href={buildQrAssignUrl(qrData, qr.id)}>
+                      <Link className="activate-button" href={buildQrAssignUrl(qrData, qr.id)}>
                         매칭대상 조회
-                      </a>
+                      </Link>
                     )}
                     {qr.subject_id && (
                       <form action={setQrSubjectAction}>
@@ -688,9 +689,9 @@ function QrManagementSection({ qrData, qrItems }) {
               )}
             </div>
             <div className="modal-footer">
-              <a className="plain-button modal-close-button" href="/admin?section=qr">
+              <Link className="plain-button modal-close-button" href="/admin?section=qr">
                 닫기
-              </a>
+              </Link>
             </div>
           </div>
         </section>

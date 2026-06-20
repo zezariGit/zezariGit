@@ -26,7 +26,13 @@ export default async function HomePage({ searchParams }) {
   const enabledProviders = getConfiguredProviderIds();
 
   if (session) {
-    const dashboardData = await getDashboardData(session);
+    const dashboardData = await getDashboardData(session, {
+      includeSubjects: activeTab !== "guardian" || showMyPage,
+      includeSubjectDetails: activeTab === "subjects" || showMyPage,
+      includeSubscription: showMyPage,
+      includeSubscriptionPlans: false,
+      includeAdDailyRate: activeTab === "dashboard" && Boolean(adSubjectId),
+    });
     return (
       <>
         <GuardianDashboard

@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import StatusToast from "../../status-toast";
 import { authOptions } from "../../../lib/auth";
 import { getGuardianAdDashboardData } from "../../../lib/db";
@@ -26,9 +27,9 @@ export default async function AccountAdsPage({ searchParams }) {
         <AccountTopbar title="광고 대시보드" />
 
         <nav className="ad-dashboard-filters" aria-label="광고 상태 필터">
-          <a className={statusFilter === "all" ? "active" : ""} href="/account/ads?status=all">전체</a>
-          <a className={statusFilter === "running" ? "active" : ""} href="/account/ads?status=running">광고중</a>
-          <a className={statusFilter === "done" ? "active" : ""} href="/account/ads?status=done">광고완료</a>
+          <Link className={statusFilter === "all" ? "active" : ""} href="/account/ads?status=all">전체</Link>
+          <Link className={statusFilter === "running" ? "active" : ""} href="/account/ads?status=running">광고중</Link>
+          <Link className={statusFilter === "done" ? "active" : ""} href="/account/ads?status=done">광고완료</Link>
         </nav>
 
         <div className="ad-dashboard-list">
@@ -70,8 +71,8 @@ export default async function AccountAdsPage({ searchParams }) {
 }
 
 function AdThumb({ ad }) {
-  if (ad.subject_photo_data_url) {
-    return <img className="ad-dashboard-thumb" src={ad.subject_photo_data_url} alt={`${ad.subject_name} 광고 이미지`} />;
+  if (ad.subject_photo_url) {
+    return <img className="ad-dashboard-thumb" src={ad.subject_photo_url} alt={`${ad.subject_name} 광고 이미지`} />;
   }
   return (
     <div className="ad-dashboard-thumb empty" aria-hidden="true">

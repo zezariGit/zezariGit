@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 
 export default function MissingReportSelector({ subjects = [] }) {
   const [selectedId, setSelectedId] = useState("");
@@ -41,7 +42,7 @@ export default function MissingReportSelector({ subjects = [] }) {
   return (
     <section className="missing-report-panel" aria-label="온라인 실종신고 대상자 선택">
       <header className="missing-report-topbar">
-        <a href="/" aria-label="대시보드로 돌아가기">‹</a>
+        <Link href="/" aria-label="대시보드로 돌아가기">‹</Link>
         <h1>온라인 실종신고</h1>
         <span aria-hidden="true" />
       </header>
@@ -85,14 +86,14 @@ export default function MissingReportSelector({ subjects = [] }) {
       {notice && (
         <div className="missing-warning" role="alert">
           <p>{notice}</p>
-          {notice.includes("상품") && <a href="/shop">상품 구매 페이지로 이동</a>}
+          {notice.includes("상품") && <Link href="/shop">상품 구매 페이지로 이동</Link>}
         </div>
       )}
 
       {nextHref ? (
-        <a className="missing-next-button" href={nextHref}>
+        <Link className="missing-next-button" href={nextHref}>
           다음
-        </a>
+        </Link>
       ) : (
         <button className="missing-next-button disabled" type="button" disabled>
           다음
@@ -103,8 +104,9 @@ export default function MissingReportSelector({ subjects = [] }) {
 }
 
 function SubjectPhoto({ subject }) {
-  if (subject.photo_data_url) {
-    return <img className="missing-subject-photo" src={subject.photo_data_url} alt={`${subject.name} 사진`} />;
+  const photoSrc = subject.photo_url || subject.photo_data_url;
+  if (photoSrc) {
+    return <img className="missing-subject-photo" src={photoSrc} alt={`${subject.name} 사진`} />;
   }
   return (
     <span className="missing-subject-photo empty" aria-hidden="true">
