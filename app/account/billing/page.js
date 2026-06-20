@@ -61,6 +61,10 @@ export default async function BillingPage({ searchParams }) {
                 <div>
                   <strong>{formatCurrency(order.amount)}</strong>
                   <span>{paymentStatusLabel(order.status)}</span>
+                  <span>배송: {shippingStatusLabel(order.fulfillment_status, order.status)}</span>
+                  {order.tracking_number && (
+                    <span>{order.carrier || "택배사 미입력"} · {order.tracking_number}</span>
+                  )}
                 </div>
               </article>
             ))}
@@ -93,4 +97,13 @@ function paymentStatusLabel(status) {
   if (status === "payment_pending") return "결제대기";
   if (status === "failed") return "결제실패";
   return status || "-";
+}
+
+function shippingStatusLabel(fulfillmentStatus, paymentStatus) {
+  if (fulfillmentStatus === "preparing") return "배송 준비";
+  if (fulfillmentStatus === "shipped") return "배송 중";
+  if (fulfillmentStatus === "delivered") return "배송 완료";
+  if (fulfillmentStatus === "cancelled") return "배송 취소";
+  if (["paid", "paid_waiting_activation", "activated"].includes(paymentStatus)) return "배송 준비";
+  return "결제 확인 전";
 }

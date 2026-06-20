@@ -12,6 +12,7 @@ import {
   setGuardianActive,
   setGuardianAdmin,
   setProductCatalogItem,
+  setProductOrderFulfillment,
   setQrActive,
   setQrSubject,
   setSubscriptionPlanPrice,
@@ -109,6 +110,20 @@ export async function setProductCatalogItemAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=products"), error.message || "상품 저장에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin?section=products"), "상품 정보가 저장되었습니다."));
+}
+
+export async function setProductOrderFulfillmentAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  try {
+    await setProductOrderFulfillment(formData);
+    revalidatePath("/admin");
+    revalidatePath("/account/billing");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=orders"), error.message || "배송 정보 저장에 실패했습니다.", "error"));
+  }
+  redirect(withNotice(getReturnTo(formData, "/admin?section=orders"), "배송 정보가 저장되었습니다."));
 }
 
 export async function setAdDailyRateAction(formData) {

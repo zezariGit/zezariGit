@@ -2801,6 +2801,7 @@ textarea:focus {
 .admin-menu {
   display: flex;
   gap: var(--space-xs);
+  overflow-x: auto;
   padding: var(--space-xs);
   border: 0.5px solid var(--c-primary-border);
   border-radius: var(--radius-lg);
@@ -2808,7 +2809,7 @@ textarea:focus {
 }
 
 .admin-menu a {
-  flex: 1;
+  flex: 1 0 112px;
   min-height: 42px;
   display: inline-flex;
   align-items: center;
@@ -4712,6 +4713,227 @@ button:disabled:hover {
   font-size: 0.86rem;
 }
 
+.order-summary-panel,
+.order-filter-panel {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.admin-order-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-top: 0.5px solid var(--c-border);
+  border-bottom: 0.5px solid var(--c-border);
+}
+
+.admin-order-summary span {
+  display: grid;
+  gap: 3px;
+  padding: var(--space-sm);
+  border-left: 0.5px solid var(--c-border);
+  color: var(--c-text-muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.admin-order-summary span:first-child {
+  border-left: 0;
+}
+
+.admin-order-summary strong {
+  color: var(--c-text);
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.admin-order-filter {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.4fr) repeat(2, minmax(150px, 0.7fr)) auto;
+  gap: var(--space-sm);
+  align-items: end;
+}
+
+.admin-order-filter label,
+.admin-shipping-form label {
+  display: grid;
+  gap: 5px;
+  color: var(--c-text);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.admin-order-filter-actions {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: var(--space-xs);
+}
+
+.admin-order-filter-actions button,
+.admin-order-filter-actions a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-md);
+  white-space: nowrap;
+}
+
+.admin-order-list {
+  display: grid;
+}
+
+.admin-order-card {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg) 0;
+  border-top: 0.5px solid var(--c-border);
+}
+
+.admin-order-card:first-child {
+  border-top: 0;
+}
+
+.admin-order-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.admin-order-card-header > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.admin-order-card-header span,
+.admin-order-card-header time {
+  color: var(--c-text-muted);
+  font-size: 0.78rem;
+}
+
+.admin-order-card-header strong {
+  color: var(--c-text);
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.admin-order-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+}
+
+.order-state {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 9px;
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-style: normal;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.order-state.payment-paid,
+.order-state.fulfillment-delivered {
+  border-color: var(--c-success-border);
+  background: var(--c-success-bg);
+  color: var(--c-success);
+}
+
+.order-state.payment-pending,
+.order-state.fulfillment-pending,
+.order-state.fulfillment-preparing {
+  border-color: var(--c-warn-border);
+  background: var(--c-warn-bg);
+  color: var(--c-warn);
+}
+
+.order-state.fulfillment-shipped {
+  border-color: var(--c-primary-border);
+  background: var(--c-primary-light);
+  color: var(--c-primary-dark);
+}
+
+.order-state.payment-failed,
+.order-state.fulfillment-cancelled {
+  border-color: var(--c-danger-border);
+  background: var(--c-danger-bg);
+  color: var(--c-danger);
+}
+
+.admin-order-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-lg);
+}
+
+.admin-order-details section {
+  min-width: 0;
+}
+
+.admin-order-details h3 {
+  margin: 0 0 var(--space-xs);
+  color: var(--c-text);
+  font-size: 0.9rem;
+}
+
+.admin-order-details dl {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: 6px var(--space-sm);
+  margin: 0;
+}
+
+.admin-order-details dt,
+.admin-order-details dd {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.admin-order-details dt {
+  color: var(--c-text-muted);
+}
+
+.admin-order-details dd {
+  color: var(--c-text);
+  overflow-wrap: anywhere;
+}
+
+.admin-shipping-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(150px, 0.7fr)) minmax(220px, 1fr) auto auto;
+  gap: var(--space-sm);
+  align-items: end;
+  padding: var(--space-md);
+  background: var(--c-bg);
+}
+
+.admin-shipping-meta {
+  display: grid;
+  gap: 3px;
+  align-self: center;
+  color: var(--c-text-muted);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.admin-shipping-form button {
+  min-height: 42px;
+  white-space: nowrap;
+}
+
+.order-payment-warning {
+  margin: calc(var(--space-md) * -0.5) 0 0;
+  color: var(--c-warn);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
 .account-page {
   min-height: 100vh;
   display: grid;
@@ -5412,6 +5634,40 @@ button:disabled:hover {
 
   .account-history-card > div:last-child {
     text-align: left;
+  }
+
+  .admin-order-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-order-summary span {
+    border-bottom: 0.5px solid var(--c-border);
+  }
+
+  .admin-order-filter,
+  .admin-order-details,
+  .admin-shipping-form {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-order-filter-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-order-card-header {
+    display: grid;
+  }
+
+  .admin-order-badges {
+    justify-content: flex-start;
+  }
+
+  .admin-order-memo-field {
+    grid-column: auto;
+  }
+
+  .admin-shipping-meta {
+    white-space: normal;
   }
 
   .ad-card-heading {
