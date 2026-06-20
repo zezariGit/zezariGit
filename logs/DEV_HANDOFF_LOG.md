@@ -2112,6 +2112,53 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
 
+## 2026-06-20 KST - Admin Order and Shipping Management
+
+### User Request
+- Add standard shopping-mall administration capabilities such as order lookup, delivery processing, and tracking-number entry.
+
+### Reflected Work
+- Added an `주문/배송` admin section.
+- Added order summary counts, integrated keyword search, payment filters, and fulfillment filters.
+- Added order, product, guardian, subject, recipient, full shipping address, payment, and timestamp views.
+- Separated payment state from fulfillment state.
+- Added fulfillment states: pending, preparing, shipped, delivered, and cancelled.
+- Added carrier, tracking number, internal admin memo, shipped time, and delivered time controls.
+- Blocks shipping processing before payment completion.
+- Requires carrier and tracking number for shipped or delivered states.
+- Automatically changes paid orders to fulfillment `preparing`.
+- Creates guardian bell notifications when an order is shipped or delivered.
+- Added shipping status and tracking information to the guardian billing history.
+- Added recipient name and phone snapshots to newly created orders.
+
+### Database
+- Schema version increased to `3`.
+- Added `fulfillment_status`, `recipient_name`, `recipient_phone`, `carrier`, `tracking_number`, `admin_memo`, `shipped_at`, and `delivered_at` to `product_orders`.
+
+### Files Changed
+- `app/admin/page.js`
+- `app/admin/actions.js`
+- `app/account/billing/page.js`
+- `app/globals.css`
+- `lib/db.js`
+- `deliverables/ADMIN_ORDER_SHIPPING.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+
+### Verification
+- Local and Vercel production builds succeeded.
+- Authenticated local admin order page returned HTTP 200 and rendered shipping controls.
+- Temporary paid order server-action test returned HTTP 303 and saved fulfillment status, carrier, tracking number, and memo.
+- Temporary order was deleted; remaining test rows were `0`.
+- Guardian billing history rendered shipping status.
+- Production public and authenticated admin pages returned HTTP 200.
+- Production DB schema version is `3` and all shipping columns exist.
+- In-app browser was unavailable, so visual screenshot inspection could not be performed.
+
+### Deployment
+- GitHub commit: `16302dd Add admin order and shipping management`
+- Vercel production deployment: `https://zezari-ozrcklodp-zezari.vercel.app`
+- Production alias: `https://zezari.vercel.app`
+
 ## 2026-06-20 KST - Kakao Address Search Fix and Detail Address Support
 
 ### User Request

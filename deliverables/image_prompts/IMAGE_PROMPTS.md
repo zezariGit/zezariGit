@@ -122,3 +122,14 @@ Create a clean Korean public-service style product and system workflow diagram f
 
 ### Notes
 - Use when explaining that the current implementation prepares internal ad status and pricing before Meta API credentials are connected.
+
+## 2026-06-20 - Admin Order And Shipping Operations
+
+### Purpose
+- Presentation diagram for the e-commerce order and delivery workflow added to REAL_QR_FIND.
+
+### Prompt
+Create a clean Korean public-service style admin operations diagram for "REAL_QR_FIND". Show a customer completing a Toss payment, an order moving through the states "결제 확인 전", "배송 준비", "배송 중", and "배송 완료", and an administrator using a dense order management screen to search orders, filter payment and delivery states, review product and recipient information, select a Korean carrier, enter a tracking number, and save an internal memo. Show automatic shipped and delivered timestamps and a bell notification sent to the guardian when delivery begins or completes. Include the Turso `product_orders` table with fulfillment status, carrier, tracking number, recipient snapshot, admin memo, shipped time, and delivered time. Use restrained civic blue, green success, amber pending, and red cancelled states, white work surfaces, compact operational layout, and no real personal data.
+
+### Notes
+- Use for presenting the separation between payment status and fulfillment status.
