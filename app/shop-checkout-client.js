@@ -59,6 +59,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
       return;
     }
     setMode(nextMode);
+    if (nextMode === "subscription") setPaymentMethod("CARD");
     setMessage("");
   };
 
@@ -157,7 +158,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
 
     const tossPayments = window.TossPayments(data.clientKey);
     const payment = tossPayments.payment({ customerKey: `guardian_${guardian?.id || "guest"}` });
-    await payment.requestPayment({
+    const request = {
       method: paymentMethod,
       amount: {
         currency: "KRW",
@@ -169,7 +170,21 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
       failUrl: data.failUrl,
       customerEmail: guardian?.email || guardian?.google_email || "",
       customerName: guardian?.name || "",
-    });
+    };
+    if (paymentMethod === "TRANSFER") {
+      request.transfer = {
+        cashReceipt: { type: "소득공제" },
+        useEscrow: false,
+      };
+    }
+    if (paymentMethod === "VIRTUAL_ACCOUNT") {
+      request.virtualAccount = {
+        cashReceipt: { type: "소득공제" },
+        validHours: 24,
+        useEscrow: false,
+      };
+    }
+    await payment.requestPayment(request);
   };
 
   const pay = async () => {
@@ -258,6 +273,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
             setShippingAddressDetail={setShippingAddressDetail}
             paymentMethod={paymentMethod}
             setPaymentMethod={setPaymentMethod}
+            mode={mode}
             amount={paymentAmount}
           />
           <button className="shop-next-button" type="button" onClick={pay} disabled={loading}>
@@ -412,6 +428,7 @@ function OrderInformation({
   setShippingAddressDetail,
   paymentMethod,
   setPaymentMethod,
+  mode,
   amount,
 }) {
   return (
@@ -464,6 +481,18 @@ function OrderInformation({
             <input type="radio" name="paymentMethod" value="CARD" checked={paymentMethod === "CARD"} onChange={(event) => setPaymentMethod(event.target.value)} />
             <span>신용/체크카드</span>
           </label>
+          {mode === "standalone" && (
+            <label>
+              <input type="radio" name="paymentMethod" value="TRANSFER" checked={paymentMethod === "TRANSFER"} onChange={(event) => setPaymentMethod(event.target.value)} />
+              <span>실시간 계좌이체</span>
+            </label>
+          )}
+          {mode === "standalone" && (
+            <label>
+              <input type="radio" name="paymentMethod" value="VIRTUAL_ACCOUNT" checked={paymentMethod === "VIRTUAL_ACCOUNT"} onChange={(event) => setPaymentMethod(event.target.value)} />
+              <span>가상계좌</span>
+            </label>
+          )}
         </div>
       </section>
     </div>

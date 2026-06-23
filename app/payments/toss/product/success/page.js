@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../../lib/auth";
-import { getProductOrderById, markProductOrderPaid } from "../../../../../lib/db";
+import { getProductOrderForGuardian, markProductOrderPaid } from "../../../../../lib/db";
 import { confirmPayment } from "../../../../../lib/toss-payments";
 
 export const dynamic = "force-dynamic";
@@ -21,13 +21,22 @@ export default async function TossProductSuccessPage({ searchParams }) {
     return <ShopComplete title="결제 인증값이 없습니다" message="Toss Payments 인증 결과를 확인할 수 없습니다." />;
   }
 
-  const order = await getProductOrderById(productOrderId);
+  const order = await getProductOrderForGuardian(session, productOrderId);
   if (!order) {
     return <ShopComplete title="주문 정보를 찾을 수 없습니다" message="다시 상품 선택 화면에서 결제를 시작해 주세요." />;
   }
+  if (["paid", "paid_waiting_activation", "activated"].includes(order.status)) {
+    return <ShopComplete title="주문이 완료되었습니다!" message="이미 결제가 완료된 주문입니다." order={order} />;
+  }
+  if (order.order_type !== "standalone" || order.toss_order_id !== orderId || Number(order.amount) !== amount) {
+    return <ShopComplete title="결제 정보가 일치하지 않습니다" message="주문번호와 결제금액을 다시 확인해 주세요." />;
+  }
 
   try {
-    await confirmPayment({ paymentKey, orderId, amount });
+    const payment = await confirmPayment({ paymentKey, orderId, amount });
+    if (payment.orderId !== orderId || Number(payment.totalAmount || 0) !== Number(order.amount) || payment.status !== "DONE") {
+      throw new Error("토스페이먼츠 승인 결과가 주문 정보와 일치하지 않습니다.");
+    }
     await markProductOrderPaid({
       orderId: productOrderId,
       paymentKey,

@@ -1,0 +1,7 @@
+reference/
+.codex-remote-attachments/
+env.txt
+.env
+.env.*
+lib/*.pdf
+lib/*.png

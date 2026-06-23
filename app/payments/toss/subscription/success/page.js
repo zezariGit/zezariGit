@@ -1,8 +1,8 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../../lib/auth";
 import {
-  getProductOrderById,
-  getSubscriptionByCustomerKey,
+  getProductOrderForGuardian,
+  getSubscriptionForGuardianByCustomerKey,
   markSubscriptionActive,
   markSubscriptionFailed,
   markSubscriptionReady,
@@ -26,9 +26,29 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
     return <PaymentResult title="결제 인증값이 없습니다" message="Toss Payments 인증 결과를 확인할 수 없습니다." />;
   }
 
-  const subscription = await getSubscriptionByCustomerKey(customerKey);
+  const subscription = await getSubscriptionForGuardianByCustomerKey(session, customerKey);
   if (!subscription) {
     return <PaymentResult title="구독 정보를 찾을 수 없습니다" message="다시 대시보드에서 구독 결제를 시작해 주세요." />;
+  }
+
+  const productOrder = productOrderId ? await getProductOrderForGuardian(session, productOrderId) : null;
+  if (productOrderId && !productOrder) {
+    return <PaymentResult title="주문 정보를 찾을 수 없습니다" message="현재 로그인한 보호자의 주문인지 확인해 주세요." />;
+  }
+  if (productOrder && ["paid", "paid_waiting_activation", "activated"].includes(productOrder.status)) {
+    return (
+      <ShopComplete
+        title="주문이 완료되었습니다!"
+        message="이미 결제가 완료된 주문입니다. 상품 수령 후 QR 코드를 활성화해 주세요."
+        order={productOrder}
+      />
+    );
+  }
+  if (productOrder && (productOrder.order_type !== "subscription" || Number(productOrder.amount) !== Number(subscription.amount))) {
+    return <PaymentResult title="결제 정보가 일치하지 않습니다" message="선택한 구독 상품과 결제금액을 다시 확인해 주세요." />;
+  }
+  if (!productOrder && subscription.status === "active") {
+    return <PaymentResult title="구독 결제가 완료되었습니다" message="이미 활성화된 구독입니다." actionLabel="대시보드로 이동" actionHref="/?tab=dashboard" />;
   }
 
   try {
@@ -41,6 +61,9 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
       orderId,
       orderName: subscription.plan_name || process.env.TOSS_SUBSCRIPTION_ORDER_NAME || "zezari 월 구독",
     });
+    if (payment.orderId !== orderId || Number(payment.totalAmount || 0) !== Number(subscription.amount) || payment.status !== "DONE") {
+      throw new Error("토스페이먼츠 승인 결과가 구독 정보와 일치하지 않습니다.");
+    }
 
     if (productOrderId) {
       await markSubscriptionReady({
@@ -49,7 +72,7 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
         payment,
         productOrderId,
       });
-      const order = await getProductOrderById(productOrderId);
+      const order = await getProductOrderForGuardian(session, productOrderId);
 
       return (
         <ShopComplete

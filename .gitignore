@@ -4,6 +4,9 @@
 !.env.example
 env.txt
 
+# Legacy site reference dump (contains production credentials and personal data)
+reference/
+
 # Vercel local project metadata
 .vercel/
 
