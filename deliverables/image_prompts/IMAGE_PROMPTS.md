@@ -133,3 +133,14 @@ Create a clean Korean public-service style admin operations diagram for "REAL_QR
 
 ### Notes
 - Use for presenting the separation between payment status and fulfillment status.
+
+## 2026-06-23 - Legacy OAuth And Toss Migration
+
+### Purpose
+- Presentation diagram for migrating the legacy zezari WordPress authentication and payment configuration into REAL_QR_FIND.
+
+### Prompt
+Create a clean Korean civic-tech system migration diagram for "REAL_QR_FIND". On the left, show a legacy WordPress site using mshop-members OAuth for Kakao and Naver and a WooCommerce Toss Payments gateway. In the center, show a secure migration layer that extracts only configuration names and encrypted environment values while explicitly excluding the WordPress SQL dump, production secrets, and personal data from Git. On the right, show the Next.js app at zezari.vercel.app using NextAuth callbacks for Kakao and Naver, social signup profile completion, and Toss Payments SDK v2 flows for card billing subscriptions plus card, bank transfer, and virtual account product purchases. Include server-side checks for guardian ownership, order ID, amount, payment status, and idempotency. Use restrained blue, green, amber, and red status colors, white work surfaces, compact architecture labels, and no real credentials or personal data.
+
+### Notes
+- Use when explaining what was migrated from configuration and what was intentionally not copied.

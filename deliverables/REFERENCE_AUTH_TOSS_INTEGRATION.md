@@ -32,6 +32,11 @@
 - Kakao scope: `profile_nickname`
 - 각 콜백 경로 생성 확인
 
+### 운영 반영
+- Vercel Production/Development 환경에 Kakao와 Naver 설정 등록 완료
+- `https://zezari.vercel.app/api/auth/providers`에서 Google, Kakao, Naver 확인
+- 운영 Kakao/Naver 로그인 시작 시 각 공식 인증 호스트 이동 확인
+
 ## Toss Payments
 ### 구버전 확인
 - 운영 모드
@@ -46,6 +51,9 @@
 - 상품 주문번호, 요청금액, 승인금액, 승인상태 검증
 - 구독 customerKey와 로그인 보호자 소유권 검증
 - 결제 완료 콜백 재진입 시 중복 승인 방지
+- 다른 보호자의 상품주문 및 구독 콜백 접근 차단 확인
+- 계좌이체·가상계좌 주문 준비 성공, 미지원 결제수단 차단 확인
+- 검증용 임시 주문은 모두 삭제 완료
 
 ### 키 운영 방침
 - 로컬 및 현재 운영 환경은 기존 Toss 테스트 키를 유지한다.

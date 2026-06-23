@@ -2112,6 +2112,57 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
 
+## 2026-06-23 KST - Legacy Kakao/Naver and Toss Integration
+
+### User Request
+- Use the legacy zezari site under `reference/` to integrate Kakao login, Naver login, and Toss Payments into the current Vercel app.
+- Apply locally and test before production deployment.
+
+### Reference Findings
+- `reference/wp.tar.gz` contains WordPress core, but `wp-content` is an external symlink and plugin PHP sources are absent.
+- `reference/wp.sql` contains active plugin and configuration records.
+- Social login came from `mshop-members-s2`; Kakao used client ID only with `profile_nickname`, while Naver used client ID and secret.
+- Toss came from the WooCommerce PGALL gateway in production mode with card, bank transfer, and virtual account enabled.
+- The dump contains production credentials and personal data, so `reference/` was added to `.gitignore`.
+- Added `.vercelignore` after verifying that Vercel CLI does not reliably inherit the local Git exclusion for an untracked reference dump.
+
+### Reflected Work
+- Added provider-specific environment requirements; Kakao no longer incorrectly requires a client secret.
+- Added Kakao public-client token authentication and the legacy `profile_nickname` scope.
+- Copied Kakao/Naver credentials from the dump to local `.env.local` without printing values.
+- Added standalone Toss card, bank transfer, and virtual account selections; subscriptions remain card billing only.
+- Added server-side payment method allowlists.
+- Added guardian ownership checks for product orders and subscriptions.
+- Added expected order ID, amount, Toss approved amount, and `DONE` status validation.
+- Added idempotent success-page handling and restricted order paid updates to pending states.
+
+### Verification
+- `npm run build` succeeded after integration.
+- Local providers endpoint returned credentials, Google, Kakao, and Naver.
+- Kakao sign-in generated `kauth.kakao.com`, scope `profile_nickname`, callback `/api/auth/callback/kakao`.
+- Naver sign-in generated `nid.naver.com`, callback `/api/auth/callback/naver`.
+- In-app browser startup failed in the managed Windows sandbox, so DOM screenshot testing was unavailable.
+- Approved temporary Turso tests confirmed `TRANSFER` and `VIRTUAL_ACCOUNT` order preparation, rejected an unsupported method with HTTP 400, and removed both temporary orders (`remainingTests=0`).
+- Cross-guardian product-order and subscription callback attempts were blocked before any Toss approval request.
+- Added Kakao and Naver configuration to Vercel Production and Development without exposing values.
+- Production providers endpoint exposes credentials, Google, Kakao, and Naver; Kakao and Naver redirect to their official authorization hosts.
+- Clean production deployment `https://zezari-2rut2jo77-zezari.vercel.app` was built from 94 application files with the reference dump excluded.
+
+### Deployment
+- GitHub commit: `6fb9a79 Harden social auth and Toss payment flows`
+- Production alias: `https://zezari.vercel.app`
+
+### Files Changed
+- `.gitignore`
+- `.env.example`
+- `lib/auth.js`
+- `lib/db.js`
+- `app/shop-checkout-client.js`
+- `app/payments/toss/product/success/page.js`
+- `app/payments/toss/subscription/success/page.js`
+- `deliverables/REFERENCE_AUTH_TOSS_INTEGRATION.md`
+- `.vercelignore`
+
 ## 2026-06-20 KST - Keep Admin Order Tab Visible
 
 ### User Report

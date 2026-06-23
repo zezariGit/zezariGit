@@ -2350,3 +2350,46 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - 원인 확인, 메뉴 재배치, 반응형 메뉴 수정, 재배포 및 검증: 약 15분.
+
+## 2026-06-23 - 구버전 SNS 로그인·토스 연동 이관
+
+### 요구내용
+- `reference`의 구버전 zezari 구현을 참고해 카카오·네이버 로그인과 토스 결제를 현재 사이트에 반영한다.
+- 로컬 반영과 테스트를 먼저 진행한다.
+
+### 반영내용
+- 구버전 WordPress SQL에서 OAuth와 결제 설정 구조를 분석했다.
+- 카카오 Client Secret을 필수로 요구하던 현재 코드 오류를 수정했다.
+- 카카오 `profile_nickname` 범위와 네이버 ID/Secret 구성을 로컬에 반영했다.
+- 상품 단독 구매에 카드, 실시간 계좌이체, 가상계좌를 제공한다.
+- 구독은 카드 빌링키 결제만 허용한다.
+- 결제 성공 시 보호자 소유권, 주문번호, 결제금액, 승인금액, 승인상태를 검증한다.
+- 중복 콜백에서 결제를 다시 승인하지 않도록 보강했다.
+- 운영키와 개인정보가 있는 `reference/`를 Git 제외 처리했다.
+- Vercel 업로드에서도 제외되도록 `.vercelignore`를 추가하고 94개 앱 파일만 포함한 깨끗한 후보 배포를 생성했다.
+
+### 검증
+- 로컬 빌드 성공.
+- 카카오·네이버 제공자 노출 및 각 공식 인증 호스트 이동 확인.
+- 카카오 scope와 새 NextAuth 콜백 경로 확인.
+- 계좌이체·가상계좌 주문 준비 성공 및 미지원 결제수단 HTTP 400 차단 확인.
+- 다른 보호자의 상품주문·구독 콜백 접근 차단 확인.
+- 임시 주문 2건 삭제 후 잔여 0건 확인.
+- 운영 Vercel에서 Google·Kakao·Naver 제공자와 공식 인증 호스트 이동 확인.
+
+### 산출물
+- `deliverables/REFERENCE_AUTH_TOSS_INTEGRATION.md`
+- 구버전 이관 발표용 이미지 생성 프롬프트
+
+### 운영 전 주의
+- Kakao/Naver 콘솔에 `zezari.vercel.app` 콜백 URL 등록이 필요하다.
+- 구버전 Toss 실결제 키는 명시적 승인 전까지 적용하지 않고 기존 테스트 키를 유지한다.
+
+### 운영 반영
+- Vercel Production/Development에 Kakao·Naver 환경변수 등록 완료.
+- GitHub commit: `6fb9a79`
+- Vercel deployment: `https://zezari-2rut2jo77-zezari.vercel.app`
+- 운영 주소: `https://zezari.vercel.app`
+
+### 반영 시간
+- 구버전 분석, 보안 보강, 로컬·외부 DB 검증, 환경변수 등록, 배포 및 운영 검증: 약 90분.
