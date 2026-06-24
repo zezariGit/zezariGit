@@ -16,6 +16,7 @@ import {
   getAdminOrdersData,
   getAdminProductsData,
   getAdminSubscriptionPlansData,
+  getAdminSubjectsData,
   getAdminUsersData,
   getQrAdminData,
   isDbAdminSession,
@@ -23,6 +24,7 @@ import {
 import {
   generateQrCodesAction,
   setGuardianActiveAction,
+  setGuardianAdminMemoAction,
   setGuardianAdminAction,
   setAdDailyRateAction,
   setProductCatalogItemAction,
@@ -66,10 +68,21 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["dashboard", "guardians", "qr", "admins", "payments", "products", "orders", "ads", "inquiries"].includes(resolvedSearchParams?.section)
+  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "products", "orders", "ads", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
+  const selectedSubjectId = resolvedSearchParams?.subject || "";
+  const guardianFilters = {
+    query: resolvedSearchParams?.guardianAdminQuery || "",
+    status: resolvedSearchParams?.guardianStatus || "all",
+  };
+  const subjectAdminFilters = {
+    query: resolvedSearchParams?.subjectAdminQuery || "",
+    status: resolvedSearchParams?.subjectStatus || "all",
+    qr: resolvedSearchParams?.subjectQr || "all",
+    guardianId: resolvedSearchParams?.guardianId || "",
+  };
   const qrFilters = {
     match: resolvedSearchParams?.match || "all",
     active: resolvedSearchParams?.active || "all",
@@ -83,7 +96,10 @@ export default async function AdminPage({ searchParams }) {
     fulfillment: resolvedSearchParams?.fulfillment || "all",
   };
   const dashboardData = activeSection === "dashboard" ? await getAdminDashboardData(resolvedSearchParams?.month) : null;
-  const adminData = activeSection === "guardians" ? await getAdminData(selectedGuardianId) : null;
+  const adminData = activeSection === "guardians" ? await getAdminData(selectedGuardianId, guardianFilters) : null;
+  const adminSubjectsData = activeSection === "subjects"
+    ? await getAdminSubjectsData(selectedSubjectId, subjectAdminFilters)
+    : null;
   const qrData = activeSection === "qr" ? await getQrAdminData(qrFilters) : null;
   const adminUsersData = activeSection === "admins" ? await getAdminUsersData() : null;
   const paymentData = activeSection === "payments" ? await getAdminSubscriptionPlansData() : null;
@@ -95,6 +111,8 @@ export default async function AdminPage({ searchParams }) {
   const title =
     activeSection === "dashboard"
       ? "대시보드"
+      : activeSection === "subjects"
+        ? "관리대상자 관리"
       : activeSection === "qr"
       ? "QR 관리"
       : activeSection === "admins"
@@ -113,6 +131,8 @@ export default async function AdminPage({ searchParams }) {
   const description =
     activeSection === "dashboard"
       ? "회원, 관리대상, QR, 실종신고, 광고와 월별 매출 현황을 한눈에 확인합니다."
+      : activeSection === "subjects"
+        ? "전체 관리대상자를 조회하고 보호자 메시지, 음성, QR과 부가정보를 확인합니다."
       : activeSection === "qr"
       ? "사람찾기 URL로 연결되는 QR 코드와 고유 문자열을 생성하고 활성 상태를 관리합니다."
       : activeSection === "admins"
@@ -127,7 +147,7 @@ export default async function AdminPage({ searchParams }) {
               ? "광고 일 단가를 설정하고 사용자별 광고 진행사항을 조회합니다."
               : activeSection === "inquiries"
                 ? "접수된 고객문의의 제목, 작성자, 상태와 작성일시를 조회합니다."
-                : "보호자를 활성화/비활성화하고, 선택한 보호자의 관리대상 4명을 조회합니다.";
+                : "보호자 목록을 조회하고 배송지, 등록대상자, 구독, 결제, 광고와 관리메모를 확인합니다.";
 
   return (
     <main className="admin-page">
@@ -149,6 +169,8 @@ export default async function AdminPage({ searchParams }) {
 
           {activeSection === "dashboard" ? (
             <AdminDashboardSection dashboardData={dashboardData} />
+          ) : activeSection === "subjects" ? (
+            <SubjectManagementSection adminSubjectsData={adminSubjectsData} />
           ) : activeSection === "qr" ? (
             <QrManagementSection qrData={qrData} qrItems={qrItems} />
           ) : activeSection === "admins" ? (
@@ -713,52 +735,79 @@ function AdminRoleManagementSection({ adminUsersData }) {
 }
 
 function GuardianManagementSection({ adminData }) {
-  const { guardians, selectedGuardian, subjects } = adminData;
-  const slots = Array.from({ length: 4 }, (_, index) => subjects[index] || null);
+  const { guardians, selectedGuardian, subjects, subscription, payments, ads, filters } = adminData;
+  const returnTo = buildGuardianAdminUrl(filters, selectedGuardian?.id);
 
   return (
-    <div className="admin-layout">
-      <section className="admin-panel">
+    <div className="admin-master-detail">
+      <section className="admin-panel admin-master-panel">
         <div className="panel-heading">
-          <h2>보호자</h2>
-          <span>{guardians.length}명</span>
+          <h2>보호자 목록</h2>
+          <span>최대 200명 / {guardians.length}명 조회</span>
         </div>
-        <div className="guardian-grid">
+        <form action="/admin" className="admin-master-filter">
+          <input type="hidden" name="section" value="guardians" />
+          <label>
+            통합 검색
+            <input name="guardianAdminQuery" defaultValue={filters.query} placeholder="회원번호, 이름, 연락처, 이메일" />
+          </label>
+          <label>
+            회원 상태
+            <select name="guardianStatus" defaultValue={filters.status}>
+              <option value="all">전체 상태</option>
+              <option value="active">활성</option>
+              <option value="inactive">비활성</option>
+            </select>
+          </label>
+          <button type="submit">검색</button>
+          <Link className="plain-button" href="/admin?section=guardians">초기화</Link>
+        </form>
+        <div className="admin-record-table-wrap">
+          <div className="admin-record-table guardian-record-table" role="table" aria-label="보호자 목록">
+            <div className="admin-record-header" role="row">
+              <span role="columnheader">회원번호</span>
+              <span role="columnheader">이름</span>
+              <span role="columnheader">연락처</span>
+              <span role="columnheader">이메일</span>
+              <span role="columnheader">가입일</span>
+              <span role="columnheader">상태</span>
+            </div>
           {guardians.map((guardian) => (
             <Link
-              className={guardian.id === selectedGuardian?.id ? "guardian-row active" : "guardian-row"}
-              href={`/admin?section=guardians&guardian=${guardian.id}`}
+                className={guardian.id === selectedGuardian?.id ? "admin-record-row active" : "admin-record-row"}
+                href={buildGuardianAdminUrl(filters, guardian.id)}
               key={guardian.id}
+                role="row"
             >
-              <div>
-                <strong>{guardian.name || "이름 미입력"}</strong>
-                <span>{guardian.email || guardian.google_email || "-"}</span>
-              </div>
-              <div className="guardian-meta">
-                <span>{guardian.subject_count || 0}/4명</span>
-                <em className={guardian.is_active ? "active-state" : "inactive-state"}>
+                <span role="cell">{formatMemberNumber(guardian.id)}</span>
+                <strong role="cell">{guardian.name || "이름 미입력"}</strong>
+                <span role="cell">{guardian.phone || "-"}</span>
+                <span role="cell">{guardian.email || guardian.google_email || "-"}</span>
+                <time role="cell">{formatDateOnlyValue(guardian.created_at)}</time>
+                <em role="cell" className={guardian.is_active ? "active-state" : "inactive-state"}>
                   {guardian.is_active ? "활성" : "비활성"}
                 </em>
-              </div>
             </Link>
           ))}
-          {guardians.length === 0 && <p className="empty-text">등록된 보호자가 없습니다.</p>}
+          </div>
         </div>
+        {guardians.length === 0 && <p className="empty-text">조건에 맞는 보호자가 없습니다.</p>}
       </section>
 
-      <section className="admin-panel">
+      <section className="admin-panel admin-detail-panel">
         {selectedGuardian ? (
           <>
-            <div className="selected-guardian">
+            <div className="admin-detail-heading">
               <div>
+                <span className="admin-detail-kicker">{formatMemberNumber(selectedGuardian.id)}</span>
                 <h2>{selectedGuardian.name || "이름 미입력"}</h2>
-                <p>{selectedGuardian.email || selectedGuardian.google_email || "-"}</p>
                 <p>{selectedGuardian.phone || "전화번호 미입력"}</p>
+                <p>{selectedGuardian.email || selectedGuardian.google_email || "이메일 미입력"}</p>
               </div>
               <form action={setGuardianActiveAction}>
                 <input type="hidden" name="guardianId" value={selectedGuardian.id} />
                 <input type="hidden" name="active" value={selectedGuardian.is_active ? "0" : "1"} />
-                <input type="hidden" name="returnTo" value={`/admin?section=guardians&guardian=${selectedGuardian.id}`} />
+                <input type="hidden" name="returnTo" value={returnTo} />
                 <FormSubmitButton
                   className={selectedGuardian.is_active ? "danger-button compact" : "activate-button"}
                   pendingText={selectedGuardian.is_active ? "비활성화중" : "활성화중"}
@@ -768,38 +817,213 @@ function GuardianManagementSection({ adminData }) {
               </form>
             </div>
 
-            <div className="admin-subject-grid">
-              {slots.map((subject, index) =>
-                subject ? (
-                  <article className="admin-subject-card" key={subject.id}>
-                    <div className="admin-subject-photo">
-                      {subject.photo_url || subject.photo_data_url ? (
-                        <img src={subject.photo_url || subject.photo_data_url} alt={`${subject.name} 사진`} />
-                      ) : (
-                        <span aria-hidden="true" />
-                      )}
-                    </div>
-                    <strong>{subject.name}</strong>
-                    <span>{formatDate(subject.birth_date)}</span>
-                    <em className={`status-badge ${statusClass(subject.status)}`}>
-                      {statusLabel(subject.status)}
-                    </em>
-                  </article>
-                ) : (
-                  <article className="admin-subject-card empty-admin-subject" key={`empty-${index}`}>
-                    <div className="admin-subject-photo">
-                      <span aria-hidden="true" />
-                    </div>
-                    <strong>미등록</strong>
-                    <span>{index + 1}번 슬롯</span>
-                    <em className="status-badge neutral">빈 슬롯</em>
-                  </article>
-                )
+            <section className="admin-detail-section">
+              <h3>배송지</h3>
+              <p>{formatFullAddress(selectedGuardian.address, selectedGuardian.address_detail)}</p>
+            </section>
+
+            <section className="admin-detail-section">
+              <h3>등록대상자</h3>
+              <Link className="admin-detail-link" href={`/admin?section=subjects&guardianId=${encodeURIComponent(selectedGuardian.id)}`}>
+                등록 대상자 {subjects.length}명 보기
+              </Link>
+              {subjects.length > 0 && (
+                <p>{subjects.map((subject) => subject.name).join(", ")}</p>
               )}
-            </div>
+            </section>
+
+            <section className="admin-detail-section">
+              <h3>구독현황</h3>
+              <dl className="admin-detail-list">
+                <div><dt>상태</dt><dd>{subscriptionStatusLabel(subscription?.status)}</dd></div>
+                <div><dt>상품</dt><dd>{subscription?.plan_name || "구독 정보 없음"}</dd></div>
+                <div><dt>기간</dt><dd>{subscription ? `${Number(subscription.plan_months || 1)}개월` : "-"}</dd></div>
+                <div><dt>이용기간</dt><dd>{subscription?.current_period_start ? `${formatDateOnlyValue(subscription.current_period_start)} ~ ${formatDateOnlyValue(subscription.current_period_end)}` : "-"}</dd></div>
+              </dl>
+            </section>
+
+            <section className="admin-detail-section">
+              <h3>결제내역</h3>
+              <div className="admin-detail-history">
+                {payments.map((payment) => (
+                  <div key={payment.id}>
+                    <strong>{formatOrderNumber(payment)}</strong>
+                    <span>{payment.product_name || orderTypeLabel(payment.order_type)} / {formatCurrency(payment.amount)}</span>
+                    <time>{formatRecentDateTime(payment.paid_at || payment.created_at)}</time>
+                  </div>
+                ))}
+                {payments.length === 0 && <p>결제내역이 없습니다.</p>}
+              </div>
+            </section>
+
+            <section className="admin-detail-section">
+              <h3>광고 내역</h3>
+              <div className="admin-detail-history">
+                {ads.map((ad) => (
+                  <div key={ad.id}>
+                    <strong>{ad.subject_name || "관리대상 미입력"}</strong>
+                    <span>{ad.region} / {adStatusLabel(ad.status)} / {formatCurrency(ad.amount)}</span>
+                    <time>{formatDate(ad.start_date)} ~ {formatDate(ad.end_date)}</time>
+                  </div>
+                ))}
+                {ads.length === 0 && <p>광고 내역이 없습니다.</p>}
+              </div>
+            </section>
+
+            <section className="admin-detail-section">
+              <h3>관리메모</h3>
+              <form action={setGuardianAdminMemoAction} className="admin-memo-form">
+                <input type="hidden" name="guardianId" value={selectedGuardian.id} />
+                <input type="hidden" name="returnTo" value={returnTo} />
+                <textarea name="adminMemo" maxLength="2000" defaultValue={selectedGuardian.admin_memo || ""} placeholder="상담, 배송, 운영 관련 내부 메모를 입력하세요." />
+                <FormSubmitButton pendingText="저장중">메모 저장</FormSubmitButton>
+              </form>
+            </section>
           </>
         ) : (
           <p className="empty-text">보호자를 선택해 주세요.</p>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function SubjectManagementSection({ adminSubjectsData }) {
+  const { subjects, selectedSubject, filters } = adminSubjectsData;
+
+  return (
+    <div className="admin-master-detail">
+      <section className="admin-panel admin-master-panel">
+        <div className="panel-heading">
+          <h2>관리대상자 목록</h2>
+          <span>최대 300명 / {subjects.length}명 조회</span>
+        </div>
+        <form action="/admin" className="admin-master-filter subject-master-filter">
+          <input type="hidden" name="section" value="subjects" />
+          {filters.guardianId && <input type="hidden" name="guardianId" value={filters.guardianId} />}
+          <label>
+            통합 검색
+            <input name="subjectAdminQuery" defaultValue={filters.query} placeholder="관리대상 이름, 보호자 이름" />
+          </label>
+          <label>
+            현재 상태
+            <select name="subjectStatus" defaultValue={filters.status}>
+              <option value="all">전체 상태</option>
+              <option value="상품구매필요">상품구매필요</option>
+              <option value="QR활성화필요">QR활성화필요</option>
+              <option value="안전">안전</option>
+              <option value="찾는중">찾는중</option>
+            </select>
+          </label>
+          <label>
+            QR 상태
+            <select name="subjectQr" defaultValue={filters.qr}>
+              <option value="all">전체 QR</option>
+              <option value="active">활성</option>
+              <option value="pending">활성화 대기</option>
+              <option value="inactive">비활성</option>
+              <option value="unassigned">미매칭</option>
+            </select>
+          </label>
+          <button type="submit">검색</button>
+          <Link className="plain-button" href="/admin?section=subjects">초기화</Link>
+        </form>
+        {filters.guardianId && (
+          <div className="admin-active-filter">
+            특정 보호자의 관리대상만 조회 중입니다.
+            <Link href="/admin?section=subjects">전체 보기</Link>
+          </div>
+        )}
+        <div className="admin-record-table-wrap">
+          <div className="admin-record-table subject-record-table" role="table" aria-label="관리대상자 목록">
+            <div className="admin-record-header" role="row">
+              <span role="columnheader">관리대상 이름</span>
+              <span role="columnheader">성별</span>
+              <span role="columnheader">생년월일</span>
+              <span role="columnheader">보호자</span>
+              <span role="columnheader">상태</span>
+              <span role="columnheader">QR 상태</span>
+            </div>
+            {subjects.map((subject) => (
+              <Link
+                className={subject.id === selectedSubject?.id ? "admin-record-row active" : "admin-record-row"}
+                href={buildSubjectAdminUrl(filters, subject.id)}
+                key={subject.id}
+                role="row"
+              >
+                <strong role="cell">{subject.name || "이름 미입력"}</strong>
+                <span role="cell">{subject.gender || "-"}</span>
+                <span role="cell">{formatDate(subject.birth_date)}</span>
+                <span role="cell">{subject.guardian_name || "보호자 미입력"}</span>
+                <em role="cell" className={`status-badge ${statusClass(subject.status)}`}>{statusLabel(subject.status)}</em>
+                <em role="cell" className={`qr-admin-state ${qrAdminStateClass(subject)}`}>{qrAdminStateLabel(subject)}</em>
+              </Link>
+            ))}
+          </div>
+        </div>
+        {subjects.length === 0 && <p className="empty-text">조건에 맞는 관리대상자가 없습니다.</p>}
+      </section>
+
+      <section className="admin-panel admin-detail-panel subject-detail-panel">
+        {selectedSubject ? (
+          <>
+            <div className="admin-detail-heading subject-detail-heading">
+              <div className="admin-detail-photo">
+                {selectedSubject.photo_url ? <img src={selectedSubject.photo_url} alt={`${selectedSubject.name} 사진`} /> : <span aria-hidden="true" />}
+              </div>
+              <div>
+                <span className="admin-detail-kicker">관리대상 상세정보</span>
+                <h2>{selectedSubject.name || "이름 미입력"}</h2>
+                <p>{selectedSubject.gender || "성별 미입력"} / {formatDate(selectedSubject.birth_date)}</p>
+                <p>보호자: {selectedSubject.guardian_name || "미입력"}</p>
+              </div>
+            </div>
+
+            <section className="admin-detail-section">
+              <h3>기본정보</h3>
+              <dl className="admin-detail-list">
+                <div><dt>이름</dt><dd>{selectedSubject.name || "-"}</dd></div>
+                <div><dt>성별</dt><dd>{selectedSubject.gender || "-"}</dd></div>
+                <div><dt>생년월일</dt><dd>{formatDate(selectedSubject.birth_date)}</dd></div>
+                <div><dt>현재 상태</dt><dd>{statusLabel(selectedSubject.status)}</dd></div>
+                <div><dt>보호자</dt><dd><Link href={`/admin?section=guardians&guardian=${encodeURIComponent(selectedSubject.guardian_id)}`}>{selectedSubject.guardian_name || "보호자 보기"}</Link></dd></div>
+                <div><dt>보호자 연락처</dt><dd>{selectedSubject.guardian_phone || "-"}</dd></div>
+              </dl>
+            </section>
+
+            <section className="admin-detail-section">
+              <h3>보호자 메시지</h3>
+              <p className="admin-message-content">{selectedSubject.guardian_message || "입력된 보호자 메시지가 없습니다."}</p>
+            </section>
+
+            <section className="admin-detail-section">
+              <h3>보호자 음성</h3>
+              {selectedSubject.voice_data_url ? (
+                <audio className="admin-voice-player" controls preload="none" src={selectedSubject.voice_data_url}>
+                  브라우저에서 음성을 재생할 수 없습니다.
+                </audio>
+              ) : (
+                <p>저장된 보호자 음성이 없습니다.</p>
+              )}
+              {selectedSubject.voice_name && <span className="admin-detail-caption">{selectedSubject.voice_name}</span>}
+            </section>
+
+            <section className="admin-detail-section">
+              <h3>부가정보</h3>
+              <dl className="admin-detail-list">
+                <div><dt>사진 파일</dt><dd>{selectedSubject.photo_name || "없음"}</dd></div>
+                <div><dt>QR 상태</dt><dd>{qrAdminStateLabel(selectedSubject)}</dd></div>
+                <div><dt>QR 코드</dt><dd>{selectedSubject.qr_code || "미매칭"}</dd></div>
+                <div><dt>등록일시</dt><dd>{formatRecentDateTime(selectedSubject.created_at)}</dd></div>
+                <div><dt>수정일시</dt><dd>{formatRecentDateTime(selectedSubject.updated_at)}</dd></div>
+              </dl>
+              {selectedSubject.qr_target_url && (
+                <a className="admin-detail-link" href={selectedSubject.qr_target_url} target="_blank" rel="noreferrer">QR 공개 페이지 열기</a>
+              )}
+            </section>
+          </>
+        ) : (
+          <p className="empty-text">관리대상자를 선택해 주세요.</p>
         )}
       </section>
     </div>
@@ -1111,6 +1335,14 @@ function formatMetricValue(value) {
   return new Intl.NumberFormat("ko-KR").format(Number(value || 0));
 }
 
+function formatMemberNumber(id) {
+  return `U-${String(id || "").replace(/-/g, "").slice(-8).toUpperCase() || "UNKNOWN"}`;
+}
+
+function formatDateOnlyValue(value) {
+  return formatRecentDate(value);
+}
+
 function formatDashboardMonth(month) {
   const [year, monthNumber] = String(month || "").split("-");
   return year && monthNumber ? `${year}년 ${Number(monthNumber)}월` : "이번 달";
@@ -1120,6 +1352,32 @@ function inquiryStatusLabel(status) {
   if (status === "answered") return "답변완료";
   if (status === "in_progress") return "처리중";
   return "접수";
+}
+
+function subscriptionStatusLabel(status) {
+  if (status === "active") return "구독중";
+  if (status === "paused") return "일시정지";
+  if (status === "ready") return "활성화 대기";
+  if (status === "cancelled") return "해지";
+  return "구독 정보 없음";
+}
+
+function orderTypeLabel(type) {
+  return type === "subscription" ? "구독 주문" : "상품 주문";
+}
+
+function qrAdminStateLabel(subject) {
+  if (!subject?.qr_id) return "미매칭";
+  if (!Number(subject.qr_is_active || 0)) return "비활성";
+  if (subject.qr_activated_at) return "활성";
+  return "활성화 대기";
+}
+
+function qrAdminStateClass(subject) {
+  if (!subject?.qr_id) return "unassigned";
+  if (!Number(subject.qr_is_active || 0)) return "inactive";
+  if (subject.qr_activated_at) return "active";
+  return "pending";
 }
 
 function formatFullAddress(address, detailAddress) {
@@ -1161,6 +1419,24 @@ function buildOrderListUrl(filters) {
   if (filters.query) params.set("orderQuery", filters.query);
   if (filters.payment && filters.payment !== "all") params.set("payment", filters.payment);
   if (filters.fulfillment && filters.fulfillment !== "all") params.set("fulfillment", filters.fulfillment);
+  return `/admin?${params.toString()}`;
+}
+
+function buildGuardianAdminUrl(filters, guardianId = "") {
+  const params = new URLSearchParams({ section: "guardians" });
+  if (filters?.query) params.set("guardianAdminQuery", filters.query);
+  if (filters?.status && filters.status !== "all") params.set("guardianStatus", filters.status);
+  if (guardianId) params.set("guardian", guardianId);
+  return `/admin?${params.toString()}`;
+}
+
+function buildSubjectAdminUrl(filters, subjectId = "") {
+  const params = new URLSearchParams({ section: "subjects" });
+  if (filters?.query) params.set("subjectAdminQuery", filters.query);
+  if (filters?.status && filters.status !== "all") params.set("subjectStatus", filters.status);
+  if (filters?.qr && filters.qr !== "all") params.set("subjectQr", filters.qr);
+  if (filters?.guardianId) params.set("guardianId", filters.guardianId);
+  if (subjectId) params.set("subject", subjectId);
   return `/admin?${params.toString()}`;
 }
 

@@ -10,6 +10,7 @@ import {
   isDbAdminSession,
   setAdDailyRate,
   setGuardianActive,
+  setGuardianAdminMemo,
   setGuardianAdmin,
   setProductCatalogItem,
   setProductOrderFulfillment,
@@ -29,6 +30,19 @@ export async function setGuardianActiveAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin"), error.message || "상태 변경에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin"), "보호자 상태가 수정되었습니다."));
+}
+
+export async function setGuardianAdminMemoAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  try {
+    await setGuardianAdminMemo(formData);
+    revalidatePath("/admin");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=guardians"), error.message || "관리 메모 저장에 실패했습니다.", "error"));
+  }
+  redirect(withNotice(getReturnTo(formData, "/admin?section=guardians"), "관리 메모가 저장되었습니다."));
 }
 
 export async function generateQrCodesAction(formData) {

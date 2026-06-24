@@ -2287,6 +2287,50 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Authenticated production dashboard and inquiry screen returned HTTP 200.
 - Production Turso schema version 4 and `customer_inquiries` table were confirmed.
 
+## 2026-06-24 KST - Split Guardian and Subject Administration
+
+### User Request
+- Split the combined Guardian Management screen into separate Guardian and Managed Subject menu sections.
+- Guardian list columns: member number, name, phone, email, joined date, status.
+- Guardian detail: shipping address, registered-subject link, subscription, payments, advertisements, administrator memo.
+- Subject list columns: name, gender, birth date, guardian, status, QR status.
+- Subject detail: basic information, guardian message, guardian voice, additional information.
+- Follow the supplied screenshots for composition while keeping the project CSS style.
+
+### Reflected Work
+- Added `관리대상자 관리` directly after Guardian Management in the administrator sidebar.
+- Rebuilt Guardian Management as a clickable master grid and a selected-guardian detail panel.
+- Added guardian integrated search and active/inactive filtering.
+- Displayed a stable short member number derived from the final eight characters of the existing guardian ID.
+- Added shipping address, subject link, latest subscription snapshot, ten recent payments, ten recent ads, and internal memo sections.
+- Added administrator-authorized memo save action with a 2,000-character limit.
+- Added schema version 5 and `guardians.admin_memo` migration.
+- Added a separate Managed Subject master grid and selected-subject detail panel.
+- Added subject/guardian search, subject status filter, QR state filter, and guardian-specific linking.
+- Added QR states for active, activation pending, inactive, and unassigned.
+- Added subject photo, guardian link/contact, guardian message, audio player, photo filename, QR code/state/public link, and timestamps.
+- Kept photo and voice blobs out of list queries; voice data loads only for the selected subject.
+
+### Verification
+- `npm run build` succeeded after the implementation and layout correction.
+- Isolated DB migrated to schema version 5 and contained `admin_memo`.
+- Guardian grid rendered six columns and two selectable rows without desktop inner overflow.
+- Guardian detail rendered shipping, subject link, subscription, payment, advertisement, and memo information.
+- Memo save returned HTTP 303, showed the success notice, and persisted to the isolated DB.
+- Inactive guardian filtering returned one expected row.
+- Subject grid rendered six columns and four QR-state variants without desktop inner overflow.
+- Subject detail rendered guardian message, audio, photo filename, QR code, and guardian link.
+- Inactive QR filtering returned one expected row.
+- Desktop used two master/detail columns; mobile used one column with no page overflow.
+- Temporary DB, credentials, fixtures, voice data, and screenshots were deleted.
+
+### Deliverable
+- `deliverables/ADMIN_GUARDIAN_SUBJECT_MANAGEMENT.md`
+- Includes screen contracts, query boundaries, schema changes, validation, and two presentation image prompts.
+
+### Time Spent
+- Data design, schema migration, actions, two master/detail screens, filtering, visual correction, authenticated testing, and documentation: about 75 minutes.
+
 ## 2026-06-23 KST - Legacy Kakao/Naver and Toss Integration
 
 ### User Request
