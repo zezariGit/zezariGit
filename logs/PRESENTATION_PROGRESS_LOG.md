@@ -2487,3 +2487,10 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 지표 정의, 구현, 경로 보정, 집계 테스트, 화면 검증, 문서화: 약 45분.
+
+### GitHub·운영반영
+- GitHub 기능 커밋: `620e0dd`
+- Vercel 배포: `https://zezari-kartwiqqy-zezari.vercel.app`
+- 운영 주소: `https://zezari.vercel.app`
+- 배포 상태: Ready
+- 운영 관리자 인증 상태에서 대시보드 HTTP 200 및 8개 지표 표시 확인.
