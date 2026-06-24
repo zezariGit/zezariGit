@@ -2393,3 +2393,32 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영 시간
 - 구버전 분석, 보안 보강, 로컬·외부 DB 검증, 환경변수 등록, 배포 및 운영 검증: 약 90분.
+
+## 2026-06-24 - 네이버 신규키·토스 라이브키 운영 전환
+
+### 요구내용
+- `.env.local`의 네이버 신규키를 유지한다.
+- 기존 토스 키를 주석 처리하고 준비된 라이브키를 활성화한다.
+- 로컬 기능 테스트 후 GitHub와 Vercel 운영 환경에 반영한다.
+
+### 반영내용
+- 네이버 신규 Client ID/Secret은 값 변경 없이 유지했다.
+- 로컬 토스 기존 키는 주석 처리하고 라이브 Client/Secret을 활성화했다.
+- Vercel Production에 네이버 신규키와 토스 라이브키를 등록했다.
+- Vercel Development는 네이버 신규키를 반영하고 토스 테스트키를 유지했다.
+- 키와 시크릿 값은 Git 및 문서에 기록하지 않았다.
+
+### 검증결과
+- Next.js 프로덕션 빌드 성공.
+- 로컬·운영 네이버 로그인 시작 URL과 신규 Client ID 사용 확인.
+- 토스 라이브 시크릿의 읽기 전용 API 인증 성공.
+- 운영 페이지 및 인증 제공자 API HTTP 200 확인.
+- 실제 승인이나 과금은 발생시키지 않았다.
+
+### 운영반영
+- 배포: `https://zezari-171s2oo07-zezari.vercel.app`
+- 운영 주소: `https://zezari.vercel.app`
+- 상태: Ready
+
+### 반영시간
+- 환경 전환, 안전 검증, 빌드, 배포, 운영 확인: 약 35분.

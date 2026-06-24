@@ -56,8 +56,17 @@
 - 검증용 임시 주문은 모두 삭제 완료
 
 ### 키 운영 방침
-- 로컬 및 현재 운영 환경은 기존 Toss 테스트 키를 유지한다.
-- 구버전 SQL에서 발견한 실결제 운영키는 명시적 운영 전환 승인 전에는 적용하지 않는다.
+- 2026-06-24 사용자 승인에 따라 로컬 `.env.local`과 Vercel Production은 Toss 라이브 키로 전환했다.
+- Vercel Development는 안전한 개발 결제를 위해 기존 Toss 테스트 키를 유지한다.
+- 실제 키 값은 문서, Git, 로그에 기록하지 않는다.
+- 라이브 키는 읽기 전용 API 인증으로 확인했으며 자동 실결제는 수행하지 않았다.
+
+### 2026-06-24 운영 검증
+- Next.js 프로덕션 빌드 성공
+- Toss 라이브 시크릿 인증 성공: 존재하지 않는 결제키 조회 시 `404 NOT_FOUND_PAYMENT`
+- 실제 결제 승인, 과금, 취소, 환불은 실행하지 않음
+- Vercel Production 배포: `https://zezari-171s2oo07-zezari.vercel.app`
+- 운영 주소: `https://zezari.vercel.app`
 
 ## 보안 주의사항
 - `reference/`, `wp.sql`, `.env.local`, `env.txt`를 Git 또는 Vercel 업로드에 추가하지 않는다.

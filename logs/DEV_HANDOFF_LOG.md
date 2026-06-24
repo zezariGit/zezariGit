@@ -2112,6 +2112,46 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
 
+## 2026-06-24 KST - Naver New Key and Toss Live Key Transition
+
+### User Request
+- Keep the new Naver credentials already active in `.env.local`.
+- Comment the previous Toss credentials and activate the commented Toss live credentials.
+- Test the affected functions, push the documentation to GitHub, deploy to Vercel, and verify production.
+
+### Reflected Work
+- Preserved the active Naver Client ID/Secret without changing their values.
+- Commented the previous active Toss Client/Secret lines in `.env.local`.
+- Activated the Toss live Client/Secret lines in `.env.local`.
+- Updated Vercel Production with the new Naver credentials and Toss live credentials.
+- Updated Vercel Development with the new Naver credentials.
+- Kept the existing Toss test credentials in Vercel Development so development payments remain non-live.
+- Kept all credential values out of Git, logs, command output, and deliverables.
+
+### Verification
+- `npm run build` succeeded with the switched local environment.
+- Local Naver provider exposure and redirect to `nid.naver.com` succeeded.
+- The local Naver authorization URL used the newly configured Client ID.
+- Toss live key format validation succeeded.
+- A read-only Toss Payments API request authenticated successfully and returned the expected `404 NOT_FOUND_PAYMENT` for a nonexistent payment key.
+- No payment approval, billing-key issuance, charge, cancellation, or refund was executed.
+- Production root and `/api/auth/providers` returned HTTP 200.
+- Production Naver sign-in redirected to `nid.naver.com` and used the newly configured Client ID.
+- Vercel Sensitive variables cannot be read back through `vercel env pull`; their values were verified through successful update/deployment and runtime behavior instead.
+
+### Deployment
+- Vercel deployment: `https://zezari-171s2oo07-zezari.vercel.app`
+- Production alias: `https://zezari.vercel.app`
+- Deployment status: Ready
+
+### Operational Notes
+- A complete Naver login requires the Naver developer console to allow `https://zezari.vercel.app/api/auth/callback/naver`.
+- A complete Toss production checkout must be performed manually by an authorized operator because it creates a real financial transaction.
+- After the first controlled live payment, verify payment approval, order state, cancellation, refund, and settlement records.
+
+### Time Spent
+- Environment transition, safe credential validation, build, deployment, and production checks: about 35 minutes.
+
 ## 2026-06-23 KST - Legacy Kakao/Naver and Toss Integration
 
 ### User Request
