@@ -3924,5 +3924,48 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Authenticated `https://zezari.vercel.app/admin?section=orders` returned HTTP 200.
 - Production HTML contains the order grid, seven grid headings, and selected-order detail panel.
 
+## 2026-06-24 KST - Toss Payments Live Payment Widget Integration
+
+### User Request
+- Use the two new keys below the Toss payment-widget section in `.env.local` to implement real Toss Payments checkout.
+
+### Reflected Work
+- Activated the new local keys as `TOSS_WIDGET_CLIENT_KEY` and `TOSS_WIDGET_SECRET_KEY` without exposing their values.
+- Preserved the existing Toss client/secret pair exclusively for subscription billing.
+- Added authenticated `GET /api/payments/toss/widget/config`.
+- Added a deterministic hashed Toss customer key that does not expose the guardian identifier.
+- Replaced the manually built standalone payment-method radio list with Toss SDK V2 payment-method and agreement widgets.
+- Product checkout now uses `widgets.setAmount()`, `renderPaymentMethods()`, `renderAgreement()`, and `widgets.requestPayment()`.
+- Product preparation stores `WIDGET` as the pending method and keeps the latest base/detail shipping address.
+- Product success confirmation now uses the widget secret key and writes the actual Toss payment method after approval.
+- Kept server-side order ID, amount, status, and ownership verification before approval.
+- Registered both widget variables in Vercel Production and Development environments.
+
+### Files Changed
+- `app/api/payments/toss/widget/config/route.js`
+- `app/api/payments/toss/product/prepare/route.js`
+- `app/payments/toss/product/success/page.js`
+- `app/shop-checkout-client.js`
+- `app/globals.css`
+- `lib/toss-payments.js`
+- `lib/db.js`
+- `deliverables/TOSS_PAYMENT_WIDGET_LIVE_INTEGRATION.md`
+- `.env.local` updated locally and remains ignored by Git
+
+### Verification
+- `npm run build` succeeded and included the widget config API route.
+- Live widget configuration returned HTTP 200 with a valid widget client-key type and hashed customer key.
+- Toss payment methods and required agreement rendered through real SDK iframes on a 430px viewport.
+- Checkout button became enabled after widget readiness and the page had no horizontal overflow.
+- Product prepare API created a temporary pending order with method `WIDGET`, amount 5,000 KRW, and detail address.
+- Temporary order and isolated DB were removed.
+- No live card/account information was entered and no financial transaction was submitted during automated verification.
+
+### Time Spent
+- Key separation, widget UI, server confirmation path, local SDK testing, Vercel environment setup, and documentation: about 55 minutes.
+
+### Deliverable
+- `deliverables/TOSS_PAYMENT_WIDGET_LIVE_INTEGRATION.md`
+
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.

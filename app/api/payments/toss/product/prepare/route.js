@@ -2,7 +2,12 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "../../../../../../lib/auth";
 import { saveProductOrderDraft } from "../../../../../../lib/db";
-import { getTossClientKey, getTossProductCallbackUrls, isTossConfigured } from "../../../../../../lib/toss-payments";
+import {
+  createTossCustomerKey,
+  getTossProductCallbackUrls,
+  getTossWidgetClientKey,
+  isTossWidgetConfigured,
+} from "../../../../../../lib/toss-payments";
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
@@ -23,12 +28,13 @@ export async function POST(request) {
       paymentMethod: body.paymentMethod,
       orderType: "standalone",
     });
-    const configured = isTossConfigured();
+    const configured = isTossWidgetConfigured();
     const { successUrl, failUrl } = getTossProductCallbackUrls(order.id);
 
     return NextResponse.json({
       configured,
-      clientKey: configured ? getTossClientKey() : "",
+      clientKey: configured ? getTossWidgetClientKey() : "",
+      customerKey: createTossCustomerKey(session.user?.id || session.user?.email),
       productOrderId: order.id,
       orderId: order.tossOrderId,
       amount: order.amount,

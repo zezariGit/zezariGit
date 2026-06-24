@@ -5452,6 +5452,28 @@ button:disabled:hover {
   font-weight: 800;
 }
 
+.toss-widget-shell {
+  min-width: 0;
+  display: grid;
+  gap: var(--space-xs);
+  overflow: hidden;
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+}
+
+.toss-widget-container {
+  min-width: 0;
+}
+
+.toss-widget-status {
+  margin: 0;
+  padding: var(--space-md);
+  color: var(--c-text-muted);
+  font-size: 0.84rem;
+  text-align: center;
+}
+
 .shop-complete-page {
   min-height: 100vh;
   display: grid;

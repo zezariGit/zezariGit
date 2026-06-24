@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import KakaoPostcodeAddress from "./kakao-postcode-address";
 
 const TOSS_SDK_URL = "https://js.tosspayments.com/v2/standard";
@@ -16,8 +16,10 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
   const [shippingAddressDetail, setShippingAddressDetail] = useState(guardian?.address_detail || "");
   const [paymentMethod, setPaymentMethod] = useState("CARD");
   const [sdkReady, setSdkReady] = useState(false);
+  const [widgetStatus, setWidgetStatus] = useState("idle");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const widgetRef = useRef(null);
 
   const subscribed = subscription?.status === "active";
   const selectedSubject = subjects.find((subject) => subject.id === subjectId) || null;
@@ -49,6 +51,52 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
     document.head.appendChild(script);
   }, []);
 
+  useEffect(() => {
+    if (step !== "order" || mode !== "standalone" || !sdkReady) {
+      widgetRef.current = null;
+      setWidgetStatus("idle");
+      return undefined;
+    }
+
+    let cancelled = false;
+    const initializeWidget = async () => {
+      setWidgetStatus("loading");
+      setMessage("");
+
+      try {
+        const response = await fetch("/api/payments/toss/widget/config", { cache: "no-store" });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data?.message || "결제위젯 설정을 불러오지 못했습니다.");
+        if (!data.configured) throw new Error("Toss Payments 결제위젯 키 설정이 필요합니다.");
+        if (!window.TossPayments) throw new Error("결제 SDK가 아직 준비되지 않았습니다.");
+
+        const tossPayments = window.TossPayments(data.clientKey);
+        const widgets = tossPayments.widgets({ customerKey: data.customerKey });
+        await widgets.setAmount({ currency: "KRW", value: productAmount });
+        if (cancelled) return;
+
+        widgetRef.current = widgets;
+        await Promise.all([
+          widgets.renderPaymentMethods({ selector: "#toss-payment-methods", variantKey: "DEFAULT" }),
+          widgets.renderAgreement({ selector: "#toss-payment-agreement", variantKey: "AGREEMENT" }),
+        ]);
+        if (!cancelled) setWidgetStatus("ready");
+      } catch (error) {
+        if (!cancelled) {
+          widgetRef.current = null;
+          setWidgetStatus("error");
+          setMessage(error.message || "결제위젯을 준비하지 못했습니다.");
+        }
+      }
+    };
+
+    initializeWidget();
+    return () => {
+      cancelled = true;
+      widgetRef.current = null;
+    };
+  }, [mode, productAmount, sdkReady, step]);
+
   const changeQuantity = (next) => {
     setQuantity(Math.max(1, Math.min(99, Number(next) || 1)));
   };
@@ -59,7 +107,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
       return;
     }
     setMode(nextMode);
-    if (nextMode === "subscription") setPaymentMethod("CARD");
+    setPaymentMethod(nextMode === "subscription" ? "CARD" : "WIDGET");
     setMessage("");
   };
 
@@ -129,6 +177,10 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
   };
 
   const startStandalonePayment = async () => {
+    if (!widgetRef.current || widgetStatus !== "ready") {
+      throw new Error("결제수단을 준비 중입니다. 잠시 후 다시 시도해 주세요.");
+    }
+
     const response = await fetch("/api/payments/toss/product/prepare", {
       method: "POST",
       headers: {
@@ -141,7 +193,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
         designIndex,
         shippingAddress,
         shippingAddressDetail,
-        paymentMethod,
+        paymentMethod: "WIDGET",
       }),
     });
     const data = await response.json();
@@ -152,18 +204,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
     if (!data.configured) {
       throw new Error("Toss Payments 키 설정이 필요합니다.");
     }
-    if (!window.TossPayments) {
-      throw new Error("결제 SDK가 아직 준비되지 않았습니다.");
-    }
-
-    const tossPayments = window.TossPayments(data.clientKey);
-    const payment = tossPayments.payment({ customerKey: `guardian_${guardian?.id || "guest"}` });
     const request = {
-      method: paymentMethod,
-      amount: {
-        currency: "KRW",
-        value: Number(data.amount || 0),
-      },
       orderId: data.orderId,
       orderName: data.orderName,
       successUrl: data.successUrl,
@@ -171,26 +212,17 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
       customerEmail: guardian?.email || guardian?.google_email || "",
       customerName: guardian?.name || "",
     };
-    if (paymentMethod === "TRANSFER") {
-      request.transfer = {
-        cashReceipt: { type: "소득공제" },
-        useEscrow: false,
-      };
-    }
-    if (paymentMethod === "VIRTUAL_ACCOUNT") {
-      request.virtualAccount = {
-        cashReceipt: { type: "소득공제" },
-        validHours: 24,
-        useEscrow: false,
-      };
-    }
-    await payment.requestPayment(request);
+    await widgetRef.current.requestPayment(request);
   };
 
   const pay = async () => {
     if (!validateSelection()) return;
     if (!sdkReady) {
       setMessage("결제 SDK를 준비 중입니다. 잠시 후 다시 시도해 주세요.");
+      return;
+    }
+    if (mode === "standalone" && widgetStatus !== "ready") {
+      setMessage("결제수단을 준비 중입니다. 잠시 후 다시 시도해 주세요.");
       return;
     }
 
@@ -273,11 +305,17 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
             setShippingAddressDetail={setShippingAddressDetail}
             paymentMethod={paymentMethod}
             setPaymentMethod={setPaymentMethod}
+            widgetStatus={widgetStatus}
             mode={mode}
             amount={paymentAmount}
           />
-          <button className="shop-next-button" type="button" onClick={pay} disabled={loading}>
-            {loading ? "결제 준비중" : "결제하기"}
+          <button
+            className="shop-next-button"
+            type="button"
+            onClick={pay}
+            disabled={loading || (mode === "standalone" && widgetStatus !== "ready")}
+          >
+            {loading ? "결제 준비중" : mode === "standalone" && widgetStatus !== "ready" ? "결제수단 준비중" : "결제하기"}
           </button>
         </>
       )}
@@ -428,6 +466,7 @@ function OrderInformation({
   setShippingAddressDetail,
   paymentMethod,
   setPaymentMethod,
+  widgetStatus,
   mode,
   amount,
 }) {
@@ -476,24 +515,20 @@ function OrderInformation({
 
       <section className="order-section">
         <h2>4. 결제 방법</h2>
-        <div className="payment-method-list">
-          <label>
-            <input type="radio" name="paymentMethod" value="CARD" checked={paymentMethod === "CARD"} onChange={(event) => setPaymentMethod(event.target.value)} />
-            <span>신용/체크카드</span>
-          </label>
-          {mode === "standalone" && (
+        {mode === "standalone" ? (
+          <div className="toss-widget-shell" aria-busy={widgetStatus === "loading"}>
+            <div id="toss-payment-methods" className="toss-widget-container" />
+            <div id="toss-payment-agreement" className="toss-widget-container" />
+            {widgetStatus === "loading" && <p className="toss-widget-status">안전한 결제수단을 불러오고 있습니다.</p>}
+          </div>
+        ) : (
+          <div className="payment-method-list">
             <label>
-              <input type="radio" name="paymentMethod" value="TRANSFER" checked={paymentMethod === "TRANSFER"} onChange={(event) => setPaymentMethod(event.target.value)} />
-              <span>실시간 계좌이체</span>
+              <input type="radio" name="paymentMethod" value="CARD" checked={paymentMethod === "CARD"} onChange={(event) => setPaymentMethod(event.target.value)} />
+              <span>신용/체크카드 자동결제 등록</span>
             </label>
-          )}
-          {mode === "standalone" && (
-            <label>
-              <input type="radio" name="paymentMethod" value="VIRTUAL_ACCOUNT" checked={paymentMethod === "VIRTUAL_ACCOUNT"} onChange={(event) => setPaymentMethod(event.target.value)} />
-              <span>가상계좌</span>
-            </label>
-          )}
-        </div>
+          </div>
+        )}
       </section>
     </div>
   );

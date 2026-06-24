@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../../lib/auth";
 import { getProductOrderForGuardian, markProductOrderPaid } from "../../../../../lib/db";
-import { confirmPayment } from "../../../../../lib/toss-payments";
+import { confirmWidgetPayment } from "../../../../../lib/toss-payments";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +33,7 @@ export default async function TossProductSuccessPage({ searchParams }) {
   }
 
   try {
-    const payment = await confirmPayment({ paymentKey, orderId, amount });
+    const payment = await confirmWidgetPayment({ paymentKey, orderId, amount });
     if (payment.orderId !== orderId || Number(payment.totalAmount || 0) !== Number(order.amount) || payment.status !== "DONE") {
       throw new Error("토스페이먼츠 승인 결과가 주문 정보와 일치하지 않습니다.");
     }
@@ -42,6 +42,7 @@ export default async function TossProductSuccessPage({ searchParams }) {
       paymentKey,
       tossOrderId: orderId,
       status: "paid",
+      paymentMethod: payment.method || "결제위젯",
     });
 
     return (
