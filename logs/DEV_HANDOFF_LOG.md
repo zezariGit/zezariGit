@@ -3874,5 +3874,45 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Production DB verification returned `remaining=0`.
 - Test notification was removed immediately after verification.
 
+## 2026-06-24 KST - Administrator Order and Shipping Grid
+
+### User Request
+- Replace the large order cards in the order/shipping tab with a grid.
+- Select an order in the grid and enter/save carrier, tracking number, memo, and other details.
+
+### Reflected Work
+- Rebuilt the screen as a left order grid and right selected-order detail panel.
+- Added grid columns for order number, guardian/subject, product, amount, payment state, fulfillment state, and order date.
+- Made each complete grid row selectable and persisted the selected order in the `order` URL query.
+- Added product, payment, recipient, base-address, and detail-address views to the detail panel.
+- Kept the existing fulfillment server action and exposed status, carrier, tracking number, and multiline administrator memo inputs in one form.
+- Extended `getAdminOrdersData` and the order URL builder so search/filter state and selected order survive saving.
+- Applied a two-column desktop layout, a one-column layout below 1200px, and an internally scrollable mobile grid.
+- No schema change was required.
+
+### Files Changed
+- `app/admin/page.js`
+- `app/globals.css`
+- `lib/db.js`
+- `deliverables/ADMIN_ORDER_GRID_MANAGEMENT.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- Three temporary orders rendered in a seven-column grid.
+- Selecting an order changed the URL and loaded matching detail-address and tracking data.
+- Saved shipped status, Hanjin carrier, tracking number, and administrator memo; verified all values in the local test DB.
+- Confirmed unpaid orders expose only pending and cancelled fulfillment states.
+- Confirmed the shipped filter returned two matching orders.
+- Confirmed desktop and mobile layouts have no page-level horizontal overflow.
+
+### Time Spent
+- Analysis, UI/data changes, responsive adjustments, save-path testing, and documentation: about 35 minutes.
+
+### Deliverable
+- `deliverables/ADMIN_ORDER_GRID_MANAGEMENT.md`
+- Includes screen/data contracts, save rules, verification, and a presentation image-generation prompt.
+
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.

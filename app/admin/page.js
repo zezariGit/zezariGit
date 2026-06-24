@@ -95,6 +95,7 @@ export default async function AdminPage({ searchParams }) {
     payment: resolvedSearchParams?.payment || "all",
     fulfillment: resolvedSearchParams?.fulfillment || "all",
   };
+  const selectedOrderId = resolvedSearchParams?.order || "";
   const dashboardData = activeSection === "dashboard" ? await getAdminDashboardData(resolvedSearchParams?.month) : null;
   const adminData = activeSection === "guardians" ? await getAdminData(selectedGuardianId, guardianFilters) : null;
   const adminSubjectsData = activeSection === "subjects"
@@ -104,7 +105,7 @@ export default async function AdminPage({ searchParams }) {
   const adminUsersData = activeSection === "admins" ? await getAdminUsersData() : null;
   const paymentData = activeSection === "payments" ? await getAdminSubscriptionPlansData() : null;
   const productsData = activeSection === "products" ? await getAdminProductsData() : null;
-  const ordersData = activeSection === "orders" ? await getAdminOrdersData(orderFilters) : null;
+  const ordersData = activeSection === "orders" ? await getAdminOrdersData(orderFilters, selectedOrderId) : null;
   const adsData = activeSection === "ads" ? await getAdminAdsData() : null;
   const inquiriesData = activeSection === "inquiries" ? await getAdminInquiriesData() : null;
   const qrItems = qrData ? await withQrImages(qrData.qrCodes) : [];
@@ -338,8 +339,12 @@ function InquiryManagementSection({ inquiriesData }) {
 }
 
 function OrderManagementSection({ ordersData }) {
-  const { orders, summary, filters } = ordersData;
-  const returnTo = buildOrderListUrl(filters);
+  const { orders, selectedOrder, summary, filters } = ordersData;
+  const selectedPaid = selectedOrder ? isPaidOrder(selectedOrder.status) : false;
+  const selectedFulfillment = selectedOrder
+    ? selectedOrder.fulfillment_status || (selectedPaid ? "preparing" : "pending")
+    : "pending";
+  const returnTo = buildOrderListUrl(filters, selectedOrder?.id);
 
   return (
     <div className="qr-admin-stack">
@@ -357,108 +362,153 @@ function OrderManagementSection({ ordersData }) {
         </div>
       </section>
 
-      <section className="admin-panel order-filter-panel">
-        <form className="admin-order-filter" action="/admin">
-          <input type="hidden" name="section" value="orders" />
-          <label>
-            통합 검색
-            <input
-              name="orderQuery"
-              defaultValue={filters.query}
-              placeholder="주문번호, 보호자, 대상자, 상품, 송장번호"
-            />
-          </label>
-          <label>
-            결제 상태
-            <select name="payment" defaultValue={filters.payment}>
-              <option value="all">전체</option>
-              <option value="paid">결제 완료</option>
-              <option value="pending">결제 대기</option>
-              <option value="failed">결제 실패/취소</option>
-            </select>
-          </label>
-          <label>
-            배송 상태
-            <select name="fulfillment" defaultValue={filters.fulfillment}>
-              <option value="all">전체</option>
-              <option value="pending">결제 확인 전</option>
-              <option value="preparing">배송 준비</option>
-              <option value="shipped">배송 중</option>
-              <option value="delivered">배송 완료</option>
-              <option value="cancelled">배송 취소</option>
-            </select>
-          </label>
-          <div className="admin-order-filter-actions">
-            <button type="submit">조회</button>
-            <Link className="plain-button" href="/admin?section=orders">초기화</Link>
+      <div className="admin-master-detail admin-order-master-detail">
+        <section className="admin-panel admin-master-panel">
+          <div className="panel-heading">
+            <h2>주문 목록</h2>
+            <span>{orders.length}건 조회</span>
           </div>
-        </form>
-      </section>
 
-      <section className="admin-panel">
-        <div className="panel-heading">
-          <h2>주문 목록</h2>
-          <span>{orders.length}건 조회</span>
-        </div>
-        <div className="admin-order-list">
-          {orders.map((order) => {
-            const paid = isPaidOrder(order.status);
-            const currentFulfillment = order.fulfillment_status || (paid ? "preparing" : "pending");
-            return (
-              <article className="admin-order-card" key={order.id}>
-                <header className="admin-order-card-header">
-                  <div>
-                    <span>주문번호</span>
-                    <strong>{formatOrderNumber(order)}</strong>
-                    <time>{formatDateTime(order.created_at)}</time>
-                  </div>
-                  <div className="admin-order-badges">
-                    <em className={`order-state ${paymentStateClass(order.status)}`}>{paymentStatusLabel(order.status)}</em>
-                    <em className={`order-state fulfillment-${currentFulfillment}`}>{fulfillmentStatusLabel(currentFulfillment)}</em>
-                  </div>
-                </header>
+          <form className="admin-order-filter order-master-filter" action="/admin">
+            <input type="hidden" name="section" value="orders" />
+            <label>
+              통합 검색
+              <input
+                name="orderQuery"
+                defaultValue={filters.query}
+                placeholder="주문번호, 보호자, 대상자, 상품, 송장번호"
+              />
+            </label>
+            <label>
+              결제 상태
+              <select name="payment" defaultValue={filters.payment}>
+                <option value="all">전체</option>
+                <option value="paid">결제 완료</option>
+                <option value="pending">결제 대기</option>
+                <option value="failed">결제 실패/취소</option>
+              </select>
+            </label>
+            <label>
+              배송 상태
+              <select name="fulfillment" defaultValue={filters.fulfillment}>
+                <option value="all">전체</option>
+                <option value="pending">결제 확인 전</option>
+                <option value="preparing">배송 준비</option>
+                <option value="shipped">배송 중</option>
+                <option value="delivered">배송 완료</option>
+                <option value="cancelled">배송 취소</option>
+              </select>
+            </label>
+            <div className="admin-order-filter-actions">
+              <button type="submit">조회</button>
+              <Link className="plain-button" href="/admin?section=orders">초기화</Link>
+            </div>
+          </form>
 
-                <div className="admin-order-details">
-                  <section>
-                    <h3>주문 상품</h3>
-                    <dl>
-                      <dt>상품</dt><dd>{order.product_name || "상품 미확인"} / {order.quantity || 1}개</dd>
-                      <dt>대상자</dt><dd>{order.subject_name || "미선택"}</dd>
-                      <dt>구매유형</dt><dd>{order.order_type === "standalone" ? "상품 단독 구매" : `${order.plan_months || "-"}개월 구독`}</dd>
-                      <dt>결제금액</dt><dd>{formatCurrency(order.amount)}</dd>
-                      <dt>결제수단</dt><dd>{order.payment_method || "-"}</dd>
-                      <dt>결제일</dt><dd>{formatDateTime(order.paid_at)}</dd>
-                    </dl>
-                  </section>
-                  <section>
-                    <h3>주문자/배송지</h3>
-                    <dl>
-                      <dt>보호자</dt><dd>{order.guardian_name || "이름 미입력"}</dd>
-                      <dt>연락처</dt><dd>{order.guardian_phone || "전화번호 미입력"}</dd>
-                      <dt>이메일</dt><dd>{order.guardian_email || order.guardian_google_email || "-"}</dd>
-                      <dt>수령인</dt><dd>{order.display_recipient_name || "이름 미입력"}</dd>
-                      <dt>수령 연락처</dt><dd>{order.display_recipient_phone || "전화번호 미입력"}</dd>
-                      <dt>주소</dt><dd>{formatFullAddress(order.shipping_address, order.shipping_address_detail)}</dd>
-                    </dl>
-                  </section>
+          <div className="admin-record-table-wrap">
+            <div className="admin-record-table order-record-table" role="table" aria-label="주문 목록">
+              <div className="admin-record-header" role="row">
+                <span role="columnheader">주문번호</span>
+                <span role="columnheader">주문자/대상자</span>
+                <span role="columnheader">상품</span>
+                <span role="columnheader">결제금액</span>
+                <span role="columnheader">결제</span>
+                <span role="columnheader">배송</span>
+                <span role="columnheader">주문일</span>
+              </div>
+              {orders.map((order) => {
+                const paid = isPaidOrder(order.status);
+                const fulfillment = order.fulfillment_status || (paid ? "preparing" : "pending");
+                return (
+                  <Link
+                    className={`admin-record-row ${selectedOrder?.id === order.id ? "active" : ""}`}
+                    href={buildOrderListUrl(filters, order.id)}
+                    key={order.id}
+                    role="row"
+                  >
+                    <strong role="cell">{formatOrderNumber(order)}</strong>
+                    <span className="order-record-party" role="cell">
+                      <strong>{order.guardian_name || "이름 미입력"}</strong>
+                      <small>{order.subject_name || "대상자 미선택"}</small>
+                    </span>
+                    <span role="cell">{order.product_name || "상품 미확인"}</span>
+                    <span role="cell">{formatCurrency(order.amount)}</span>
+                    <em className={`order-state ${paymentStateClass(order.status)}`} role="cell">
+                      {paymentStatusLabel(order.status)}
+                    </em>
+                    <em className={`order-state fulfillment-${fulfillment}`} role="cell">
+                      {fulfillmentStatusLabel(fulfillment)}
+                    </em>
+                    <time role="cell">{formatDate(order.created_at)}</time>
+                  </Link>
+                );
+              })}
+              {orders.length === 0 && <p className="empty-text">조건에 맞는 주문이 없습니다.</p>}
+            </div>
+          </div>
+        </section>
+
+        <aside className="admin-panel admin-detail-panel order-detail-panel">
+          {selectedOrder ? (
+            <>
+              <div className="admin-detail-heading">
+                <div>
+                  <span>주문 상세 정보</span>
+                  <h2>{formatOrderNumber(selectedOrder)}</h2>
+                  <time>{formatDateTime(selectedOrder.created_at)}</time>
                 </div>
+                <div className="order-detail-badges">
+                  <em className={`order-state ${paymentStateClass(selectedOrder.status)}`}>
+                    {paymentStatusLabel(selectedOrder.status)}
+                  </em>
+                  <em className={`order-state fulfillment-${selectedFulfillment}`}>
+                    {fulfillmentStatusLabel(selectedFulfillment)}
+                  </em>
+                </div>
+              </div>
 
-                <form className="admin-shipping-form" action={setProductOrderFulfillmentAction}>
-                  <input type="hidden" name="orderId" value={order.id} />
+              <section className="admin-detail-section">
+                <h3>주문 상품</h3>
+                <dl className="admin-detail-list">
+                  <div><dt>상품</dt><dd>{selectedOrder.product_name || "상품 미확인"} / {selectedOrder.quantity || 1}개</dd></div>
+                  <div><dt>대상자</dt><dd>{selectedOrder.subject_name || "미선택"}</dd></div>
+                  <div><dt>구매유형</dt><dd>{selectedOrder.order_type === "standalone" ? "상품 단독 구매" : `${selectedOrder.plan_months || "-"}개월 구독`}</dd></div>
+                  <div><dt>결제금액</dt><dd>{formatCurrency(selectedOrder.amount)}</dd></div>
+                  <div><dt>결제수단</dt><dd>{selectedOrder.payment_method || "-"}</dd></div>
+                  <div><dt>결제일</dt><dd>{formatDateTime(selectedOrder.paid_at)}</dd></div>
+                </dl>
+              </section>
+
+              <section className="admin-detail-section">
+                <h3>수령인 및 배송지</h3>
+                <dl className="admin-detail-list">
+                  <div><dt>보호자</dt><dd>{selectedOrder.guardian_name || "이름 미입력"}</dd></div>
+                  <div><dt>연락처</dt><dd>{selectedOrder.guardian_phone || "전화번호 미입력"}</dd></div>
+                  <div><dt>이메일</dt><dd>{selectedOrder.guardian_email || selectedOrder.guardian_google_email || "-"}</dd></div>
+                  <div><dt>수령인</dt><dd>{selectedOrder.display_recipient_name || "이름 미입력"}</dd></div>
+                  <div><dt>수령 연락처</dt><dd>{selectedOrder.display_recipient_phone || "전화번호 미입력"}</dd></div>
+                  <div><dt>배송지</dt><dd>{formatFullAddress(selectedOrder.shipping_address, selectedOrder.shipping_address_detail)}</dd></div>
+                </dl>
+              </section>
+
+              <section className="admin-detail-section order-fulfillment-section">
+                <h3>배송 정보 입력</h3>
+                <form className="order-detail-form" action={setProductOrderFulfillmentAction}>
+                  <input type="hidden" name="orderId" value={selectedOrder.id} />
                   <input type="hidden" name="returnTo" value={returnTo} />
                   <label>
                     배송상태
-                    <select name="fulfillmentStatus" defaultValue={currentFulfillment}>
-                      {!paid && <option value="pending">결제 확인 전</option>}
-                      {paid && <option value="preparing">배송 준비</option>}
-                      {paid && <option value="shipped">배송 중</option>}
-                      {paid && <option value="delivered">배송 완료</option>}
+                    <select name="fulfillmentStatus" defaultValue={selectedFulfillment}>
+                      {!selectedPaid && <option value="pending">결제 확인 전</option>}
+                      {selectedPaid && <option value="preparing">배송 준비</option>}
+                      {selectedPaid && <option value="shipped">배송 중</option>}
+                      {selectedPaid && <option value="delivered">배송 완료</option>}
                       <option value="cancelled">배송 취소</option>
                     </select>
                   </label>
                   <label>
                     택배사
-                    <select name="carrier" defaultValue={order.carrier || ""}>
+                    <select name="carrier" defaultValue={selectedOrder.carrier || ""}>
                       <option value="">택배사 선택</option>
                       <option value="CJ대한통운">CJ대한통운</option>
                       <option value="한진택배">한진택배</option>
@@ -470,25 +520,26 @@ function OrderManagementSection({ ordersData }) {
                   </label>
                   <label>
                     송장번호
-                    <input name="trackingNumber" defaultValue={order.tracking_number || ""} placeholder="송장번호 입력" />
+                    <input name="trackingNumber" defaultValue={selectedOrder.tracking_number || ""} placeholder="송장번호 입력" />
                   </label>
-                  <label className="admin-order-memo-field">
+                  <label>
                     관리자 메모
-                    <input name="adminMemo" defaultValue={order.admin_memo || ""} placeholder="포장·배송 관련 내부 메모" />
+                    <textarea name="adminMemo" defaultValue={selectedOrder.admin_memo || ""} placeholder="포장, 출고, 고객 요청 등 내부 메모" />
                   </label>
                   <div className="admin-shipping-meta">
-                    <span>발송 {formatDateTime(order.shipped_at)}</span>
-                    <span>완료 {formatDateTime(order.delivered_at)}</span>
+                    <span>발송 {formatDateTime(selectedOrder.shipped_at)}</span>
+                    <span>완료 {formatDateTime(selectedOrder.delivered_at)}</span>
                   </div>
+                  {!selectedPaid && <p className="order-payment-warning">결제 완료 전에는 배송준비·배송중·배송완료로 변경할 수 없습니다.</p>}
                   <FormSubmitButton pendingText="저장중">배송정보 저장</FormSubmitButton>
                 </form>
-                {!paid && <p className="order-payment-warning">결제 완료 전에는 배송준비·배송중·배송완료로 변경할 수 없습니다.</p>}
-              </article>
-            );
-          })}
-          {orders.length === 0 && <p className="empty-text">조건에 맞는 주문이 없습니다.</p>}
-        </div>
-      </section>
+              </section>
+            </>
+          ) : (
+            <p className="empty-text">조회된 주문이 없습니다. 검색 조건을 변경해 주세요.</p>
+          )}
+        </aside>
+      </div>
     </div>
   );
 }
@@ -1414,11 +1465,12 @@ function fulfillmentStatusLabel(status) {
   return "결제 확인 전";
 }
 
-function buildOrderListUrl(filters) {
+function buildOrderListUrl(filters, orderId = "") {
   const params = new URLSearchParams({ section: "orders" });
   if (filters.query) params.set("orderQuery", filters.query);
   if (filters.payment && filters.payment !== "all") params.set("payment", filters.payment);
   if (filters.fulfillment && filters.fulfillment !== "all") params.set("fulfillment", filters.fulfillment);
+  if (orderId) params.set("order", orderId);
   return `/admin?${params.toString()}`;
 }
 
