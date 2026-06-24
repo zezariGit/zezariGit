@@ -2187,6 +2187,12 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Time Spent
 - Source review, implementation, responsive correction, authenticated visual verification, and documentation: about 35 minutes.
 
+### GitHub and Production
+- GitHub commit: `85e6e3b Add collapsible admin sidebar`
+- Vercel deployment: `https://zezari-80jqysx8b-zezari.vercel.app`
+- Production alias: `https://zezari.vercel.app`
+- Deployment status: Ready
+
 ## 2026-06-23 KST - Legacy Kakao/Naver and Toss Integration
 
 ### User Request
