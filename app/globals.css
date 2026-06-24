@@ -2931,6 +2931,193 @@ textarea:focus {
   transform: rotate(-45deg);
 }
 
+.admin-dashboard-section {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.admin-dashboard-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.admin-dashboard-heading h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.admin-dashboard-heading p {
+  margin: 6px 0 0;
+  color: var(--c-text-muted);
+  font-size: 14px;
+}
+
+.admin-dashboard-month-form {
+  display: flex;
+  align-items: end;
+  gap: var(--space-xs);
+}
+
+.admin-dashboard-month-form label {
+  display: grid;
+  gap: 5px;
+  color: var(--c-text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-dashboard-month-form input {
+  min-height: 42px;
+}
+
+.admin-dashboard-month-form button {
+  min-height: 42px;
+  padding: 0 var(--space-md);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--c-primary);
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.admin-metric-card {
+  min-width: 0;
+  min-height: 126px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.admin-metric-card.is-emphasis {
+  border-color: var(--c-primary-border);
+  background: var(--c-primary-light);
+}
+
+.admin-metric-mark {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: #e8f2fb;
+  color: #246a9d;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-metric-card.tone-teal .admin-metric-mark {
+  background: #e2f3f2;
+  color: #15736f;
+}
+
+.admin-metric-card.tone-green .admin-metric-mark {
+  background: #e5f4e9;
+  color: #2f7a45;
+}
+
+.admin-metric-card.tone-red .admin-metric-mark {
+  background: #fae9e7;
+  color: #a73931;
+}
+
+.admin-metric-card.tone-amber .admin-metric-mark {
+  background: #fff2d9;
+  color: #8a5a00;
+}
+
+.admin-metric-card.tone-navy .admin-metric-mark {
+  background: #dce8f2;
+  color: #1d4f73;
+}
+
+.admin-metric-card.tone-cyan .admin-metric-mark {
+  background: #e2f4f8;
+  color: #176d80;
+}
+
+.admin-metric-card.tone-violet .admin-metric-mark {
+  background: #eee9f8;
+  color: #65508f;
+}
+
+.admin-metric-card > div {
+  min-width: 0;
+}
+
+.admin-metric-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--c-text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.admin-metric-card strong {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  min-width: 0;
+  color: var(--c-text);
+  font-size: 28px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.admin-metric-card strong small {
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 1100px) {
+  .admin-dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .admin-dashboard-heading {
+    align-items: stretch;
+    display: grid;
+  }
+
+  .admin-dashboard-month-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .admin-dashboard-month-form label {
+    min-width: 0;
+  }
+
+  .admin-dashboard-month-form input {
+    width: 100%;
+  }
+
+  .admin-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-metric-card {
+    min-height: 104px;
+  }
+}
+
 @media (max-width: 860px) {
   .admin-workspace,
   .admin-workspace.is-menu-collapsed {

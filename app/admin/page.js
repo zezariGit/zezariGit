@@ -10,6 +10,7 @@ import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
 import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
 import {
   getAdminAdsData,
+  getAdminDashboardData,
   getAdminData,
   getAdminOrdersData,
   getAdminProductsData,
@@ -64,9 +65,9 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["qr", "admins", "payments", "products", "orders", "ads"].includes(resolvedSearchParams?.section)
+  const activeSection = ["dashboard", "guardians", "qr", "admins", "payments", "products", "orders", "ads"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
-    : "guardians";
+    : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
   const qrFilters = {
     match: resolvedSearchParams?.match || "all",
@@ -80,6 +81,7 @@ export default async function AdminPage({ searchParams }) {
     payment: resolvedSearchParams?.payment || "all",
     fulfillment: resolvedSearchParams?.fulfillment || "all",
   };
+  const dashboardData = activeSection === "dashboard" ? await getAdminDashboardData(resolvedSearchParams?.month) : null;
   const adminData = activeSection === "guardians" ? await getAdminData(selectedGuardianId) : null;
   const qrData = activeSection === "qr" ? await getQrAdminData(qrFilters) : null;
   const adminUsersData = activeSection === "admins" ? await getAdminUsersData() : null;
@@ -89,7 +91,9 @@ export default async function AdminPage({ searchParams }) {
   const adsData = activeSection === "ads" ? await getAdminAdsData() : null;
   const qrItems = qrData ? await withQrImages(qrData.qrCodes) : [];
   const title =
-    activeSection === "qr"
+    activeSection === "dashboard"
+      ? "대시보드"
+      : activeSection === "qr"
       ? "QR 관리"
       : activeSection === "admins"
         ? "관리자 관리"
@@ -103,7 +107,9 @@ export default async function AdminPage({ searchParams }) {
               ? "광고 관리"
               : "보호자 관리";
   const description =
-    activeSection === "qr"
+    activeSection === "dashboard"
+      ? "회원, 관리대상, QR, 실종신고, 광고와 월별 매출 현황을 한눈에 확인합니다."
+      : activeSection === "qr"
       ? "사람찾기 URL로 연결되는 QR 코드와 고유 문자열을 생성하고 활성 상태를 관리합니다."
       : activeSection === "admins"
         ? "가입된 보호자 사용자에게 관리자 역할을 부여하거나 회수합니다."
@@ -135,7 +141,9 @@ export default async function AdminPage({ searchParams }) {
             </div>
           </header>
 
-          {activeSection === "qr" ? (
+          {activeSection === "dashboard" ? (
+            <AdminDashboardSection dashboardData={dashboardData} />
+          ) : activeSection === "qr" ? (
             <QrManagementSection qrData={qrData} qrItems={qrItems} />
           ) : activeSection === "admins" ? (
             <AdminRoleManagementSection adminUsersData={adminUsersData} />
@@ -154,6 +162,49 @@ export default async function AdminPage({ searchParams }) {
       </section>
       <StatusToast message={notice} type={noticeType} />
     </main>
+  );
+}
+
+function AdminDashboardSection({ dashboardData }) {
+  const cards = [
+    { label: "전체 회원", value: dashboardData.totalGuardians, unit: "명", mark: "회", tone: "blue" },
+    { label: "관리대상자", value: dashboardData.totalSubjects, unit: "명", mark: "대", tone: "teal" },
+    { label: "활성 QR", value: dashboardData.activeQrCount, unit: "개", mark: "QR", tone: "green" },
+    { label: "실종신고 현황", value: dashboardData.missingReportCount, unit: "건", mark: "실", tone: "red" },
+    { label: "광고 진행중", value: dashboardData.activeAdCount, unit: "건", mark: "광", tone: "amber" },
+    { label: "월매출", value: dashboardData.monthlyRevenue, unit: "원", mark: "월", tone: "navy", emphasis: true },
+    { label: "상품매출", value: dashboardData.productRevenue, unit: "원", mark: "상", tone: "cyan" },
+    { label: "구독매출", value: dashboardData.subscriptionRevenue, unit: "원", mark: "구", tone: "violet" },
+  ];
+
+  return (
+    <section className="admin-dashboard-section" aria-labelledby="admin-dashboard-title">
+      <div className="admin-dashboard-heading">
+        <div>
+          <h2 id="admin-dashboard-title">운영 현황</h2>
+          <p>{formatDashboardMonth(dashboardData.month)} 기준</p>
+        </div>
+        <form action="/admin" className="admin-dashboard-month-form">
+          <input type="hidden" name="section" value="dashboard" />
+          <label>
+            <span>조회 월</span>
+            <input type="month" name="month" defaultValue={dashboardData.month} />
+          </label>
+          <button type="submit">조회</button>
+        </form>
+      </div>
+      <div className="admin-dashboard-grid">
+        {cards.map((card) => (
+          <article className={`admin-metric-card tone-${card.tone}${card.emphasis ? " is-emphasis" : ""}`} key={card.label}>
+            <span className="admin-metric-mark" aria-hidden="true">{card.mark}</span>
+            <div>
+              <span className="admin-metric-label">{card.label}</span>
+              <strong>{formatMetricValue(card.value)}<small>{card.unit}</small></strong>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -569,7 +620,7 @@ function GuardianManagementSection({ adminData }) {
           {guardians.map((guardian) => (
             <Link
               className={guardian.id === selectedGuardian?.id ? "guardian-row active" : "guardian-row"}
-              href={`/admin?guardian=${guardian.id}`}
+              href={`/admin?section=guardians&guardian=${guardian.id}`}
               key={guardian.id}
             >
               <div>
@@ -600,7 +651,7 @@ function GuardianManagementSection({ adminData }) {
               <form action={setGuardianActiveAction}>
                 <input type="hidden" name="guardianId" value={selectedGuardian.id} />
                 <input type="hidden" name="active" value={selectedGuardian.is_active ? "0" : "1"} />
-                <input type="hidden" name="returnTo" value={`/admin?guardian=${selectedGuardian.id}`} />
+                <input type="hidden" name="returnTo" value={`/admin?section=guardians&guardian=${selectedGuardian.id}`} />
                 <FormSubmitButton
                   className={selectedGuardian.is_active ? "danger-button compact" : "activate-button"}
                   pendingText={selectedGuardian.is_active ? "비활성화중" : "활성화중"}
@@ -903,6 +954,15 @@ function formatDateTime(value) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function formatMetricValue(value) {
+  return new Intl.NumberFormat("ko-KR").format(Number(value || 0));
+}
+
+function formatDashboardMonth(month) {
+  const [year, monthNumber] = String(month || "").split("-");
+  return year && monthNumber ? `${year}년 ${Number(monthNumber)}월` : "이번 달";
 }
 
 function formatFullAddress(address, detailAddress) {

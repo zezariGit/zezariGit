@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 const STORAGE_KEY = "zezari:admin-menu-collapsed";
 
 const MENU_ITEMS = [
-  { id: "guardians", label: "보호자 관리", href: "/admin" },
+  { id: "dashboard", label: "대시보드", href: "/admin" },
+  { id: "guardians", label: "보호자 관리", href: "/admin?section=guardians" },
   { id: "orders", label: "주문/배송", href: "/admin?section=orders" },
   { id: "qr", label: "QR 관리", href: "/admin?section=qr" },
   { id: "admins", label: "관리자 관리", href: "/admin?section=admins" },

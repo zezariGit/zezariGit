@@ -2193,6 +2193,45 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Production alias: `https://zezari.vercel.app`
 - Deployment status: Ready
 
+## 2026-06-24 KST - Administrator Operations Dashboard
+
+### User Request
+- Add a dashboard above Guardian Management in the administrator menu.
+- Show cards for total members, managed subjects, active QR codes, missing reports, active ads, monthly revenue, product revenue, and subscription revenue.
+- Follow the supplied screenshot for composition while keeping the project CSS style.
+
+### Reflected Work
+- Added Dashboard as the first administrator menu and default `/admin` section.
+- Moved Guardian Management to the explicit `section=guardians` route and repaired guardian selection/return URLs.
+- Added a month picker for revenue lookup.
+- Added eight responsive metric cards using the existing government-style color and spacing tokens.
+- Added `getAdminDashboardData()` with batched count and revenue queries.
+- Defined an active QR as both administrator-enabled and user-activated.
+- Defined an active missing report as a subject with status `찾는중`.
+- Defined an active advertisement as `subject_ads.status = 'active'`.
+- Split paid monthly order revenue into standalone product and subscription sales.
+- Added unmatched latest subscription payments while preventing duplicate counting against subscription product orders.
+- Calculated month boundaries using Korean time through SQLite `+9 hours` conversion.
+
+### Verification
+- `npm run build` succeeded.
+- Isolated SQLite fixtures produced the exact expected eight metrics: 2 members, 3 subjects, 1 active QR, 1 missing report, 1 active ad, KRW 5,000 product revenue, KRW 36,900 subscription revenue, and KRW 41,900 monthly revenue.
+- Changing the selected month to May 2026 produced KRW 7,000 monthly revenue.
+- Dashboard was the active default menu and Guardian Management routing remained functional.
+- Playwright/Chrome visual checks confirmed four desktop columns, one mobile column, and no horizontal overflow.
+- The temporary database, administrator account, and screenshots were deleted after verification.
+
+### Data Limitation
+- Recurring subscription payment history is currently derived from paid subscription orders plus the latest unmatched subscription payment.
+- A dedicated payment transaction ledger will be needed for multiple recurring billing cycles, cancellations, refunds, and settlement reconciliation.
+
+### Deliverable
+- `deliverables/ADMIN_DASHBOARD_METRICS.md`
+- Includes metric definitions, implementation map, validation values, operational limits, and a presentation image prompt.
+
+### Time Spent
+- Data definition, implementation, route correction, isolated aggregate testing, visual verification, and documentation: about 45 minutes.
+
 ## 2026-06-23 KST - Legacy Kakao/Naver and Toss Integration
 
 ### User Request
