@@ -2525,3 +2525,11 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 데이터 매핑, 스키마, UI, 링크, 최신 4건 테스트, 반응형 검증, 문서화: 약 50분.
+
+### GitHub·운영반영
+- GitHub 기능 커밋: `68cbe18`
+- Vercel 배포: `https://zezari-m5i4jao30-zezari.vercel.app`
+- 운영 주소: `https://zezari.vercel.app`
+- 배포 상태: Ready
+- 운영 대시보드·고객문의 화면 HTTP 200 확인.
+- Turso 스키마 버전 4와 고객문의 테이블 생성 확인.

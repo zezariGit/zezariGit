@@ -2279,6 +2279,14 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Time Spent
 - Data mapping, schema preparation, UI, links, isolated five-record testing, responsive verification, and documentation: about 50 minutes.
 
+### GitHub and Production
+- GitHub feature commit: `68cbe18 Add admin dashboard recent status`
+- Vercel deployment: `https://zezari-m5i4jao30-zezari.vercel.app`
+- Production alias: `https://zezari.vercel.app`
+- Deployment status: Ready
+- Authenticated production dashboard and inquiry screen returned HTTP 200.
+- Production Turso schema version 4 and `customer_inquiries` table were confirmed.
+
 ## 2026-06-23 KST - Legacy Kakao/Naver and Toss Integration
 
 ### User Request
