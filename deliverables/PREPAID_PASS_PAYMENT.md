@@ -76,3 +76,12 @@
 
 ## 10. 발표용 이미지 생성 프롬프트
 Create a polished Korean civic-tech flow diagram for "REAL_QR_FIND" prepaid QR safety passes. Show a guardian selecting a managed subject and a 1, 3, or 6 month pass, completing one-time payment through Toss Payments Widget, receiving a QR product, scanning the exact QR assigned to the ordered subject, and starting the pass only after QR activation. Add renewal extending from the current expiry date, pause freezing the remaining period, resume extending the expiry by the paused duration, and expired or paused states hiding all personal information on the public QR page. Include Next.js, Toss Payments confirm API, Turso tables `product_orders`, `subscriptions`, `subjects`, and `qr_codes`, plus server checks for guardian ownership, order ID, amount, payment status, and subject-to-QR match. Use white work surfaces, civic blue, green active, amber ready or paused, red expired, compact Korean labels, and no real credentials or personal information.
+
+## 11. 배포 결과
+- GitHub 기능 커밋: `c786b3d Convert subscriptions to prepaid QR passes`
+- Vercel 운영 배포: `https://zezari-aio9zrzb1-zezari.vercel.app`
+- 운영 주소: `https://zezari.vercel.app`
+- 배포 상태: Ready
+- 운영 Turso 스키마 버전 6과 1·3·6개월 이용권 이름을 확인했다.
+- 운영 로그인 상태에서 결제위젯 설정 API 200, 결제수단·약관 iframe 2개, 결제 버튼 활성화를 확인했다.
+- 실제 주문 생성과 금전 거래는 실행하지 않았다.

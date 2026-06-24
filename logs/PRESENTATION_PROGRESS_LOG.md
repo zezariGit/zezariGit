@@ -2681,3 +2681,12 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 결제 구조 전환, 기간 계산, 개인정보 보호, 화면·DB 테스트, 문서화: 약 75분.
+
+### GitHub·운영반영
+- GitHub 기능 커밋: `c786b3d`
+- Vercel 배포: `https://zezari-aio9zrzb1-zezari.vercel.app`
+- 운영 주소: `https://zezari.vercel.app`
+- 배포 상태: Ready
+- 운영 Turso 스키마 버전 6과 1·3·6개월 이용권 이름 확인.
+- 운영 마이페이지의 선불 이용권 문구, 결제위젯 설정 API 200, 토스 결제수단·약관 iframe 2개, 결제 버튼 활성화 확인.
+- 운영 검증 중 주문 생성과 실제 금전 거래는 실행하지 않음.

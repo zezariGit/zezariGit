@@ -4037,5 +4037,20 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `deliverables/PREPAID_PASS_PAYMENT.md`
 - Includes state transitions, security rules, test evidence, operations checklist, and image-generation prompt.
 
+### Deployment
+- GitHub feature commit: `c786b3d Convert subscriptions to prepaid QR passes`
+- Vercel production deployment: `https://zezari-aio9zrzb1-zezari.vercel.app`
+- Production alias: `https://zezari.vercel.app`
+- Deployment state: Ready
+
+### Production Verification
+- Production home and dynamic find check returned HTTP 200.
+- Unauthenticated widget config correctly returned HTTP 401.
+- Authenticated account billing showed the prepaid pass heading and explicit non-auto-renewal copy.
+- Authenticated widget config returned HTTP 200 with configured widget keys and a hashed customer key.
+- The live Toss payment-method and agreement frames both rendered and the payment button became enabled.
+- Turso schema version 6 and the 1, 3, and 6 month pass labels were confirmed.
+- No production order was created and no financial transaction was submitted.
+
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
