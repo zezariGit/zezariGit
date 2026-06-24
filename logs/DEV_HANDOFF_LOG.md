@@ -3967,5 +3967,17 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Deliverable
 - `deliverables/TOSS_PAYMENT_WIDGET_LIVE_INTEGRATION.md`
 
+### Deployment
+- GitHub feature commit: `2abfee9 Integrate Toss live payment widget`
+- Vercel production deployment: `https://zezari-1ms1dpbib-zezari.vercel.app`
+- Production alias: `https://zezari.vercel.app`
+- Deployment state: Ready
+
+### Production Verification
+- Authenticated production widget config returned HTTP 200 and recognized the live payment-widget key type.
+- Toss payment-method and required-agreement frames rendered on the production shop page.
+- The production checkout button enabled after widget readiness.
+- No production order was created and no financial transaction was submitted during verification.
+
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.

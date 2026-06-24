@@ -2639,3 +2639,11 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 결제 구조 분석, 위젯·승인 구현, 로컬 SDK 검증, Vercel 환경설정, 문서화: 약 55분.
+
+### GitHub·운영반영
+- GitHub 기능 커밋: `2abfee9`
+- Vercel 배포: `https://zezari-1ms1dpbib-zezari.vercel.app`
+- 운영 주소: `https://zezari.vercel.app`
+- 배포 상태: Ready
+- 운영 상품 결제화면에서 토스 라이브 결제수단·필수약관 위젯과 결제하기 버튼 활성화 확인.
+- 운영 검증 중 주문 생성과 실제 금전 거래는 실행하지 않음.
