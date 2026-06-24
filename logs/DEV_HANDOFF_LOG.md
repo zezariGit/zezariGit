@@ -2331,6 +2331,14 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Time Spent
 - Data design, schema migration, actions, two master/detail screens, filtering, visual correction, authenticated testing, and documentation: about 75 minutes.
 
+### GitHub and Production
+- GitHub feature commit: `aec4921 Split guardian and subject administration`
+- Vercel deployment: `https://zezari-kuey3f4bf-zezari.vercel.app`
+- Production alias: `https://zezari.vercel.app`
+- Deployment status: Ready
+- Authenticated production Guardian, Subject, and Orders screens returned HTTP 200.
+- Production Turso schema version 5 and `guardians.admin_memo` were confirmed.
+
 ## 2026-06-23 KST - Legacy Kakao/Naver and Toss Integration
 
 ### User Request
