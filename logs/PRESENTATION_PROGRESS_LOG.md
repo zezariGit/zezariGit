@@ -2604,3 +2604,10 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 화면·데이터 개편, 저장 테스트, 반응형 검증, 문서화: 약 35분.
+
+### GitHub·운영반영
+- GitHub 기능 커밋: `b3715ec`
+- Vercel 배포: `https://zezari-h8yvds49o-zezari.vercel.app`
+- 운영 주소: `https://zezari.vercel.app`
+- 배포 상태: Ready
+- 인증된 운영 주문/배송 화면 HTTP 200, 주문 그리드·7개 열·상세 패널 확인.

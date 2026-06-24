@@ -3914,5 +3914,15 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `deliverables/ADMIN_ORDER_GRID_MANAGEMENT.md`
 - Includes screen/data contracts, save rules, verification, and a presentation image-generation prompt.
 
+### Deployment
+- GitHub feature commit: `b3715ec Rebuild order shipping admin as grid`
+- Vercel production deployment: `https://zezari-h8yvds49o-zezari.vercel.app`
+- Production alias: `https://zezari.vercel.app`
+- Deployment state: Ready
+
+### Production Verification
+- Authenticated `https://zezari.vercel.app/admin?section=orders` returned HTTP 200.
+- Production HTML contains the order grid, seven grid headings, and selected-order detail panel.
+
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
