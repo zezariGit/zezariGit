@@ -144,3 +144,14 @@ Create a clean Korean civic-tech system migration diagram for "REAL_QR_FIND". On
 
 ### Notes
 - Use when explaining what was migrated from configuration and what was intentionally not copied.
+
+## 2026-06-24 - Prepaid QR Pass Payment And Activation
+
+### Purpose
+- Presentation diagram for the one-time Toss payment, subject-specific QR activation, renewal, pause/resume, expiry, and privacy flow.
+
+### Prompt
+Create a polished Korean civic-tech flow diagram for "REAL_QR_FIND" prepaid QR safety passes. Show a guardian selecting a managed subject and a 1, 3, or 6 month pass, completing one-time payment through Toss Payments Widget, receiving a QR product, scanning the exact QR assigned to the ordered subject, and starting the pass only after QR activation. Add renewal extending from the current expiry date, pause freezing the remaining period, resume extending the expiry by the paused duration, and expired or paused states hiding all personal information on the public QR page. Include Next.js, Toss Payments confirm API, Turso tables `product_orders`, `subscriptions`, `subjects`, and `qr_codes`, plus server checks for guardian ownership, order ID, amount, payment status, and subject-to-QR match. Use white work surfaces, civic blue, green active, amber ready or paused, red expired, compact Korean labels, and no real credentials or personal information.
+
+### Notes
+- Use when explaining why the service no longer requires an automatic-billing contract and how public QR privacy follows the paid period.

@@ -18,6 +18,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `UI_STYLE_GUIDE.md`: gov-style design base and future page styling rules.
 - `QR_MANAGEMENT.md`: QR generation, unique URL strings, admin activation, and public find URL behavior.
 - `TOSS_PAYMENTS_SETUP.md`: Toss Payments subscription payment foundation and callback flow.
+- `PREPAID_PASS_PAYMENT.md`: one-time Toss payment, QR-based pass activation, renewal, pause/resume, expiry, and privacy rules.
 - `PUSH_NOTIFICATION_SETUP.md`: guardian browser push registration and QR find-page notification flow.
 - `ADVERTISING_SETUP.md`: dashboard subject advertisement modal, admin daily rate, advertisement progress foundation, and Meta API preparation.
 - `USER_MANUAL.md`: Google Docs user manual link, coverage, and maintenance rule.

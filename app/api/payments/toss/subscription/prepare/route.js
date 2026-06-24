@@ -1,8 +1,13 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "../../../../../../lib/auth";
-import { prepareSubscriptionForGuardian, saveProductOrderDraft } from "../../../../../../lib/db";
-import { getTossCallbackUrls, getTossClientKey, isTossConfigured } from "../../../../../../lib/toss-payments";
+import { saveProductOrderDraft } from "../../../../../../lib/db";
+import {
+  createTossCustomerKey,
+  getTossCallbackUrls,
+  getTossWidgetClientKey,
+  isTossWidgetConfigured,
+} from "../../../../../../lib/toss-payments";
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
@@ -12,46 +17,37 @@ export async function POST(request) {
 
   const body = await request.json().catch(() => ({}));
   const planMonths = Number(body?.planMonths || 1);
-  let productOrder = null;
-  if (body?.productId) {
-    productOrder = await saveProductOrderDraft(session, {
+  try {
+    if (!body?.productId) throw new Error("이용권과 함께 구매할 상품을 선택해 주세요.");
+    const productOrder = await saveProductOrderDraft(session, {
       productId: body.productId,
       subjectId: body.subjectId,
       quantity: body.quantity,
       designIndex: body.designIndex,
       shippingAddress: body.shippingAddress,
       shippingAddressDetail: body.shippingAddressDetail,
-      paymentMethod: body.paymentMethod,
+      paymentMethod: "WIDGET",
       orderType: "subscription",
       planMonths,
     });
-  }
-  const { guardian, subscription, plan } = await prepareSubscriptionForGuardian(session, planMonths);
-  const configured = isTossConfigured();
-  const { successUrl: baseSuccessUrl, failUrl } = getTossCallbackUrls();
-  const successUrl = productOrder
-    ? appendQuery(baseSuccessUrl, { productOrderId: productOrder.id })
-    : baseSuccessUrl;
+    const configured = isTossWidgetConfigured();
+    const { successUrl, failUrl } = getTossCallbackUrls(productOrder.id);
 
-  return NextResponse.json({
-    configured,
-    clientKey: configured ? getTossClientKey() : "",
-    customerKey: subscription.customer_key,
-    productOrderId: productOrder?.id || "",
-    planMonths: plan.months,
-    amount: plan.amount,
-    orderName: plan.name,
-    successUrl,
-    failUrl,
-    customerName: guardian.name || session.user?.name || "",
-    customerEmail: guardian.email || session.user?.email || "",
-  });
-}
-
-function appendQuery(url, values) {
-  const next = new URL(url);
-  for (const [key, value] of Object.entries(values)) {
-    if (value) next.searchParams.set(key, value);
+    return NextResponse.json({
+      configured,
+      clientKey: configured ? getTossWidgetClientKey() : "",
+      customerKey: createTossCustomerKey(session.user?.id || session.user?.email),
+      productOrderId: productOrder.id,
+      orderId: productOrder.tossOrderId,
+      planMonths: productOrder.plan.months,
+      amount: productOrder.amount,
+      orderName: `${productOrder.product.name} + ${productOrder.plan.name}`,
+      successUrl,
+      failUrl,
+      customerName: productOrder.guardian.name || session.user?.name || "",
+      customerEmail: productOrder.guardian.email || session.user?.email || "",
+    });
+  } catch (error) {
+    return NextResponse.json({ message: error.message || "이용권 결제 준비에 실패했습니다." }, { status: 400 });
   }
-  return next.toString();
 }

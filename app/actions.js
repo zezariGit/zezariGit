@@ -116,7 +116,7 @@ export async function activateQrAction(formData) {
   } catch (error) {
     redirect(withNotice(`/find/${publicKey}`, error.message || "QR 활성화에 실패했습니다.", "error"));
   }
-  redirect(withNotice(`/find/${publicKey}`, "QR 코드가 활성화되었습니다. 오늘부터 구독기간이 시작됩니다."));
+  redirect(withNotice(`/find/${publicKey}`, "QR 코드가 활성화되었습니다. 오늘부터 이용기간이 시작됩니다."));
 }
 
 export async function registerCouponAction(formData) {

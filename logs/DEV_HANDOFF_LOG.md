@@ -3979,5 +3979,63 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - The production checkout button enabled after widget readiness.
 - No production order was created and no financial transaction was submitted during verification.
 
+## 2026-06-24 KST - Toss Automatic Billing To Prepaid Pass Conversion
+
+### User Request
+- Proceed with option 2: remove the automatic-billing dependency and implement 1, 3, and 6 month one-time pass payments through the Toss payment widget.
+- Start the first paid period when the guardian activates the ordered subject's QR, extend renewals from the current end date, preserve time during pause, and hide public QR personal information after expiry.
+
+### Reflected Work
+- Removed billing-key issue and automatic billing API paths from the subscription checkout.
+- Unified both pass and standalone product checkout on the Toss Payments Widget V2 one-time payment flow.
+- Added server-side pass completion with guardian ownership, order ID, amount, Toss status, and idempotent order-state validation.
+- A new pass is stored as `ready` until the ordered subject's QR is activated.
+- Restricted activation to the managed subject selected in the paid order; another subject's QR is rejected before any QR or subscription mutation.
+- Active and paused renewals extend from the stored period end with calendar-month end clamping.
+- Pause/resume now extends the expiry by the actual paused duration.
+- Expired active rows and active rows without an end date normalize to `expired`.
+- Public QR pages hide subject and guardian personal information for ready, paused, expired, failed, and missing-pass states.
+- Added pass status controls and explicit non-auto-renewal guidance to the account billing page.
+- Updated schema version to 6 and renamed plan labels while retaining admin-set prices.
+- Kept the legacy `billing_key` column for compatibility but clear it in new payment and activation paths.
+
+### Files Changed
+- `lib/db.js`
+- `lib/toss-payments.js`
+- `app/shop-checkout-client.js`
+- `app/api/payments/toss/subscription/prepare/route.js`
+- `app/payments/toss/subscription/success/page.js`
+- `app/payments/toss/subscription/fail/page.js`
+- `app/payments/toss/product/fail/page.js`
+- `app/find/[key]/page.js`
+- `app/account/billing/page.js`
+- `app/account/account-ui.js`
+- `app/account/subscription-controls.js`
+- `app/api/subscription/status/route.js`
+- `app/dashboard.js`
+- `app/admin/page.js`
+- `app/admin/actions.js`
+- `app/actions.js`
+- `app/globals.css`
+- `app/toss-subscription-button.js` removed
+- `deliverables/PREPAID_PASS_PAYMENT.md`
+
+### Verification
+- `npm run build` succeeded.
+- Seven prepaid lifecycle DB scenarios passed.
+- Five QR target and expiry privacy boundary scenarios passed.
+- Real Toss payment-method and agreement frames rendered locally without submitting a payment.
+- Checkout had no horizontal overflow at 1440px and 390px.
+- Expired QR output contained no subject name, guardian name, safe phone, or address.
+- QR activation, pause, and resume UI flows completed against an isolated local database.
+- No financial transaction was submitted.
+
+### Time Spent
+- Payment conversion, period rules, privacy hardening, responsive/browser verification, edge-case fixes, and documentation: about 75 minutes.
+
+### Deliverable
+- `deliverables/PREPAID_PASS_PAYMENT.md`
+- Includes state transitions, security rules, test evidence, operations checklist, and image-generation prompt.
+
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.

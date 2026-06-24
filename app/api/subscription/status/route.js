@@ -13,14 +13,19 @@ export async function POST(request) {
   const body = await request.json().catch(() => ({}));
   const action = String(body?.action || "").trim();
 
-  if (action === "pause") {
-    await pauseSubscriptionForGuardian(session);
-  } else if (action === "resume") {
-    await resumeSubscriptionForGuardian(session);
-  } else {
-    return NextResponse.json({ message: "지원하지 않는 구독 상태 변경입니다." }, { status: 400 });
-  }
+  try {
+    if (action === "pause") {
+      await pauseSubscriptionForGuardian(session);
+    } else if (action === "resume") {
+      await resumeSubscriptionForGuardian(session);
+    } else {
+      return NextResponse.json({ message: "지원하지 않는 이용권 상태 변경입니다." }, { status: 400 });
+    }
 
-  revalidatePath("/");
-  return NextResponse.json({ ok: true });
+    revalidatePath("/");
+    revalidatePath("/account/billing");
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    return NextResponse.json({ message: error.message || "이용권 상태를 변경하지 못했습니다." }, { status: 400 });
+  }
 }

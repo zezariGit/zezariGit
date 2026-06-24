@@ -26,10 +26,12 @@ export function formatDate(value) {
 }
 
 export function subscriptionStatusLabel(status) {
-  if (status === "active") return "구독중";
+  if (status === "active") return "이용중";
   if (status === "paused") return "일시정지";
-  if (status === "ready") return "결제대기";
-  return "미구독";
+  if (status === "ready") return "QR 활성화 대기";
+  if (status === "expired") return "이용기간 만료";
+  if (status === "failed") return "결제 실패";
+  return "미이용";
 }
 
 export function adStatusLabel(status) {

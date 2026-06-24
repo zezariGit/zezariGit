@@ -139,7 +139,7 @@ export default async function AdminPage({ searchParams }) {
       : activeSection === "admins"
         ? "가입된 보호자 사용자에게 관리자 역할을 부여하거나 회수합니다."
         : activeSection === "payments"
-          ? "구독 옵션별 기간과 가격을 관리합니다."
+          ? "선불 이용권의 기간과 가격을 관리합니다."
           : activeSection === "products"
             ? "사용자 상품 선택 화면에 노출되는 상품 이미지, 가격, 활성 상태를 관리합니다."
             : activeSection === "orders"
@@ -148,7 +148,7 @@ export default async function AdminPage({ searchParams }) {
               ? "광고 일 단가를 설정하고 사용자별 광고 진행사항을 조회합니다."
               : activeSection === "inquiries"
                 ? "접수된 고객문의의 제목, 작성자, 상태와 작성일시를 조회합니다."
-                : "보호자 목록을 조회하고 배송지, 등록대상자, 구독, 결제, 광고와 관리메모를 확인합니다.";
+                : "보호자 목록을 조회하고 배송지, 등록대상자, 이용권, 결제, 광고와 관리메모를 확인합니다.";
 
   return (
     <main className="admin-page">
@@ -205,7 +205,7 @@ function AdminDashboardSection({ dashboardData }) {
     { label: "광고 진행중", value: dashboardData.activeAdCount, unit: "건", mark: "광", tone: "amber" },
     { label: "월매출", value: dashboardData.monthlyRevenue, unit: "원", mark: "월", tone: "navy", emphasis: true },
     { label: "상품매출", value: dashboardData.productRevenue, unit: "원", mark: "상", tone: "cyan" },
-    { label: "구독매출", value: dashboardData.subscriptionRevenue, unit: "원", mark: "구", tone: "violet" },
+    { label: "이용권 매출", value: dashboardData.subscriptionRevenue, unit: "원", mark: "이", tone: "violet" },
   ];
 
   return (
@@ -472,7 +472,7 @@ function OrderManagementSection({ ordersData }) {
                 <dl className="admin-detail-list">
                   <div><dt>상품</dt><dd>{selectedOrder.product_name || "상품 미확인"} / {selectedOrder.quantity || 1}개</dd></div>
                   <div><dt>대상자</dt><dd>{selectedOrder.subject_name || "미선택"}</dd></div>
-                  <div><dt>구매유형</dt><dd>{selectedOrder.order_type === "standalone" ? "상품 단독 구매" : `${selectedOrder.plan_months || "-"}개월 구독`}</dd></div>
+                  <div><dt>구매유형</dt><dd>{selectedOrder.order_type === "standalone" ? "상품 단독 구매" : `${selectedOrder.plan_months || "-"}개월 이용권`}</dd></div>
                   <div><dt>결제금액</dt><dd>{formatCurrency(selectedOrder.amount)}</dd></div>
                   <div><dt>결제수단</dt><dd>{selectedOrder.payment_method || "-"}</dd></div>
                   <div><dt>결제일</dt><dd>{formatDateTime(selectedOrder.paid_at)}</dd></div>
@@ -617,7 +617,7 @@ function PaymentManagementSection({ paymentData }) {
     <div className="qr-admin-stack">
       <section className="admin-panel">
         <div className="panel-heading">
-          <h2>구독 옵션 가격</h2>
+          <h2>이용권 옵션 가격</h2>
           <span>{plans.length}개</span>
         </div>
         <div className="payment-plan-grid">
@@ -884,10 +884,10 @@ function GuardianManagementSection({ adminData }) {
             </section>
 
             <section className="admin-detail-section">
-              <h3>구독현황</h3>
+              <h3>이용권 현황</h3>
               <dl className="admin-detail-list">
                 <div><dt>상태</dt><dd>{subscriptionStatusLabel(subscription?.status)}</dd></div>
-                <div><dt>상품</dt><dd>{subscription?.plan_name || "구독 정보 없음"}</dd></div>
+                <div><dt>상품</dt><dd>{subscription?.plan_name || "이용권 정보 없음"}</dd></div>
                 <div><dt>기간</dt><dd>{subscription ? `${Number(subscription.plan_months || 1)}개월` : "-"}</dd></div>
                 <div><dt>이용기간</dt><dd>{subscription?.current_period_start ? `${formatDateOnlyValue(subscription.current_period_start)} ~ ${formatDateOnlyValue(subscription.current_period_end)}` : "-"}</dd></div>
               </dl>
@@ -1406,15 +1406,16 @@ function inquiryStatusLabel(status) {
 }
 
 function subscriptionStatusLabel(status) {
-  if (status === "active") return "구독중";
+  if (status === "active") return "이용중";
   if (status === "paused") return "일시정지";
   if (status === "ready") return "활성화 대기";
   if (status === "cancelled") return "해지";
-  return "구독 정보 없음";
+  if (status === "expired") return "기간 만료";
+  return "이용권 정보 없음";
 }
 
 function orderTypeLabel(type) {
-  return type === "subscription" ? "구독 주문" : "상품 주문";
+  return type === "subscription" ? "이용권 주문" : "상품 주문";
 }
 
 function qrAdminStateLabel(subject) {

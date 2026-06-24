@@ -5994,6 +5994,34 @@ button:disabled:hover {
   font-weight: 800;
 }
 
+.account-subscription-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-primary-light);
+}
+
+.account-subscription-summary > div:first-child {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.account-subscription-summary strong {
+  color: var(--c-primary-dark);
+  font-size: 1rem;
+}
+
+.account-subscription-summary span {
+  color: var(--c-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
 .account-subject-list,
 .account-history-list,
 .coupon-list,
@@ -6620,6 +6648,7 @@ button:disabled:hover {
   .coupon-card,
   .payment-method-card,
   .ad-dashboard-card,
+  .account-subscription-summary,
   .coupon-register-form > div {
     grid-template-columns: 1fr;
   }

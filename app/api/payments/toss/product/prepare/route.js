@@ -38,7 +38,7 @@ export async function POST(request) {
       productOrderId: order.id,
       orderId: order.tossOrderId,
       amount: order.amount,
-      orderName: `${order.product.name} ${order.orderType === "standalone" ? "단독 구매" : "구독"}`,
+      orderName: `${order.product.name} 단독 구매`,
       successUrl,
       failUrl,
     });

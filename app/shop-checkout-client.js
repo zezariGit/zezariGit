@@ -14,7 +14,6 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
   const [designIndex, setDesignIndex] = useState(0);
   const [shippingAddress, setShippingAddress] = useState(guardian?.address || "");
   const [shippingAddressDetail, setShippingAddressDetail] = useState(guardian?.address_detail || "");
-  const [paymentMethod, setPaymentMethod] = useState("CARD");
   const [sdkReady, setSdkReady] = useState(false);
   const [widgetStatus, setWidgetStatus] = useState("idle");
   const [loading, setLoading] = useState(false);
@@ -52,7 +51,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
   }, []);
 
   useEffect(() => {
-    if (step !== "order" || mode !== "standalone" || !sdkReady) {
+    if (step !== "order" || !sdkReady) {
       widgetRef.current = null;
       setWidgetStatus("idle");
       return undefined;
@@ -72,7 +71,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
 
         const tossPayments = window.TossPayments(data.clientKey);
         const widgets = tossPayments.widgets({ customerKey: data.customerKey });
-        await widgets.setAmount({ currency: "KRW", value: productAmount });
+        await widgets.setAmount({ currency: "KRW", value: paymentAmount });
         if (cancelled) return;
 
         widgetRef.current = widgets;
@@ -95,7 +94,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
       cancelled = true;
       widgetRef.current = null;
     };
-  }, [mode, productAmount, sdkReady, step]);
+  }, [paymentAmount, sdkReady, step]);
 
   const changeQuantity = (next) => {
     setQuantity(Math.max(1, Math.min(99, Number(next) || 1)));
@@ -103,11 +102,10 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
 
   const chooseMode = (nextMode) => {
     if (nextMode === "standalone" && !subscribed) {
-      setMessage("상품 단독 구매는 구독중인 고객만 선택할 수 있습니다.");
+      setMessage("상품 단독 구매는 이용권 사용중인 고객만 선택할 수 있습니다.");
       return;
     }
     setMode(nextMode);
-    setPaymentMethod(nextMode === "subscription" ? "CARD" : "WIDGET");
     setMessage("");
   };
 
@@ -117,7 +115,11 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
       return false;
     }
     if (mode === "standalone" && !subscribed) {
-      setMessage("상품 단독 구매는 구독중인 고객만 선택할 수 있습니다.");
+      setMessage("상품 단독 구매는 이용권 사용중인 고객만 선택할 수 있습니다.");
+      return false;
+    }
+    if (mode === "subscription" && subscription?.status === "ready") {
+      setMessage("QR 활성화를 기다리는 이용권이 있습니다. QR 활성화 후 추가 구매해 주세요.");
       return false;
     }
     if (step === "order" && !shippingAddress.trim()) {
@@ -139,6 +141,10 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
   };
 
   const startSubscription = async () => {
+    if (!widgetRef.current || widgetStatus !== "ready") {
+      throw new Error("결제수단을 준비 중입니다. 잠시 후 다시 시도해 주세요.");
+    }
+
     const response = await fetch("/api/payments/toss/subscription/prepare", {
       method: "POST",
       headers: {
@@ -152,27 +158,24 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
         designIndex,
         shippingAddress,
         shippingAddressDetail,
-        paymentMethod,
+        paymentMethod: "WIDGET",
       }),
     });
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data?.message || "구독 결제 준비에 실패했습니다.");
+      throw new Error(data?.message || "이용권 결제 준비에 실패했습니다.");
     }
     if (!data.configured) {
       throw new Error("Toss Payments 키 설정이 필요합니다.");
     }
-    if (!window.TossPayments) {
-      throw new Error("결제 SDK가 아직 준비되지 않았습니다.");
-    }
-
-    const tossPayments = window.TossPayments(data.clientKey);
-    const payment = tossPayments.payment({ customerKey: data.customerKey });
-    await payment.requestBillingAuth({
-      method: "CARD",
+    await widgetRef.current.requestPayment({
+      orderId: data.orderId,
+      orderName: data.orderName,
       successUrl: data.successUrl,
       failUrl: data.failUrl,
+      customerEmail: data.customerEmail || guardian?.email || guardian?.google_email || "",
+      customerName: data.customerName || guardian?.name || "",
     });
   };
 
@@ -221,7 +224,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
       setMessage("결제 SDK를 준비 중입니다. 잠시 후 다시 시도해 주세요.");
       return;
     }
-    if (mode === "standalone" && widgetStatus !== "ready") {
+    if (widgetStatus !== "ready") {
       setMessage("결제수단을 준비 중입니다. 잠시 후 다시 시도해 주세요.");
       return;
     }
@@ -303,19 +306,16 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
             setShippingAddress={setShippingAddress}
             shippingAddressDetail={shippingAddressDetail}
             setShippingAddressDetail={setShippingAddressDetail}
-            paymentMethod={paymentMethod}
-            setPaymentMethod={setPaymentMethod}
             widgetStatus={widgetStatus}
-            mode={mode}
             amount={paymentAmount}
           />
           <button
             className="shop-next-button"
             type="button"
             onClick={pay}
-            disabled={loading || (mode === "standalone" && widgetStatus !== "ready")}
+            disabled={loading || widgetStatus !== "ready"}
           >
-            {loading ? "결제 준비중" : mode === "standalone" && widgetStatus !== "ready" ? "결제수단 준비중" : "결제하기"}
+            {loading ? "결제 준비중" : widgetStatus !== "ready" ? "결제수단 준비중" : "결제하기"}
           </button>
         </>
       )}
@@ -389,33 +389,36 @@ function ProductConfiguration({
 
       <div className="purchase-mode-tabs" role="tablist" aria-label="구매 방식">
         <button className={mode === "subscription" ? "active" : ""} type="button" onClick={() => chooseMode("subscription")}>
-          구독기간
+          이용기간
         </button>
         <button
           className={mode === "standalone" ? "active" : ""}
           type="button"
           onClick={() => chooseMode("standalone")}
           disabled={!subscribed}
-          title={subscribed ? "상품 단독 구매" : "구독중인 고객만 선택 가능합니다"}
+          title={subscribed ? "상품 단독 구매" : "이용권 사용중인 고객만 선택 가능합니다"}
         >
           상품 단독 구매
         </button>
       </div>
 
       {mode === "subscription" ? (
-        <div className="plan-choice-list">
-          {plans.map((plan) => (
-            <button
-              className={String(plan.months) === String(planMonths) ? "active" : ""}
-              type="button"
-              key={plan.months}
-              onClick={() => setPlanMonths(String(plan.months))}
-            >
-              <span>{planLabel(plan.months)}</span>
-              <strong>{formatCurrency(plan.amount)}{plan.months === 1 ? "/월" : ""}</strong>
-            </button>
-          ))}
-        </div>
+        <>
+          <div className="plan-choice-list">
+            {plans.map((plan) => (
+              <button
+                className={String(plan.months) === String(planMonths) ? "active" : ""}
+                type="button"
+                key={plan.months}
+                onClick={() => setPlanMonths(String(plan.months))}
+              >
+                <span>{planLabel(plan.months)}</span>
+                <strong>{formatCurrency(plan.amount)}</strong>
+              </button>
+            ))}
+          </div>
+          <p className="shop-note">선택한 기간을 한 번 결제하며 자동 갱신되지 않습니다.</p>
+        </>
       ) : (
         <div className="standalone-info-panel">
           <div className="shop-summary-list">
@@ -426,7 +429,7 @@ function ProductConfiguration({
             <span>결제예정금액</span>
             <strong>{formatCurrency(productAmount)}</strong>
           </div>
-          <p className="shop-warning">상품 단독 구매는 구독중 고객에게만 표시됩니다.</p>
+          <p className="shop-warning">상품 단독 구매는 이용권 사용중인 고객에게만 표시됩니다.</p>
         </div>
       )}
     </>
@@ -464,10 +467,7 @@ function OrderInformation({
   setShippingAddress,
   shippingAddressDetail,
   setShippingAddressDetail,
-  paymentMethod,
-  setPaymentMethod,
   widgetStatus,
-  mode,
   amount,
 }) {
   return (
@@ -515,20 +515,11 @@ function OrderInformation({
 
       <section className="order-section">
         <h2>4. 결제 방법</h2>
-        {mode === "standalone" ? (
-          <div className="toss-widget-shell" aria-busy={widgetStatus === "loading"}>
-            <div id="toss-payment-methods" className="toss-widget-container" />
-            <div id="toss-payment-agreement" className="toss-widget-container" />
-            {widgetStatus === "loading" && <p className="toss-widget-status">안전한 결제수단을 불러오고 있습니다.</p>}
-          </div>
-        ) : (
-          <div className="payment-method-list">
-            <label>
-              <input type="radio" name="paymentMethod" value="CARD" checked={paymentMethod === "CARD"} onChange={(event) => setPaymentMethod(event.target.value)} />
-              <span>신용/체크카드 자동결제 등록</span>
-            </label>
-          </div>
-        )}
+        <div className="toss-widget-shell" aria-busy={widgetStatus === "loading"}>
+          <div id="toss-payment-methods" className="toss-widget-container" />
+          <div id="toss-payment-agreement" className="toss-widget-container" />
+          {widgetStatus === "loading" && <p className="toss-widget-status">안전한 결제수단을 불러오고 있습니다.</p>}
+        </div>
       </section>
     </div>
   );
@@ -550,9 +541,6 @@ function productFallbackIcon(slug) {
 }
 
 function planLabel(months) {
-  if (Number(months) === 1) return "월간";
-  if (Number(months) === 12) return "연간";
-  if (Number(months) === 0) return "평생권";
   return `${months}개월`;
 }
 

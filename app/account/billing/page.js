@@ -5,6 +5,7 @@ import StatusToast from "../../status-toast";
 import { authOptions } from "../../../lib/auth";
 import { getGuardianBillingData } from "../../../lib/db";
 import { AccountTopbar, formatCurrency, formatDate, subscriptionStatusLabel } from "../account-ui";
+import SubscriptionControls from "../subscription-controls";
 
 export default async function BillingPage({ searchParams }) {
   const session = await getServerSession(authOptions);
@@ -15,23 +16,31 @@ export default async function BillingPage({ searchParams }) {
   const noticeType = params?.noticeType || "success";
   const { subjects, subscription, productOrders } = await getGuardianBillingData(session);
   const statusLabel = subscriptionStatusLabel(subscription?.status);
-  const nextBillingDate = subscription?.current_period_end ? formatDate(subscription.current_period_end) : "-";
+  const expiryDate = subscription?.current_period_end ? formatDate(subscription.current_period_end) : "-";
 
   return (
     <main className="account-page">
       <section className="account-panel">
-        <AccountTopbar title="결제 및 구독 현황" />
+        <AccountTopbar title="결제 및 이용권 현황" />
 
         <section className="account-section">
-          <h2>구독 현황</h2>
+          <h2>이용권 현황</h2>
+          <div className="account-subscription-summary">
+            <div>
+              <strong>{statusLabel}</strong>
+              <span>이용 만료일: {expiryDate}</span>
+              <span>자동 갱신되지 않으며, 필요한 기간만큼 직접 추가 구매합니다.</span>
+            </div>
+            <SubscriptionControls status={subscription?.status || "none"} />
+          </div>
           <div className="account-subject-list">
             {subjects.map((subject) => (
               <article className="account-subject-card" key={subject.id}>
                 <SubjectAvatar subject={subject} />
                 <div>
                   <strong>{subject.name}</strong>
-                  <span>구독기간: {statusLabel}</span>
-                  <span>다음 결제일: {nextBillingDate}</span>
+                  <span>이용권 상태: {statusLabel}</span>
+                  <span>이용 만료일: {expiryDate}</span>
                 </div>
                 <a href="#payment-history">결제 내역 &gt;</a>
               </article>
@@ -43,6 +52,7 @@ export default async function BillingPage({ searchParams }) {
         </section>
 
         <nav className="account-menu-list" aria-label="결제 관련 메뉴">
+          <Link href="/shop">이용권 추가 구매</Link>
           <Link href="/account/coupons">쿠폰함</Link>
           <Link href="/account/payment-methods">결제수단</Link>
           <Link href="/account/ads">광고 대시보드</Link>
@@ -55,7 +65,7 @@ export default async function BillingPage({ searchParams }) {
               <article className="account-history-card" key={order.id}>
                 <div>
                   <strong>{order.product_name || "상품"}</strong>
-                  <span>{order.subject_name || "대상자 미선택"} · {order.order_type === "standalone" ? "상품 단독 구매" : "구독 상품"}</span>
+                  <span>{order.subject_name || "대상자 미선택"} · {order.order_type === "standalone" ? "상품 단독 구매" : "이용권 포함 상품"}</span>
                   <span>{formatDate(order.created_at)}</span>
                 </div>
                 <div>

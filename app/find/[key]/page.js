@@ -66,8 +66,36 @@ export default async function FindPage({ params, searchParams }) {
     );
   }
 
-  if (!data.qr_activated_at) {
-    const owner = Boolean(session && getGuardianKey(session) === data.guardian_google_id);
+  const owner = Boolean(session && getGuardianKey(session) === data.guardian_google_id);
+  const subscriptionReady = data.subscription_status === "ready";
+  const subscriptionActive = hasActiveAccess(data.subscription_status, data.subscription_period_end);
+
+  if (!subscriptionActive && !subscriptionReady) {
+    const paused = data.subscription_status === "paused";
+    const expired = data.subscription_status === "expired";
+    return (
+      <main className="find-page">
+        <section className="find-shell">
+          <p className="intro-kicker">이용권 확인 필요</p>
+          <h1>{paused ? "현재 서비스가 일시정지되어 있습니다" : expired ? "이용기간이 만료되었습니다" : "사용 가능한 이용권이 없습니다"}</h1>
+          <p>이용권이 활성화되기 전에는 대상자와 보호자의 개인정보가 표시되지 않습니다.</p>
+          {owner ? (
+            <a className="primary-button" href={paused ? "/account/billing" : "/shop"}>
+              {paused ? "이용권 재개하기" : "이용권 구매하기"}
+            </a>
+          ) : (
+            <div className="find-key-box">
+              <span>QR 코드</span>
+              <strong>{data.code}</strong>
+            </div>
+          )}
+        </section>
+        <StatusToast message={notice} type={noticeType} />
+      </main>
+    );
+  }
+
+  if (!data.qr_activated_at || subscriptionReady) {
     return (
       <main className="find-page">
         <section className="find-shell qr-activation-shell">
@@ -91,7 +119,7 @@ export default async function FindPage({ params, searchParams }) {
                   QR 코드 활성화하기
                 </button>
               </form>
-              <p className="find-notify-message">활성화가 완료되면 오늘부터 구독기간이 시작되고, 이 QR에서 대상자 정보가 조회됩니다.</p>
+              <p className="find-notify-message">활성화가 완료되면 오늘부터 이용기간이 시작되고, 이 QR에서 대상자 정보가 조회됩니다.</p>
             </>
           ) : (
             <>
@@ -162,6 +190,13 @@ export default async function FindPage({ params, searchParams }) {
       <StatusToast message={notice} type={noticeType} />
     </main>
   );
+}
+
+function hasActiveAccess(status, periodEnd) {
+  if (status !== "active") return false;
+  if (!periodEnd) return false;
+  const end = new Date(periodEnd);
+  return !Number.isNaN(end.getTime()) && end.getTime() > Date.now();
 }
 
 function formatDate(value) {

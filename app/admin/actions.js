@@ -109,7 +109,7 @@ export async function setSubscriptionPlanPriceAction(formData) {
   } catch (error) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=payments"), error.message || "가격 저장에 실패했습니다.", "error"));
   }
-  redirect(withNotice(getReturnTo(formData, "/admin?section=payments"), "구독 가격이 저장되었습니다."));
+  redirect(withNotice(getReturnTo(formData, "/admin?section=payments"), "이용권 가격이 저장되었습니다."));
 }
 
 export async function setProductCatalogItemAction(formData) {

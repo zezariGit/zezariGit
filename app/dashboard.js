@@ -227,12 +227,14 @@ function GuardianInfoTab({ guardian, session }) {
 function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref = "" }) {
   const primarySubject = subjects[0] || null;
   const subscriptionLabel = subscription?.status === "active"
-    ? "구독중"
+    ? "이용중"
     : subscription?.status === "paused"
       ? "일시정지"
       : subscription?.status === "ready"
-        ? "결제대기"
-        : "미구독";
+        ? "QR 활성화 대기"
+        : subscription?.status === "expired"
+          ? "이용기간 만료"
+          : "미이용";
 
   return (
     <section
@@ -286,7 +288,7 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
 
       <div className="my-page-section">
         <h3>부가 정보</h3>
-        <InfoRow label="결제 및 구독 현황" value={subscriptionLabel} actionLabel="상세보기 >" href="/account/billing" />
+        <InfoRow label="결제 및 이용권 현황" value={subscriptionLabel} actionLabel="상세보기 >" href="/account/billing" />
         <InfoRow label="제자리 서비스 소개" value="QR 안심 서비스" />
         <Link className="my-menu-link" href="/account/coupons">쿠폰함</Link>
         <Link className="my-menu-link" href="/account/payment-methods">결제수단</Link>
