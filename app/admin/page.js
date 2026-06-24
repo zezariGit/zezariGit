@@ -12,6 +12,7 @@ import {
   getAdminAdsData,
   getAdminDashboardData,
   getAdminData,
+  getAdminInquiriesData,
   getAdminOrdersData,
   getAdminProductsData,
   getAdminSubscriptionPlansData,
@@ -65,7 +66,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["dashboard", "guardians", "qr", "admins", "payments", "products", "orders", "ads"].includes(resolvedSearchParams?.section)
+  const activeSection = ["dashboard", "guardians", "qr", "admins", "payments", "products", "orders", "ads", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -89,6 +90,7 @@ export default async function AdminPage({ searchParams }) {
   const productsData = activeSection === "products" ? await getAdminProductsData() : null;
   const ordersData = activeSection === "orders" ? await getAdminOrdersData(orderFilters) : null;
   const adsData = activeSection === "ads" ? await getAdminAdsData() : null;
+  const inquiriesData = activeSection === "inquiries" ? await getAdminInquiriesData() : null;
   const qrItems = qrData ? await withQrImages(qrData.qrCodes) : [];
   const title =
     activeSection === "dashboard"
@@ -105,7 +107,9 @@ export default async function AdminPage({ searchParams }) {
               ? "주문/배송 관리"
             : activeSection === "ads"
               ? "광고 관리"
-              : "보호자 관리";
+              : activeSection === "inquiries"
+                ? "고객문의 관리"
+                : "보호자 관리";
   const description =
     activeSection === "dashboard"
       ? "회원, 관리대상, QR, 실종신고, 광고와 월별 매출 현황을 한눈에 확인합니다."
@@ -121,7 +125,9 @@ export default async function AdminPage({ searchParams }) {
               ? "주문과 결제 상태를 조회하고 배송상태, 택배사, 송장번호를 관리합니다."
             : activeSection === "ads"
               ? "광고 일 단가를 설정하고 사용자별 광고 진행사항을 조회합니다."
-              : "보호자를 활성화/비활성화하고, 선택한 보호자의 관리대상 4명을 조회합니다.";
+              : activeSection === "inquiries"
+                ? "접수된 고객문의의 제목, 작성자, 상태와 작성일시를 조회합니다."
+                : "보호자를 활성화/비활성화하고, 선택한 보호자의 관리대상 4명을 조회합니다.";
 
   return (
     <main className="admin-page">
@@ -155,6 +161,8 @@ export default async function AdminPage({ searchParams }) {
             <OrderManagementSection ordersData={ordersData} />
           ) : activeSection === "ads" ? (
             <AdManagementSection adsData={adsData} />
+          ) : activeSection === "inquiries" ? (
+            <InquiryManagementSection inquiriesData={inquiriesData} />
           ) : (
             <GuardianManagementSection adminData={adminData} />
           )}
@@ -203,6 +211,105 @@ function AdminDashboardSection({ dashboardData }) {
             </div>
           </article>
         ))}
+      </div>
+      <div className="admin-recent-heading">
+        <h2>최근 현황</h2>
+        <span>항목별 최근 4건</span>
+      </div>
+      <div className="admin-recent-grid">
+        <RecentStatusCard
+          title="신규가입자"
+          items={dashboardData.recentGuardians}
+          href="/admin?section=guardians"
+          emptyText="최근 가입자가 없습니다."
+          getPrimary={(item) => item.name || item.login_id || item.email || item.google_email || "이름 미입력"}
+          getDate={(item) => formatRecentDateTime(item.created_at)}
+        />
+        <RecentStatusCard
+          title="신규주문"
+          items={dashboardData.recentOrders}
+          href="/admin?section=orders"
+          emptyText="최근 주문이 없습니다."
+          getPrimary={(item) => formatOrderNumber(item)}
+          getDate={(item) => formatRecentDateTime(item.created_at)}
+        />
+        <RecentStatusCard
+          title="QR 활성화 요청"
+          items={dashboardData.pendingQrActivations}
+          href="/admin?section=qr&match=matched&active=active"
+          emptyText="대기 중인 활성화 요청이 없습니다."
+          getPrimary={(item) => item.subject_name || "관리대상 미입력"}
+          getDate={(item) => formatRecentDateTime(item.requested_at)}
+        />
+        <RecentStatusCard
+          title="실종신고 현황"
+          items={dashboardData.missingReports}
+          href="/admin?section=ads"
+          emptyText="진행 중인 실종신고가 없습니다."
+          getPrimary={(item) => item.name || "관리대상 미입력"}
+          getDate={(item) => formatRecentDate(item.reported_at)}
+        />
+        <RecentStatusCard
+          title="고객문의"
+          items={dashboardData.recentInquiries}
+          href="/admin?section=inquiries"
+          emptyText="접수된 고객문의가 없습니다."
+          getPrimary={(item) => item.title || "제목 없음"}
+          getDate={(item) => formatRecentDateTime(item.created_at)}
+        />
+      </div>
+    </section>
+  );
+}
+
+function RecentStatusCard({ title, items, href, emptyText, getPrimary, getDate }) {
+  return (
+    <article className="admin-recent-card">
+      <h3>{title}</h3>
+      {items.length > 0 ? (
+        <ul>
+          {items.map((item) => (
+            <li key={item.id}>
+              <strong>{getPrimary(item)}</strong>
+              <time>{getDate(item)}</time>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="admin-recent-empty">{emptyText}</p>
+      )}
+      <Link href={href}>더보기</Link>
+    </article>
+  );
+}
+
+function InquiryManagementSection({ inquiriesData }) {
+  const { inquiries } = inquiriesData;
+
+  return (
+    <section className="admin-panel">
+      <div className="panel-heading">
+        <h2>고객문의 목록</h2>
+        <span>최근 최대 100건</span>
+      </div>
+      <div className="admin-inquiry-list">
+        {inquiries.map((inquiry) => (
+          <article className="admin-inquiry-card" key={inquiry.id}>
+            <div>
+              <strong>{inquiry.title || "제목 없음"}</strong>
+              <span>{inquiry.guardian_name || "작성자 미확인"}</span>
+            </div>
+            <div>
+              <em className={`inquiry-status status-${inquiry.status || "received"}`}>
+                {inquiryStatusLabel(inquiry.status)}
+              </em>
+              <time>{formatDateTime(inquiry.created_at)}</time>
+            </div>
+          </article>
+        ))}
+        {inquiries.length === 0 && (
+          <p className="empty-text">아직 접수된 고객문의가 없습니다. 사용자 문의 접수 기능을 추가하면 이 화면에 표시됩니다.</p>
+        )}
       </div>
     </section>
   );
@@ -943,6 +1050,50 @@ function formatDate(value) {
   return String(value).replaceAll("-", ".");
 }
 
+function formatRecentDateTime(value) {
+  const date = parseDatabaseDate(value);
+  if (!date) return "-";
+  const parts = getKoreanDateParts(date, {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  });
+  return `${parts.year}.${parts.month}.${parts.day} ${parts.hour}:${parts.minute}`;
+}
+
+function formatRecentDate(value) {
+  const date = parseDatabaseDate(value);
+  if (!date) return "-";
+  const parts = getKoreanDateParts(date, {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  return `${parts.year}.${parts.month}.${parts.day}`;
+}
+
+function getKoreanDateParts(date, options) {
+  return Object.fromEntries(
+    new Intl.DateTimeFormat("en-CA", options)
+      .formatToParts(date)
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value]),
+  );
+}
+
+function parseDatabaseDate(value) {
+  if (!value) return null;
+  const raw = String(value).trim();
+  const normalized = /(?:Z|[+-]\d{2}:?\d{2})$/.test(raw) ? raw : `${raw.replace(" ", "T")}Z`;
+  const date = new Date(normalized);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
 function formatDateTime(value) {
   if (!value) return "-";
   const date = new Date(value);
@@ -963,6 +1114,12 @@ function formatMetricValue(value) {
 function formatDashboardMonth(month) {
   const [year, monthNumber] = String(month || "").split("-");
   return year && monthNumber ? `${year}년 ${Number(monthNumber)}월` : "이번 달";
+}
+
+function inquiryStatusLabel(status) {
+  if (status === "answered") return "답변완료";
+  if (status === "in_progress") return "처리중";
+  return "접수";
 }
 
 function formatFullAddress(address, detailAddress) {

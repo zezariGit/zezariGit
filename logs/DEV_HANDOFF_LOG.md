@@ -2239,6 +2239,46 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Deployment status: Ready
 - Authenticated production dashboard returned HTTP 200 and rendered all eight metric labels.
 
+## 2026-06-24 KST - Administrator Dashboard Recent Status
+
+### User Request
+- Add a Recent Status section below the eight dashboard metric cards.
+- Add five cards showing the latest four members, orders, QR activation requests, missing reports, and customer inquiries.
+- Show the requested identifying text and date/time in each card.
+- Add a More link below every card and connect it to the relevant screen when available.
+
+### Reflected Work
+- Added five recent-status cards below the operations metrics.
+- Added recent guardian, order, pending QR activation, missing-report, and inquiry reads to the existing dashboard DB batch.
+- Limited each recent query to four rows ordered newest first.
+- Defined pending QR activation as an administrator-enabled matched QR without `activated_at` whose subject status is `QR활성화필요`.
+- Used the latest paid order time as the QR request time, with QR/subject update time as fallback.
+- Used the subject `updated_at` time as the current missing-report date because a separate report history table does not yet exist.
+- Formatted recent timestamps in Korean time as `YYYY.MM.DD HH:mm`.
+- Connected More links to Guardian Management, Orders/Shipping, QR Management, Advertisement Management, and Customer Inquiries.
+- Raised DB schema version from 3 to 4 and added `customer_inquiries` plus its created-time index.
+- Added a read-only Customer Inquiry administrator screen and sidebar menu item.
+
+### Verification
+- `npm run build` succeeded after all changes.
+- Seeded five isolated records per recent category and confirmed only the newest four were rendered in descending order.
+- Confirmed all five More destinations returned HTTP 200.
+- Confirmed the Customer Inquiry page rendered all five seeded inquiries.
+- Confirmed schema version 4.
+- Playwright/Chrome screenshots verified five desktop columns, one mobile column, readable wrapping, and no horizontal overflow.
+- Deleted the isolated database, test account, fixtures, and screenshots.
+
+### Known Follow-up
+- User-side inquiry submission is not implemented yet; the table and administrator read screen are ready for that future flow.
+- A dedicated missing-report history table will be needed to preserve repeated report/closure events instead of using the subject's latest status update time.
+
+### Deliverable
+- `deliverables/ADMIN_DASHBOARD_RECENT_STATUS.md`
+- Includes data definitions, routing, schema notes, verification, and a presentation image prompt.
+
+### Time Spent
+- Data mapping, schema preparation, UI, links, isolated five-record testing, responsive verification, and documentation: about 50 minutes.
+
 ## 2026-06-23 KST - Legacy Kakao/Naver and Toss Integration
 
 ### User Request

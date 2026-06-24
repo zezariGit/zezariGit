@@ -3084,8 +3084,157 @@ textarea:focus {
   font-weight: 700;
 }
 
+.admin-recent-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.admin-recent-heading h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.admin-recent-heading span {
+  color: var(--c-text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-recent-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.admin-recent-card {
+  min-width: 0;
+  min-height: 248px;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.admin-recent-card h3 {
+  margin: 0 0 var(--space-sm);
+  color: var(--c-text);
+  font-size: 16px;
+}
+
+.admin-recent-card ul {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-recent-card li {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  padding-bottom: var(--space-xs);
+  border-bottom: 0.5px solid var(--c-border);
+}
+
+.admin-recent-card li:last-child {
+  border-bottom: 0;
+}
+
+.admin-recent-card li strong,
+.admin-recent-card li time {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.admin-recent-card li strong {
+  color: var(--c-text);
+  font-size: 13px;
+}
+
+.admin-recent-card li time {
+  color: var(--c-text-muted);
+  font-size: 12px;
+}
+
+.admin-recent-empty {
+  margin: 0;
+  color: var(--c-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.admin-recent-card > a {
+  align-self: flex-end;
+  margin-top: auto;
+  padding-top: var(--space-md);
+  color: var(--c-primary-dark);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-recent-card > a::after {
+  content: " >";
+}
+
+.admin-inquiry-list {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.admin-inquiry-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-sm) 0;
+  border-bottom: 0.5px solid var(--c-border);
+}
+
+.admin-inquiry-card > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.admin-inquiry-card > div:last-child {
+  justify-items: end;
+}
+
+.admin-inquiry-card strong,
+.admin-inquiry-card span,
+.admin-inquiry-card time {
+  overflow-wrap: anywhere;
+}
+
+.admin-inquiry-card span,
+.admin-inquiry-card time {
+  color: var(--c-text-muted);
+  font-size: 13px;
+}
+
+.inquiry-status {
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--c-primary-light);
+  color: var(--c-primary-dark);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
 @media (max-width: 1100px) {
   .admin-dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-recent-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -3113,8 +3262,25 @@ textarea:focus {
     grid-template-columns: 1fr;
   }
 
+  .admin-recent-grid {
+    grid-template-columns: 1fr;
+  }
+
   .admin-metric-card {
     min-height: 104px;
+  }
+
+  .admin-recent-card {
+    min-height: 220px;
+  }
+
+  .admin-inquiry-card {
+    align-items: flex-start;
+    display: grid;
+  }
+
+  .admin-inquiry-card > div:last-child {
+    justify-items: start;
   }
 }
 
