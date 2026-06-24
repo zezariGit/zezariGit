@@ -5,6 +5,7 @@ import FormSubmitButton from "../form-submit-button";
 import { LogoutButton, SocialLoginButtons } from "../auth-actions";
 import ModalScrollLock from "../modal-scroll-lock";
 import StatusToast from "../status-toast";
+import AdminWorkspace from "./admin-workspace";
 import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
 import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
 import {
@@ -119,59 +120,37 @@ export default async function AdminPage({ searchParams }) {
   return (
     <main className="admin-page">
       <section className="admin-shell">
-        <header className="admin-header">
-          <div>
-            <p className="intro-kicker">관리자</p>
-            <h1>{title}</h1>
-            <p>{description}</p>
-          </div>
-          <div className="admin-header-actions">
-            <Link className="admin-link" href="/">
-              사용자 화면
-            </Link>
-            <LogoutButton />
-          </div>
-        </header>
+        <AdminWorkspace activeSection={activeSection}>
+          <header className="admin-header">
+            <div>
+              <p className="intro-kicker">관리자</p>
+              <h1>{title}</h1>
+              <p>{description}</p>
+            </div>
+            <div className="admin-header-actions">
+              <Link className="admin-link" href="/">
+                사용자 화면
+              </Link>
+              <LogoutButton />
+            </div>
+          </header>
 
-        <nav className="admin-menu" aria-label="관리자 메뉴">
-          <Link className={activeSection === "guardians" ? "active" : ""} href="/admin">
-            보호자 관리
-          </Link>
-          <Link className={activeSection === "orders" ? "active" : ""} href="/admin?section=orders">
-            주문/배송
-          </Link>
-          <Link className={activeSection === "qr" ? "active" : ""} href="/admin?section=qr">
-            QR 관리
-          </Link>
-          <Link className={activeSection === "admins" ? "active" : ""} href="/admin?section=admins">
-            관리자 관리
-          </Link>
-          <Link className={activeSection === "payments" ? "active" : ""} href="/admin?section=payments">
-            결제 관리
-          </Link>
-          <Link className={activeSection === "products" ? "active" : ""} href="/admin?section=products">
-            상품 관리
-          </Link>
-          <Link className={activeSection === "ads" ? "active" : ""} href="/admin?section=ads">
-            광고 관리
-          </Link>
-        </nav>
-
-        {activeSection === "qr" ? (
-          <QrManagementSection qrData={qrData} qrItems={qrItems} />
-        ) : activeSection === "admins" ? (
-          <AdminRoleManagementSection adminUsersData={adminUsersData} />
-        ) : activeSection === "payments" ? (
-          <PaymentManagementSection paymentData={paymentData} />
-        ) : activeSection === "products" ? (
-          <ProductManagementSection productsData={productsData} />
-        ) : activeSection === "orders" ? (
-          <OrderManagementSection ordersData={ordersData} />
-        ) : activeSection === "ads" ? (
-          <AdManagementSection adsData={adsData} />
-        ) : (
-          <GuardianManagementSection adminData={adminData} />
-        )}
+          {activeSection === "qr" ? (
+            <QrManagementSection qrData={qrData} qrItems={qrItems} />
+          ) : activeSection === "admins" ? (
+            <AdminRoleManagementSection adminUsersData={adminUsersData} />
+          ) : activeSection === "payments" ? (
+            <PaymentManagementSection paymentData={paymentData} />
+          ) : activeSection === "products" ? (
+            <ProductManagementSection productsData={productsData} />
+          ) : activeSection === "orders" ? (
+            <OrderManagementSection ordersData={ordersData} />
+          ) : activeSection === "ads" ? (
+            <AdManagementSection adsData={adsData} />
+          ) : (
+            <GuardianManagementSection adminData={adminData} />
+          )}
+        </AdminWorkspace>
       </section>
       <StatusToast message={notice} type={noticeType} />
     </main>

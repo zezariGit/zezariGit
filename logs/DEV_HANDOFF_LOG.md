@@ -2152,6 +2152,41 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Time Spent
 - Environment transition, safe credential validation, build, deployment, and production checks: about 35 minutes.
 
+## 2026-06-24 KST - Collapsible Admin Sidebar Navigation
+
+### User Request
+- Move the administrator tabs from the top of the page to a vertical menu on the left.
+- Allow the vertical menu to be hidden and shown again.
+
+### Reflected Work
+- Added `app/admin/admin-workspace.js` as a client-side layout component.
+- Moved all seven administrator sections into a left vertical navigation panel.
+- Added an accessible icon button for hiding and expanding the menu.
+- Stored the collapsed state in `localStorage`, so the preference survives reloads and section navigation.
+- Preserved all existing section URLs, server-side data loading, forms, filters, and active-section behavior.
+- Expanded the administrator shell maximum width to accommodate the navigation and work area.
+- Added a responsive one-column layout below 860px so the menu does not reduce mobile content width.
+- Added focus, hover, and reduced-motion styles consistent with the project CSS tokens.
+
+### Verification
+- `npm run build` succeeded twice, including after the responsive-order correction.
+- Desktop expanded sidebar measured 216px and contained seven menu links.
+- Desktop collapsed sidebar measured 56px and hid the menu links.
+- Reload preserved the collapsed state.
+- The `주문/배송` active menu state was correctly highlighted.
+- Mobile placed content below the expanded menu and produced no horizontal overflow.
+- Desktop expanded/collapsed and mobile screenshots were visually inspected; no clipping or overlap was found.
+- Visual testing used a temporary local SQLite database, not the operating Turso database.
+- The temporary database, test user, and screenshots were deleted after verification.
+- The in-app browser connection was unavailable due to a runtime metadata error, so installed Chrome was controlled with Playwright as the fallback.
+
+### Deliverable
+- `deliverables/ADMIN_SIDEBAR_NAVIGATION.md`
+- Includes implementation structure, behavior, test results, and a presentation image prompt.
+
+### Time Spent
+- Source review, implementation, responsive correction, authenticated visual verification, and documentation: about 35 minutes.
+
 ## 2026-06-23 KST - Legacy Kakao/Naver and Toss Integration
 
 ### User Request
