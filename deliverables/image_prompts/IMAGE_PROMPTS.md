@@ -155,3 +155,14 @@ Create a polished Korean civic-tech flow diagram for "REAL_QR_FIND" prepaid QR s
 
 ### Notes
 - Use when explaining why the service no longer requires an automatic-billing contract and how public QR privacy follows the paid period.
+
+## 2026-06-25 - Admin Advertisement Grid Management
+
+### Purpose
+- Presentation diagram for the admin advertisement grid, selected-row operations, and future Meta Ads API readiness.
+
+### Prompt
+Create a clean Korean civic-tech admin UI diagram for "REAL_QR_FIND" advertisement management. Show a left admin sidebar, an advertisement daily-rate panel, a dense advertisement grid with columns "광고 번호, 관리대상, 보호자, 상태, 광고지역, 광고기간, 광고비, 클릭수", top action buttons "광고승인, 광고정지, 광고재개, 광고상세정보", and a right detail panel with Meta API placeholders for campaign ID, API status, and click count. Use white surfaces, civic blue accents, green advertising, amber paused, gray expired states, compact Korean labels, and no real personal data.
+
+### Notes
+- Use when presenting the conversion from card-style advertisement management to a grid-style operations screen for future Meta Ads API control.

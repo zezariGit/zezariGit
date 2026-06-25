@@ -30,16 +30,24 @@ Project: REAL_QR_FIND / zezari
 ## Admin Flow
 1. Admin opens `/admin?section=ads`.
 2. Admin can update the advertising daily unit price.
-3. Admin can view user advertisement progress as a grid:
-   - guardian
+3. Admin can search and filter advertisement progress:
+   - search by advertisement ID, managed subject, guardian, phone, or email
+   - filter by all, approval waiting, advertising, paused, or expired
+4. Admin can view user advertisement progress as a grid:
+   - advertisement number
    - managed subject
+   - guardian
+   - status
    - advertising region
    - period
-   - days
-   - daily rate
    - total amount
-   - internal status
-   - Meta API status placeholder
+   - click count
+5. Admin can select one advertisement and use:
+   - `광고승인`
+   - `광고정지`
+   - `광고재개`
+   - `광고상세정보`
+6. The detail panel shows the selected advertisement, guardian, subject, Meta campaign placeholder, Meta API status, registration time, and update time.
 
 ## Database
 
@@ -61,12 +69,13 @@ Project: REAL_QR_FIND / zezari
 ## Meta API Preparation
 - `subject_ads.meta_campaign_id` is reserved for Meta campaign/ad set identifiers.
 - `subject_ads.meta_status` currently stores `meta_api_pending`.
+- `subject_ads.click_count` stores the synced or manually imported click count. It defaults to `0` until Meta API reporting is connected.
 - Future API integration should add:
   - Meta access token environment variables
   - campaign creation API call
   - pause/resume API call
   - stop/delete API call
-  - webhook or polling sync for Meta delivery status
+  - webhook or polling sync for Meta delivery status and click count
   - error code/message columns if needed
 
 ## Verification

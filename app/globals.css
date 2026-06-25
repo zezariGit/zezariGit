@@ -1532,6 +1532,79 @@ a {
   font-size: 0.9rem;
 }
 
+.admin-master-detail.admin-ad-master-detail {
+  grid-template-columns: minmax(0, 1.7fr) minmax(340px, 0.82fr);
+}
+
+.admin-master-filter.ad-master-filter {
+  grid-template-columns: minmax(240px, 1fr) 160px auto auto;
+}
+
+.admin-ad-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.admin-ad-toolbar form {
+  display: contents;
+}
+
+.admin-ad-toolbar .primary-button,
+.admin-ad-toolbar .plain-button {
+  flex: 0 0 auto;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-md);
+  border: 0.5px solid var(--c-primary-border);
+  text-decoration: none;
+}
+
+.admin-ad-toolbar .plain-button {
+  border-color: var(--c-border);
+  background: var(--c-surface);
+}
+
+.admin-ad-detail-button.disabled {
+  pointer-events: none;
+  border-color: var(--c-border);
+  background: #f1f2f4;
+  color: var(--c-text-muted);
+}
+
+.ad-record-table {
+  min-width: 980px;
+}
+
+.ad-record-table .admin-record-header,
+.ad-record-table .admin-record-row {
+  grid-template-columns: 128px minmax(108px, 0.9fr) minmax(118px, 1fr) 82px minmax(104px, 0.9fr) 150px 88px 64px;
+}
+
+.ad-record-table .admin-record-row {
+  min-height: 62px;
+}
+
+.ad-record-table .admin-record-row > strong,
+.ad-record-table .admin-record-row > time,
+.ad-record-table .admin-record-row > span {
+  font-size: 12px;
+}
+
+.ad-record-table .ad-status-pill {
+  min-height: 28px;
+  padding: 0 8px;
+  font-size: 11px;
+}
+
+.admin-ad-detail-panel .admin-detail-heading .ad-status-pill {
+  flex: 0 0 auto;
+}
+
 .bell-icon {
   width: 34px;
   height: 34px;
@@ -3599,6 +3672,10 @@ textarea:focus {
 
 @media (max-width: 1200px) {
   .admin-master-detail {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-master-detail.admin-ad-master-detail {
     grid-template-columns: 1fr;
   }
 
@@ -6530,6 +6607,7 @@ button:disabled:hover {
   .qr-create-panel,
   .qr-create-form,
   .qr-filter-form,
+  .admin-master-filter.ad-master-filter,
   .qr-card,
   .qr-match-form,
   .qr-match-search-form,
@@ -6542,6 +6620,16 @@ button:disabled:hover {
   .find-profile,
   .find-contact-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-ad-toolbar {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .admin-ad-toolbar .primary-button,
+  .admin-ad-toolbar .plain-button {
+    width: 100%;
   }
 
   .qr-card {

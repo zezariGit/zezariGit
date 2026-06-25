@@ -2112,6 +2112,54 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
 
+## 2026-06-25 KST - Admin Advertisement Grid Management
+
+### User Request
+- Change the administrator advertisement management screen from card layout to grid layout.
+- Show advertisement number, managed subject, guardian, status, advertisement region, period, cost, and clicks.
+- Add top buttons for advertisement approval, pause, resume, and detail view.
+- Keep the design ready for future Meta Ads API integration.
+
+### Reflected Work
+- Replaced the admin advertisement card list with a grid/master-detail operations layout.
+- Added advertisement search and status filtering for the admin ad section.
+- Added selected-row URL state via `ad=<id>` and right-side detail display.
+- Added admin-only status mutation action:
+  - `approve` sets ad status to `active`.
+  - `pause` sets ad status to `paused`.
+  - `resume` sets ad status to `active`.
+- Added disabled-button rules when the selected ad is not in a valid state for that action.
+- Added `subject_ads.click_count` as a Meta reporting placeholder and bumped `DB_SCHEMA_VERSION` to 7.
+- Updated Korean ad status labels:
+  - `active` -> `광고중`
+  - `paused` -> `정지중`
+  - `ready` -> `승인대기`
+  - `ended` -> `만료`
+- Updated advertising and database deliverables plus the cumulative image prompt archive.
+
+### Files Changed
+- `lib/db.js`
+- `app/admin/actions.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `deliverables/ADMIN_AD_GRID_MANAGEMENT.md`
+- `deliverables/ADVERTISING_SETUP.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/README.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` returned no whitespace errors.
+
+### Time Spent
+- Admin ad grid conversion, DB placeholder, action wiring, responsive CSS, documentation, and build verification: about 35 minutes.
+
+### Notes For Next AI
+- Meta Ads API is still not connected.
+- Future integration should map Meta campaign approval/pause/resume calls to the new admin actions and periodically sync clicks into `subject_ads.click_count`.
+- The current guardian-facing ad request flow still creates internal ad rows directly; admin approval is now available as an operations control.
+
 ## 2026-06-24 KST - Naver New Key and Toss Live Key Transition
 
 ### User Request

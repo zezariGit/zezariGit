@@ -210,6 +210,7 @@ Stores advertisement requests and status by managed subject.
 | `status` | TEXT | `ready`, `active`, `paused`, `ended` |
 | `meta_campaign_id` | TEXT | Reserved Meta API campaign identifier |
 | `meta_status` | TEXT | Reserved Meta API status, currently `meta_api_pending` |
+| `click_count` | INTEGER | Meta/reporting click count placeholder, defaults to `0` |
 | `paused_at` | TEXT | Last pause timestamp |
 | `ended_at` | TEXT | End timestamp |
 | `created_at` | TEXT | Created timestamp |

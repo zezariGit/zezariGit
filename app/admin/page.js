@@ -31,6 +31,7 @@ import {
   setProductOrderFulfillmentAction,
   setQrActiveAction,
   setQrSubjectAction,
+  setAdminSubjectAdStatusAction,
   setSubscriptionPlanPriceAction,
 } from "./actions";
 
@@ -96,6 +97,11 @@ export default async function AdminPage({ searchParams }) {
     fulfillment: resolvedSearchParams?.fulfillment || "all",
   };
   const selectedOrderId = resolvedSearchParams?.order || "";
+  const selectedAdId = resolvedSearchParams?.ad || "";
+  const adFilters = {
+    query: resolvedSearchParams?.adQuery || "",
+    status: resolvedSearchParams?.adStatus || "all",
+  };
   const dashboardData = activeSection === "dashboard" ? await getAdminDashboardData(resolvedSearchParams?.month) : null;
   const adminData = activeSection === "guardians" ? await getAdminData(selectedGuardianId, guardianFilters) : null;
   const adminSubjectsData = activeSection === "subjects"
@@ -106,7 +112,7 @@ export default async function AdminPage({ searchParams }) {
   const paymentData = activeSection === "payments" ? await getAdminSubscriptionPlansData() : null;
   const productsData = activeSection === "products" ? await getAdminProductsData() : null;
   const ordersData = activeSection === "orders" ? await getAdminOrdersData(orderFilters, selectedOrderId) : null;
-  const adsData = activeSection === "ads" ? await getAdminAdsData() : null;
+  const adsData = activeSection === "ads" ? await getAdminAdsData(adFilters, selectedAdId) : null;
   const inquiriesData = activeSection === "inquiries" ? await getAdminInquiriesData() : null;
   const qrItems = qrData ? await withQrImages(qrData.qrCodes) : [];
   const title =
@@ -545,9 +551,11 @@ function OrderManagementSection({ ordersData }) {
 }
 
 function AdManagementSection({ adsData }) {
-  const { setting, ads } = adsData;
+  const { setting, ads, selectedAd, filters } = adsData;
   const activeCount = ads.filter((ad) => ad.status === "active").length;
   const pausedCount = ads.filter((ad) => ad.status === "paused").length;
+  const endedCount = ads.filter((ad) => ad.status === "ended").length;
+  const selectedAdReturnTo = buildAdListUrl(filters, selectedAd?.id);
 
   return (
     <div className="qr-admin-stack">
@@ -572,41 +580,173 @@ function AdManagementSection({ adsData }) {
         <div className="qr-stats" aria-label="광고 상태 요약">
           <span>전체 {ads.length}건</span>
           <span>광고중 {activeCount}건</span>
-          <span>일시정지 {pausedCount}건</span>
+          <span>정지중 {pausedCount}건</span>
+          <span>만료 {endedCount}건</span>
         </div>
       </section>
 
-      <section className="admin-panel">
-        <div className="panel-heading">
-          <h2>사용자별 광고 진행사항</h2>
-          <span>{ads.length}건</span>
-        </div>
-        <div className="admin-ad-grid">
-          {ads.map((ad) => (
-            <article className="admin-ad-card" key={ad.id}>
-              <div className="admin-ad-main">
-                <strong>{ad.subject_name || "관리대상 미입력"}</strong>
-                <span>{ad.guardian_name || ad.guardian_email || ad.guardian_google_email || "보호자 미입력"}</span>
-                <span>{ad.guardian_phone || "전화번호 미입력"}</span>
+      <div className="admin-master-detail admin-ad-master-detail">
+        <section className="admin-panel admin-master-panel">
+          <div className="panel-heading">
+            <h2>광고 목록</h2>
+            <span>{ads.length}건 조회</span>
+          </div>
+
+          <form className="admin-master-filter ad-master-filter" action="/admin">
+            <input type="hidden" name="section" value="ads" />
+            <label>
+              통합 검색
+              <input
+                name="adQuery"
+                defaultValue={filters.query}
+                placeholder="광고번호, 관리대상, 보호자, 연락처"
+              />
+            </label>
+            <label>
+              진행 상태
+              <select name="adStatus" defaultValue={filters.status}>
+                <option value="all">전체</option>
+                <option value="ready">승인대기</option>
+                <option value="active">광고중</option>
+                <option value="paused">정지중</option>
+                <option value="ended">만료</option>
+              </select>
+            </label>
+            <button type="submit">조회</button>
+            <Link className="plain-button" href="/admin?section=ads">초기화</Link>
+          </form>
+
+          <div className="admin-ad-toolbar" aria-label="광고 관리 작업">
+            <AdStatusActionButton
+              ad={selectedAd}
+              command="approve"
+              returnTo={selectedAdReturnTo}
+              disabled={!selectedAd || !["ready", "active", "paused"].includes(selectedAd.status)}
+            >
+              광고승인
+            </AdStatusActionButton>
+            <AdStatusActionButton
+              ad={selectedAd}
+              command="pause"
+              returnTo={selectedAdReturnTo}
+              disabled={!selectedAd || !["ready", "active"].includes(selectedAd.status)}
+            >
+              광고정지
+            </AdStatusActionButton>
+            <AdStatusActionButton
+              ad={selectedAd}
+              command="resume"
+              returnTo={selectedAdReturnTo}
+              disabled={!selectedAd || selectedAd.status !== "paused"}
+            >
+              광고재개
+            </AdStatusActionButton>
+            <Link
+              className={`plain-button admin-ad-detail-button${selectedAd ? "" : " disabled"}`}
+              href={selectedAd ? `${selectedAdReturnTo}#admin-ad-detail` : "/admin?section=ads"}
+              aria-disabled={!selectedAd}
+            >
+              광고상세정보
+            </Link>
+          </div>
+
+          <div className="admin-record-table-wrap">
+            <div className="admin-record-table ad-record-table" role="table" aria-label="광고 목록">
+              <div className="admin-record-header" role="row">
+                <span role="columnheader">광고 번호</span>
+                <span role="columnheader">관리대상</span>
+                <span role="columnheader">보호자</span>
+                <span role="columnheader">상태</span>
+                <span role="columnheader">광고지역</span>
+                <span role="columnheader">광고기간</span>
+                <span role="columnheader">광고비</span>
+                <span role="columnheader">클릭수</span>
               </div>
-              <div className="admin-ad-meta">
-                <em className={`ad-status-pill ${ad.status}`}>{adStatusLabel(ad.status)}</em>
-                <span>{ad.region}</span>
-                <span>
-                  {formatDate(ad.start_date)} ~ {formatDate(ad.end_date)}
-                </span>
-                <span>
-                  {ad.days}일 / {formatCurrency(ad.amount)}
-                </span>
-                <span>일 단가 {formatCurrency(ad.daily_rate)}</span>
-                <span>Meta API: {ad.meta_campaign_id || ad.meta_status || "연동 대기"}</span>
+              {ads.map((ad) => (
+                <Link
+                  className={ad.id === selectedAd?.id ? "admin-record-row active" : "admin-record-row"}
+                  href={buildAdListUrl(filters, ad.id)}
+                  key={ad.id}
+                  role="row"
+                >
+                  <strong role="cell">{formatAdNumber(ad)}</strong>
+                  <span role="cell">{ad.subject_name || "관리대상 미입력"}</span>
+                  <span role="cell">{ad.guardian_name || ad.guardian_email || ad.guardian_google_email || "보호자 미입력"}</span>
+                  <em role="cell" className={`ad-status-pill ${ad.status}`}>{adStatusLabel(ad.status)}</em>
+                  <span role="cell">{ad.region || "지역 미입력"}</span>
+                  <time role="cell">{formatDate(ad.start_date)} ~ {formatDate(ad.end_date)}</time>
+                  <span role="cell">{formatCurrency(ad.amount)}</span>
+                  <span role="cell">{formatMetricValue(ad.click_count)}</span>
+                </Link>
+              ))}
+              {ads.length === 0 && <p className="empty-text">등록된 광고 진행사항이 없습니다.</p>}
+            </div>
+          </div>
+        </section>
+
+        <aside className="admin-panel admin-detail-panel admin-ad-detail-panel" id="admin-ad-detail">
+          {selectedAd ? (
+            <>
+              <div className="admin-detail-heading">
+                <div>
+                  <span className="admin-detail-kicker">{formatAdNumber(selectedAd)}</span>
+                  <h2>{selectedAd.subject_name || "관리대상 미입력"}</h2>
+                  <p>{selectedAd.guardian_name || selectedAd.guardian_email || selectedAd.guardian_google_email || "보호자 미입력"}</p>
+                </div>
+                <em className={`ad-status-pill ${selectedAd.status}`}>{adStatusLabel(selectedAd.status)}</em>
               </div>
-            </article>
-          ))}
-          {ads.length === 0 && <p className="empty-text">등록된 광고 진행사항이 없습니다.</p>}
-        </div>
-      </section>
+
+              <section className="admin-detail-section">
+                <h3>광고 상세정보</h3>
+                <dl className="admin-detail-list">
+                  <div><dt>광고지역</dt><dd>{selectedAd.region || "-"}</dd></div>
+                  <div><dt>광고기간</dt><dd>{formatDate(selectedAd.start_date)} ~ {formatDate(selectedAd.end_date)}</dd></div>
+                  <div><dt>집행일수</dt><dd>{Number(selectedAd.days || 0).toLocaleString("ko-KR")}일</dd></div>
+                  <div><dt>광고비</dt><dd>{formatCurrency(selectedAd.amount)}</dd></div>
+                  <div><dt>일 단가</dt><dd>{formatCurrency(selectedAd.daily_rate)}</dd></div>
+                  <div><dt>클릭수</dt><dd>{formatMetricValue(selectedAd.click_count)}</dd></div>
+                </dl>
+              </section>
+
+              <section className="admin-detail-section">
+                <h3>연결 정보</h3>
+                <dl className="admin-detail-list">
+                  <div><dt>관리대상</dt><dd><Link href={`/admin?section=subjects&subject=${encodeURIComponent(selectedAd.subject_id)}`}>{selectedAd.subject_name || "대상자 보기"}</Link></dd></div>
+                  <div><dt>대상자 상태</dt><dd>{statusLabel(selectedAd.subject_status)}</dd></div>
+                  <div><dt>보호자</dt><dd><Link href={`/admin?section=guardians&guardian=${encodeURIComponent(selectedAd.guardian_id)}`}>{selectedAd.guardian_name || "보호자 보기"}</Link></dd></div>
+                  <div><dt>보호자 연락처</dt><dd>{selectedAd.guardian_phone || "-"}</dd></div>
+                </dl>
+              </section>
+
+              <section className="admin-detail-section">
+                <h3>Meta 연동 준비 정보</h3>
+                <dl className="admin-detail-list">
+                  <div><dt>캠페인 ID</dt><dd>{selectedAd.meta_campaign_id || "미연동"}</dd></div>
+                  <div><dt>Meta 상태</dt><dd>{selectedAd.meta_status || "연동 대기"}</dd></div>
+                  <div><dt>등록일시</dt><dd>{formatRecentDateTime(selectedAd.created_at)}</dd></div>
+                  <div><dt>수정일시</dt><dd>{formatRecentDateTime(selectedAd.updated_at)}</dd></div>
+                </dl>
+              </section>
+            </>
+          ) : (
+            <p className="empty-text">광고를 선택해 주세요.</p>
+          )}
+        </aside>
+      </div>
     </div>
+  );
+}
+
+function AdStatusActionButton({ ad, command, returnTo, disabled, children }) {
+  return (
+    <form action={setAdminSubjectAdStatusAction}>
+      <input type="hidden" name="adId" value={ad?.id || ""} />
+      <input type="hidden" name="command" value={command} />
+      <input type="hidden" name="returnTo" value={returnTo} />
+      <FormSubmitButton className="primary-button compact" pendingText="처리중" disabled={disabled}>
+        {children}
+      </FormSubmitButton>
+    </form>
   );
 }
 
@@ -1440,6 +1580,11 @@ function formatOrderNumber(order) {
   return order.toss_order_id || `ORDER-${String(order.id || "").slice(0, 8).toUpperCase()}`;
 }
 
+function formatAdNumber(ad) {
+  const compactId = String(ad?.id || "").replace(/-/g, "").slice(0, 10).toUpperCase();
+  return `AD-${compactId || "UNKNOWN"}`;
+}
+
 function isPaidOrder(status) {
   return ["paid", "paid_waiting_activation", "activated"].includes(status);
 }
@@ -1472,6 +1617,14 @@ function buildOrderListUrl(filters, orderId = "") {
   if (filters.payment && filters.payment !== "all") params.set("payment", filters.payment);
   if (filters.fulfillment && filters.fulfillment !== "all") params.set("fulfillment", filters.fulfillment);
   if (orderId) params.set("order", orderId);
+  return `/admin?${params.toString()}`;
+}
+
+function buildAdListUrl(filters, adId = "") {
+  const params = new URLSearchParams({ section: "ads" });
+  if (filters?.query) params.set("adQuery", filters.query);
+  if (filters?.status && filters.status !== "all") params.set("adStatus", filters.status);
+  if (adId) params.set("ad", adId);
   return `/admin?${params.toString()}`;
 }
 
@@ -1521,9 +1674,9 @@ function statusLabel(status) {
 
 function adStatusLabel(status) {
   if (status === "active") return "광고중";
-  if (status === "paused") return "일시정지";
-  if (status === "ready") return "준비중";
-  if (status === "ended") return "종료";
+  if (status === "paused") return "정지중";
+  if (status === "ready") return "승인대기";
+  if (status === "ended") return "만료";
   return "연동 대기";
 }
 
