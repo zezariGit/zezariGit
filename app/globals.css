@@ -996,6 +996,28 @@ a {
   line-height: 1.4;
 }
 
+.notification-inline-link,
+.notification-action-link {
+  color: var(--c-primary-dark);
+  font-weight: 900;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.notification-action-link {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-primary-light);
+  font-size: 0.78rem;
+  text-decoration: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .notification-swipe-content,
   .notification-swipe-content.deleting {

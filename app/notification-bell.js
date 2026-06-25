@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
@@ -222,11 +222,68 @@ function SwipeNotificationItem({ notification, onDelete }) {
         onPointerCancel={(event) => finishGesture(event, true)}
       >
         <strong>{notification.title || "REAL_QR_FIND 알림"}</strong>
-        {notification.body && <span>{notification.body}</span>}
+        {notification.body && <span>{renderLinkedText(notification.body)}</span>}
+        {notification.url && (
+          <a
+            className="notification-action-link"
+            href={notification.url}
+            target={isExternalUrl(notification.url) ? "_blank" : undefined}
+            rel={isExternalUrl(notification.url) ? "noreferrer" : undefined}
+            onPointerDown={(event) => event.stopPropagation()}
+            onPointerMove={(event) => event.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
+          >
+            {isMapUrl(notification.url) ? "지도 열기" : "관련 화면 열기"}
+          </a>
+        )}
         <time dateTime={notification.created_at}>{formatNotificationTime(notification.created_at)}</time>
       </div>
     </li>
   );
+}
+
+function renderLinkedText(text) {
+  const parts = String(text || "").split(/(https?:\/\/[^\s]+)/g);
+  return parts.map((part, index) => {
+    if (!/^https?:\/\//.test(part)) return part;
+    const href = part.replace(/[),.;]+$/, "");
+    const suffix = part.slice(href.length);
+
+    return (
+      <Fragment key={`${href}-${index}`}>
+        <a
+          className="notification-inline-link"
+          href={href}
+          target="_blank"
+          rel="noreferrer"
+          onPointerDown={(event) => event.stopPropagation()}
+          onPointerMove={(event) => event.stopPropagation()}
+          onClick={(event) => event.stopPropagation()}
+        >
+          {linkLabel(href)}
+        </a>
+        {suffix}
+      </Fragment>
+    );
+  });
+}
+
+function linkLabel(url) {
+  if (url.includes("map.naver.com")) return "네이버 지도";
+  if (url.includes("map.kakao.com")) return "카카오 지도";
+  return url;
+}
+
+function isMapUrl(url) {
+  return /map\.(naver|kakao)\.com/.test(String(url || ""));
+}
+
+function isExternalUrl(url) {
+  try {
+    return new URL(url, window.location.origin).origin !== window.location.origin;
+  } catch {
+    return false;
+  }
 }
 
 function BellIcon() {

@@ -1,4 +1,4 @@
-const CACHE_NAME = "zezari-v14";
+const CACHE_NAME = "zezari-v15";
 const APP_SHELL = ["/", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
@@ -70,6 +70,10 @@ self.addEventListener("notificationclick", (event) => {
 
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      if (isExternalUrl(targetUrl)) {
+        return self.clients.openWindow(targetUrl);
+      }
+
       for (const client of clients) {
         if ("focus" in client) {
           client.navigate(targetUrl);
@@ -80,6 +84,14 @@ self.addEventListener("notificationclick", (event) => {
     })
   );
 });
+
+function isExternalUrl(value) {
+  try {
+    return new URL(value, self.location.origin).origin !== self.location.origin;
+  } catch {
+    return false;
+  }
+}
 
 async function broadcastPushMessage(payload) {
   const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });

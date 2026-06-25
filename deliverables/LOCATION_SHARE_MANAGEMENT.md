@@ -26,8 +26,9 @@ Date: 2026-06-25
 ## Guardian Notification
 - Notification title: `{관리대상 이름} 발견 위치가 공유되었습니다`
 - Notification body tells the guardian to open the map.
-- The primary notification URL is the Kakao map link.
-- The notification history body also stores the Naver map link when generated.
+- The primary notification click URL is the Naver map link when generated, with the Kakao map link as fallback.
+- The in-app bell notification list renders URL text as clickable links and also shows a `지도 열기` action button.
+- The service worker opens external map URLs in a new browser window when the system push notification is clicked.
 - If the guardian has no registered push device, the location is still stored and the finder receives a message that no guardian push device is registered yet.
 
 ## Administrator Screen
@@ -85,6 +86,8 @@ Indexes:
 ## Files Changed
 - `lib/db.js`
 - `lib/push.js`
+- `public/sw.js`
+- `app/notification-bell.js`
 - `app/api/find/[key]/location/route.js`
 - `app/find/[key]/location-share-button.js`
 - `app/find/[key]/page.js`
@@ -104,6 +107,7 @@ Indexes:
 - `git diff --check` returned no whitespace errors except expected Windows LF/CRLF warnings.
 - Local Next dev server on port `3010` returned HTTP 200 for `/` and `/admin?section=locations`.
 - `POST /api/find/__codex_missing_key__/location` returned HTTP 400 with `등록되지 않은 QR입니다.`, confirming the route loads and reaches QR validation.
+- Notification link bugfix build succeeded after changing the primary map URL to Naver-first and rendering in-app notification links as anchors.
 - `agent-browser` CLI was not available in PATH, so browser visual automation could not be run in this environment.
 - Manual browser verification should include:
   - inactive/unpaid QR cannot submit location

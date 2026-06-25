@@ -2112,6 +2112,38 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
 
+## 2026-06-25 KST - Location Notification Map Link Click Fix
+
+### User Request
+- The Naver map sharing link appears in the notification message, but it is not clickable.
+
+### Root Cause
+- Browser system push notifications do not make URLs in the notification body clickable.
+- The app's in-dashboard bell notification list rendered `notification.body` as plain text, so stored Naver map URLs were also not clickable there.
+- The service worker attempted to navigate existing app windows to the notification URL; for external map domains, opening a new window is more reliable.
+
+### Reflected Work
+- Changed location-share notification URL selection to Naver-first with Kakao fallback.
+- Kept a stored map URL in the notification history body for audit/readback.
+- Rendered URLs inside in-app bell notification bodies as clickable anchors.
+- Added an explicit `지도 열기` button in each bell notification when `notification.url` exists.
+- Stopped notification swipe/delete pointer handlers from swallowing link clicks.
+- Updated the service worker cache version and changed external notification click URLs to open in a new browser window.
+
+### Files Changed
+- `lib/push.js`
+- `public/sw.js`
+- `app/notification-bell.js`
+- `app/globals.css`
+- `deliverables/LOCATION_SHARE_MANAGEMENT.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` returned no whitespace errors except expected Windows LF/CRLF warnings.
+
+### Time Spent
+- Notification diagnosis, link rendering fix, service-worker click handling, documentation, and build verification: about 20 minutes.
+
 ## 2026-06-25 KST - Public QR Location Share And Admin Location Management
 
 ### User Request
