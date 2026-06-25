@@ -13,6 +13,7 @@ import {
   getAdminDashboardData,
   getAdminData,
   getAdminInquiriesData,
+  getAdminMissingReportsData,
   getAdminOrdersData,
   getAdminProductsData,
   getAdminSubscriptionPlansData,
@@ -69,7 +70,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "products", "orders", "ads", "inquiries"].includes(resolvedSearchParams?.section)
+  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "products", "orders", "ads", "missing", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -102,6 +103,11 @@ export default async function AdminPage({ searchParams }) {
     query: resolvedSearchParams?.adQuery || "",
     status: resolvedSearchParams?.adStatus || "all",
   };
+  const missingFilters = {
+    query: resolvedSearchParams?.missingQuery || "",
+    startDate: resolvedSearchParams?.missingStart || "",
+    endDate: resolvedSearchParams?.missingEnd || "",
+  };
   const dashboardData = activeSection === "dashboard" ? await getAdminDashboardData(resolvedSearchParams?.month) : null;
   const adminData = activeSection === "guardians" ? await getAdminData(selectedGuardianId, guardianFilters) : null;
   const adminSubjectsData = activeSection === "subjects"
@@ -113,6 +119,7 @@ export default async function AdminPage({ searchParams }) {
   const productsData = activeSection === "products" ? await getAdminProductsData() : null;
   const ordersData = activeSection === "orders" ? await getAdminOrdersData(orderFilters, selectedOrderId) : null;
   const adsData = activeSection === "ads" ? await getAdminAdsData(adFilters, selectedAdId) : null;
+  const missingReportsData = activeSection === "missing" ? await getAdminMissingReportsData(missingFilters) : null;
   const inquiriesData = activeSection === "inquiries" ? await getAdminInquiriesData() : null;
   const qrItems = qrData ? await withQrImages(qrData.qrCodes) : [];
   const title =
@@ -132,6 +139,8 @@ export default async function AdminPage({ searchParams }) {
               ? "주문/배송 관리"
             : activeSection === "ads"
               ? "광고 관리"
+              : activeSection === "missing"
+                ? "실종신고 관리"
               : activeSection === "inquiries"
                 ? "고객문의 관리"
                 : "보호자 관리";
@@ -152,6 +161,8 @@ export default async function AdminPage({ searchParams }) {
               ? "주문과 결제 상태를 조회하고 배송상태, 택배사, 송장번호를 관리합니다."
             : activeSection === "ads"
               ? "광고 일 단가를 설정하고 사용자별 광고 진행사항을 조회합니다."
+              : activeSection === "missing"
+                ? "실종신고 접수 현황과 광고 상태, 발견 여부를 조회합니다."
               : activeSection === "inquiries"
                 ? "접수된 고객문의의 제목, 작성자, 상태와 작성일시를 조회합니다."
                 : "보호자 목록을 조회하고 배송지, 등록대상자, 이용권, 결제, 광고와 관리메모를 확인합니다.";
@@ -190,6 +201,8 @@ export default async function AdminPage({ searchParams }) {
             <OrderManagementSection ordersData={ordersData} />
           ) : activeSection === "ads" ? (
             <AdManagementSection adsData={adsData} />
+          ) : activeSection === "missing" ? (
+            <MissingReportManagementSection missingReportsData={missingReportsData} />
           ) : activeSection === "inquiries" ? (
             <InquiryManagementSection inquiriesData={inquiriesData} />
           ) : (
@@ -273,7 +286,7 @@ function AdminDashboardSection({ dashboardData }) {
         <RecentStatusCard
           title="실종신고 현황"
           items={dashboardData.missingReports}
-          href="/admin?section=ads"
+          href="/admin?section=missing"
           emptyText="진행 중인 실종신고가 없습니다."
           getPrimary={(item) => item.name || "관리대상 미입력"}
           getDate={(item) => formatRecentDate(item.reported_at)}
@@ -309,6 +322,77 @@ function RecentStatusCard({ title, items, href, emptyText, getPrimary, getDate }
       )}
       <Link href={href}>더보기</Link>
     </article>
+  );
+}
+
+function MissingReportManagementSection({ missingReportsData }) {
+  const { reports, filters } = missingReportsData;
+
+  return (
+    <section className="admin-panel">
+      <div className="panel-heading">
+        <h2>실종신고 목록</h2>
+        <span>{reports.length}건 조회</span>
+      </div>
+
+      <form className="admin-master-filter missing-report-filter" action="/admin">
+        <input type="hidden" name="section" value="missing" />
+        <label>
+          통합 검색
+          <input
+            name="missingQuery"
+            defaultValue={filters.query}
+            placeholder="대상자, 보호자, 연락처, 이메일"
+          />
+        </label>
+        <label>
+          신고 시작일
+          <input type="date" name="missingStart" defaultValue={filters.startDate} />
+        </label>
+        <label>
+          신고 종료일
+          <input type="date" name="missingEnd" defaultValue={filters.endDate} />
+        </label>
+        <button type="submit">조회</button>
+        <Link className="plain-button" href="/admin?section=missing">초기화</Link>
+      </form>
+
+      <div className="admin-record-table-wrap">
+        <div className="admin-record-table missing-report-table" role="table" aria-label="실종신고 목록">
+          <div className="admin-record-header" role="row">
+            <span role="columnheader">신고일시</span>
+            <span role="columnheader">대상자</span>
+            <span role="columnheader">보호자</span>
+            <span role="columnheader">신고상태</span>
+            <span role="columnheader">광고상태</span>
+            <span role="columnheader">발견여부</span>
+          </div>
+          {reports.map((report) => (
+            <div className="admin-record-row" role="row" key={`${report.subject_id}-${report.ad_id || "no-ad"}`}>
+              <time role="cell">{formatRecentDateTime(report.reported_at)}</time>
+              <Link role="cell" href={`/admin?section=subjects&subject=${encodeURIComponent(report.subject_id)}`}>
+                {report.subject_name || "관리대상 미입력"}
+              </Link>
+              <Link role="cell" href={`/admin?section=guardians&guardian=${encodeURIComponent(report.guardian_id)}`}>
+                {report.guardian_name || report.guardian_email || report.guardian_google_email || "보호자 미입력"}
+              </Link>
+              <em role="cell" className={`status-badge ${missingReportStatusClass(report)}`}>
+                {missingReportStatusLabel(report)}
+              </em>
+              <em role="cell" className={`ad-status-pill ${report.ad_status || "none"}`}>
+                {report.ad_status ? adStatusLabel(report.ad_status) : "미진행"}
+              </em>
+              <em role="cell" className={`status-badge ${missingFoundClass(report)}`}>
+                {missingFoundLabel(report)}
+              </em>
+            </div>
+          ))}
+          {reports.length === 0 && (
+            <p className="empty-text">조건에 맞는 실종신고 이력이 없습니다.</p>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -1670,6 +1754,41 @@ function statusLabel(status) {
   if (status === "문제없음") return "안전";
   if (["상품구매필요", "QR활성화필요", "안전", "찾는중"].includes(status)) return status;
   return "상품구매필요";
+}
+
+function missingReportStatusLabel(report) {
+  const subjectStatus = statusLabel(report?.subject_status);
+  const adStatus = String(report?.ad_status || "");
+  if (subjectStatus === "찾는중") {
+    if (adStatus === "active") return "광고 진행 중";
+    if (adStatus === "paused") return "광고 정지 중";
+    if (adStatus === "ended") return "종료 처리";
+    return "신고 접수";
+  }
+  if (subjectStatus === "안전" && report?.ad_id) return "발견 완료";
+  if (adStatus === "ended") return "종료 완료";
+  return "신고 이력";
+}
+
+function missingReportStatusClass(report) {
+  const label = missingReportStatusLabel(report);
+  if (label.includes("발견")) return "safe";
+  if (label.includes("종료")) return "neutral";
+  return "searching";
+}
+
+function missingFoundLabel(report) {
+  const subjectStatus = statusLabel(report?.subject_status);
+  if (subjectStatus === "찾는중") return "미발견";
+  if (subjectStatus === "안전") return "발견";
+  return "미확인";
+}
+
+function missingFoundClass(report) {
+  const label = missingFoundLabel(report);
+  if (label === "발견") return "safe";
+  if (label === "미발견") return "searching";
+  return "neutral";
 }
 
 function adStatusLabel(status) {

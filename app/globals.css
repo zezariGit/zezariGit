@@ -1605,6 +1605,42 @@ a {
   flex: 0 0 auto;
 }
 
+.admin-master-filter.missing-report-filter {
+  grid-template-columns: minmax(220px, 1fr) 150px 150px auto auto;
+}
+
+.missing-report-table {
+  min-width: 760px;
+}
+
+.missing-report-table .admin-record-header,
+.missing-report-table .admin-record-row {
+  grid-template-columns: 148px minmax(112px, 1fr) minmax(118px, 1fr) 118px 92px 92px;
+}
+
+.missing-report-table .admin-record-row {
+  min-height: 62px;
+}
+
+.missing-report-table .admin-record-row > time,
+.missing-report-table .admin-record-row > a {
+  font-size: 12px;
+}
+
+.missing-report-table .status-badge,
+.missing-report-table .ad-status-pill {
+  min-height: 28px;
+  min-width: 72px;
+  padding: 0 8px;
+  font-size: 11px;
+}
+
+.ad-status-pill.none {
+  border: 0.5px solid var(--c-border);
+  background: #eef1f0;
+  color: var(--c-text-muted);
+}
+
 .bell-icon {
   width: 34px;
   height: 34px;
@@ -6608,6 +6644,7 @@ button:disabled:hover {
   .qr-create-form,
   .qr-filter-form,
   .admin-master-filter.ad-master-filter,
+  .admin-master-filter.missing-report-filter,
   .qr-card,
   .qr-match-form,
   .qr-match-search-form,

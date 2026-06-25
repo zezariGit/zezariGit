@@ -166,3 +166,14 @@ Create a clean Korean civic-tech admin UI diagram for "REAL_QR_FIND" advertiseme
 
 ### Notes
 - Use when presenting the conversion from card-style advertisement management to a grid-style operations screen for future Meta Ads API control.
+
+## 2026-06-25 - Admin Missing Report Management
+
+### Purpose
+- Presentation diagram for the new administrator missing report management menu and grid.
+
+### Prompt
+Create a clean Korean civic-tech admin UI diagram for "REAL_QR_FIND" missing report management. Show a left admin sidebar with "실종신고 관리" selected, a date-range filter for "신고일시", a search input, and a dense grid with columns "신고일시, 대상자, 보호자, 신고상태, 광고상태, 발견여부". Include example status chips for "신고 접수", "광고 진행 중", "발견 완료", "종료 완료", advertisement chips "광고중/정지중/만료", and found state chips "미발견/발견/미확인". Use white work surfaces, civic blue accents, red missing, green found, amber paused, gray completed states, compact Korean labels, and no real personal data.
+
+### Notes
+- Use when explaining how the admin can monitor online missing reports separately from advertisement management.

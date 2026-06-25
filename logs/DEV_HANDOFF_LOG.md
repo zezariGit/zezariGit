@@ -2167,6 +2167,47 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Future integration should map Meta campaign approval/pause/resume calls to the new admin actions and periodically sync clicks into `subject_ads.click_count`.
 - The current guardian-facing ad request flow still creates internal ad rows directly; admin approval is now available as an operations control.
 
+## 2026-06-25 KST - Admin Missing Report Management Menu
+
+### User Request
+- Add a missing report menu to the administrator page.
+- Show report date/time, managed subject, guardian, report status, advertisement status, and found status in a grid.
+
+### Reflected Work
+- Added `실종신고 관리` to the left administrator menu.
+- Added `/admin?section=missing` as a recognized admin section.
+- Added a missing report management grid with:
+  - 신고일시
+  - 대상자
+  - 보호자
+  - 신고상태
+  - 광고상태
+  - 발견여부
+- Added integrated search by subject, guardian, phone, or email.
+- Added report date start/end filters.
+- Changed the dashboard recent `실종신고 현황` "더보기" link to open the new missing report management screen.
+- Added `getAdminMissingReportsData` in `lib/db.js`.
+- The current implementation derives missing reports from `subjects.status = '찾는중'` and latest `subject_ads` history because no dedicated `missing_reports` table exists yet.
+
+### Files Changed
+- `app/admin/admin-workspace.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `lib/db.js`
+- `deliverables/ADMIN_MISSING_REPORT_MANAGEMENT.md`
+- `deliverables/README.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` returned no whitespace errors.
+
+### Time Spent
+- Menu wiring, query function, grid UI, responsive CSS, documentation, and build verification: about 30 minutes.
+
+### Notes For Next AI
+- If missing report lifecycle becomes more detailed, introduce a dedicated `missing_reports` table rather than continuing to infer reports from subject current status and latest advertisement history.
+
 ## 2026-06-24 KST - Naver New Key and Toss Live Key Transition
 
 ### User Request
