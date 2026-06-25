@@ -23,6 +23,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `ADVERTISING_SETUP.md`: dashboard subject advertisement modal, admin daily rate, advertisement progress foundation, and Meta API preparation.
 - `ADMIN_AD_GRID_MANAGEMENT.md`: admin advertisement grid, selected-row actions, detail panel, click-count schema placeholder, and Meta API readiness.
 - `ADMIN_MISSING_REPORT_MANAGEMENT.md`: admin missing-report menu, date/search filters, status mapping, and grid behavior.
+- `LOCATION_SHARE_MANAGEMENT.md`: public QR location-share button, guardian push map links, `location_shares` table, and admin location-share grid/detail management.
 - `USER_MANUAL.md`: Google Docs user manual link, coverage, and maintenance rule.
 - Current UI feedback pattern: submit buttons show inline progress bars, and server actions show bottom status messages via `notice` query parameters.
 

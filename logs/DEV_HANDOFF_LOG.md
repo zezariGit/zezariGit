@@ -2112,6 +2112,50 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
 
+## 2026-06-25 KST - Public QR Location Share And Admin Location Management
+
+### User Request
+- Add an administrator `위치공유관리` menu and page.
+- Add a `위치공유` button to the public QR page so the finder can grant phone/browser location permission.
+- Store the shared location, notify the guardian by push, and include a Kakao or Naver map link in the notification.
+- Let administrators review shared-location history in a grid similar to the provided wireframe.
+
+### Reflected Work
+- Added a new `location_shares` Turso table and schema migration with share timestamp, QR, guardian, subject, finder contact, location memo, latitude, longitude, accuracy, Kakao map URL, Naver map URL, user-agent, and request IP snapshot.
+- Added a public QR geolocation client button with optional finder contact and location description fields.
+- Added `POST /api/find/[key]/location` to validate the QR and active service state, store the shared location, and send the guardian push notification when push is configured.
+- Limited location sharing to enabled QR codes that have been activated by the owning guardian and are covered by an active paid service period.
+- Added `notifyGuardianLocationShared` so guardian notification history and web-push payloads include map links.
+- Added the admin sidebar menu item `위치공유 관리`.
+- Added `/admin?section=locations` with search/date filters, a dense grid, selected row highlighting, and a right detail panel with map preview, Kakao/Naver links, coordinates, accuracy, safe phone, finder contact, and subject/guardian admin links.
+- Updated global CSS using the existing admin master/detail style and public QR button style.
+- Updated official deliverables, database schema documentation, and image prompt archive.
+
+### Files Changed
+- `lib/db.js`
+- `lib/push.js`
+- `app/api/find/[key]/location/route.js`
+- `app/find/[key]/location-share-button.js`
+- `app/find/[key]/page.js`
+- `app/admin/admin-workspace.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `deliverables/LOCATION_SHARE_MANAGEMENT.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/README.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+
+### Verification
+- `git diff --check` returned no whitespace errors except expected Windows LF/CRLF warnings.
+- `npm run build` succeeded before deployment.
+- Local Next dev server on port `3010` returned HTTP 200 for `/` and `/admin?section=locations`.
+- `POST /api/find/__codex_missing_key__/location` returned HTTP 400 with `등록되지 않은 QR입니다.`, confirming the new API route loads and reaches QR validation.
+- `agent-browser` CLI was not available in PATH, so browser visual automation could not be run in this environment.
+- Full mobile geolocation permission flow still requires a real browser/device permission test after deployment.
+
+### Time Spent
+- DB/API/push/admin/public QR UI/CSS/documentation/build verification: about 40 minutes.
+
 ## 2026-06-25 KST - Admin Advertisement Grid Management
 
 ### User Request

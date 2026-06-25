@@ -5,6 +5,7 @@ import { authOptions } from "../../../lib/auth";
 import { getGuardianKey } from "../../../lib/db";
 import { getFindPageDataByKey } from "../../../lib/db";
 import GuardianNotifyButton from "./notify-button";
+import LocationShareButton from "./location-share-button";
 
 export const dynamic = "force-dynamic";
 
@@ -185,7 +186,10 @@ export default async function FindPage({ params, searchParams }) {
           </div>
         )}
 
-        <GuardianNotifyButton qrKey={data.public_key} />
+        <div className="find-action-stack">
+          <GuardianNotifyButton qrKey={data.public_key} />
+          <LocationShareButton qrKey={data.public_key} />
+        </div>
       </section>
       <StatusToast message={notice} type={noticeType} />
     </main>

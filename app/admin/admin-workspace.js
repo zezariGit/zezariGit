@@ -16,6 +16,7 @@ const MENU_ITEMS = [
   { id: "products", label: "상품 관리", href: "/admin?section=products" },
   { id: "ads", label: "광고 관리", href: "/admin?section=ads" },
   { id: "missing", label: "실종신고 관리", href: "/admin?section=missing" },
+  { id: "locations", label: "위치공유 관리", href: "/admin?section=locations" },
   { id: "inquiries", label: "고객문의", href: "/admin?section=inquiries" },
 ];
 

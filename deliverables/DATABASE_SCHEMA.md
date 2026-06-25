@@ -96,6 +96,31 @@ Stores push notification message history for each logged-in guardian.
 | `read_at` | TEXT | Read timestamp, nullable until the guardian opens the notification panel |
 | `created_at` | TEXT | Created timestamp |
 
+### location_shares
+
+Stores public QR location-share history when a finder grants browser location permission.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | TEXT | Primary key |
+| `qr_id` | TEXT | QR code used by the finder |
+| `guardian_id` | TEXT | Guardian notified by push |
+| `subject_id` | TEXT | Managed subject linked to the QR |
+| `public_key` | TEXT | Public QR key snapshot |
+| `subject_name` | TEXT | Subject name snapshot |
+| `guardian_name` | TEXT | Guardian name snapshot |
+| `guardian_safe_phone` | TEXT | Safe/relay phone snapshot, not the guardian private phone |
+| `finder_contact` | TEXT | Optional finder-entered contact |
+| `address_label` | TEXT | Optional finder-entered location memo |
+| `latitude` | REAL | Browser-provided latitude |
+| `longitude` | REAL | Browser-provided longitude |
+| `accuracy` | REAL | Browser-provided accuracy in meters |
+| `kakao_map_url` | TEXT | Generated Kakao map link |
+| `naver_map_url` | TEXT | Generated Naver map link |
+| `user_agent` | TEXT | Finder browser user-agent snapshot |
+| `ip_address` | TEXT | Request IP snapshot from forwarding headers |
+| `created_at` | TEXT | Created timestamp |
+
 ### subscriptions
 
 Stores Toss Payments subscription/billing state for a guardian.
@@ -242,6 +267,8 @@ Stores advertisement requests and status by managed subject.
 - Logged-in guardians can register a browser push subscription from the dashboard.
 - Public find pages can call the notification API to send a push message to the assigned guardian.
 - The push notification message is also stored in `guardian_notifications` so the guardian can review messages from the top-left bell notification panel.
+- Public find pages can call the location-share API only when the QR is enabled, activated by the guardian, linked to a subject, and covered by an active paid service period.
+- Location-share history is stored in `location_shares`; guardian push notifications use generated map links and do not store the raw private guardian phone number.
 - Privacy note: public QR pages intentionally expose configured subject/contact fields. Raw guardian phone numbers are private; before production launch, connect a real safe-number provider and add explicit guardian consent and a field-level exposure policy.
 - Dashboard no longer starts new subscription billing directly; the dashboard product purchase button now opens `/shop`.
 - Logged-in guardians select a product, target subject, quantity, and subscription period from `/shop`.
@@ -258,6 +285,7 @@ Stores advertisement requests and status by managed subject.
 - Admin users can edit the global advertisement daily rate.
 - Admin users can list advertisement progress by guardian and managed subject.
 - Meta API fields are reserved but external Meta calls are not connected yet.
+- Admin users can list QR location-share history by subject, guardian, finder contact, address memo, and share date range.
 
 ## Upload Rules
 - Photo file must be an image.
@@ -277,6 +305,7 @@ Stores advertisement requests and status by managed subject.
   - `product_orders`
   - `push_subscriptions`
   - `guardian_notifications`
+  - `location_shares`
   - `ad_settings`
   - `subject_ads`
 

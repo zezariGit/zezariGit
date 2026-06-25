@@ -13,6 +13,7 @@ import {
   getAdminDashboardData,
   getAdminData,
   getAdminInquiriesData,
+  getAdminLocationSharesData,
   getAdminMissingReportsData,
   getAdminOrdersData,
   getAdminProductsData,
@@ -70,7 +71,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "products", "orders", "ads", "missing", "inquiries"].includes(resolvedSearchParams?.section)
+  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "products", "orders", "ads", "missing", "locations", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -108,6 +109,12 @@ export default async function AdminPage({ searchParams }) {
     startDate: resolvedSearchParams?.missingStart || "",
     endDate: resolvedSearchParams?.missingEnd || "",
   };
+  const selectedLocationShareId = resolvedSearchParams?.locationShare || "";
+  const locationFilters = {
+    query: resolvedSearchParams?.locationQuery || "",
+    startDate: resolvedSearchParams?.locationStart || "",
+    endDate: resolvedSearchParams?.locationEnd || "",
+  };
   const dashboardData = activeSection === "dashboard" ? await getAdminDashboardData(resolvedSearchParams?.month) : null;
   const adminData = activeSection === "guardians" ? await getAdminData(selectedGuardianId, guardianFilters) : null;
   const adminSubjectsData = activeSection === "subjects"
@@ -120,6 +127,7 @@ export default async function AdminPage({ searchParams }) {
   const ordersData = activeSection === "orders" ? await getAdminOrdersData(orderFilters, selectedOrderId) : null;
   const adsData = activeSection === "ads" ? await getAdminAdsData(adFilters, selectedAdId) : null;
   const missingReportsData = activeSection === "missing" ? await getAdminMissingReportsData(missingFilters) : null;
+  const locationSharesData = activeSection === "locations" ? await getAdminLocationSharesData(locationFilters, selectedLocationShareId) : null;
   const inquiriesData = activeSection === "inquiries" ? await getAdminInquiriesData() : null;
   const qrItems = qrData ? await withQrImages(qrData.qrCodes) : [];
   const title =
@@ -141,6 +149,8 @@ export default async function AdminPage({ searchParams }) {
               ? "광고 관리"
               : activeSection === "missing"
                 ? "실종신고 관리"
+                : activeSection === "locations"
+                  ? "위치공유 관리"
               : activeSection === "inquiries"
                 ? "고객문의 관리"
                 : "보호자 관리";
@@ -163,6 +173,8 @@ export default async function AdminPage({ searchParams }) {
               ? "광고 일 단가를 설정하고 사용자별 광고 진행사항을 조회합니다."
               : activeSection === "missing"
                 ? "실종신고 접수 현황과 광고 상태, 발견 여부를 조회합니다."
+                : activeSection === "locations"
+                  ? "QR 공개 페이지에서 공유된 발견 위치와 지도 링크를 조회합니다."
               : activeSection === "inquiries"
                 ? "접수된 고객문의의 제목, 작성자, 상태와 작성일시를 조회합니다."
                 : "보호자 목록을 조회하고 배송지, 등록대상자, 이용권, 결제, 광고와 관리메모를 확인합니다.";
@@ -203,6 +215,8 @@ export default async function AdminPage({ searchParams }) {
             <AdManagementSection adsData={adsData} />
           ) : activeSection === "missing" ? (
             <MissingReportManagementSection missingReportsData={missingReportsData} />
+          ) : activeSection === "locations" ? (
+            <LocationShareManagementSection locationSharesData={locationSharesData} />
           ) : activeSection === "inquiries" ? (
             <InquiryManagementSection inquiriesData={inquiriesData} />
           ) : (
@@ -393,6 +407,126 @@ function MissingReportManagementSection({ missingReportsData }) {
         </div>
       </div>
     </section>
+  );
+}
+
+function LocationShareManagementSection({ locationSharesData }) {
+  const { shares, selectedShare, filters } = locationSharesData;
+
+  return (
+    <div className="admin-master-detail admin-location-master-detail">
+      <section className="admin-panel admin-master-panel">
+        <div className="panel-heading">
+          <h2>위치공유 목록</h2>
+          <span>{shares.length}건 조회</span>
+        </div>
+
+        <form className="admin-master-filter location-share-filter" action="/admin">
+          <input type="hidden" name="section" value="locations" />
+          <label>
+            통합 검색
+            <input
+              name="locationQuery"
+              defaultValue={filters.query}
+              placeholder="대상자명, 보호자명, 연락처, 주소"
+            />
+          </label>
+          <label>
+            공유 시작일
+            <input type="date" name="locationStart" defaultValue={filters.startDate} />
+          </label>
+          <label>
+            공유 종료일
+            <input type="date" name="locationEnd" defaultValue={filters.endDate} />
+          </label>
+          <button type="submit">조회</button>
+          <Link className="plain-button" href="/admin?section=locations">초기화</Link>
+        </form>
+
+        <div className="admin-record-table-wrap">
+          <div className="admin-record-table location-share-table" role="table" aria-label="위치공유 목록">
+            <div className="admin-record-header" role="row">
+              <span role="columnheader">공유일시</span>
+              <span role="columnheader">대상자</span>
+              <span role="columnheader">보호자</span>
+              <span role="columnheader">발견자 연락처</span>
+              <span role="columnheader">주소</span>
+              <span role="columnheader">위도</span>
+              <span role="columnheader">경도</span>
+            </div>
+            {shares.map((share) => (
+              <Link
+                className={share.id === selectedShare?.id ? "admin-record-row active" : "admin-record-row"}
+                href={buildLocationShareUrl(filters, share.id)}
+                key={share.id}
+                role="row"
+              >
+                <time role="cell">{formatRecentDateTime(share.created_at)}</time>
+                <span role="cell">{share.subject_display_name || "관리대상 미입력"}</span>
+                <span role="cell">{share.guardian_display_name || "보호자 미입력"}</span>
+                <span role="cell">{share.finder_contact || "미입력"}</span>
+                <span role="cell">{share.address_label || "지도 링크 확인"}</span>
+                <span role="cell">{formatCoordinate(share.latitude)}</span>
+                <span role="cell">{formatCoordinate(share.longitude)}</span>
+              </Link>
+            ))}
+            {shares.length === 0 && <p className="empty-text">공유된 위치 이력이 없습니다.</p>}
+          </div>
+        </div>
+      </section>
+
+      <aside className="admin-panel admin-detail-panel location-share-detail-panel">
+        {selectedShare ? (
+          <>
+            <div className="admin-detail-heading">
+              <div>
+                <span className="admin-detail-kicker">위치 상세 보기</span>
+                <h2>{selectedShare.subject_display_name || "관리대상 미입력"}</h2>
+                <p>{formatRecentDateTime(selectedShare.created_at)}</p>
+              </div>
+            </div>
+
+            <div className="location-map-preview" aria-hidden="true">
+              <span className="location-map-pin" />
+            </div>
+
+            <section className="admin-detail-section">
+              <h3>위치 정보</h3>
+              <dl className="admin-detail-list">
+                <div><dt>주소/설명</dt><dd>{selectedShare.address_label || "지도 링크 확인"}</dd></div>
+                <div><dt>위도</dt><dd>{formatCoordinate(selectedShare.latitude)}</dd></div>
+                <div><dt>경도</dt><dd>{formatCoordinate(selectedShare.longitude)}</dd></div>
+                <div><dt>정확도</dt><dd>{selectedShare.accuracy ? `약 ${Math.round(Number(selectedShare.accuracy))}m` : "-"}</dd></div>
+              </dl>
+              <div className="location-map-links">
+                {selectedShare.kakao_map_url && (
+                  <a className="admin-detail-link" href={selectedShare.kakao_map_url} target="_blank" rel="noreferrer">
+                    카카오 지도 열기
+                  </a>
+                )}
+                {selectedShare.naver_map_url && (
+                  <a className="admin-detail-link" href={selectedShare.naver_map_url} target="_blank" rel="noreferrer">
+                    네이버 지도 열기
+                  </a>
+                )}
+              </div>
+            </section>
+
+            <section className="admin-detail-section">
+              <h3>연결 정보</h3>
+              <dl className="admin-detail-list">
+                <div><dt>대상자</dt><dd><Link href={`/admin?section=subjects&subject=${encodeURIComponent(selectedShare.subject_id)}`}>{selectedShare.subject_display_name || "대상자 보기"}</Link></dd></div>
+                <div><dt>보호자</dt><dd><Link href={`/admin?section=guardians&guardian=${encodeURIComponent(selectedShare.guardian_id)}`}>{selectedShare.guardian_display_name || "보호자 보기"}</Link></dd></div>
+                <div><dt>안심번호</dt><dd>{selectedShare.guardian_safe_phone || "-"}</dd></div>
+                <div><dt>발견자 연락처</dt><dd>{selectedShare.finder_contact || "미입력"}</dd></div>
+              </dl>
+            </section>
+          </>
+        ) : (
+          <p className="empty-text">위치공유 이력을 선택해 주세요.</p>
+        )}
+      </aside>
+    </div>
   );
 }
 
@@ -1712,6 +1846,15 @@ function buildAdListUrl(filters, adId = "") {
   return `/admin?${params.toString()}`;
 }
 
+function buildLocationShareUrl(filters, shareId = "") {
+  const params = new URLSearchParams({ section: "locations" });
+  if (filters?.query) params.set("locationQuery", filters.query);
+  if (filters?.startDate) params.set("locationStart", filters.startDate);
+  if (filters?.endDate) params.set("locationEnd", filters.endDate);
+  if (shareId) params.set("locationShare", shareId);
+  return `/admin?${params.toString()}`;
+}
+
 function buildGuardianAdminUrl(filters, guardianId = "") {
   const params = new URLSearchParams({ section: "guardians" });
   if (filters?.query) params.set("guardianAdminQuery", filters.query);
@@ -1732,6 +1875,11 @@ function buildSubjectAdminUrl(filters, subjectId = "") {
 
 function formatCurrency(value) {
   return `${Number(value || 0).toLocaleString("ko-KR")}원`;
+}
+
+function formatCoordinate(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number.toFixed(6) : "-";
 }
 
 function productFallbackIcon(slug) {

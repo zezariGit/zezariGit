@@ -177,3 +177,14 @@ Create a clean Korean civic-tech admin UI diagram for "REAL_QR_FIND" missing rep
 
 ### Notes
 - Use when explaining how the admin can monitor online missing reports separately from advertisement management.
+
+## 2026-06-25 - Public QR Location Share And Admin Location Management
+
+### Purpose
+- Presentation diagram for QR finder location sharing, guardian push map links, and administrator location-share history management.
+
+### Prompt
+Create a clean Korean civic-tech admin and public QR workflow diagram for "REAL_QR_FIND" location sharing. Show a finder scanning `/find/{QR key}`, pressing "위치공유", granting mobile location permission, and sending a guardian push notification with Kakao and Naver map links. Show the administrator left sidebar with "위치공유 관리" selected, a date/search filter, a dense grid with columns "공유일시, 대상자, 보호자, 발견자 연락처, 주소, 위도, 경도", and a right detail panel with a map preview and coordinates. Include Turso table `location_shares`, Web Push, and privacy notes that raw guardian phone numbers are not exposed. Use white work surfaces, civic blue accents, purple location pins, green successful share states, compact Korean labels, and no real personal data.
+
+### Notes
+- Use when explaining that QR finders can share location only after browser permission and that administrators can audit the history without exposing the guardian's raw private phone number.
