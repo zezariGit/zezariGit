@@ -84,6 +84,13 @@ Disabled buttons remain visible but cannot be clicked when the selected advertis
 - `npm run build` succeeded.
 - `git diff --check` returned no whitespace errors.
 
+## Deployment
+- GitHub commit: `c4288df Convert admin ads to grid management`
+- Vercel production deployment: `https://zezari-q8466w9ph-zezari.vercel.app`
+- Production alias: `https://zezari.vercel.app`
+- Deployment state: Ready
+- Production home check: HTTP 200
+
 ## Time Spent
 - UI conversion, DB schema placeholder, admin action wiring, documentation, and build verification: about 35 minutes.
 

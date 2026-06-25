@@ -2155,6 +2155,13 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Time Spent
 - Admin ad grid conversion, DB placeholder, action wiring, responsive CSS, documentation, and build verification: about 35 minutes.
 
+### Deployment
+- GitHub commit: `c4288df Convert admin ads to grid management`
+- Vercel production deployment: `https://zezari-q8466w9ph-zezari.vercel.app`
+- Production alias: `https://zezari.vercel.app`
+- Deployment state: Ready
+- Production home check: HTTP 200.
+
 ### Notes For Next AI
 - Meta Ads API is still not connected.
 - Future integration should map Meta campaign approval/pause/resume calls to the new admin actions and periodically sync clicks into `subject_ads.click_count`.
