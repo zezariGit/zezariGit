@@ -4254,3 +4254,52 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
+
+## 2026-06-26 KST - Admin Payment Ledger And Excel-Compatible Grid Exports
+
+### User Request
+- Add an admin `결제 관리` page that shows a grid with payment number, guardian, subject, category, payment method, amount, and payment date.
+- Add Excel download to each admin grid.
+
+### Reflected Work
+- Added `getAdminPaymentsData()` in `lib/db.js`.
+- The payment ledger combines completed `product_orders` rows and current `subject_ads` amount rows.
+- Product orders are split into `상품` and `이용권` categories.
+- Advertisement rows are displayed as `광고` and use `광고 결제 준비` as the payment method until the external ad/payment API is connected.
+- Updated the admin `결제 관리` section to show:
+  - search by payment number, guardian, phone, email, subject, category, and method
+  - category filter for all/product/pass/ad
+  - grid columns requested by the user
+  - existing pass price management below the ledger
+- Added `app/admin/export-button.js`, a reusable client CSV downloader.
+- Added Excel-compatible CSV export buttons to admin list/grid views:
+  - payment ledger
+  - guardians
+  - subjects
+  - QR codes
+  - admin users
+  - products
+  - orders
+  - ads
+  - missing reports
+  - location shares
+  - inquiries
+- Added shared CSS for heading action buttons, export buttons, payment filters, and payment grid columns.
+
+### Files Changed
+- `app/admin/page.js`
+- `app/admin/export-button.js`
+- `app/globals.css`
+- `lib/db.js`
+- `deliverables/ADMIN_PAYMENT_EXPORT_MANAGEMENT.md`
+- `deliverables/README.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` passed with only Windows line-ending warnings.
+
+### Time Spent
+- Payment query, admin grid, reusable CSV export, per-grid export mapping, CSS, documentation, and build verification: about 45 minutes.
+
+### Deliverable
+- `deliverables/ADMIN_PAYMENT_EXPORT_MANAGEMENT.md`

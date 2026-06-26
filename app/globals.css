@@ -1909,6 +1909,38 @@ a {
   font-weight: 800;
 }
 
+.admin-heading-actions {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+}
+
+.excel-download-button {
+  min-height: 36px;
+  padding: 0 var(--space-sm);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-primary-dark);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.excel-download-button:hover:not(:disabled) {
+  background: var(--c-primary-light);
+}
+
+.excel-download-button:disabled {
+  border-color: var(--c-border);
+  background: #f1f2f4;
+  color: var(--c-text-muted);
+  cursor: not-allowed;
+}
+
 .form-grid,
 .subject-fields {
   display: grid;
@@ -3448,6 +3480,10 @@ textarea:focus {
 
 .admin-master-filter.subject-master-filter {
   grid-template-columns: minmax(0, 1fr) 145px 145px auto auto;
+}
+
+.admin-master-filter.payment-ledger-filter {
+  grid-template-columns: minmax(220px, 1fr) 150px auto auto;
 }
 
 .admin-master-filter label {
@@ -5962,6 +5998,25 @@ button:disabled:hover {
   text-overflow: ellipsis;
 }
 
+.payment-record-table {
+  min-width: 900px;
+}
+
+.payment-record-table .admin-record-header,
+.payment-record-table .admin-record-row {
+  grid-template-columns: 140px minmax(112px, 0.9fr) minmax(112px, 0.9fr) minmax(170px, 1.35fr) 100px 92px 132px;
+}
+
+.payment-record-table .admin-record-row {
+  min-height: 62px;
+}
+
+.payment-record-table .admin-record-row > strong,
+.payment-record-table .admin-record-row > span,
+.payment-record-table .admin-record-row > time {
+  font-size: 12px;
+}
+
 .order-detail-panel .admin-detail-heading span,
 .order-detail-panel .admin-detail-heading time {
   color: var(--c-text-muted);
@@ -6781,6 +6836,7 @@ button:disabled:hover {
   .admin-master-filter.ad-master-filter,
   .admin-master-filter.missing-report-filter,
   .admin-master-filter.location-share-filter,
+  .admin-master-filter.payment-ledger-filter,
   .qr-card,
   .qr-match-form,
   .qr-match-search-form,

@@ -188,3 +188,14 @@ Create a clean Korean civic-tech admin and public QR workflow diagram for "REAL_
 
 ### Notes
 - Use when explaining that QR finders can share location only after browser permission and that administrators can audit the history without exposing the guardian's raw private phone number.
+
+## 2026-06-26 - Admin Payment Ledger And Excel Exports
+
+### Purpose
+- Presentation diagram for the administrator payment ledger and Excel-compatible downloads across admin grids.
+
+### Prompt
+Create a clean Korean civic-tech admin UI diagram for "REAL_QR_FIND" payment and operations export management. Show a left admin sidebar with "결제 관리" selected, a top filter row with "통합 검색", a category select for "전체/이용권/상품/광고", a purple "조회" button, a reset button, and an "엑셀 다운로드" button. Show a dense payment ledger grid with columns "결제번호, 보호자, 대상자, 구분, 결제수단, 결제금액, 결제일". Add small connected callouts showing that the same Excel-compatible CSV export exists on 보호자 관리, 관리대상자 관리, QR 관리, 주문/배송, 광고 관리, 실종신고 관리, 위치공유 관리, and 고객문의 grids. Include Turso data sources `product_orders` and `subject_ads`, and note that ad payment rows are prepared for future external ad payment/API integration. Use white work surfaces, civic blue table headers, restrained purple action buttons, compact Korean labels, and no real personal data.
+
+### Notes
+- Use when presenting payment ledger operations and the reason CSV export was added across administrator grids.

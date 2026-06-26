@@ -6,6 +6,7 @@ import { LogoutButton, SocialLoginButtons } from "../auth-actions";
 import ModalScrollLock from "../modal-scroll-lock";
 import StatusToast from "../status-toast";
 import AdminWorkspace from "./admin-workspace";
+import AdminExportButton from "./export-button";
 import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
 import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
 import {
@@ -16,6 +17,7 @@ import {
   getAdminLocationSharesData,
   getAdminMissingReportsData,
   getAdminOrdersData,
+  getAdminPaymentsData,
   getAdminProductsData,
   getAdminSubscriptionPlansData,
   getAdminSubjectsData,
@@ -98,6 +100,10 @@ export default async function AdminPage({ searchParams }) {
     payment: resolvedSearchParams?.payment || "all",
     fulfillment: resolvedSearchParams?.fulfillment || "all",
   };
+  const paymentFilters = {
+    query: resolvedSearchParams?.paymentLedgerQuery || "",
+    type: resolvedSearchParams?.paymentLedgerType || "all",
+  };
   const selectedOrderId = resolvedSearchParams?.order || "";
   const selectedAdId = resolvedSearchParams?.ad || "";
   const adFilters = {
@@ -122,7 +128,12 @@ export default async function AdminPage({ searchParams }) {
     : null;
   const qrData = activeSection === "qr" ? await getQrAdminData(qrFilters) : null;
   const adminUsersData = activeSection === "admins" ? await getAdminUsersData() : null;
-  const paymentData = activeSection === "payments" ? await getAdminSubscriptionPlansData() : null;
+  const paymentData = activeSection === "payments"
+    ? {
+        ...(await getAdminSubscriptionPlansData()),
+        ...(await getAdminPaymentsData(paymentFilters)),
+      }
+    : null;
   const productsData = activeSection === "products" ? await getAdminProductsData() : null;
   const ordersData = activeSection === "orders" ? await getAdminOrdersData(orderFilters, selectedOrderId) : null;
   const adsData = activeSection === "ads" ? await getAdminAdsData(adFilters, selectedAdId) : null;
@@ -164,7 +175,7 @@ export default async function AdminPage({ searchParams }) {
       : activeSection === "admins"
         ? "가입된 보호자 사용자에게 관리자 역할을 부여하거나 회수합니다."
         : activeSection === "payments"
-          ? "선불 이용권의 기간과 가격을 관리합니다."
+          ? "결제내역을 조회하고 선불 이용권의 기간과 가격을 관리합니다."
           : activeSection === "products"
             ? "사용자 상품 선택 화면에 노출되는 상품 이미지, 가격, 활성 상태를 관리합니다."
             : activeSection === "orders"
@@ -346,7 +357,10 @@ function MissingReportManagementSection({ missingReportsData }) {
     <section className="admin-panel">
       <div className="panel-heading">
         <h2>실종신고 목록</h2>
-        <span>{reports.length}건 조회</span>
+        <div className="admin-heading-actions">
+          <span>{reports.length}건 조회</span>
+          <AdminExportButton filename="zezari-missing-reports.csv" rows={missingReportExportRows(reports)} />
+        </div>
       </div>
 
       <form className="admin-master-filter missing-report-filter" action="/admin">
@@ -418,7 +432,10 @@ function LocationShareManagementSection({ locationSharesData }) {
       <section className="admin-panel admin-master-panel">
         <div className="panel-heading">
           <h2>위치공유 목록</h2>
-          <span>{shares.length}건 조회</span>
+          <div className="admin-heading-actions">
+            <span>{shares.length}건 조회</span>
+            <AdminExportButton filename="zezari-location-shares.csv" rows={locationShareExportRows(shares)} />
+          </div>
         </div>
 
         <form className="admin-master-filter location-share-filter" action="/admin">
@@ -537,7 +554,10 @@ function InquiryManagementSection({ inquiriesData }) {
     <section className="admin-panel">
       <div className="panel-heading">
         <h2>고객문의 목록</h2>
-        <span>최근 최대 100건</span>
+        <div className="admin-heading-actions">
+          <span>최근 최대 100건</span>
+          <AdminExportButton filename="zezari-inquiries.csv" rows={inquiryExportRows(inquiries)} />
+        </div>
       </div>
       <div className="admin-inquiry-list">
         {inquiries.map((inquiry) => (
@@ -590,7 +610,10 @@ function OrderManagementSection({ ordersData }) {
         <section className="admin-panel admin-master-panel">
           <div className="panel-heading">
             <h2>주문 목록</h2>
-            <span>{orders.length}건 조회</span>
+            <div className="admin-heading-actions">
+              <span>{orders.length}건 조회</span>
+              <AdminExportButton filename="zezari-orders.csv" rows={orderExportRows(orders)} />
+            </div>
           </div>
 
           <form className="admin-order-filter order-master-filter" action="/admin">
@@ -807,7 +830,10 @@ function AdManagementSection({ adsData }) {
         <section className="admin-panel admin-master-panel">
           <div className="panel-heading">
             <h2>광고 목록</h2>
-            <span>{ads.length}건 조회</span>
+            <div className="admin-heading-actions">
+              <span>{ads.length}건 조회</span>
+              <AdminExportButton filename="zezari-ads.csv" rows={adExportRows(ads)} />
+            </div>
           </div>
 
           <form className="admin-master-filter ad-master-filter" action="/admin">
@@ -969,10 +995,69 @@ function AdStatusActionButton({ ad, command, returnTo, disabled, children }) {
 }
 
 function PaymentManagementSection({ paymentData }) {
-  const { plans } = paymentData;
+  const { plans, payments, filters } = paymentData;
 
   return (
     <div className="qr-admin-stack">
+      <section className="admin-panel">
+        <div className="panel-heading">
+          <h2>결제내역</h2>
+          <div className="admin-heading-actions">
+            <span>최근 최대 300건 / {payments.length}건 조회</span>
+            <AdminExportButton filename="zezari-payments.csv" rows={paymentExportRows(payments)} />
+          </div>
+        </div>
+
+        <form className="admin-master-filter payment-ledger-filter" action="/admin">
+          <input type="hidden" name="section" value="payments" />
+          <label>
+            통합 검색
+            <input
+              name="paymentLedgerQuery"
+              defaultValue={filters.query}
+              placeholder="결제번호, 보호자, 대상자, 구분, 결제수단"
+            />
+          </label>
+          <label>
+            구분
+            <select name="paymentLedgerType" defaultValue={filters.type}>
+              <option value="all">전체</option>
+              <option value="subscription">이용권</option>
+              <option value="product">상품</option>
+              <option value="ad">광고</option>
+            </select>
+          </label>
+          <button type="submit">조회</button>
+          <Link className="plain-button" href="/admin?section=payments">초기화</Link>
+        </form>
+
+        <div className="admin-record-table-wrap">
+          <div className="admin-record-table payment-record-table" role="table" aria-label="결제내역">
+            <div className="admin-record-header" role="row">
+              <span role="columnheader">결제번호</span>
+              <span role="columnheader">보호자</span>
+              <span role="columnheader">대상자</span>
+              <span role="columnheader">구분</span>
+              <span role="columnheader">결제수단</span>
+              <span role="columnheader">결제금액</span>
+              <span role="columnheader">결제일</span>
+            </div>
+            {payments.map((payment) => (
+              <div className="admin-record-row" role="row" key={`${payment.payment_kind}-${payment.id}`}>
+                <strong role="cell">{formatPaymentNumber(payment)}</strong>
+                <span role="cell">{payment.guardian_name || "보호자 미입력"}</span>
+                <span role="cell">{payment.subject_name || "대상자 미선택"}</span>
+                <span role="cell">{paymentKindLabel(payment)}</span>
+                <span role="cell">{payment.payment_method || "-"}</span>
+                <span role="cell">{formatCurrency(payment.amount)}</span>
+                <time role="cell">{formatRecentDateTime(payment.payment_date)}</time>
+              </div>
+            ))}
+            {payments.length === 0 && <p className="empty-text">조건에 맞는 결제내역이 없습니다.</p>}
+          </div>
+        </div>
+      </section>
+
       <section className="admin-panel">
         <div className="panel-heading">
           <h2>이용권 옵션 가격</h2>
@@ -1012,7 +1097,10 @@ function ProductManagementSection({ productsData }) {
       <section className="admin-panel">
         <div className="panel-heading">
           <h2>상품 이미지 및 가격</h2>
-          <span>{products.length}개</span>
+          <div className="admin-heading-actions">
+            <span>{products.length}개</span>
+            <AdminExportButton filename="zezari-products.csv" rows={productExportRows(products)} />
+          </div>
         </div>
         <p className="empty-text">업로드한 상품 이미지는 사용자 상품 선택 화면에 노출됩니다. 이미지는 1MB 이하만 저장됩니다.</p>
         <div className="product-admin-grid">
@@ -1098,7 +1186,10 @@ function AdminRoleManagementSection({ adminUsersData }) {
       <section className="admin-panel">
         <div className="panel-heading">
           <h2>가입된 사용자</h2>
-          <span>{users.length}명</span>
+          <div className="admin-heading-actions">
+            <span>{users.length}명</span>
+            <AdminExportButton filename="zezari-admin-users.csv" rows={adminUserExportRows(users)} />
+          </div>
         </div>
         <div className="admin-user-grid">
           {users.map((user) => {
@@ -1152,7 +1243,10 @@ function GuardianManagementSection({ adminData }) {
       <section className="admin-panel admin-master-panel">
         <div className="panel-heading">
           <h2>보호자 목록</h2>
-          <span>최대 200명 / {guardians.length}명 조회</span>
+          <div className="admin-heading-actions">
+            <span>최대 200명 / {guardians.length}명 조회</span>
+            <AdminExportButton filename="zezari-guardians.csv" rows={guardianExportRows(guardians)} />
+          </div>
         </div>
         <form action="/admin" className="admin-master-filter">
           <input type="hidden" name="section" value="guardians" />
@@ -1305,7 +1399,10 @@ function SubjectManagementSection({ adminSubjectsData }) {
       <section className="admin-panel admin-master-panel">
         <div className="panel-heading">
           <h2>관리대상자 목록</h2>
-          <span>최대 300명 / {subjects.length}명 조회</span>
+          <div className="admin-heading-actions">
+            <span>최대 300명 / {subjects.length}명 조회</span>
+            <AdminExportButton filename="zezari-subjects.csv" rows={subjectExportRows(subjects)} />
+          </div>
         </div>
         <form action="/admin" className="admin-master-filter subject-master-filter">
           <input type="hidden" name="section" value="subjects" />
@@ -1504,7 +1601,10 @@ function QrManagementSection({ qrData, qrItems }) {
       <section className="admin-panel">
         <div className="panel-heading">
           <h2>생성된 QR</h2>
-          <span>{qrData.filteredCount}/{qrData.total}개</span>
+          <div className="admin-heading-actions">
+            <span>{qrData.filteredCount}/{qrData.total}개</span>
+            <AdminExportButton filename="zezari-qr-codes.csv" rows={qrExportRows(qrItems)} />
+          </div>
         </div>
         <div className="qr-grid">
           {qrItems.map((qr) => (
@@ -1678,6 +1778,149 @@ async function withQrImages(qrCodes) {
   );
 }
 
+function paymentExportRows(payments = []) {
+  return payments.map((payment) => ({
+    결제번호: formatPaymentNumber(payment),
+    보호자: payment.guardian_name || "보호자 미입력",
+    대상자: payment.subject_name || "대상자 미선택",
+    구분: paymentKindLabel(payment),
+    결제수단: payment.payment_method || "-",
+    결제금액: formatCurrency(payment.amount),
+    결제일: formatRecentDateTime(payment.payment_date),
+  }));
+}
+
+function guardianExportRows(guardians = []) {
+  return guardians.map((guardian) => ({
+    회원번호: formatMemberNumber(guardian.id),
+    이름: guardian.name || "이름 미입력",
+    연락처: guardian.phone || "-",
+    이메일: guardian.email || guardian.google_email || "-",
+    가입일: formatDateOnlyValue(guardian.created_at),
+    상태: guardian.is_active ? "활성" : "비활성",
+    등록대상자수: Number(guardian.subject_count || 0),
+  }));
+}
+
+function subjectExportRows(subjects = []) {
+  return subjects.map((subject) => ({
+    관리대상명: subject.name || "이름 미입력",
+    성별: subject.gender || "-",
+    생년월일: formatDate(subject.birth_date),
+    보호자: subject.guardian_name || "보호자 미입력",
+    상태: statusLabel(subject.status),
+    "QR 상태": qrAdminStateLabel(subject),
+    "QR 코드": subject.qr_code || "미매칭",
+    등록일: formatRecentDateTime(subject.created_at),
+  }));
+}
+
+function orderExportRows(orders = []) {
+  return orders.map((order) => ({
+    주문번호: formatOrderNumber(order),
+    보호자: order.guardian_name || "이름 미입력",
+    대상자: order.subject_name || "대상자 미선택",
+    상품: order.product_name || "상품 미확인",
+    구매유형: order.order_type === "standalone" ? "상품 단독 구매" : `${order.plan_months || "-"}개월 이용권`,
+    결제금액: formatCurrency(order.amount),
+    결제상태: paymentStatusLabel(order.status),
+    배송상태: fulfillmentStatusLabel(order.fulfillment_status || (isPaidOrder(order.status) ? "preparing" : "pending")),
+    택배사: order.carrier || "-",
+    송장번호: order.tracking_number || "-",
+    주문일: formatRecentDateTime(order.created_at),
+    결제일: formatRecentDateTime(order.paid_at),
+    배송지: formatFullAddress(order.shipping_address, order.shipping_address_detail),
+    관리자메모: order.admin_memo || "",
+  }));
+}
+
+function adExportRows(ads = []) {
+  return ads.map((ad) => ({
+    광고번호: formatAdNumber(ad),
+    관리대상: ad.subject_name || "관리대상 미입력",
+    보호자: ad.guardian_name || ad.guardian_email || ad.guardian_google_email || "보호자 미입력",
+    상태: adStatusLabel(ad.status),
+    광고지역: ad.region || "지역 미입력",
+    광고기간: `${formatDate(ad.start_date)} ~ ${formatDate(ad.end_date)}`,
+    광고비: formatCurrency(ad.amount),
+    클릭수: formatMetricValue(ad.click_count),
+    등록일: formatRecentDateTime(ad.created_at),
+  }));
+}
+
+function missingReportExportRows(reports = []) {
+  return reports.map((report) => ({
+    신고일시: formatRecentDateTime(report.reported_at),
+    대상자: report.subject_name || "관리대상 미입력",
+    보호자: report.guardian_name || report.guardian_email || report.guardian_google_email || "보호자 미입력",
+    신고상태: missingReportStatusLabel(report),
+    광고상태: report.ad_status ? adStatusLabel(report.ad_status) : "미진행",
+    발견여부: missingFoundLabel(report),
+  }));
+}
+
+function locationShareExportRows(shares = []) {
+  return shares.map((share) => ({
+    공유일시: formatRecentDateTime(share.created_at),
+    대상자: share.subject_display_name || "관리대상 미입력",
+    보호자: share.guardian_display_name || "보호자 미입력",
+    발견자연락처: share.finder_contact || "미입력",
+    주소: share.address_label || "지도 링크 확인",
+    위도: formatCoordinate(share.latitude),
+    경도: formatCoordinate(share.longitude),
+    카카오맵: share.kakao_map_url || "",
+    네이버지도: share.naver_map_url || "",
+  }));
+}
+
+function inquiryExportRows(inquiries = []) {
+  return inquiries.map((inquiry) => ({
+    제목: inquiry.title || "제목 없음",
+    작성자: inquiry.guardian_name || "작성자 미확인",
+    상태: inquiryStatusLabel(inquiry.status),
+    작성일시: formatRecentDateTime(inquiry.created_at),
+  }));
+}
+
+function productExportRows(products = []) {
+  return products.map((product) => ({
+    상품명: product.name || "-",
+    구분: product.slug || "-",
+    설명: product.description || "",
+    단독구매가격: formatCurrency(product.unit_price),
+    노출상태: product.is_active !== 0 ? "노출" : "숨김",
+    정렬순서: Number(product.sort_order || 0),
+    이미지파일: product.image_name || "-",
+  }));
+}
+
+function adminUserExportRows(users = []) {
+  return users.map((user) => ({
+    회원번호: formatMemberNumber(user.id),
+    이름: user.name || "이름 미입력",
+    아이디: user.login_id || "-",
+    연락처: user.phone || "전화번호 미입력",
+    이메일: user.email || user.google_email || "-",
+    권한: isBaseAdminUser(user) || Number(user.is_admin || 0) === 1 ? "관리자" : "일반 보호자",
+    상태: user.is_active ? "활성" : "비활성",
+    등록대상자수: Number(user.subject_count || 0),
+    가입일: formatRecentDateTime(user.created_at),
+  }));
+}
+
+function qrExportRows(qrItems = []) {
+  return qrItems.map((qr) => ({
+    QR코드: qr.code,
+    고유문자열: qr.public_key,
+    보호자: qr.guardian_name || "미배정",
+    관리대상: qr.subject_name || "미배정",
+    매칭상태: qr.subject_id ? "매칭" : "미매칭",
+    활성상태: qr.is_active ? "활성" : "비활성",
+    공개URL: qr.target_url,
+    생성일: formatRecentDateTime(qr.created_at),
+  }));
+}
+
 function formatDate(value) {
   if (!value) return "-";
   return String(value).replaceAll("-", ".");
@@ -1801,6 +2044,19 @@ function formatOrderNumber(order) {
 function formatAdNumber(ad) {
   const compactId = String(ad?.id || "").replace(/-/g, "").slice(0, 10).toUpperCase();
   return `AD-${compactId || "UNKNOWN"}`;
+}
+
+function formatPaymentNumber(payment) {
+  if (payment?.payment_kind === "ad") {
+    return `AD-${String(payment.id || payment.payment_number || "").replace(/-/g, "").slice(0, 10).toUpperCase() || "UNKNOWN"}`;
+  }
+  return payment?.payment_number || `PAY-${String(payment?.id || "").slice(0, 8).toUpperCase() || "UNKNOWN"}`;
+}
+
+function paymentKindLabel(payment) {
+  const group = payment?.payment_group || (payment?.payment_kind === "ad" ? "광고" : "상품");
+  const item = payment?.payment_item || "-";
+  return `${group} - ${item}`;
 }
 
 function isPaidOrder(status) {
