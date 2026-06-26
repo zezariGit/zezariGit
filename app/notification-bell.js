@@ -233,7 +233,7 @@ function SwipeNotificationItem({ notification, onDelete }) {
             onPointerMove={(event) => event.stopPropagation()}
             onClick={(event) => event.stopPropagation()}
           >
-            {isMapUrl(notification.url) ? "지도 열기" : "관련 화면 열기"}
+            {notificationActionLabel(notification.url)}
           </a>
         )}
         <time dateTime={notification.created_at}>{formatNotificationTime(notification.created_at)}</time>
@@ -269,13 +269,20 @@ function renderLinkedText(text) {
 }
 
 function linkLabel(url) {
+  if (url.includes("map.kakao.com")) return "카카오맵";
   if (url.includes("map.naver.com")) return "네이버 지도";
-  if (url.includes("map.kakao.com")) return "카카오 지도";
   return url;
 }
 
 function isMapUrl(url) {
   return /map\.(naver|kakao)\.com/.test(String(url || ""));
+}
+
+function notificationActionLabel(url) {
+  const text = String(url || "");
+  if (text.includes("map.kakao.com")) return "카카오맵 열기";
+  if (text.includes("map.naver.com")) return "네이버 지도 열기";
+  return isMapUrl(text) ? "지도 열기" : "관련 화면 열기";
 }
 
 function isExternalUrl(url) {

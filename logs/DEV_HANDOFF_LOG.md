@@ -2112,6 +2112,34 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Production Verification
 - `https://zezari.vercel.app` returned HTTP 200.
 
+## 2026-06-26 KST - Location Notification Kakao Map Primary Link
+
+### User Request
+- Real phone testing showed Kakao Map opens the accurate shared location.
+- Change location-share push notifications from Naver-map-first back to Kakao-map-first.
+- Rename user-facing map link labels from Naver map wording to Kakao Map wording.
+
+### Reflected Work
+- Changed `notifyGuardianLocationShared()` to select `kakaoMapUrl || naverMapUrl || "/"`.
+- Stored notification history body now labels the selected link as `카카오맵 링크` when a Kakao URL exists.
+- Changed in-app bell notification link labels so `map.kakao.com` displays `카카오맵`.
+- Changed the notification action button label to `카카오맵 열기` for Kakao map URLs, while keeping Naver as a fallback.
+- Kept both `kakao_map_url` and `naver_map_url` in the location-share DB model for admin/fallback use.
+
+### Files Changed
+- `lib/push.js`
+- `app/notification-bell.js`
+- `deliverables/LOCATION_SHARE_MANAGEMENT.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` returned no whitespace errors except expected Windows LF/CRLF warnings.
+
+### Time Spent
+- Kakao-map primary link switch, notification label cleanup, documentation, and build verification: about 15 minutes.
+
 ## 2026-06-25 KST - Location Notification Map Link Click Fix
 
 ### User Request
