@@ -1560,10 +1560,11 @@ function AdminRoleManagementSection({ adminUsersData }) {
 }
 
 function GuardianManagementSection({ adminData }) {
-  const { summary, guardians, selectedGuardian, subjects, subscription, payments, ads, filters } = adminData;
+  const { summary, guardians, selectedGuardian, subjects, subscription, payments, ads, activities, filters } = adminData;
   const returnTo = buildGuardianAdminUrl(filters, selectedGuardian?.id);
   const selectedGuardianType = guardianTypeLabel(selectedGuardian, subscription);
   const visibleRows = Math.max(0, 12 - guardians.length);
+  const guardianTabName = selectedGuardian ? `guardian-detail-tab-${selectedGuardian.id}` : "guardian-detail-tab";
 
   return (
     <div className="guardian-admin-page">
@@ -1719,73 +1720,142 @@ function GuardianManagementSection({ adminData }) {
                 </div>
               </div>
 
-              <nav className="guardian-detail-tabs" aria-label="보호자 상세 이동">
-                <a href="#guardian-basic-info" className="active">기본정보</a>
-                <Link href={`/admin?section=subjects&guardianId=${encodeURIComponent(selectedGuardian.id)}`}>대상자</Link>
-                <Link href={`/admin?section=orders&orderQuery=${encodeURIComponent(selectedGuardian.name || selectedGuardian.phone || selectedGuardian.id)}`}>구독/주문</Link>
-                <Link href={`/admin?section=ads&adQuery=${encodeURIComponent(selectedGuardian.name || selectedGuardian.phone || selectedGuardian.id)}`}>광고</Link>
-                <Link href={`/admin?section=locations&locationQuery=${encodeURIComponent(selectedGuardian.name || selectedGuardian.phone || selectedGuardian.id)}`}>활동 내역</Link>
-              </nav>
+              <div className="guardian-detail-tabset">
+                <input className="guardian-tab-radio" type="radio" id={`${guardianTabName}-basic`} name={guardianTabName} defaultChecked />
+                <input className="guardian-tab-radio" type="radio" id={`${guardianTabName}-subjects`} name={guardianTabName} />
+                <input className="guardian-tab-radio" type="radio" id={`${guardianTabName}-orders`} name={guardianTabName} />
+                <input className="guardian-tab-radio" type="radio" id={`${guardianTabName}-ads`} name={guardianTabName} />
+                <input className="guardian-tab-radio" type="radio" id={`${guardianTabName}-activity`} name={guardianTabName} />
 
-              <section id="guardian-basic-info" className="guardian-detail-section">
-                <dl className="guardian-detail-list">
-                  <div><dt>이름</dt><dd>{selectedGuardian.name || "이름 미입력"} ({formatMemberNumber(selectedGuardian.id)})</dd></div>
-                  <div><dt>보호자 구분</dt><dd>{selectedGuardianType}</dd></div>
-                  <div><dt>보호자 상태</dt><dd>{Number(selectedGuardian.is_active || 0) ? "일반" : "휴면/비활성"}</dd></div>
-                  <div><dt>연락처</dt><dd>{selectedGuardian.phone || "-"}</dd></div>
-                  <div><dt>생년월일</dt><dd>{formatDate(selectedGuardian.birth_date)}{selectedGuardian.birth_date ? ` (${calculateAgeLabel(selectedGuardian.birth_date)})` : ""}</dd></div>
-                  <div><dt>성별</dt><dd>-</dd></div>
-                  <div><dt>주소</dt><dd>{formatFullAddress(selectedGuardian.address, selectedGuardian.address_detail)}</dd></div>
-                  <div><dt>SNS 로그인</dt><dd><GuardianProviderBadges guardian={selectedGuardian} /></dd></div>
-                </dl>
-              </section>
-
-              <section className="guardian-detail-section">
-                <div className="guardian-detail-mini-grid">
-                  <div>
-                    <strong>등록 대상자</strong>
-                    <span>{subjects.length}명</span>
-                    {subjects.length > 0 && <p>{subjects.map((subject) => subject.name).join(", ")}</p>}
-                  </div>
-                  <div>
-                    <strong>구독 현황</strong>
-                    <span>{subscriptionStatusLabel(subscription?.status)}</span>
-                    <p>{subscription?.plan_name || "이용권 정보 없음"}</p>
-                  </div>
-                  <div>
-                    <strong>결제 내역</strong>
-                    <span>{payments.length}건</span>
-                    <p>{payments[0] ? `${formatCurrency(payments[0].amount)} / ${formatRecentDateTime(payments[0].paid_at || payments[0].created_at)}` : "결제내역 없음"}</p>
-                  </div>
-                  <div>
-                    <strong>광고 내역</strong>
-                    <span>{ads.length}건</span>
-                    <p>{ads[0] ? `${ads[0].region} / ${adStatusLabel(ads[0].status)}` : "광고 내역 없음"}</p>
-                  </div>
+                <div className="guardian-detail-tabs" role="tablist" aria-label="보호자 상세 탭">
+                  <label htmlFor={`${guardianTabName}-basic`} role="tab">기본정보</label>
+                  <label htmlFor={`${guardianTabName}-subjects`} role="tab">대상자</label>
+                  <label htmlFor={`${guardianTabName}-orders`} role="tab">구독/주문</label>
+                  <label htmlFor={`${guardianTabName}-ads`} role="tab">광고</label>
+                  <label htmlFor={`${guardianTabName}-activity`} role="tab">활동 내역</label>
                 </div>
-              </section>
 
-              <section className="guardian-detail-section">
-                <form action={setGuardianAdminMemoAction} className="guardian-detail-memo-form">
-                  <input type="hidden" name="guardianId" value={selectedGuardian.id} />
-                  <input type="hidden" name="returnTo" value={returnTo} />
-                  <label htmlFor="guardian-admin-memo">메모</label>
-                  <textarea id="guardian-admin-memo" name="adminMemo" maxLength="2000" defaultValue={selectedGuardian.admin_memo || ""} placeholder="복지기본소속 선생님, 상담 이력 등 내부 메모를 입력하세요." />
-                  <FormSubmitButton pendingText="저장중">저장</FormSubmitButton>
-                </form>
-              </section>
+                <div className="guardian-tab-panels">
+                  <section className="guardian-tab-panel guardian-basic-panel">
+                    <dl className="guardian-detail-list">
+                      <div><dt>이름</dt><dd>{selectedGuardian.name || "이름 미입력"} ({formatMemberNumber(selectedGuardian.id)})</dd></div>
+                      <div><dt>보호자 구분</dt><dd>{selectedGuardianType}</dd></div>
+                      <div><dt>보호자 상태</dt><dd>{Number(selectedGuardian.is_active || 0) ? "일반" : "휴면/비활성"}</dd></div>
+                      <div><dt>연락처</dt><dd>{selectedGuardian.phone || "-"}</dd></div>
+                      <div><dt>생년월일</dt><dd>{formatDate(selectedGuardian.birth_date)}{selectedGuardian.birth_date ? ` (${calculateAgeLabel(selectedGuardian.birth_date)})` : ""}</dd></div>
+                      <div><dt>성별</dt><dd>-</dd></div>
+                      <div><dt>주소</dt><dd>{formatFullAddress(selectedGuardian.address, selectedGuardian.address_detail)}</dd></div>
+                      <div><dt>SNS 로그인</dt><dd><GuardianProviderBadges guardian={selectedGuardian} /></dd></div>
+                    </dl>
 
-              <form action={setGuardianActiveAction} className="guardian-withdraw-form">
-                <input type="hidden" name="guardianId" value={selectedGuardian.id} />
-                <input type="hidden" name="active" value={Number(selectedGuardian.is_active || 0) ? "0" : "1"} />
-                <input type="hidden" name="returnTo" value={returnTo} />
-                <FormSubmitButton
-                  className={Number(selectedGuardian.is_active || 0) ? "danger-button compact" : "activate-button"}
-                  pendingText={Number(selectedGuardian.is_active || 0) ? "처리중" : "재활성화중"}
-                >
-                  {Number(selectedGuardian.is_active || 0) ? "탈퇴 처리" : "재활성화"}
-                </FormSubmitButton>
-              </form>
+                    <form action={setGuardianAdminMemoAction} className="guardian-detail-memo-form">
+                      <input type="hidden" name="guardianId" value={selectedGuardian.id} />
+                      <input type="hidden" name="returnTo" value={returnTo} />
+                      <label htmlFor={`guardian-admin-memo-${selectedGuardian.id}`}>메모</label>
+                      <textarea id={`guardian-admin-memo-${selectedGuardian.id}`} name="adminMemo" maxLength="2000" defaultValue={selectedGuardian.admin_memo || ""} placeholder="복지기본소속 선생님, 상담 이력 등 내부 메모를 입력하세요." />
+                      <FormSubmitButton pendingText="저장중">저장</FormSubmitButton>
+                    </form>
+
+                    <form action={setGuardianActiveAction} className="guardian-withdraw-form">
+                      <input type="hidden" name="guardianId" value={selectedGuardian.id} />
+                      <input type="hidden" name="active" value={Number(selectedGuardian.is_active || 0) ? "0" : "1"} />
+                      <input type="hidden" name="returnTo" value={returnTo} />
+                      <FormSubmitButton
+                        className={Number(selectedGuardian.is_active || 0) ? "danger-button compact" : "activate-button"}
+                        pendingText={Number(selectedGuardian.is_active || 0) ? "처리중" : "재활성화중"}
+                      >
+                        {Number(selectedGuardian.is_active || 0) ? "탈퇴 처리" : "재활성화"}
+                      </FormSubmitButton>
+                    </form>
+                  </section>
+
+                  <section className="guardian-tab-panel guardian-subject-panel">
+                    <div className="guardian-tab-section-title">대상자</div>
+                    <div className="guardian-subject-card-list">
+                      {subjects.map((subject) => (
+                        <article className="guardian-subject-card" key={subject.id}>
+                          <div className="guardian-subject-avatar" aria-hidden="true">{guardianInitial(subject)}</div>
+                          <div>
+                            <strong>{subject.name || "이름 미입력"} <small>({subject.gender || "-"}, {calculateAgeLabel(subject.birth_date)})</small></strong>
+                            <span>{formatDateOnlyValue(subject.created_at)} 등록</span>
+                          </div>
+                          <em className={`status-badge ${statusClass(subject.status)}`}>{statusLabel(subject.status)}</em>
+                          <Link href={`/admin?section=subjects&subject=${encodeURIComponent(subject.id)}`}>상세보기 &gt;</Link>
+                        </article>
+                      ))}
+                      {subjects.length === 0 && <p className="empty-text">등록된 대상자가 없습니다.</p>}
+                    </div>
+                  </section>
+
+                  <section className="guardian-tab-panel guardian-orders-panel">
+                    <div className="guardian-tab-section-title">주문 내역</div>
+                    <div className="guardian-detail-card-list">
+                      {payments.map((payment) => (
+                        <article className="guardian-detail-mini-card" key={payment.id}>
+                          <div className="guardian-detail-row"><strong>주문번호</strong><span>{formatOrderNumber(payment)}</span><Link href={`/admin?section=orders&order=${encodeURIComponent(payment.id)}`}>상세보기 &gt;</Link></div>
+                          <div className="guardian-detail-row"><strong>주문일시</strong><span>{formatRecentDateTime(payment.created_at)}</span></div>
+                          <div className="guardian-detail-row"><strong>상품(옵션)</strong><span>{payment.product_name || orderTypeLabel(payment.order_type)}</span></div>
+                          <div className="guardian-detail-row"><strong>주문금액</strong><span>{formatCurrency(payment.amount)}</span></div>
+                          <div className="guardian-detail-row"><strong>배송상태</strong><span>{fulfillmentStatusLabel(payment.fulfillment_status)}</span></div>
+                        </article>
+                      ))}
+                      {payments.length === 0 && <p className="empty-text">주문 내역이 없습니다.</p>}
+                    </div>
+
+                    <div className="guardian-tab-section-title">구독 내역</div>
+                    <article className="guardian-detail-mini-card">
+                      <div className="guardian-detail-row"><strong>구독상태</strong><span>{subscriptionStatusLabel(subscription?.status)}</span></div>
+                      <div className="guardian-detail-row"><strong>구독상품</strong><span>{subscription?.plan_name || "이용권 정보 없음"}</span></div>
+                      <div className="guardian-detail-row"><strong>구독기간</strong><span>{subscription ? `${Number(subscription.plan_months || 1)}개월` : "-"}</span></div>
+                      <div className="guardian-detail-row"><strong>다음 결제일</strong><span>{formatDateOnlyValue(subscription?.current_period_end)}</span></div>
+                      <div className="guardian-detail-row"><strong>구독금액</strong><span>{subscription ? formatCurrency(subscription.amount) : "-"}</span></div>
+                    </article>
+
+                    <div className="guardian-tab-section-title">결제 내역</div>
+                    <div className="guardian-detail-card-list">
+                      {payments.slice(0, 3).map((payment) => (
+                        <article className="guardian-detail-mini-card compact" key={`payment-${payment.id}`}>
+                          <div className="guardian-detail-row"><strong>결제수단</strong><span>{payment.payment_method || "-"}</span><Link href={`/admin?section=payments&paymentLedgerQuery=${encodeURIComponent(formatOrderNumber(payment))}`}>상세보기 &gt;</Link></div>
+                          <div className="guardian-detail-row"><strong>총 결제 금액</strong><span>{formatCurrency(payment.amount)}</span></div>
+                        </article>
+                      ))}
+                      {payments.length === 0 && <p className="empty-text">결제 내역이 없습니다.</p>}
+                    </div>
+                  </section>
+
+                  <section className="guardian-tab-panel guardian-ads-panel">
+                    <div className="guardian-tab-section-title">광고 내역</div>
+                    <div className="guardian-detail-card-list">
+                      {ads.map((ad) => (
+                        <article className="guardian-detail-mini-card" key={ad.id}>
+                          <div className="guardian-detail-row"><strong>광고명</strong><span>{ad.subject_name || "관리대상 미입력"}</span><Link href={`/admin?section=ads&ad=${encodeURIComponent(ad.id)}`}>상세보기 &gt;</Link></div>
+                          <div className="guardian-detail-row"><strong>광고상태</strong><span>{adStatusLabel(ad.status)}</span></div>
+                          <div className="guardian-detail-row"><strong>광고기간</strong><span>{formatDate(ad.start_date)} ~ {formatDate(ad.end_date)}</span></div>
+                          <div className="guardian-detail-row"><strong>광고지역</strong><span>{ad.region || "-"}</span></div>
+                          <div className="guardian-detail-row"><strong>일 예산</strong><span>{formatCurrency(ad.daily_rate)}</span></div>
+                          <div className="guardian-detail-row"><strong>총 예산</strong><span>{formatCurrency(ad.amount)}</span></div>
+                          <div className="guardian-detail-row"><strong>클릭수</strong><span>{formatMetricValue(ad.click_count)}</span></div>
+                        </article>
+                      ))}
+                      {ads.length === 0 && <p className="empty-text">광고 내역이 없습니다.</p>}
+                    </div>
+                  </section>
+
+                  <section className="guardian-tab-panel guardian-activity-panel">
+                    <div className="guardian-tab-section-title">활동 내역</div>
+                    <ol className="guardian-activity-list">
+                      {activities.map((activity) => (
+                        <li key={activity.id}>
+                          <time>{formatRecentDateTime(activity.created_at)}</time>
+                          <span>{activity.title || "활동"}</span>
+                          {activity.body && <p>{truncateText(activity.body, 42)}</p>}
+                        </li>
+                      ))}
+                      {activities.length === 0 && <li className="guardian-activity-empty">최근 활동 내역이 없습니다.</li>}
+                    </ol>
+                  </section>
+                </div>
+              </div>
             </>
           ) : (
             <p className="empty-text">보호자를 선택해 주세요.</p>

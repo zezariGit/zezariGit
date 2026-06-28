@@ -4482,3 +4482,43 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Deliverable
 - `deliverables/GUARDIAN_ADMIN_OPERATIONS_LAYOUT.md`
+
+## 2026-06-29 KST - Guardian Detail In-Card Tabs
+
+### User Request
+- The top items in the guardian detail card are tabs, not page navigation links.
+- Clicking each tab should switch the detail information inside the same card.
+- The attached image shows the expected per-tab card content.
+
+### Reflected Work
+- Replaced the guardian detail panel tab links with in-card CSS radio tabs in `app/admin/page.js`.
+- Added tab panels for:
+  - base guardian information
+  - managed subjects
+  - subscriptions/orders/payments
+  - advertisements
+  - activity history
+- Expanded `getAdminData()` in `lib/db.js` to include:
+  - subject gender, created date, and QR state
+  - order fulfillment, quantity, plan months, and activation data
+  - advertisement daily rate, click count, meta fields, and days
+  - recent guardian notifications for activity history
+- Added tab, card, subject, order, ad, and activity timeline CSS in `app/globals.css`.
+- Updated the guardian admin deliverable.
+
+### Files Changed
+- `lib/db.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `deliverables/GUARDIAN_ADMIN_OPERATIONS_LAYOUT.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with Windows line-ending warnings only.
+- Local dev route `http://localhost:3000/admin?section=guardians` returned 200.
+- Pending: production deployment verification.
+
+### Time Spent
+- In-card tab conversion, query expansion, CSS, documentation, and local verification: about 35 minutes.

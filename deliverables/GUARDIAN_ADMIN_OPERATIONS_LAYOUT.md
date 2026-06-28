@@ -29,11 +29,21 @@
 - Reworked the right detail panel with:
   - Avatar-style initial mark
   - Guardian profile header
-  - Detail navigation links
+  - In-card tab switching
   - Basic information list
-  - Subject/subscription/payment/ad summary cards
+  - Subject, subscription/order, advertisement, and activity panels
   - Admin memo save form
   - Deactivation/reactivation action
+
+## 2026-06-29 Update
+- Changed the right detail panel tabs from page-navigation links to in-card tabs.
+- Tabs now switch the visible detail content inside the same card:
+  - `기본정보`: guardian base information, SNS login, admin memo, deactivate/reactivate action
+  - `대상자`: managed-subject cards with status and detail links
+  - `구독/주문`: order cards, subscription summary, and payment summary
+  - `광고`: advertisement cards with period, region, budget, and click count
+  - `활동 내역`: guardian notification timeline
+- Expanded `getAdminData()` to load guardian notification activity and additional subject/order/ad fields needed by the in-card tabs.
 
 ## Data Rules
 - Guardian type is derived from existing data:
@@ -62,6 +72,7 @@
 - `https://zezari.vercel.app/admin?section=guardians` returned 200.
 - Vercel error log scan found no errors for the deployment.
 - Browser visual verification with Playwright could not run because the local Playwright browser binary was not installed.
+- Latest tab-switching update: local `npm run build` succeeded and local `/admin?section=guardians` returned 200. Production verification pending.
 
 ## Notes
 - Future page-size selection can be wired to URL parameters if real pagination is added.

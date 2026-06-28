@@ -232,3 +232,4 @@ Create a Korean SaaS admin console UI mockup for "REAL_QR_FIND" guardian managem
 
 ### Notes
 - Use when presenting the guardian-management screen conversion from a simple master-detail list to an operations-grade grid and detail workspace.
+- Updated on 2026-06-29: the right detail panel tabs are in-card tabs that switch content in place, not page-navigation links. Show separate visible tab states for 기본정보, 대상자, 구독/주문, 광고, and 활동 내역.
