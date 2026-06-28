@@ -57,6 +57,10 @@
 - `npm run build` succeeded.
 - `git diff --check` succeeded with only existing Windows line-ending warnings.
 - Local dev route `http://localhost:3000/admin?section=guardians` returned 200.
+- Production deployment succeeded.
+- `https://zezari.vercel.app` returned 200.
+- `https://zezari.vercel.app/admin?section=guardians` returned 200.
+- Vercel error log scan found no errors for the deployment.
 - Browser visual verification with Playwright could not run because the local Playwright browser binary was not installed.
 
 ## Notes

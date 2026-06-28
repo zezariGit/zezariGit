@@ -2980,7 +2980,9 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 공백 검사 통과(Windows 줄바꿈 경고만 표시).
 - 로컬 dev 서버에서 `/admin?section=guardians` 응답 200 확인.
 - Playwright 시각 검증은 로컬 브라우저 바이너리가 없어 수행하지 못했다.
-- 운영 배포 검증 예정.
+- 운영 배포 성공.
+- `https://zezari.vercel.app`, `https://zezari.vercel.app/admin?section=guardians` 응답 200 확인.
+- Vercel 오류 로그 확인 결과 신규 오류 없음.
 
 ### 산출물
 - `deliverables/GUARDIAN_ADMIN_OPERATIONS_LAYOUT.md`
