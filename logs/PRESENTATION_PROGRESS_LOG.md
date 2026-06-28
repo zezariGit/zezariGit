@@ -3013,7 +3013,9 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 프로덕션 빌드 성공.
 - 공백 검사 통과(Windows 줄바꿈 경고만 표시).
 - 로컬 dev 서버에서 `/admin?section=guardians` 응답 200 확인.
-- 운영 배포 검증 예정.
+- 운영 배포 성공.
+- `https://zezari.vercel.app`, `https://zezari.vercel.app/admin?section=guardians` 응답 200 확인.
+- Vercel 오류 로그 확인 결과 신규 오류 없음.
 
 ### 반영시간
 - 상세 카드 탭 전환, 조회 데이터 보강, CSS, 문서화, 로컬 검증: 약 35분.

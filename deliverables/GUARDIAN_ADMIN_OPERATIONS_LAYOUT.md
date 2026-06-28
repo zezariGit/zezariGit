@@ -72,7 +72,7 @@
 - `https://zezari.vercel.app/admin?section=guardians` returned 200.
 - Vercel error log scan found no errors for the deployment.
 - Browser visual verification with Playwright could not run because the local Playwright browser binary was not installed.
-- Latest tab-switching update: local `npm run build` succeeded and local `/admin?section=guardians` returned 200. Production verification pending.
+- Latest tab-switching update: local `npm run build` succeeded, local `/admin?section=guardians` returned 200, production deployment succeeded, `https://zezari.vercel.app/admin?section=guardians` returned 200, and Vercel error log scan found no errors.
 
 ## Notes
 - Future page-size selection can be wired to URL parameters if real pagination is added.
