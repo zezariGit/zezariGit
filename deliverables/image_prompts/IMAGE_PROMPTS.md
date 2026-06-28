@@ -199,3 +199,14 @@ Create a clean Korean civic-tech admin UI diagram for "REAL_QR_FIND" payment and
 
 ### Notes
 - Use when presenting payment ledger operations and the reason CSV export was added across administrator grids.
+
+## 2026-06-28 - Admin Navy Sidebar Navigation
+
+### Purpose
+- Presentation visual for the redesigned administrator left navigation menu.
+
+### Prompt
+Create a Korean admin console UI mockup for "REAL_QR_FIND" showing a dark navy left sidebar like an operational control panel. At the top, show a shield icon and the title "제자리 관리자". Below it, show vertical menu items with crisp white line icons and Korean labels: 대시보드, 보호자 관리, 대상자 관리, QR 관리, 주문 관리, 결제 관리, 상품 관리, 광고 관리, 실종신고 관리, 위치공유 관리, 고객 문의, 관리자 관리. The selected menu "대시보드" has a purple background and subtle light border. At the bottom of the sidebar, show two quick actions: "사용자 화면" and "로그아웃". Also show a small collapse toggle and a second miniature state where the menu is hidden and the main workspace becomes wider. Use compact SaaS admin styling, white workspace panels, public-service trust tone, no real personal data, 16:9 presentation slide.
+
+### Notes
+- Use when explaining that the admin menu kept its hide/show behavior while adopting a stronger operations-menu style.

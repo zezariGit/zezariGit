@@ -4303,3 +4303,44 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Deliverable
 - `deliverables/ADMIN_PAYMENT_EXPORT_MANAGEMENT.md`
+
+## 2026-06-28 KST - Admin Sidebar Visual Refresh
+
+### User Request
+- Restyle the left admin management menu to match the attached dark sidebar reference.
+- Keep the existing hide/collapse behavior.
+- Move `로그아웃` and `사용자 화면` into the left management menu.
+
+### Reflected Work
+- Updated `app/admin/admin-workspace.js`:
+  - changed the sidebar title to `제자리 관리자`
+  - added line icons to each admin menu item
+  - moved `사용자 화면` and `로그아웃` into a bottom quick-actions area
+  - preserved the localStorage-backed collapsed menu behavior
+- Updated `app/admin/page.js`:
+  - removed duplicate header-right `사용자 화면` and logout controls from the admin content header
+- Updated `app/auth-actions.js`:
+  - made `LogoutButton` accept optional `className` and `children` while keeping the existing default behavior
+- Updated `app/globals.css`:
+  - changed the admin sidebar to a dark navy operations menu
+  - added purple active-state styling, white icon/text styling, bottom actions, and responsive/collapsed rules
+- Updated admin sidebar deliverable and image prompt archive.
+
+### Files Changed
+- `app/admin/admin-workspace.js`
+- `app/admin/page.js`
+- `app/auth-actions.js`
+- `app/globals.css`
+- `deliverables/ADMIN_SIDEBAR_NAVIGATION.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+
+### Time Spent
+- Sidebar structure, icon set, CSS styling, duplicate header action cleanup, documentation, and build verification: about 25 minutes.
+
+### Deliverable
+- `deliverables/ADMIN_SIDEBAR_NAVIGATION.md`

@@ -200,12 +200,6 @@ export default async function AdminPage({ searchParams }) {
               <h1>{title}</h1>
               <p>{description}</p>
             </div>
-            <div className="admin-header-actions">
-              <Link className="admin-link" href="/">
-                사용자 화면
-              </Link>
-              <LogoutButton />
-            </div>
           </header>
 
           {activeSection === "dashboard" ? (
