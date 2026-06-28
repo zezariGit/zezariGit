@@ -89,6 +89,9 @@ export default async function AdminPage({ searchParams }) {
     query: resolvedSearchParams?.subjectAdminQuery || "",
     status: resolvedSearchParams?.subjectStatus || "all",
     qr: resolvedSearchParams?.subjectQr || "all",
+    subscription: resolvedSearchParams?.subjectSubscription || "all",
+    startDate: resolvedSearchParams?.subjectStart || "",
+    endDate: resolvedSearchParams?.subjectEnd || "",
     guardianId: resolvedSearchParams?.guardianId || "",
   };
   const qrFilters = {
@@ -144,6 +147,16 @@ export default async function AdminPage({ searchParams }) {
   const locationSharesData = activeSection === "locations" ? await getAdminLocationSharesData(locationFilters, selectedLocationShareId) : null;
   const inquiriesData = activeSection === "inquiries" ? await getAdminInquiriesData() : null;
   const qrItems = qrData ? await withQrImages(qrData.qrCodes) : [];
+  const selectedSubjectQrImage = adminSubjectsData?.selectedSubject?.qr_target_url
+    ? await QRCode.toDataURL(adminSubjectsData.selectedSubject.qr_target_url, {
+        margin: 1,
+        width: 144,
+        color: {
+          dark: "#1f2d3d",
+          light: "#ffffff",
+        },
+      })
+    : "";
   const title =
     activeSection === "dashboard"
       ? "대시보드"
@@ -208,7 +221,7 @@ export default async function AdminPage({ searchParams }) {
           {activeSection === "dashboard" ? (
             <AdminDashboardSection dashboardData={dashboardData} />
           ) : activeSection === "subjects" ? (
-            <SubjectManagementSection adminSubjectsData={adminSubjectsData} />
+            <SubjectManagementSection adminSubjectsData={adminSubjectsData} selectedSubjectQrImage={selectedSubjectQrImage} />
           ) : activeSection === "qr" ? (
             <QrManagementSection qrData={qrData} qrItems={qrItems} />
           ) : activeSection === "admins" ? (
@@ -1892,30 +1905,46 @@ function GuardianProviderBadges({ guardian }) {
   );
 }
 
-function SubjectManagementSection({ adminSubjectsData }) {
-  const { subjects, selectedSubject, filters } = adminSubjectsData;
+function SubjectManagementSection({ adminSubjectsData, selectedSubjectQrImage }) {
+  const { summary, subjects, selectedSubject, subscription, orders, ads, activities, filters } = adminSubjectsData;
+  const visibleRows = Math.max(0, 12 - subjects.length);
+  const subjectTabName = selectedSubject ? `subject-detail-tab-${selectedSubject.id}` : "subject-detail-tab";
 
   return (
-    <div className="admin-master-detail">
-      <section className="admin-panel admin-master-panel">
-        <div className="panel-heading">
-          <h2>관리대상자 목록</h2>
-          <div className="admin-heading-actions">
-            <span>최대 300명 / {subjects.length}명 조회</span>
-            <AdminExportButton filename="zezari-subjects.csv" rows={subjectExportRows(subjects)} />
-          </div>
+    <div className="subject-admin-page">
+      <section className="guardian-admin-status subject-admin-status" aria-labelledby="subject-status-title">
+        <h2 id="subject-status-title">현황</h2>
+        <div className="subject-stat-grid">
+          <GuardianStatCard icon="people" title="전체 대상자" value={formatCountWithUnit(summary.totalSubjects, "명")} />
+          <GuardianStatCard
+            icon="growth"
+            title="신규 대상자"
+            value={formatCountWithUnit(summary.newSubjectsToday, "명")}
+            note={formatDeltaText(summary.newSubjectsToday, summary.newSubjectsYesterday, "명", "어제 대비")}
+            noteTone={Number(summary.newSubjectsToday || 0) >= Number(summary.newSubjectsYesterday || 0) ? "positive" : "negative"}
+          />
+          <GuardianStatCard icon="linked" title="안전" value={formatCountWithUnit(summary.safeSubjects, "명")} note={`${safePercent(summary.safeSubjects, summary.totalSubjects).toFixed(2)}%`} noteTone="positive" />
+          <GuardianStatCard icon="money" title="상품구매필요" value={formatCountWithUnit(summary.purchaseNeededSubjects, "명")} note={`${safePercent(summary.purchaseNeededSubjects, summary.totalSubjects).toFixed(2)}%`} noteTone={Number(summary.purchaseNeededSubjects || 0) > 0 ? "negative" : "neutral"} />
+          <GuardianStatCard icon="qr" title="QR미활성화" value={formatCountWithUnit(summary.qrNeededSubjects, "명")} note={`${safePercent(summary.qrNeededSubjects, summary.totalSubjects).toFixed(2)}%`} noteTone={Number(summary.qrNeededSubjects || 0) > 0 ? "negative" : "neutral"} />
+          <GuardianStatCard icon="person" title="찾는 중" value={formatCountWithUnit(summary.searchingSubjects, "명")} note={`${safePercent(summary.searchingSubjects, summary.totalSubjects).toFixed(2)}%`} noteTone={Number(summary.searchingSubjects || 0) > 0 ? "negative" : "neutral"} />
+          <GuardianStatCard icon="blocked" title="비활성" value={formatCountWithUnit(summary.inactiveQrSubjects, "명")} note={`${safePercent(summary.inactiveQrSubjects, summary.totalSubjects).toFixed(2)}%`} />
+          <GuardianStatCard icon="blocked" title="삭제" value={formatCountWithUnit(summary.deletedSubjects, "명")} note={`${safePercent(summary.deletedSubjects, summary.totalSubjects).toFixed(2)}%`} />
         </div>
-        <form action="/admin" className="admin-master-filter subject-master-filter">
+      </section>
+
+      <section className="admin-panel guardian-search-panel subject-search-panel">
+        <h2>조회</h2>
+        <form action="/admin" className="guardian-admin-filter subject-admin-filter">
           <input type="hidden" name="section" value="subjects" />
           {filters.guardianId && <input type="hidden" name="guardianId" value={filters.guardianId} />}
           <label>
-            통합 검색
-            <input name="subjectAdminQuery" defaultValue={filters.query} placeholder="관리대상 이름, 보호자 이름" />
+            검색어
+            <input name="subjectAdminQuery" defaultValue={filters.query} placeholder="이름, 연락처" />
           </label>
           <label>
-            현재 상태
+            대상자 상태
             <select name="subjectStatus" defaultValue={filters.status}>
-              <option value="all">전체 상태</option>
+              <option value="all">전체</option>
               <option value="상품구매필요">상품구매필요</option>
               <option value="QR활성화필요">QR활성화필요</option>
               <option value="안전">안전</option>
@@ -1925,15 +1954,30 @@ function SubjectManagementSection({ adminSubjectsData }) {
           <label>
             QR 상태
             <select name="subjectQr" defaultValue={filters.qr}>
-              <option value="all">전체 QR</option>
+              <option value="all">전체</option>
               <option value="active">활성</option>
               <option value="pending">활성화 대기</option>
               <option value="inactive">비활성</option>
               <option value="unassigned">미매칭</option>
             </select>
           </label>
+          <label>
+            구독 상태
+            <select name="subjectSubscription" defaultValue={filters.subscription}>
+              <option value="all">전체</option>
+              <option value="active">이용중</option>
+              <option value="paused">일시정지</option>
+              <option value="none">미구독</option>
+            </select>
+          </label>
+          <fieldset className="guardian-filter-date subject-filter-date">
+            <legend>등록일</legend>
+            <input type="date" name="subjectStart" defaultValue={filters.startDate} aria-label="등록 시작일" />
+            <span>~</span>
+            <input type="date" name="subjectEnd" defaultValue={filters.endDate} aria-label="등록 종료일" />
+          </fieldset>
+          <Link className="plain-button guardian-reset-button" href="/admin?section=subjects">초기화</Link>
           <button type="submit">검색</button>
-          <Link className="plain-button" href="/admin?section=subjects">초기화</Link>
         </form>
         {filters.guardianId && (
           <div className="admin-active-filter">
@@ -1941,98 +1985,239 @@ function SubjectManagementSection({ adminSubjectsData }) {
             <Link href="/admin?section=subjects">전체 보기</Link>
           </div>
         )}
-        <div className="admin-record-table-wrap">
-          <div className="admin-record-table subject-record-table" role="table" aria-label="관리대상자 목록">
-            <div className="admin-record-header" role="row">
-              <span role="columnheader">관리대상 이름</span>
-              <span role="columnheader">성별</span>
-              <span role="columnheader">생년월일</span>
-              <span role="columnheader">보호자</span>
-              <span role="columnheader">상태</span>
-              <span role="columnheader">QR 상태</span>
-            </div>
-            {subjects.map((subject) => (
-              <Link
-                className={subject.id === selectedSubject?.id ? "admin-record-row active" : "admin-record-row"}
-                href={buildSubjectAdminUrl(filters, subject.id)}
-                key={subject.id}
-                role="row"
-              >
-                <strong role="cell">{subject.name || "이름 미입력"}</strong>
-                <span role="cell">{subject.gender || "-"}</span>
-                <span role="cell">{formatDate(subject.birth_date)}</span>
-                <span role="cell">{subject.guardian_name || "보호자 미입력"}</span>
-                <em role="cell" className={`status-badge ${statusClass(subject.status)}`}>{statusLabel(subject.status)}</em>
-                <em role="cell" className={`qr-admin-state ${qrAdminStateClass(subject)}`}>{qrAdminStateLabel(subject)}</em>
-              </Link>
-            ))}
+      </section>
+
+      <div className="guardian-admin-layout subject-admin-layout">
+        <section className="admin-panel guardian-list-panel subject-list-panel">
+          <div className="guardian-list-heading">
+            <h2>전체 대상자 <strong>{formatMetricValue(summary.totalSubjects)}</strong>명</h2>
+            <AdminExportButton filename="zezari-subjects.csv" rows={subjectExportRows(subjects)} />
           </div>
-        </div>
-        {subjects.length === 0 && <p className="empty-text">조건에 맞는 관리대상자가 없습니다.</p>}
-      </section>
-
-      <section className="admin-panel admin-detail-panel subject-detail-panel">
-        {selectedSubject ? (
-          <>
-            <div className="admin-detail-heading subject-detail-heading">
-              <div className="admin-detail-photo">
-                {selectedSubject.photo_url ? <img src={selectedSubject.photo_url} alt={`${selectedSubject.name} 사진`} /> : <span aria-hidden="true" />}
+          <div className="admin-record-table-wrap guardian-admin-table-wrap">
+            <div className="admin-record-table guardian-admin-table subject-admin-table" role="table" aria-label="관리대상자 목록">
+              <div className="admin-record-header" role="row">
+                <span role="columnheader">□</span>
+                <span role="columnheader">대상자 번호</span>
+                <span role="columnheader">대상자</span>
+                <span role="columnheader">보호자</span>
+                <span role="columnheader">대상자상태</span>
+                <span role="columnheader">QR 상태</span>
+                <span role="columnheader">구독 상태</span>
+                <span role="columnheader">등록일</span>
+                <span role="columnheader">관리</span>
               </div>
-              <div>
-                <span className="admin-detail-kicker">관리대상 상세정보</span>
-                <h2>{selectedSubject.name || "이름 미입력"}</h2>
-                <p>{selectedSubject.gender || "성별 미입력"} / {formatDate(selectedSubject.birth_date)}</p>
-                <p>보호자: {selectedSubject.guardian_name || "미입력"}</p>
-              </div>
+              {subjects.map((subject) => (
+                <Link
+                  className={subject.id === selectedSubject?.id ? "admin-record-row active" : "admin-record-row"}
+                  href={buildSubjectAdminUrl(filters, subject.id)}
+                  key={subject.id}
+                  role="row"
+                >
+                  <span role="cell">{subject.id === selectedSubject?.id ? "◉" : "□"}</span>
+                  <span role="cell">{formatSubjectNumber(subject.id)}</span>
+                  <strong role="cell">{subject.name || "이름 미입력"}<small>{subject.gender || "-"} · {calculateAgeLabel(subject.birth_date)}</small></strong>
+                  <span role="cell">{subject.guardian_name || "보호자 미입력"}<small>{subject.guardian_phone || "-"}</small></span>
+                  <em role="cell" className={`status-badge ${statusClass(subject.status)}`}>{statusLabel(subject.status)}</em>
+                  <em role="cell" className={`qr-admin-state ${qrAdminStateClass(subject)}`}>{qrAdminStateLabel(subject)}</em>
+                  <em role="cell" className={`guardian-table-badge ${subscriptionStateClass(subject.subscription_status)}`}>{subscriptionStatusLabel(subject.subscription_status)}</em>
+                  <time role="cell">{formatDateOnlyValue(subject.created_at)}</time>
+                  <span role="cell">상세보기</span>
+                </Link>
+              ))}
+              {subjects.length > 0 && Array.from({ length: visibleRows }, (_, index) => (
+                <div className="admin-record-row guardian-empty-row" role="row" key={`subject-empty-${index}`}>
+                  {Array.from({ length: 9 }, (_, cellIndex) => <span role="cell" key={`subject-empty-${index}-${cellIndex}`}>&nbsp;</span>)}
+                </div>
+              ))}
+              {subjects.length === 0 && (
+                <div className="admin-record-row guardian-empty-result" role="row">
+                  <span role="cell">조건에 맞는 관리대상자가 없습니다.</span>
+                </div>
+              )}
             </div>
+          </div>
+          <div className="guardian-list-footer">
+            <span>선택한 대상자 {selectedSubject ? "1" : "0"}명</span>
+            <label>
+              <select defaultValue="10" aria-label="페이지당 대상자 수">
+                <option value="10">10개씩 보기</option>
+                <option value="20">20개씩 보기</option>
+                <option value="50">50개씩 보기</option>
+              </select>
+            </label>
+          </div>
+        </section>
 
-            <section className="admin-detail-section">
-              <h3>기본정보</h3>
-              <dl className="admin-detail-list">
-                <div><dt>이름</dt><dd>{selectedSubject.name || "-"}</dd></div>
-                <div><dt>성별</dt><dd>{selectedSubject.gender || "-"}</dd></div>
-                <div><dt>생년월일</dt><dd>{formatDate(selectedSubject.birth_date)}</dd></div>
-                <div><dt>현재 상태</dt><dd>{statusLabel(selectedSubject.status)}</dd></div>
-                <div><dt>보호자</dt><dd><Link href={`/admin?section=guardians&guardian=${encodeURIComponent(selectedSubject.guardian_id)}`}>{selectedSubject.guardian_name || "보호자 보기"}</Link></dd></div>
-                <div><dt>보호자 연락처</dt><dd>{selectedSubject.guardian_phone || "-"}</dd></div>
-              </dl>
-            </section>
+        <section className="admin-panel guardian-detail-card subject-detail-card">
+          {selectedSubject ? (
+            <>
+              <div className="guardian-detail-header subject-detail-header">
+                <div className="subject-detail-avatar" aria-hidden="true">
+                  {selectedSubject.photo_url ? <img src={selectedSubject.photo_url} alt="" /> : <span>{guardianInitial(selectedSubject)}</span>}
+                </div>
+                <div>
+                  <h2>{selectedSubject.name || "이름 미입력"} <small>({selectedSubject.gender || "-"}, {calculateAgeLabel(selectedSubject.birth_date)})</small></h2>
+                  <em className={`guardian-status-pill ${statusClass(selectedSubject.status)}`}>
+                    {statusLabel(selectedSubject.status)}
+                  </em>
+                  <span>{formatDate(selectedSubject.birth_date)}</span>
+                  <span>{formatDateOnlyValue(selectedSubject.created_at)} 가입</span>
+                  <span>{formatDateOnlyValue(selectedSubject.updated_at)} 수정</span>
+                </div>
+              </div>
 
-            <section className="admin-detail-section">
-              <h3>보호자 메시지</h3>
-              <p className="admin-message-content">{selectedSubject.guardian_message || "입력된 보호자 메시지가 없습니다."}</p>
-            </section>
+              <div className="guardian-detail-tabset">
+                <input className="guardian-tab-radio" type="radio" id={`${subjectTabName}-basic`} name={subjectTabName} defaultChecked />
+                <input className="guardian-tab-radio" type="radio" id={`${subjectTabName}-guardian`} name={subjectTabName} />
+                <input className="guardian-tab-radio" type="radio" id={`${subjectTabName}-qr`} name={subjectTabName} />
+                <input className="guardian-tab-radio" type="radio" id={`${subjectTabName}-ads`} name={subjectTabName} />
+                <input className="guardian-tab-radio" type="radio" id={`${subjectTabName}-orders`} name={subjectTabName} />
+                <input className="guardian-tab-radio" type="radio" id={`${subjectTabName}-activity`} name={subjectTabName} />
 
-            <section className="admin-detail-section">
-              <h3>보호자 음성</h3>
-              {selectedSubject.voice_data_url ? (
-                <audio className="admin-voice-player" controls preload="none" src={selectedSubject.voice_data_url}>
-                  브라우저에서 음성을 재생할 수 없습니다.
-                </audio>
-              ) : (
-                <p>저장된 보호자 음성이 없습니다.</p>
-              )}
-              {selectedSubject.voice_name && <span className="admin-detail-caption">{selectedSubject.voice_name}</span>}
-            </section>
+                <div className="guardian-detail-tabs" role="tablist" aria-label="대상자 상세 탭">
+                  <label htmlFor={`${subjectTabName}-basic`} role="tab">기본 정보</label>
+                  <label htmlFor={`${subjectTabName}-guardian`} role="tab">보호자</label>
+                  <label htmlFor={`${subjectTabName}-qr`} role="tab">QR</label>
+                  <label htmlFor={`${subjectTabName}-ads`} role="tab">광고</label>
+                  <label htmlFor={`${subjectTabName}-orders`} role="tab">구독/주문</label>
+                  <label htmlFor={`${subjectTabName}-activity`} role="tab">활동 내역</label>
+                </div>
 
-            <section className="admin-detail-section">
-              <h3>부가정보</h3>
-              <dl className="admin-detail-list">
-                <div><dt>사진 파일</dt><dd>{selectedSubject.photo_name || "없음"}</dd></div>
-                <div><dt>QR 상태</dt><dd>{qrAdminStateLabel(selectedSubject)}</dd></div>
-                <div><dt>QR 코드</dt><dd>{selectedSubject.qr_code || "미매칭"}</dd></div>
-                <div><dt>등록일시</dt><dd>{formatRecentDateTime(selectedSubject.created_at)}</dd></div>
-                <div><dt>수정일시</dt><dd>{formatRecentDateTime(selectedSubject.updated_at)}</dd></div>
-              </dl>
-              {selectedSubject.qr_target_url && (
-                <a className="admin-detail-link" href={selectedSubject.qr_target_url} target="_blank" rel="noreferrer">QR 공개 페이지 열기</a>
-              )}
-            </section>
-          </>
-        ) : (
-          <p className="empty-text">관리대상자를 선택해 주세요.</p>
-        )}
-      </section>
+                <div className="guardian-tab-panels">
+                  <section className="guardian-tab-panel subject-basic-panel">
+                    <dl className="guardian-detail-list">
+                      <div><dt>이름</dt><dd>{selectedSubject.name || "-"}</dd></div>
+                      <div><dt>성별</dt><dd>{selectedSubject.gender || "-"}</dd></div>
+                      <div><dt>생년월일</dt><dd>{formatDate(selectedSubject.birth_date)} ({calculateAgeLabel(selectedSubject.birth_date)})</dd></div>
+                      <div><dt>주소</dt><dd>{formatFullAddress(selectedSubject.guardian_address, selectedSubject.guardian_address_detail)}</dd></div>
+                      <div><dt>보호자 메시지</dt><dd className="admin-message-content">{selectedSubject.guardian_message || "입력된 보호자 메시지가 없습니다."}</dd></div>
+                      <div><dt>대상자 상태</dt><dd>{statusLabel(selectedSubject.status)}</dd></div>
+                      <div><dt>QR 상태</dt><dd>{qrAdminStateLabel(selectedSubject)}</dd></div>
+                    </dl>
+                    <div className="subject-detail-media-block">
+                      <div className="guardian-tab-section-title">사진</div>
+                      <div className="subject-photo-strip">
+                        {selectedSubject.photo_url ? <img src={selectedSubject.photo_url} alt={`${selectedSubject.name} 사진`} /> : <span>사진 없음</span>}
+                        <em>{selectedSubject.photo_name || "사진 파일 없음"}</em>
+                      </div>
+                    </div>
+                    <div className="subject-detail-media-block">
+                      <div className="guardian-tab-section-title">보호자 음성</div>
+                      {selectedSubject.voice_data_url ? (
+                        <audio className="admin-voice-player" controls preload="none" src={selectedSubject.voice_data_url}>
+                          브라우저에서 음성을 재생할 수 없습니다.
+                        </audio>
+                      ) : (
+                        <p className="empty-text">저장된 보호자 음성이 없습니다.</p>
+                      )}
+                      {selectedSubject.voice_name && <span className="admin-detail-caption">{selectedSubject.voice_name}</span>}
+                    </div>
+                  </section>
+
+                  <section className="guardian-tab-panel subject-guardian-panel">
+                    <div className="guardian-tab-section-title">보호자 정보</div>
+                    <article className="guardian-detail-mini-card">
+                      <div className="guardian-detail-row"><strong>이름(아이디)</strong><span>{selectedSubject.guardian_name || "-"} ({selectedSubject.guardian_login_id || selectedSubject.guardian_email || selectedSubject.guardian_google_email || "-"})</span><Link href={`/admin?section=guardians&guardian=${encodeURIComponent(selectedSubject.guardian_id)}`}>상세보기 &gt;</Link></div>
+                      <div className="guardian-detail-row"><strong>연락처</strong><span>{selectedSubject.guardian_phone || "-"}</span></div>
+                      <div className="guardian-detail-row"><strong>보호자 구분</strong><span>{subscription?.status === "active" ? "VIP" : "일반"}</span></div>
+                      <div className="guardian-detail-row"><strong>주소</strong><span>{formatFullAddress(selectedSubject.guardian_address, selectedSubject.guardian_address_detail)}</span></div>
+                      <div className="guardian-detail-row"><strong>가입일</strong><span>{formatRecentDateTime(selectedSubject.guardian_created_at)}</span></div>
+                    </article>
+                  </section>
+
+                  <section className="guardian-tab-panel subject-qr-panel">
+                    <div className="guardian-tab-section-title">QR 정보</div>
+                    <article className="guardian-detail-mini-card subject-qr-card">
+                      <div className="subject-qr-preview">
+                        {selectedSubjectQrImage ? <img src={selectedSubjectQrImage} alt={`${selectedSubject.name} QR 코드`} /> : <span>미매칭</span>}
+                      </div>
+                      <div>
+                        <div className="guardian-detail-row"><strong>QR 번호</strong><span>{selectedSubject.qr_code || "미매칭"}</span>{selectedSubject.qr_target_url && <Link href={selectedSubject.qr_target_url} target="_blank">상세보기 &gt;</Link>}</div>
+                        <div className="guardian-detail-row"><strong>QR 상태</strong><span>{qrAdminStateLabel(selectedSubject)}</span></div>
+                        <div className="guardian-detail-row"><strong>발급일</strong><span>{formatRecentDateTime(selectedSubject.qr_updated_at)}</span></div>
+                        <div className="guardian-detail-row"><strong>활성화 시점</strong><span>{formatRecentDateTime(selectedSubject.qr_activated_at)}</span></div>
+                        <div className="guardian-detail-row"><strong>최근 수정일</strong><span>{formatRecentDateTime(selectedSubject.qr_updated_at)}</span></div>
+                      </div>
+                    </article>
+                  </section>
+
+                  <section className="guardian-tab-panel subject-ads-panel">
+                    <div className="guardian-tab-section-title">광고 내역</div>
+                    <div className="guardian-detail-card-list">
+                      {ads.map((ad) => (
+                        <article className="guardian-detail-mini-card" key={ad.id}>
+                          <div className="guardian-detail-row"><strong>광고명</strong><span>{selectedSubject.name || "관리대상 미입력"}</span><Link href={`/admin?section=ads&ad=${encodeURIComponent(ad.id)}`}>상세보기 &gt;</Link></div>
+                          <div className="guardian-detail-row"><strong>광고상태</strong><span>{adStatusLabel(ad.status)}</span></div>
+                          <div className="guardian-detail-row"><strong>광고기간</strong><span>{formatDate(ad.start_date)} ~ {formatDate(ad.end_date)}</span></div>
+                          <div className="guardian-detail-row"><strong>광고지역</strong><span>{ad.region || "-"}</span></div>
+                          <div className="guardian-detail-row"><strong>일 예산</strong><span>{formatCurrency(ad.daily_rate)}</span></div>
+                          <div className="guardian-detail-row"><strong>총 예산</strong><span>{formatCurrency(ad.amount)}</span></div>
+                          <div className="guardian-detail-row"><strong>도달수</strong><span>{formatMetricValue(ad.click_count)}</span></div>
+                        </article>
+                      ))}
+                      {ads.length === 0 && <p className="empty-text">광고 내역이 없습니다.</p>}
+                    </div>
+                  </section>
+
+                  <section className="guardian-tab-panel subject-orders-panel">
+                    <div className="guardian-tab-section-title">주문 내역</div>
+                    <div className="guardian-detail-card-list">
+                      {orders.map((order) => (
+                        <article className="guardian-detail-mini-card" key={order.id}>
+                          <div className="guardian-detail-row"><strong>주문번호</strong><span>{formatOrderNumber(order)}</span><Link href={`/admin?section=orders&order=${encodeURIComponent(order.id)}`}>상세보기 &gt;</Link></div>
+                          <div className="guardian-detail-row"><strong>주문일시</strong><span>{formatRecentDateTime(order.created_at)}</span></div>
+                          <div className="guardian-detail-row"><strong>상품(옵션)</strong><span>{order.product_name || orderTypeLabel(order.order_type)}</span></div>
+                          <div className="guardian-detail-row"><strong>주문금액</strong><span>{formatCurrency(order.amount)}</span></div>
+                          <div className="guardian-detail-row"><strong>배송상태</strong><span>{fulfillmentStatusLabel(order.fulfillment_status)}</span></div>
+                        </article>
+                      ))}
+                      {orders.length === 0 && <p className="empty-text">주문 내역이 없습니다.</p>}
+                    </div>
+
+                    <div className="guardian-tab-section-title">구독 내역</div>
+                    <article className="guardian-detail-mini-card">
+                      <div className="guardian-detail-row"><strong>구독번호</strong><span>{subscription?.id || "-"}</span></div>
+                      <div className="guardian-detail-row"><strong>구독상품</strong><span>{subscription?.plan_name || "이용권 정보 없음"}</span></div>
+                      <div className="guardian-detail-row"><strong>구독상태</strong><span>{subscriptionStatusLabel(subscription?.status)}</span></div>
+                      <div className="guardian-detail-row"><strong>구독 시작일시</strong><span>{formatRecentDateTime(subscription?.current_period_start)}</span></div>
+                      <div className="guardian-detail-row"><strong>다음 결제일</strong><span>{formatDateOnlyValue(subscription?.current_period_end)}</span></div>
+                      <div className="guardian-detail-row"><strong>구독 금액</strong><span>{subscription ? formatCurrency(subscription.amount) : "-"}</span></div>
+                    </article>
+
+                    <div className="guardian-tab-section-title">결제 내역</div>
+                    <div className="guardian-detail-card-list">
+                      {orders.filter((order) => isPaidOrder(order.status)).slice(0, 10).map((order) => (
+                        <article className="guardian-detail-mini-card compact" key={`subject-payment-${order.id}`}>
+                          <div className="guardian-detail-row"><strong>결제수단</strong><span>{order.payment_method || "-"}</span><Link href={`/admin?section=payments&paymentLedgerQuery=${encodeURIComponent(formatOrderNumber(order))}`}>상세보기 &gt;</Link></div>
+                          <div className="guardian-detail-row"><strong>총 결제 금액</strong><span>{formatCurrency(order.amount)}</span></div>
+                          <div className="guardian-detail-row"><strong>결제일</strong><span>{formatRecentDateTime(order.paid_at)}</span></div>
+                        </article>
+                      ))}
+                      {orders.filter((order) => isPaidOrder(order.status)).length === 0 && <p className="empty-text">결제 내역이 없습니다.</p>}
+                    </div>
+                  </section>
+
+                  <section className="guardian-tab-panel subject-activity-panel">
+                    <div className="guardian-tab-section-title">활동 내역</div>
+                    <ol className="guardian-activity-list">
+                      {activities.map((activity) => (
+                        <li key={activity.id}>
+                          <time>{formatRecentDateTime(activity.at)}</time>
+                          <span>{activity.title || "활동"}</span>
+                          {activity.body && <p>{truncateText(activity.body, 42)}</p>}
+                        </li>
+                      ))}
+                      {activities.length === 0 && <li className="guardian-activity-empty">최근 활동 내역이 없습니다.</li>}
+                    </ol>
+                  </section>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p className="empty-text">관리대상자를 선택해 주세요.</p>
+          )}
+        </section>
+      </div>
     </div>
   );
 }
@@ -2564,6 +2749,10 @@ function formatMemberNumber(id) {
   return `U-${String(id || "").replace(/-/g, "").slice(-8).toUpperCase() || "UNKNOWN"}`;
 }
 
+function formatSubjectNumber(id) {
+  return `DP-${String(id || "").replace(/-/g, "").slice(-6).toUpperCase() || "UNKNOWN"}`;
+}
+
 function guardianInitial(guardian) {
   const name = String(guardian?.name || guardian?.login_id || guardian?.email || "보").trim();
   return name.slice(0, 1).toUpperCase();
@@ -2580,6 +2769,12 @@ function guardianTypeClass(guardian, subscription = null) {
   const label = guardianTypeLabel(guardian, subscription);
   if (label === "VIP") return "vip";
   if (label === "관리자") return "admin";
+  return "normal";
+}
+
+function subscriptionStateClass(status) {
+  if (status === "active") return "vip";
+  if (status === "paused") return "inactive";
   return "normal";
 }
 
@@ -2734,6 +2929,9 @@ function buildSubjectAdminUrl(filters, subjectId = "") {
   if (filters?.query) params.set("subjectAdminQuery", filters.query);
   if (filters?.status && filters.status !== "all") params.set("subjectStatus", filters.status);
   if (filters?.qr && filters.qr !== "all") params.set("subjectQr", filters.qr);
+  if (filters?.subscription && filters.subscription !== "all") params.set("subjectSubscription", filters.subscription);
+  if (filters?.startDate) params.set("subjectStart", filters.startDate);
+  if (filters?.endDate) params.set("subjectEnd", filters.endDate);
   if (filters?.guardianId) params.set("guardianId", filters.guardianId);
   if (subjectId) params.set("subject", subjectId);
   return `/admin?${params.toString()}`;

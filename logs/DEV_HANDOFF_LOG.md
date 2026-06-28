@@ -4552,3 +4552,46 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - CSS layout stabilization, documentation, and local verification: about 10 minutes.
+
+## 2026-06-29 KST - Subject Admin Operations Layout
+
+### User Request
+- Rebuild the administrator `대상자관리` page based on the provided operations-style reference.
+- The right detail card should use in-card tabs like the guardian management detail card.
+- Detail-card tabs with growing data should use internal scrollbars; applying this to every detail tab is acceptable.
+- Apply the same all-tab scroll rule to the guardian management detail card as well.
+
+### Reflected Work
+- Rebuilt `SubjectManagementSection()` in `app/admin/page.js` as:
+  - top subject status metrics
+  - expanded search/filter area
+  - dense left subject grid
+  - right in-card tabbed detail panel
+- Added subject filters for subscription state and registration date range.
+- Added selected-subject QR image generation using the existing `qrcode` package.
+- Expanded `getAdminSubjectsData()` in `lib/db.js` to return:
+  - summary metrics
+  - subscription status
+  - selected guardian detail fields
+  - selected subject orders
+  - selected subject ads
+  - synthesized subject activity history
+- Changed the shared detail-tab CSS so every guardian and subject detail tab has a fixed-height internal scrollbar.
+- Updated the guardian/subject admin deliverable.
+
+### Files Changed
+- `app/admin/page.js`
+- `app/globals.css`
+- `lib/db.js`
+- `deliverables/ADMIN_GUARDIAN_SUBJECT_MANAGEMENT.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with Windows line-ending warnings only.
+- Direct Turso read check for the subject list joins succeeded without printing secrets.
+- Direct Node import of `lib/db.js` was not usable because the project relies on Next.js extensionless module resolution; this did not affect the Next.js production build.
+
+### Time Spent
+- Data query expansion, subject admin UI rebuild, CSS, documentation, and local verification: about 50 minutes.
