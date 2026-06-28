@@ -4344,3 +4344,56 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Deliverable
 - `deliverables/ADMIN_SIDEBAR_NAVIGATION.md`
+
+## 2026-06-28 KST - Admin Operations Dashboard Revamp
+
+### User Request
+- Change the admin dashboard to match the attached operations-style reference.
+- Treat the change as both visual and functional.
+
+### Reflected Work
+- Expanded `getAdminDashboardData()` in `lib/db.js`.
+- Added real data for:
+  - total guardians and total subjects
+  - today's new guardians and subjects with yesterday comparison
+  - active and inactive QR counts
+  - active ads and rejected ad-review count
+  - daily revenue, monthly revenue, previous-period comparison
+  - product, subscription, ad, refund, and net revenue
+  - order fulfillment status counts
+  - ad status counts
+  - subscription status counts
+  - operational risk counts
+  - recent 30-day trend data
+  - recent guardians, orders, notifications, missing reports, inquiries, and ads
+- Rebuilt `AdminDashboardSection()` in `app/admin/page.js`.
+- Added:
+  - five thick-border overview cards
+  - recent 30-day SVG trend chart
+  - recent status tables
+  - order status flow
+  - recent missing-ad table
+  - ad and subscription donut panels
+  - sales summary table
+- Added dashboard-specific CSS in `app/globals.css` for cards, tables, chart, donut panels, and responsive layouts.
+- Added official deliverable and image-generation prompt.
+
+### Files Changed
+- `lib/db.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `deliverables/ADMIN_DASHBOARD_OPERATIONS_REVAMP.md`
+- `deliverables/README.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- Direct Node import verification was blocked by Next.js extensionless ESM import resolution outside the Next runtime.
+
+### Time Spent
+- Data aggregation, dashboard JSX, CSS, documentation, and build verification: about 60 minutes.
+
+### Deliverable
+- `deliverables/ADMIN_DASHBOARD_OPERATIONS_REVAMP.md`

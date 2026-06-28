@@ -210,3 +210,14 @@ Create a Korean admin console UI mockup for "REAL_QR_FIND" showing a dark navy l
 
 ### Notes
 - Use when explaining that the admin menu kept its hide/show behavior while adopting a stronger operations-menu style.
+
+## 2026-06-28 - Admin Operations Dashboard Revamp
+
+### Purpose
+- Presentation visual for the redesigned operations-focused administrator dashboard.
+
+### Prompt
+Create a Korean operations dashboard UI mockup for "REAL_QR_FIND". At the top, show the title "현황" and five large white cards with thick black borders and bold black icons. Card 1 shows 전체 보호자 and 전체 대상자. Card 2 shows 신규 보호자 and 신규 대상자 with 전일 대비 notes. Card 3 shows 활성 QR and 미활성 QR with percentage notes. Card 4 shows 광고 진행중 and 광고 심사반려. Card 5 shows 일 매출 and 월 매출. In the center, show a recent 30-day line chart for 매출, 주문, and 위치공유 activity with a yellow memo box explaining the graph. Below, show compact tables for 신규 가입자, 신규 주문, 최근 활동 알림, and 주의 대상 현황. At the bottom, show 주문 현황 flow, 최근 실종 광고 table, 광고 진행 도넛 chart, 구독 현황 도넛 chart, and 매출 현황 table. Use a clean Korean SaaS admin style, white background, black table borders, restrained purple/blue/yellow accents, no real personal data, 16:9 presentation slide.
+
+### Notes
+- Use when explaining the shift from simple metric cards to a dense operations dashboard.

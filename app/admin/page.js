@@ -235,22 +235,15 @@ export default async function AdminPage({ searchParams }) {
 }
 
 function AdminDashboardSection({ dashboardData }) {
-  const cards = [
-    { label: "전체 회원", value: dashboardData.totalGuardians, unit: "명", mark: "회", tone: "blue" },
-    { label: "관리대상자", value: dashboardData.totalSubjects, unit: "명", mark: "대", tone: "teal" },
-    { label: "활성 QR", value: dashboardData.activeQrCount, unit: "개", mark: "QR", tone: "green" },
-    { label: "실종신고 현황", value: dashboardData.missingReportCount, unit: "건", mark: "실", tone: "red" },
-    { label: "광고 진행중", value: dashboardData.activeAdCount, unit: "건", mark: "광", tone: "amber" },
-    { label: "월매출", value: dashboardData.monthlyRevenue, unit: "원", mark: "월", tone: "navy", emphasis: true },
-    { label: "상품매출", value: dashboardData.productRevenue, unit: "원", mark: "상", tone: "cyan" },
-    { label: "이용권 매출", value: dashboardData.subscriptionRevenue, unit: "원", mark: "이", tone: "violet" },
-  ];
+  const qrRatio = safePercent(dashboardData.activeQrCount, dashboardData.totalSubjects);
+  const inactiveQrRatio = safePercent(dashboardData.inactiveQrCount, dashboardData.totalSubjects);
+  const monthlyDeltaRate = safePercent(dashboardData.monthlyRevenue - dashboardData.previousMonthRevenue, dashboardData.previousMonthRevenue);
 
   return (
     <section className="admin-dashboard-section" aria-labelledby="admin-dashboard-title">
       <div className="admin-dashboard-heading">
         <div>
-          <h2 id="admin-dashboard-title">운영 현황</h2>
+          <h2 id="admin-dashboard-title">현황</h2>
           <p>{formatDashboardMonth(dashboardData.month)} 기준</p>
         </div>
         <form action="/admin" className="admin-dashboard-month-form">
@@ -262,86 +255,390 @@ function AdminDashboardSection({ dashboardData }) {
           <button type="submit">조회</button>
         </form>
       </div>
-      <div className="admin-dashboard-grid">
-        {cards.map((card) => (
-          <article className={`admin-metric-card tone-${card.tone}${card.emphasis ? " is-emphasis" : ""}`} key={card.label}>
-            <span className="admin-metric-mark" aria-hidden="true">{card.mark}</span>
-            <div>
-              <span className="admin-metric-label">{card.label}</span>
-              <strong>{formatMetricValue(card.value)}<small>{card.unit}</small></strong>
-            </div>
-          </article>
-        ))}
+
+      <div className="admin-overview-grid">
+        <DashboardSummaryCard
+          icon="people"
+          rows={[
+            { label: "전체 보호자", value: formatCountWithUnit(dashboardData.totalGuardians, "명") },
+            { label: "전체 대상자", value: formatCountWithUnit(dashboardData.totalSubjects, "명") },
+          ]}
+        />
+        <DashboardSummaryCard
+          icon="person"
+          rows={[
+            {
+              label: "신규 보호자",
+              value: formatCountWithUnit(dashboardData.newGuardiansToday, "명"),
+              note: formatDeltaText(dashboardData.newGuardiansToday, dashboardData.newGuardiansYesterday, "명"),
+            },
+            {
+              label: "신규 대상자",
+              value: formatCountWithUnit(dashboardData.newSubjectsToday, "명"),
+              note: formatDeltaText(dashboardData.newSubjectsToday, dashboardData.newSubjectsYesterday, "명"),
+            },
+          ]}
+        />
+        <DashboardSummaryCard
+          icon="qr"
+          rows={[
+            {
+              label: "활성 QR",
+              value: formatCountWithUnit(dashboardData.activeQrCount, "개"),
+              note: `(전체 대상자 ${qrRatio.toFixed(1)}%)`,
+            },
+            {
+              label: "미활성 QR",
+              value: formatCountWithUnit(dashboardData.inactiveQrCount, "개"),
+              note: `(전체 대상자 ${inactiveQrRatio.toFixed(1)}%)`,
+            },
+          ]}
+        />
+        <DashboardSummaryCard
+          icon="megaphone"
+          rows={[
+            {
+              label: "광고 진행중",
+              value: formatCountWithUnit(dashboardData.activeAdCount, "건"),
+              note: formatDeltaText(dashboardData.activeAdCount, dashboardData.adStatus.paused, "건", "정지 대비"),
+            },
+            { label: "광고 심사반려", value: formatCountWithUnit(dashboardData.adRejectedCount, "건") },
+          ]}
+        />
+        <DashboardSummaryCard
+          icon="money"
+          rows={[
+            {
+              label: "일 매출",
+              value: formatCurrency(dashboardData.todayRevenue),
+              note: formatDeltaText(dashboardData.todayRevenue, dashboardData.yesterdayRevenue, "원"),
+            },
+            {
+              label: "월 매출",
+              value: formatCurrency(dashboardData.monthlyRevenue),
+              note: `(전월 대비 ${monthlyDeltaRate >= 0 ? "+" : ""}${monthlyDeltaRate.toFixed(1)}%)`,
+            },
+          ]}
+        />
       </div>
+
+      <DashboardTrendChart data={dashboardData.dailyTrend} />
+
       <div className="admin-recent-heading">
         <h2>최근 현황</h2>
-        <span>항목별 최근 4건</span>
+        <span>운영 확인이 필요한 최신 데이터</span>
       </div>
-      <div className="admin-recent-grid">
-        <RecentStatusCard
-          title="신규가입자"
-          items={dashboardData.recentGuardians}
-          href="/admin?section=guardians"
+      <div className="dashboard-recent-tables">
+        <DashboardMiniTable
+          title="신규 가입자"
+          columns={["보호자명", "연락처", "나이", "가입일"]}
+          rows={dashboardData.recentGuardians.map((item) => [
+            item.name || item.login_id || item.email || item.google_email || "이름 미입력",
+            item.phone || "-",
+            calculateAgeLabel(item.birth_date),
+            formatRecentDate(item.created_at),
+          ])}
           emptyText="최근 가입자가 없습니다."
-          getPrimary={(item) => item.name || item.login_id || item.email || item.google_email || "이름 미입력"}
-          getDate={(item) => formatRecentDateTime(item.created_at)}
         />
-        <RecentStatusCard
-          title="신규주문"
-          items={dashboardData.recentOrders}
-          href="/admin?section=orders"
+        <DashboardMiniTable
+          title="신규 주문"
+          wide
+          columns={["주문번호", "대상자명(보호자명)", "상품명(옵션)", "결제금액", "주문일시"]}
+          rows={dashboardData.recentOrders.map((item) => [
+            formatOrderNumber(item),
+            `${item.subject_name || "대상자 미선택"}(${item.guardian_name || "보호자 미입력"})`,
+            item.product_name || "상품 미확인",
+            formatCurrency(item.amount),
+            formatRecentDateTime(item.created_at),
+          ])}
           emptyText="최근 주문이 없습니다."
-          getPrimary={(item) => formatOrderNumber(item)}
-          getDate={(item) => formatRecentDateTime(item.created_at)}
         />
-        <RecentStatusCard
-          title="QR 활성화 요청"
-          items={dashboardData.pendingQrActivations}
-          href="/admin?section=qr&match=matched&active=active"
-          emptyText="대기 중인 활성화 요청이 없습니다."
-          getPrimary={(item) => item.subject_name || "관리대상 미입력"}
-          getDate={(item) => formatRecentDateTime(item.requested_at)}
+        <DashboardMiniTable
+          title="최근 활동 알림"
+          columns={["구분", "내용", "발생일시"]}
+          rows={dashboardData.recentNotifications.map((item) => [
+            item.title || "알림",
+            item.body || item.guardian_name || "-",
+            formatRecentDateTime(item.created_at),
+          ])}
+          emptyText="최근 알림이 없습니다."
         />
-        <RecentStatusCard
-          title="실종신고 현황"
-          items={dashboardData.missingReports}
-          href="/admin?section=missing"
-          emptyText="진행 중인 실종신고가 없습니다."
-          getPrimary={(item) => item.name || "관리대상 미입력"}
-          getDate={(item) => formatRecentDate(item.reported_at)}
+        <DashboardMiniTable
+          title="주의 대상 현황"
+          compact
+          columns={["구분", "건수"]}
+          rows={[
+            ["QR 미활성화 (10일 초과)", formatMetricValue(dashboardData.risks.qrPendingOver10)],
+            ["상품 발송대기중 (2일 이상)", formatMetricValue(dashboardData.risks.shippingWaitingOver2)],
+            ["구독 만료 예정일 (7일 이내)", formatMetricValue(dashboardData.risks.subscriptionExpiring7)],
+            ["광고 심사 지연 (1시간 이상)", formatMetricValue(dashboardData.risks.adReviewOver1)],
+            ["취소/환불 대기 (24시간 이상)", formatMetricValue(dashboardData.risks.refundWaitingOver1)],
+          ]}
         />
-        <RecentStatusCard
-          title="고객문의"
-          items={dashboardData.recentInquiries}
-          href="/admin?section=inquiries"
-          emptyText="접수된 고객문의가 없습니다."
-          getPrimary={(item) => item.title || "제목 없음"}
-          getDate={(item) => formatRecentDateTime(item.created_at)}
+      </div>
+
+      <div className="dashboard-bottom-grid">
+        <section className="dashboard-operations-card dashboard-order-card">
+          <h2>주문 현황</h2>
+          <OrderStatusFlow status={dashboardData.orderStatus} />
+          <DashboardMiniTable
+            title="최근 실종 광고"
+            columns={["대상자", "보호자", "캠페인", "현재 상태", "광고 진행", "비고"]}
+            rows={dashboardData.recentMissingAds.map((item) => [
+              `${item.subject_name || "관리대상 미입력"}${item.subject_birth_date ? `(${formatAgeFromBirthDate(item.subject_birth_date)})` : ""}`,
+              `${item.guardian_name || "보호자 미입력"}${item.guardian_phone ? `(${item.guardian_phone})` : ""}`,
+              formatRecentDateTime(item.created_at),
+              item.status === "active" ? "진행중" : adStatusLabel(item.status),
+              item.status === "active" ? "광고 진행" : adStatusLabel(item.status),
+              item.click_count ? `클릭 ${formatMetricValue(item.click_count)}회` : "-",
+            ])}
+            emptyText="최근 광고가 없습니다."
+          />
+        </section>
+        <DashboardDonutPanel
+          title="광고 진행 현황"
+          centerLabel="진행중"
+          centerValue={`${formatMetricValue(dashboardData.adStatus.active)}건`}
+          items={[
+            { label: "진행중", value: dashboardData.adStatus.active, color: "#f4b657" },
+            { label: "승인대기", value: dashboardData.adStatus.ready, color: "#8b76e8" },
+            { label: "정지중", value: dashboardData.adStatus.paused, color: "#e35b5b" },
+            { label: "만료", value: dashboardData.adStatus.ended, color: "#aab2bd" },
+            { label: "심사반려", value: dashboardData.adStatus.rejected, color: "#222222" },
+          ]}
         />
+        <DashboardDonutPanel
+          title="구독 현황"
+          centerLabel="구독중"
+          centerValue={formatCountWithUnit(dashboardData.subscriptionStatus.active, "건")}
+          items={[
+            { label: "구독중", value: dashboardData.subscriptionStatus.active, color: "#f4b657" },
+            { label: "활성대기", value: dashboardData.subscriptionStatus.ready, color: "#8b76e8" },
+            { label: "일시정지", value: dashboardData.subscriptionStatus.paused, color: "#3d7df2" },
+            { label: "만료", value: dashboardData.subscriptionStatus.expired, color: "#aab2bd" },
+            { label: "취소", value: dashboardData.subscriptionStatus.cancelled, color: "#e35b5b" },
+          ]}
+        />
+        <section className="dashboard-operations-card dashboard-sales-card">
+          <h2>매출 현황</h2>
+          <table>
+            <caption>매출 요약</caption>
+            <tbody>
+              <tr><th>총 매출</th><td>{formatCurrency(dashboardData.monthlyRevenue)}</td></tr>
+              <tr><th>상품 매출</th><td>{formatCurrency(dashboardData.productRevenue)}</td></tr>
+              <tr><th>구독 매출</th><td>{formatCurrency(dashboardData.subscriptionRevenue)}</td></tr>
+              <tr><th>광고 매출</th><td>{formatCurrency(dashboardData.advertisingRevenue)}</td></tr>
+              <tr><th>환불 금액</th><td className="negative">{formatCurrency(-dashboardData.refundAmount)}</td></tr>
+              <tr><th>실 매출</th><td className="positive">{formatCurrency(dashboardData.netRevenue)}</td></tr>
+            </tbody>
+          </table>
+        </section>
       </div>
     </section>
   );
 }
 
-function RecentStatusCard({ title, items, href, emptyText, getPrimary, getDate }) {
+function DashboardSummaryCard({ icon, rows }) {
   return (
-    <article className="admin-recent-card">
-      <h3>{title}</h3>
-      {items.length > 0 ? (
-        <ul>
-          {items.map((item) => (
-            <li key={item.id}>
-              <strong>{getPrimary(item)}</strong>
-              <time>{getDate(item)}</time>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="admin-recent-empty">{emptyText}</p>
-      )}
-      <Link href={href}>더보기</Link>
+    <article className="dashboard-summary-card">
+      <DashboardIcon name={icon} />
+      <div className="dashboard-summary-values">
+        {rows.map((row) => (
+          <div key={row.label}>
+            <h3>{row.label}</h3>
+            <strong>{row.value}</strong>
+            {row.note && <span>{row.note}</span>}
+          </div>
+        ))}
+      </div>
     </article>
   );
+}
+
+function DashboardTrendChart({ data }) {
+  const chartWidth = 940;
+  const chartHeight = 190;
+  const paddingX = 34;
+  const paddingY = 20;
+  const maxRevenue = Math.max(1, ...data.map((item) => Number(item.revenue || 0)));
+  const maxOrders = Math.max(1, ...data.map((item) => Number(item.orders || 0)));
+  const maxActivity = Math.max(1, ...data.map((item) => Number(item.activity || 0)));
+  const series = [
+    { label: "매출", color: "#4d7df3", points: trendPoints(data, "revenue", maxRevenue, chartWidth, chartHeight, paddingX, paddingY) },
+    { label: "주문", color: "#8b76e8", points: trendPoints(data, "orders", maxOrders, chartWidth, chartHeight, paddingX, paddingY) },
+    { label: "위치공유", color: "#f3b45b", points: trendPoints(data, "activity", maxActivity, chartWidth, chartHeight, paddingX, paddingY) },
+  ];
+
+  return (
+    <section className="dashboard-trend-panel" aria-label="최근 30일 운영 추이">
+      <div className="dashboard-trend-legend">
+        {series.map((item) => (
+          <span key={item.label}><i style={{ backgroundColor: item.color }} />{item.label}</span>
+        ))}
+      </div>
+      <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} role="img" aria-label="최근 30일 매출, 주문, 위치공유 추이">
+        {[0, 1, 2, 3, 4].map((line) => {
+          const y = paddingY + ((chartHeight - paddingY * 2) / 4) * line;
+          return <line className="dashboard-chart-gridline" x1={paddingX} x2={chartWidth - paddingX} y1={y} y2={y} key={line} />;
+        })}
+        {series.map((item) => (
+          <polyline fill="none" stroke={item.color} strokeWidth="3" points={item.points} key={item.label} />
+        ))}
+        {data.map((item, index) => {
+          if (index % 7 !== 0 && index !== data.length - 1) return null;
+          const x = paddingX + ((chartWidth - paddingX * 2) / Math.max(1, data.length - 1)) * index;
+          return (
+            <text className="dashboard-chart-label" x={x} y={chartHeight - 2} textAnchor="middle" key={item.day}>
+              {item.day.slice(5).replace("-", ".")}
+            </text>
+          );
+        })}
+      </svg>
+      <aside className="dashboard-chart-note">
+        <strong>그래프 (최근 30일)</strong>
+        <span>일별 매출 현황: 선 그래프</span>
+        <span>일별 주문 현황: 선 그래프</span>
+        <span>일별 위치공유/광고 활동: 선 그래프</span>
+      </aside>
+    </section>
+  );
+}
+
+function DashboardMiniTable({ title, columns, rows, emptyText = "표시할 데이터가 없습니다.", wide = false, compact = false }) {
+  const emptyRows = Math.max(0, 4 - rows.length);
+  return (
+    <section className={`dashboard-table-panel${wide ? " is-wide" : ""}${compact ? " is-compact" : ""}`}>
+      <h3>{title}</h3>
+      <div className="dashboard-table-wrap">
+        <table>
+          <thead>
+            <tr>{columns.map((column) => <th key={column}>{column}</th>)}</tr>
+          </thead>
+          <tbody>
+            {rows.map((row, rowIndex) => (
+              <tr key={`${title}-${rowIndex}`}>
+                {row.map((cell, cellIndex) => <td key={`${title}-${rowIndex}-${cellIndex}`}>{cell}</td>)}
+              </tr>
+            ))}
+            {rows.length === 0 && (
+              <tr><td colSpan={columns.length}>{emptyText}</td></tr>
+            )}
+            {rows.length > 0 && Array.from({ length: emptyRows }, (_, index) => (
+              <tr className="dashboard-empty-row" key={`${title}-empty-${index}`}>
+                {columns.map((column) => <td key={`${column}-${index}`}>&nbsp;</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function OrderStatusFlow({ status }) {
+  const steps = [
+    { label: "신규주문", value: status.newOrders },
+    { label: "배송준비", value: status.preparing },
+    { label: "배송중", value: status.shipped },
+    { label: "배송완료", value: status.delivered },
+  ];
+
+  return (
+    <div className="dashboard-order-flow" aria-label="주문 상태 흐름">
+      {steps.map((step, index) => (
+        <div className="dashboard-order-step" key={step.label}>
+          <strong>{step.label}</strong>
+          <span>{formatCountWithUnit(step.value, "건")}</span>
+          {index < steps.length - 1 && <b aria-hidden="true">›</b>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function DashboardDonutPanel({ title, centerLabel, centerValue, items }) {
+  const total = items.reduce((sum, item) => sum + Number(item.value || 0), 0);
+  return (
+    <section className="dashboard-operations-card dashboard-donut-card">
+      <h2>{title}</h2>
+      <div className="dashboard-donut" style={{ "--donut": buildDonutGradient(items) }}>
+        <div>
+          <span>{centerLabel}</span>
+          <strong>{centerValue}</strong>
+        </div>
+      </div>
+      <div className="dashboard-donut-legend">
+        {items.map((item) => (
+          <span key={item.label}>
+            <i style={{ backgroundColor: item.color }} />
+            {item.label} {formatMetricValue(item.value)}
+            {total > 0 ? ` (${safePercent(item.value, total).toFixed(0)}%)` : ""}
+          </span>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function DashboardIcon({ name }) {
+  return (
+    <svg className="dashboard-card-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+      {dashboardIconPath(name)}
+    </svg>
+  );
+}
+
+function dashboardIconPath(name) {
+  switch (name) {
+    case "people":
+      return (
+        <>
+          <circle cx="24" cy="22" r="8" />
+          <circle cx="42" cy="24" r="7" />
+          <circle cx="12" cy="27" r="6" />
+          <path d="M10 50c1.8-10 7-15 15.5-15S39 40 41 50z" />
+          <path d="M35 50c.9-7 4.8-11 11-11 5.3 0 9.2 3.5 10.3 11z" />
+          <path d="M4 50c.7-5.5 3.8-9 8.8-9 3.2 0 5.8 1.5 7.3 4" />
+        </>
+      );
+    case "person":
+      return (
+        <>
+          <circle cx="32" cy="21" r="11" />
+          <path d="M12 52c2.7-12.3 9.4-18.5 20-18.5S49.3 39.7 52 52z" />
+        </>
+      );
+    case "qr":
+      return (
+        <>
+          <path d="M10 10h14v14H10z" />
+          <path d="M40 10h14v14H40z" />
+          <path d="M10 40h14v14H10z" />
+          <path d="M33 33h7v7h-7z" />
+          <path d="M47 33h7v7h-7z" />
+          <path d="M33 47h7v7h-7z" />
+          <path d="M47 47h7v7h-7z" />
+        </>
+      );
+    case "megaphone":
+      return (
+        <>
+          <path d="M9 37h10l30 13V14L19 27H9z" />
+          <path d="M19 38 24 57" />
+          <path d="M53 23c3 2.4 4.5 5.4 4.5 9s-1.5 6.6-4.5 9" />
+        </>
+      );
+    case "money":
+    default:
+      return (
+        <>
+          <path d="M20 17 14 27v21c0 7 7 10 18 10s18-3 18-10V27l-6-10z" />
+          <path d="M22 17c4 3 16 3 20 0" />
+          <path d="M32 29v18" />
+          <path d="M25 35c1.2-3.4 4-5 7-5 4 0 7 2 7 5.5 0 7-14 4-14 10 0 3 3 5 7 5 3.6 0 6.2-1.4 7.6-4.2" />
+        </>
+      );
+  }
 }
 
 function MissingReportManagementSection({ missingReportsData }) {
@@ -1913,6 +2210,69 @@ function qrExportRows(qrItems = []) {
     공개URL: qr.target_url,
     생성일: formatRecentDateTime(qr.created_at),
   }));
+}
+
+function trendPoints(data, key, maxValue, chartWidth, chartHeight, paddingX, paddingY) {
+  const innerWidth = chartWidth - paddingX * 2;
+  const innerHeight = chartHeight - paddingY * 2 - 14;
+  return data
+    .map((item, index) => {
+      const x = paddingX + (innerWidth / Math.max(1, data.length - 1)) * index;
+      const y = paddingY + innerHeight - (Number(item[key] || 0) / Math.max(1, maxValue)) * innerHeight;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+}
+
+function buildDonutGradient(items) {
+  const total = items.reduce((sum, item) => sum + Number(item.value || 0), 0);
+  if (total <= 0) return "#eef1f4 0deg 360deg";
+
+  let cursor = 0;
+  return items
+    .filter((item) => Number(item.value || 0) > 0)
+    .map((item) => {
+      const start = cursor;
+      cursor += (Number(item.value || 0) / total) * 360;
+      return `${item.color} ${start.toFixed(2)}deg ${cursor.toFixed(2)}deg`;
+    })
+    .join(", ");
+}
+
+function formatCountWithUnit(value, unit) {
+  return `${formatMetricValue(value)}${unit}`;
+}
+
+function formatDeltaText(current, previous, unit, label = "전일 대비") {
+  const delta = Number(current || 0) - Number(previous || 0);
+  return `(${label} ${delta >= 0 ? "+" : ""}${formatMetricValue(delta)}${unit})`;
+}
+
+function safePercent(part, total) {
+  const denominator = Number(total || 0);
+  if (denominator === 0) return 0;
+  return (Number(part || 0) / denominator) * 100;
+}
+
+function calculateAgeLabel(birthDate) {
+  const age = calculateAge(birthDate);
+  return age === null ? "-" : `${age}세`;
+}
+
+function formatAgeFromBirthDate(birthDate) {
+  const age = calculateAge(birthDate);
+  return age === null ? "나이 미상" : `${age}세`;
+}
+
+function calculateAge(birthDate) {
+  if (!birthDate) return null;
+  const date = new Date(String(birthDate));
+  if (Number.isNaN(date.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - date.getFullYear();
+  const monthDiff = now.getMonth() - date.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < date.getDate())) age -= 1;
+  return age < 0 ? null : age;
 }
 
 function formatDate(value) {
