@@ -4397,3 +4397,28 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Deliverable
 - `deliverables/ADMIN_DASHBOARD_OPERATIONS_REVAMP.md`
+
+## 2026-06-28 KST - Admin Dashboard Recent Notification Truncation
+
+### User Request
+- In the admin dashboard recent status area, the recent activity notification content becomes too tall when the body contains long text or map URLs.
+- Show only up to 10 characters and display the rest as `...`.
+
+### Reflected Work
+- Updated `AdminDashboardSection()` in `app/admin/page.js`.
+- Added `truncateText()` helper and applied it only to the `최근 활동 알림 > 내용` column.
+- Preserved the full notification body in the cell `title` tooltip for quick operator reference.
+- Added `.dashboard-cell-ellipsis` CSS to prevent long notification text from expanding the row height.
+
+### Files Changed
+- `app/admin/page.js`
+- `app/globals.css`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- Pending: deployment verification
+
+### Time Spent
+- Notification display adjustment and log update: about 10 minutes.

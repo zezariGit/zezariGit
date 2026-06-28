@@ -3673,6 +3673,15 @@ textarea:focus {
   background: #ffffff;
 }
 
+.dashboard-cell-ellipsis {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
 .dashboard-table-panel.is-compact th,
 .dashboard-table-panel.is-compact td {
   padding: 9px 6px;

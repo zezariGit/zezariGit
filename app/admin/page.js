@@ -358,7 +358,9 @@ function AdminDashboardSection({ dashboardData }) {
           columns={["구분", "내용", "발생일시"]}
           rows={dashboardData.recentNotifications.map((item) => [
             item.title || "알림",
-            item.body || item.guardian_name || "-",
+            <span className="dashboard-cell-ellipsis" title={item.body || item.guardian_name || "-"}>
+              {truncateText(item.body || item.guardian_name || "-", 10)}
+            </span>,
             formatRecentDateTime(item.created_at),
           ])}
           emptyText="최근 알림이 없습니다."
@@ -2305,6 +2307,11 @@ function formatRecentDate(value) {
     day: "2-digit",
   });
   return `${parts.year}.${parts.month}.${parts.day}`;
+}
+
+function truncateText(value, maxLength = 10) {
+  const text = String(value || "-").trim() || "-";
+  return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 }
 
 function getKoreanDateParts(date, options) {
