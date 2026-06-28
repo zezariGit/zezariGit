@@ -221,3 +221,14 @@ Create a Korean operations dashboard UI mockup for "REAL_QR_FIND". At the top, s
 
 ### Notes
 - Use when explaining the shift from simple metric cards to a dense operations dashboard.
+
+## 2026-06-29 - Guardian Admin Operations Layout
+
+### Purpose
+- Presentation visual for the redesigned administrator guardian-management screen.
+
+### Prompt
+Create a Korean SaaS admin console UI mockup for "REAL_QR_FIND" guardian management. Show a left admin sidebar and a white operations workspace. At the top of the guardian page, show four thick-border summary cards titled "전체 보호자", "신규 보호자", "대상자 등록", and "대상자 미등록" with bold black icons and compact count notes. Below, show a search panel with fields "검색어", "상태", "구분", and "가입일" date range, plus "초기화" and purple "검색" buttons. The main area is split into a wide dense grid and a right detail panel. The grid columns are "선택, 이름, 아이디, 연락처, 생년월일, 성별, 보호자상태, 보호자 구분, 가입일, 관리" with colored status cells for 일반, 휴면, VIP, and 관리자. The right detail panel shows a circular profile initial, guardian name/member number, status pill, tabs "기본정보, 대상자, 구독/주문, 광고, 활동 내역", a basic information list, small summary cards for 대상자/구독/결제/광고, an admin memo box, and action buttons "탈퇴 처리" and "저장". Use the existing REAL_QR_FIND admin style: white panels, thin gray grid lines, restrained purple actions, black headings, compact Korean labels, and no real personal data.
+
+### Notes
+- Use when presenting the guardian-management screen conversion from a simple master-detail list to an operations-grade grid and detail workspace.

@@ -22,6 +22,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `PUSH_NOTIFICATION_SETUP.md`: guardian browser push registration and QR find-page notification flow.
 - `ADVERTISING_SETUP.md`: dashboard subject advertisement modal, admin daily rate, advertisement progress foundation, and Meta API preparation.
 - `ADMIN_DASHBOARD_OPERATIONS_REVAMP.md`: operations-style admin dashboard with overview cards, trend chart, recent tables, order/ad/subscription/sales panels.
+- `GUARDIAN_ADMIN_OPERATIONS_LAYOUT.md`: operations-style guardian management screen with status cards, extended filters, dense grid, detail panel, and CSV export additions.
 - `ADMIN_AD_GRID_MANAGEMENT.md`: admin advertisement grid, selected-row actions, detail panel, click-count schema placeholder, and Meta API readiness.
 - `ADMIN_MISSING_REPORT_MANAGEMENT.md`: admin missing-report menu, date/search filters, status mapping, and grid behavior.
 - `LOCATION_SHARE_MANAGEMENT.md`: public QR location-share button, guardian push map links, `location_shares` table, and admin location-share grid/detail management.

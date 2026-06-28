@@ -81,6 +81,9 @@ export default async function AdminPage({ searchParams }) {
   const guardianFilters = {
     query: resolvedSearchParams?.guardianAdminQuery || "",
     status: resolvedSearchParams?.guardianStatus || "all",
+    type: resolvedSearchParams?.guardianType || "all",
+    startDate: resolvedSearchParams?.guardianStart || "",
+    endDate: resolvedSearchParams?.guardianEnd || "",
   };
   const subjectAdminFilters = {
     query: resolvedSearchParams?.subjectAdminQuery || "",
@@ -608,6 +611,35 @@ function dashboardIconPath(name) {
         <>
           <circle cx="32" cy="21" r="11" />
           <path d="M12 52c2.7-12.3 9.4-18.5 20-18.5S49.3 39.7 52 52z" />
+        </>
+      );
+    case "growth":
+      return (
+        <>
+          <circle cx="17" cy="43" r="7" />
+          <circle cx="34" cy="38" r="7" />
+          <circle cx="51" cy="33" r="7" />
+          <path d="M8 26h14l7-8 8 6 15-17" />
+          <path d="M45 7h7v7" />
+          <path d="M7 56c2-6 5.5-9 10-9s8 3 10 9" />
+          <path d="M24 56c2-6 5.5-9 10-9s8 3 10 9" />
+          <path d="M41 56c2-6 5.5-9 10-9s8 3 10 9" />
+        </>
+      );
+    case "linked":
+      return (
+        <>
+          <circle cx="24" cy="18" r="8" />
+          <path d="M10 46c2-10 6.7-15 14-15s12 5 14 15" />
+          <path d="M43 14c6 3 9 8 9 15s-3 12-9 15" />
+          <path d="M49 25h9v9" />
+        </>
+      );
+    case "blocked":
+      return (
+        <>
+          <circle cx="32" cy="32" r="22" />
+          <path d="M17 17 47 47" />
         </>
       );
     case "qr":
@@ -1528,159 +1560,265 @@ function AdminRoleManagementSection({ adminUsersData }) {
 }
 
 function GuardianManagementSection({ adminData }) {
-  const { guardians, selectedGuardian, subjects, subscription, payments, ads, filters } = adminData;
+  const { summary, guardians, selectedGuardian, subjects, subscription, payments, ads, filters } = adminData;
   const returnTo = buildGuardianAdminUrl(filters, selectedGuardian?.id);
+  const selectedGuardianType = guardianTypeLabel(selectedGuardian, subscription);
+  const visibleRows = Math.max(0, 12 - guardians.length);
 
   return (
-    <div className="admin-master-detail">
-      <section className="admin-panel admin-master-panel">
-        <div className="panel-heading">
-          <h2>보호자 목록</h2>
-          <div className="admin-heading-actions">
-            <span>최대 200명 / {guardians.length}명 조회</span>
-            <AdminExportButton filename="zezari-guardians.csv" rows={guardianExportRows(guardians)} />
-          </div>
+    <div className="guardian-admin-page">
+      <section className="guardian-admin-status" aria-labelledby="guardian-status-title">
+        <h2 id="guardian-status-title">현황</h2>
+        <div className="guardian-stat-grid">
+          <GuardianStatCard
+            icon="people"
+            title="전체 보호자"
+            value={formatCountWithUnit(summary.totalGuardians, "명")}
+          />
+          <GuardianStatCard
+            icon="growth"
+            title="신규 보호자"
+            value={formatCountWithUnit(summary.newGuardiansToday, "명")}
+            note={formatDeltaText(summary.newGuardiansToday, summary.newGuardiansYesterday, "명", "어제 대비")}
+            noteTone={Number(summary.newGuardiansToday || 0) >= Number(summary.newGuardiansYesterday || 0) ? "positive" : "negative"}
+          />
+          <GuardianStatCard
+            icon="linked"
+            title="대상자 등록"
+            value={formatCountWithUnit(summary.registeredGuardians, "명")}
+            note={`전체 보호자 ${safePercent(summary.registeredGuardians, summary.totalGuardians).toFixed(0)}%`}
+            noteTone="positive"
+          />
+          <GuardianStatCard
+            icon="blocked"
+            title="대상자 미등록"
+            value={formatCountWithUnit(summary.unregisteredGuardians, "명")}
+            note={`전체 보호자 ${safePercent(summary.unregisteredGuardians, summary.totalGuardians).toFixed(0)}%`}
+            noteTone={Number(summary.unregisteredGuardians || 0) > 0 ? "negative" : "neutral"}
+          />
         </div>
-        <form action="/admin" className="admin-master-filter">
+      </section>
+
+      <section className="admin-panel guardian-search-panel">
+        <h2>조회</h2>
+        <form action="/admin" className="guardian-admin-filter">
           <input type="hidden" name="section" value="guardians" />
           <label>
-            통합 검색
-            <input name="guardianAdminQuery" defaultValue={filters.query} placeholder="회원번호, 이름, 연락처, 이메일" />
+            검색어
+            <input name="guardianAdminQuery" defaultValue={filters.query} placeholder="이름, 연락처" />
           </label>
           <label>
-            회원 상태
+            상태
             <select name="guardianStatus" defaultValue={filters.status}>
-              <option value="all">전체 상태</option>
+              <option value="all">전체</option>
               <option value="active">활성</option>
-              <option value="inactive">비활성</option>
+              <option value="inactive">휴면/비활성</option>
             </select>
           </label>
+          <label>
+            구분
+            <select name="guardianType" defaultValue={filters.type}>
+              <option value="all">전체</option>
+              <option value="vip">VIP</option>
+              <option value="normal">일반</option>
+              <option value="admin">관리자</option>
+            </select>
+          </label>
+          <fieldset className="guardian-filter-date">
+            <legend>가입일</legend>
+            <input type="date" name="guardianStart" defaultValue={filters.startDate} aria-label="가입 시작일" />
+            <span>~</span>
+            <input type="date" name="guardianEnd" defaultValue={filters.endDate} aria-label="가입 종료일" />
+          </fieldset>
+          <Link className="plain-button guardian-reset-button" href="/admin?section=guardians">초기화</Link>
           <button type="submit">검색</button>
-          <Link className="plain-button" href="/admin?section=guardians">초기화</Link>
         </form>
-        <div className="admin-record-table-wrap">
-          <div className="admin-record-table guardian-record-table" role="table" aria-label="보호자 목록">
-            <div className="admin-record-header" role="row">
-              <span role="columnheader">회원번호</span>
-              <span role="columnheader">이름</span>
-              <span role="columnheader">연락처</span>
-              <span role="columnheader">이메일</span>
-              <span role="columnheader">가입일</span>
-              <span role="columnheader">상태</span>
-            </div>
-          {guardians.map((guardian) => (
-            <Link
-                className={guardian.id === selectedGuardian?.id ? "admin-record-row active" : "admin-record-row"}
-                href={buildGuardianAdminUrl(filters, guardian.id)}
-              key={guardian.id}
-                role="row"
-            >
-                <span role="cell">{formatMemberNumber(guardian.id)}</span>
-                <strong role="cell">{guardian.name || "이름 미입력"}</strong>
-                <span role="cell">{guardian.phone || "-"}</span>
-                <span role="cell">{guardian.email || guardian.google_email || "-"}</span>
-                <time role="cell">{formatDateOnlyValue(guardian.created_at)}</time>
-                <em role="cell" className={guardian.is_active ? "active-state" : "inactive-state"}>
-                  {guardian.is_active ? "활성" : "비활성"}
-                </em>
-            </Link>
-          ))}
-          </div>
-        </div>
-        {guardians.length === 0 && <p className="empty-text">조건에 맞는 보호자가 없습니다.</p>}
       </section>
 
-      <section className="admin-panel admin-detail-panel">
-        {selectedGuardian ? (
-          <>
-            <div className="admin-detail-heading">
-              <div>
-                <span className="admin-detail-kicker">{formatMemberNumber(selectedGuardian.id)}</span>
-                <h2>{selectedGuardian.name || "이름 미입력"}</h2>
-                <p>{selectedGuardian.phone || "전화번호 미입력"}</p>
-                <p>{selectedGuardian.email || selectedGuardian.google_email || "이메일 미입력"}</p>
+      <div className="guardian-admin-layout">
+        <section className="admin-panel guardian-list-panel">
+          <div className="guardian-list-heading">
+            <h2>전체 보호자 <strong>{formatMetricValue(summary.totalGuardians)}</strong>명</h2>
+            <AdminExportButton filename="zezari-guardians.csv" rows={guardianExportRows(guardians)} />
+          </div>
+          <div className="admin-record-table-wrap guardian-admin-table-wrap">
+            <div className="admin-record-table guardian-record-table guardian-admin-table" role="table" aria-label="보호자 목록">
+              <div className="admin-record-header" role="row">
+                <span role="columnheader">□</span>
+                <span role="columnheader">이름</span>
+                <span role="columnheader">아이디</span>
+                <span role="columnheader">연락처</span>
+                <span role="columnheader">생년월일</span>
+                <span role="columnheader">성별</span>
+                <span role="columnheader">보호자상태</span>
+                <span role="columnheader">보호자 구분</span>
+                <span role="columnheader">가입일</span>
+                <span role="columnheader">관리</span>
               </div>
-              <form action={setGuardianActiveAction}>
+              {guardians.map((guardian) => (
+                <Link
+                  className={guardian.id === selectedGuardian?.id ? "admin-record-row active" : "admin-record-row"}
+                  href={buildGuardianAdminUrl(filters, guardian.id)}
+                  key={guardian.id}
+                  role="row"
+                >
+                  <span role="cell">{guardian.id === selectedGuardian?.id ? "◉" : "□"}</span>
+                  <strong role="cell">{guardian.name || "이름 미입력"}<small>{formatMemberNumber(guardian.id)}</small></strong>
+                  <span role="cell">{guardian.login_id || providerLoginLabel(guardian) || "-"}</span>
+                  <span role="cell">{guardian.phone || "-"}</span>
+                  <span role="cell">{formatDate(guardian.birth_date)}{guardian.birth_date ? <small>{calculateAgeLabel(guardian.birth_date)}</small> : null}</span>
+                  <span role="cell">-</span>
+                  <em role="cell" className={`guardian-table-badge ${Number(guardian.is_active || 0) ? "active" : "inactive"}`}>
+                    {Number(guardian.is_active || 0) ? "일반" : "휴면"}
+                  </em>
+                  <em role="cell" className={`guardian-table-badge ${guardianTypeClass(guardian)}`}>
+                    {guardianTypeLabel(guardian)}
+                  </em>
+                  <time role="cell">{formatDateOnlyValue(guardian.created_at)}</time>
+                  <span role="cell">상세보기</span>
+                </Link>
+              ))}
+              {guardians.length > 0 && Array.from({ length: visibleRows }, (_, index) => (
+                <div className="admin-record-row guardian-empty-row" role="row" key={`guardian-empty-${index}`}>
+                  {Array.from({ length: 10 }, (_, cellIndex) => <span role="cell" key={`guardian-empty-${index}-${cellIndex}`}>&nbsp;</span>)}
+                </div>
+              ))}
+              {guardians.length === 0 && (
+                <div className="admin-record-row guardian-empty-result" role="row">
+                  <span role="cell">조건에 맞는 보호자가 없습니다.</span>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="guardian-list-footer">
+            <span>선택한 보호자 {selectedGuardian ? "1" : "0"}명</span>
+            <label>
+              <select defaultValue="10" aria-label="페이지당 보호자 수">
+                <option value="10">10개씩 보기</option>
+                <option value="20">20개씩 보기</option>
+                <option value="50">50개씩 보기</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section className="admin-panel guardian-detail-card">
+          {selectedGuardian ? (
+            <>
+              <div className="guardian-detail-header">
+                <div className="guardian-avatar" aria-hidden="true">
+                  {guardianInitial(selectedGuardian)}
+                </div>
+                <div>
+                  <h2>{selectedGuardian.name || "이름 미입력"} <small>({formatMemberNumber(selectedGuardian.id)})</small></h2>
+                  <em className={`guardian-status-pill ${Number(selectedGuardian.is_active || 0) ? "active" : "inactive"}`}>
+                    {Number(selectedGuardian.is_active || 0) ? "일반" : "휴면"}
+                  </em>
+                  <span>{selectedGuardian.phone || "연락처 미입력"}</span>
+                  <span>{formatDateOnlyValue(selectedGuardian.created_at)} 가입</span>
+                </div>
+              </div>
+
+              <nav className="guardian-detail-tabs" aria-label="보호자 상세 이동">
+                <a href="#guardian-basic-info" className="active">기본정보</a>
+                <Link href={`/admin?section=subjects&guardianId=${encodeURIComponent(selectedGuardian.id)}`}>대상자</Link>
+                <Link href={`/admin?section=orders&orderQuery=${encodeURIComponent(selectedGuardian.name || selectedGuardian.phone || selectedGuardian.id)}`}>구독/주문</Link>
+                <Link href={`/admin?section=ads&adQuery=${encodeURIComponent(selectedGuardian.name || selectedGuardian.phone || selectedGuardian.id)}`}>광고</Link>
+                <Link href={`/admin?section=locations&locationQuery=${encodeURIComponent(selectedGuardian.name || selectedGuardian.phone || selectedGuardian.id)}`}>활동 내역</Link>
+              </nav>
+
+              <section id="guardian-basic-info" className="guardian-detail-section">
+                <dl className="guardian-detail-list">
+                  <div><dt>이름</dt><dd>{selectedGuardian.name || "이름 미입력"} ({formatMemberNumber(selectedGuardian.id)})</dd></div>
+                  <div><dt>보호자 구분</dt><dd>{selectedGuardianType}</dd></div>
+                  <div><dt>보호자 상태</dt><dd>{Number(selectedGuardian.is_active || 0) ? "일반" : "휴면/비활성"}</dd></div>
+                  <div><dt>연락처</dt><dd>{selectedGuardian.phone || "-"}</dd></div>
+                  <div><dt>생년월일</dt><dd>{formatDate(selectedGuardian.birth_date)}{selectedGuardian.birth_date ? ` (${calculateAgeLabel(selectedGuardian.birth_date)})` : ""}</dd></div>
+                  <div><dt>성별</dt><dd>-</dd></div>
+                  <div><dt>주소</dt><dd>{formatFullAddress(selectedGuardian.address, selectedGuardian.address_detail)}</dd></div>
+                  <div><dt>SNS 로그인</dt><dd><GuardianProviderBadges guardian={selectedGuardian} /></dd></div>
+                </dl>
+              </section>
+
+              <section className="guardian-detail-section">
+                <div className="guardian-detail-mini-grid">
+                  <div>
+                    <strong>등록 대상자</strong>
+                    <span>{subjects.length}명</span>
+                    {subjects.length > 0 && <p>{subjects.map((subject) => subject.name).join(", ")}</p>}
+                  </div>
+                  <div>
+                    <strong>구독 현황</strong>
+                    <span>{subscriptionStatusLabel(subscription?.status)}</span>
+                    <p>{subscription?.plan_name || "이용권 정보 없음"}</p>
+                  </div>
+                  <div>
+                    <strong>결제 내역</strong>
+                    <span>{payments.length}건</span>
+                    <p>{payments[0] ? `${formatCurrency(payments[0].amount)} / ${formatRecentDateTime(payments[0].paid_at || payments[0].created_at)}` : "결제내역 없음"}</p>
+                  </div>
+                  <div>
+                    <strong>광고 내역</strong>
+                    <span>{ads.length}건</span>
+                    <p>{ads[0] ? `${ads[0].region} / ${adStatusLabel(ads[0].status)}` : "광고 내역 없음"}</p>
+                  </div>
+                </div>
+              </section>
+
+              <section className="guardian-detail-section">
+                <form action={setGuardianAdminMemoAction} className="guardian-detail-memo-form">
+                  <input type="hidden" name="guardianId" value={selectedGuardian.id} />
+                  <input type="hidden" name="returnTo" value={returnTo} />
+                  <label htmlFor="guardian-admin-memo">메모</label>
+                  <textarea id="guardian-admin-memo" name="adminMemo" maxLength="2000" defaultValue={selectedGuardian.admin_memo || ""} placeholder="복지기본소속 선생님, 상담 이력 등 내부 메모를 입력하세요." />
+                  <FormSubmitButton pendingText="저장중">저장</FormSubmitButton>
+                </form>
+              </section>
+
+              <form action={setGuardianActiveAction} className="guardian-withdraw-form">
                 <input type="hidden" name="guardianId" value={selectedGuardian.id} />
-                <input type="hidden" name="active" value={selectedGuardian.is_active ? "0" : "1"} />
+                <input type="hidden" name="active" value={Number(selectedGuardian.is_active || 0) ? "0" : "1"} />
                 <input type="hidden" name="returnTo" value={returnTo} />
                 <FormSubmitButton
-                  className={selectedGuardian.is_active ? "danger-button compact" : "activate-button"}
-                  pendingText={selectedGuardian.is_active ? "비활성화중" : "활성화중"}
+                  className={Number(selectedGuardian.is_active || 0) ? "danger-button compact" : "activate-button"}
+                  pendingText={Number(selectedGuardian.is_active || 0) ? "처리중" : "재활성화중"}
                 >
-                  {selectedGuardian.is_active ? "비활성화" : "활성화"}
+                  {Number(selectedGuardian.is_active || 0) ? "탈퇴 처리" : "재활성화"}
                 </FormSubmitButton>
               </form>
-            </div>
-
-            <section className="admin-detail-section">
-              <h3>배송지</h3>
-              <p>{formatFullAddress(selectedGuardian.address, selectedGuardian.address_detail)}</p>
-            </section>
-
-            <section className="admin-detail-section">
-              <h3>등록대상자</h3>
-              <Link className="admin-detail-link" href={`/admin?section=subjects&guardianId=${encodeURIComponent(selectedGuardian.id)}`}>
-                등록 대상자 {subjects.length}명 보기
-              </Link>
-              {subjects.length > 0 && (
-                <p>{subjects.map((subject) => subject.name).join(", ")}</p>
-              )}
-            </section>
-
-            <section className="admin-detail-section">
-              <h3>이용권 현황</h3>
-              <dl className="admin-detail-list">
-                <div><dt>상태</dt><dd>{subscriptionStatusLabel(subscription?.status)}</dd></div>
-                <div><dt>상품</dt><dd>{subscription?.plan_name || "이용권 정보 없음"}</dd></div>
-                <div><dt>기간</dt><dd>{subscription ? `${Number(subscription.plan_months || 1)}개월` : "-"}</dd></div>
-                <div><dt>이용기간</dt><dd>{subscription?.current_period_start ? `${formatDateOnlyValue(subscription.current_period_start)} ~ ${formatDateOnlyValue(subscription.current_period_end)}` : "-"}</dd></div>
-              </dl>
-            </section>
-
-            <section className="admin-detail-section">
-              <h3>결제내역</h3>
-              <div className="admin-detail-history">
-                {payments.map((payment) => (
-                  <div key={payment.id}>
-                    <strong>{formatOrderNumber(payment)}</strong>
-                    <span>{payment.product_name || orderTypeLabel(payment.order_type)} / {formatCurrency(payment.amount)}</span>
-                    <time>{formatRecentDateTime(payment.paid_at || payment.created_at)}</time>
-                  </div>
-                ))}
-                {payments.length === 0 && <p>결제내역이 없습니다.</p>}
-              </div>
-            </section>
-
-            <section className="admin-detail-section">
-              <h3>광고 내역</h3>
-              <div className="admin-detail-history">
-                {ads.map((ad) => (
-                  <div key={ad.id}>
-                    <strong>{ad.subject_name || "관리대상 미입력"}</strong>
-                    <span>{ad.region} / {adStatusLabel(ad.status)} / {formatCurrency(ad.amount)}</span>
-                    <time>{formatDate(ad.start_date)} ~ {formatDate(ad.end_date)}</time>
-                  </div>
-                ))}
-                {ads.length === 0 && <p>광고 내역이 없습니다.</p>}
-              </div>
-            </section>
-
-            <section className="admin-detail-section">
-              <h3>관리메모</h3>
-              <form action={setGuardianAdminMemoAction} className="admin-memo-form">
-                <input type="hidden" name="guardianId" value={selectedGuardian.id} />
-                <input type="hidden" name="returnTo" value={returnTo} />
-                <textarea name="adminMemo" maxLength="2000" defaultValue={selectedGuardian.admin_memo || ""} placeholder="상담, 배송, 운영 관련 내부 메모를 입력하세요." />
-                <FormSubmitButton pendingText="저장중">메모 저장</FormSubmitButton>
-              </form>
-            </section>
-          </>
-        ) : (
-          <p className="empty-text">보호자를 선택해 주세요.</p>
-        )}
-      </section>
+            </>
+          ) : (
+            <p className="empty-text">보호자를 선택해 주세요.</p>
+          )}
+        </section>
+      </div>
     </div>
+  );
+}
+
+function GuardianStatCard({ icon, title, value, note = "", noteTone = "neutral" }) {
+  return (
+    <article className="guardian-stat-card">
+      <DashboardIcon name={icon} />
+      <div>
+        <h3>{title}</h3>
+        <strong>{value}</strong>
+        {note && <span className={`guardian-stat-note ${noteTone}`}>{note}</span>}
+      </div>
+    </article>
+  );
+}
+
+function GuardianProviderBadges({ guardian }) {
+  const providers = guardianProviderLabels(guardian);
+  return (
+    <span className="guardian-provider-badges">
+      {providers.map((provider) => (
+        <em className={`guardian-provider-badge ${provider.className}`} key={provider.label}>
+          {provider.label}
+        </em>
+      ))}
+    </span>
   );
 }
 
@@ -2087,10 +2225,14 @@ function guardianExportRows(guardians = []) {
   return guardians.map((guardian) => ({
     회원번호: formatMemberNumber(guardian.id),
     이름: guardian.name || "이름 미입력",
+    아이디: guardian.login_id || providerLoginLabel(guardian) || "-",
     연락처: guardian.phone || "-",
     이메일: guardian.email || guardian.google_email || "-",
+    생년월일: formatDate(guardian.birth_date),
+    주소: formatFullAddress(guardian.address, guardian.address_detail),
+    보호자구분: guardianTypeLabel(guardian),
     가입일: formatDateOnlyValue(guardian.created_at),
-    상태: guardian.is_active ? "활성" : "비활성",
+    상태: Number(guardian.is_active || 0) ? "일반" : "휴면/비활성",
     등록대상자수: Number(guardian.subject_count || 0),
   }));
 }
@@ -2352,6 +2494,40 @@ function formatMemberNumber(id) {
   return `U-${String(id || "").replace(/-/g, "").slice(-8).toUpperCase() || "UNKNOWN"}`;
 }
 
+function guardianInitial(guardian) {
+  const name = String(guardian?.name || guardian?.login_id || guardian?.email || "보").trim();
+  return name.slice(0, 1).toUpperCase();
+}
+
+function guardianTypeLabel(guardian, subscription = null) {
+  if (!guardian) return "일반";
+  if (Number(guardian.is_admin || 0)) return "관리자";
+  if (subscription?.status === "active" || Number(guardian.active_subscription_count || 0) > 0) return "VIP";
+  return "일반";
+}
+
+function guardianTypeClass(guardian, subscription = null) {
+  const label = guardianTypeLabel(guardian, subscription);
+  if (label === "VIP") return "vip";
+  if (label === "관리자") return "admin";
+  return "normal";
+}
+
+function providerLoginLabel(guardian) {
+  const provider = guardianProviderLabels(guardian)[0]?.label || "";
+  if (!provider) return "";
+  return provider === "ID" ? guardian?.login_id || "ID" : provider;
+}
+
+function guardianProviderLabels(guardian) {
+  const key = String(guardian?.google_id || "");
+  if (key.startsWith("kakao:")) return [{ label: "KAKAO", className: "kakao" }];
+  if (key.startsWith("naver:")) return [{ label: "NAVER", className: "naver" }];
+  if (key.startsWith("credentials:")) return [{ label: "ID", className: "credentials" }];
+  if (key) return [{ label: "GOOGLE", className: "google" }];
+  return [{ label: "미연결", className: "neutral" }];
+}
+
 function formatDateOnlyValue(value) {
   return formatRecentDate(value);
 }
@@ -2476,6 +2652,9 @@ function buildGuardianAdminUrl(filters, guardianId = "") {
   const params = new URLSearchParams({ section: "guardians" });
   if (filters?.query) params.set("guardianAdminQuery", filters.query);
   if (filters?.status && filters.status !== "all") params.set("guardianStatus", filters.status);
+  if (filters?.type && filters.type !== "all") params.set("guardianType", filters.type);
+  if (filters?.startDate) params.set("guardianStart", filters.startDate);
+  if (filters?.endDate) params.set("guardianEnd", filters.endDate);
   if (guardianId) params.set("guardian", guardianId);
   return `/admin?${params.toString()}`;
 }

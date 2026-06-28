@@ -4425,3 +4425,57 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Notification display adjustment and log update: about 10 minutes.
+
+## 2026-06-29 KST - Guardian Admin Operations Layout
+
+### User Request
+- Change the guardian-management screen to match the provided operations-style reference.
+- Include top status cards, search filters, a dense guardian grid, and a right-side detail panel.
+
+### Reflected Work
+- Expanded `getAdminData()` in `lib/db.js`.
+- Added guardian-management summary counts:
+  - total guardians
+  - active/inactive guardians
+  - new guardians today and yesterday
+  - guardians with registered subjects
+  - guardians without registered subjects
+  - total subjects
+- Added guardian filters:
+  - keyword
+  - status
+  - derived guardian type
+  - signup date range
+- Rebuilt `GuardianManagementSection()` in `app/admin/page.js`.
+- Added:
+  - four status cards
+  - operations-style search panel
+  - dense guardian grid
+  - color-coded guardian status/type cells
+  - right detail panel with profile, detail links, base information, subject/subscription/payment/ad summaries, admin memo, and deactivation/reactivation action
+- Added guardian-specific responsive CSS in `app/globals.css`.
+- Expanded guardian CSV export columns.
+- Added official deliverable and image-generation prompt.
+
+### Files Changed
+- `lib/db.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `deliverables/GUARDIAN_ADMIN_OPERATIONS_LAYOUT.md`
+- `deliverables/README.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with Windows line-ending warnings only.
+- Local dev route `http://localhost:3000/admin?section=guardians` returned 200.
+- Playwright visual verification could not run because the browser binary is not installed in this environment.
+- Pending: production deployment verification.
+
+### Time Spent
+- Data query expansion, screen rebuild, CSS, deliverable/log updates, and local verification: about 55 minutes.
+
+### Deliverable
+- `deliverables/GUARDIAN_ADMIN_OPERATIONS_LAYOUT.md`
