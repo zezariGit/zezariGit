@@ -4525,3 +4525,30 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - In-card tab conversion, query expansion, CSS, documentation, and local verification: about 35 minutes.
+
+## 2026-06-29 KST - Guardian Detail Tab Scroll Areas
+
+### User Request
+- The `구독/주문` and `활동 내역` tabs inside the guardian detail card can accumulate many records.
+- Keep those tabs in a fixed-size area with an internal scrollbar so the whole admin screen does not stretch downward.
+
+### Reflected Work
+- Added fixed-height scroll handling in `app/globals.css` for:
+  - `.guardian-orders-panel`
+  - `.guardian-activity-panel`
+- Added styled scrollbar tracks/thumbs and `overscroll-behavior: contain` so scrolling stays inside the selected detail tab.
+- Added a smaller fixed height for mobile widths.
+- Updated the guardian admin deliverable to record the tab scrolling rule.
+
+### Files Changed
+- `app/globals.css`
+- `deliverables/GUARDIAN_ADMIN_OPERATIONS_LAYOUT.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with Windows line-ending warnings only.
+
+### Time Spent
+- CSS layout stabilization, documentation, and local verification: about 10 minutes.

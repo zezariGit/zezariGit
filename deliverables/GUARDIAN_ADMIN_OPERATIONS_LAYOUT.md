@@ -44,6 +44,7 @@
   - `광고`: advertisement cards with period, region, budget, and click count
   - `활동 내역`: guardian notification timeline
 - Expanded `getAdminData()` to load guardian notification activity and additional subject/order/ad fields needed by the in-card tabs.
+- Added fixed-height internal scroll areas to the `구독/주문` and `활동 내역` tabs so long order, payment, subscription, and activity histories do not stretch the whole detail card.
 
 ## Data Rules
 - Guardian type is derived from existing data:
