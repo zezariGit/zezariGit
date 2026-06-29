@@ -16,6 +16,7 @@ import {
   getAdminData,
   getAdminInquiriesData,
   getAdminLocationSharesData,
+  getAdminMessagesData,
   getAdminMissingReportsData,
   getAdminOrdersData,
   getAdminPaymentsData,
@@ -43,6 +44,7 @@ import {
   setAdminSubjectAdStatusAction,
   createAdminPaymentRefundAction,
   saveAdminCouponAction,
+  saveAdminMessageAction,
   setSubscriptionAdminMemoAction,
   setSubscriptionPlanPriceAction,
 } from "./actions";
@@ -81,7 +83,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "orders", "subscriptions", "ads", "missing", "locations", "inquiries"].includes(resolvedSearchParams?.section)
+  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "orders", "subscriptions", "ads", "missing", "locations", "notifications", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -166,6 +168,15 @@ export default async function AdminPage({ searchParams }) {
     startDate: resolvedSearchParams?.locationStart || "",
     endDate: resolvedSearchParams?.locationEnd || "",
   };
+  const selectedMessageId = resolvedSearchParams?.message || "";
+  const composeMessage = resolvedSearchParams?.compose === "1";
+  const messageFilters = {
+    query: resolvedSearchParams?.messageQuery || "",
+    channel: resolvedSearchParams?.messageChannel || "all",
+    status: resolvedSearchParams?.messageStatus || "all",
+    startDate: resolvedSearchParams?.messageStart || "",
+    endDate: resolvedSearchParams?.messageEnd || "",
+  };
   const dashboardData = activeSection === "dashboard" ? await getAdminDashboardData(resolvedSearchParams?.month) : null;
   const adminData = activeSection === "guardians" ? await getAdminData(selectedGuardianId, guardianFilters) : null;
   const adminSubjectsData = activeSection === "subjects"
@@ -186,6 +197,7 @@ export default async function AdminPage({ searchParams }) {
   const adsData = activeSection === "ads" ? await getAdminAdsData(adFilters, selectedAdId) : null;
   const missingReportsData = activeSection === "missing" ? await getAdminMissingReportsData(missingFilters) : null;
   const locationSharesData = activeSection === "locations" ? await getAdminLocationSharesData(locationFilters, selectedLocationShareId) : null;
+  const messagesData = activeSection === "notifications" ? await getAdminMessagesData(messageFilters, composeMessage ? "new" : selectedMessageId) : null;
   const inquiriesData = activeSection === "inquiries" ? await getAdminInquiriesData() : null;
   const qrItems = qrData ? await withQrImages(qrData.qrCodes) : [];
   const selectedSubjectQrImage = adminSubjectsData?.selectedSubject?.qr_target_url
@@ -223,6 +235,8 @@ export default async function AdminPage({ searchParams }) {
                 ? "실종신고 관리"
                 : activeSection === "locations"
                   ? "위치공유 관리"
+                  : activeSection === "notifications"
+                    ? "알림 관리"
               : activeSection === "inquiries"
                 ? "고객문의 관리"
                 : "보호자 관리";
@@ -251,6 +265,8 @@ export default async function AdminPage({ searchParams }) {
                 ? "실종신고 접수 현황과 광고 상태, 발견 여부를 조회합니다."
                 : activeSection === "locations"
                   ? "QR 공개 페이지에서 공유된 발견 위치와 지도 링크를 조회합니다."
+                  : activeSection === "notifications"
+                    ? "가입 보호자에게 푸시 알림 메시지를 작성, 저장, 발송하고 결과를 확인합니다."
               : activeSection === "inquiries"
                 ? "접수된 고객문의의 제목, 작성자, 상태와 작성일시를 조회합니다."
                 : "보호자 목록을 조회하고 배송지, 등록대상자, 이용권, 결제, 광고와 관리메모를 확인합니다.";
@@ -291,6 +307,8 @@ export default async function AdminPage({ searchParams }) {
             <MissingReportManagementSection missingReportsData={missingReportsData} />
           ) : activeSection === "locations" ? (
             <LocationShareManagementSection locationSharesData={locationSharesData} />
+          ) : activeSection === "notifications" ? (
+            <NotificationManagementSection messagesData={messagesData} composeMessage={composeMessage} />
           ) : activeSection === "inquiries" ? (
             <InquiryManagementSection inquiriesData={inquiriesData} />
           ) : (
@@ -949,6 +967,241 @@ function LocationShareManagementSection({ locationSharesData }) {
         )}
       </aside>
     </div>
+  );
+}
+
+function NotificationManagementSection({ messagesData, composeMessage }) {
+  const { messages, selectedMessage, subjects, summary, filters } = messagesData;
+  const visibleRows = Math.max(0, 12 - messages.length);
+  const selectedReturnTo = buildAdminMessageUrl(filters, selectedMessage?.id);
+  const closeComposeUrl = buildAdminMessageUrl(filters, selectedMessage?.id);
+
+  return (
+    <div className="admin-message-page">
+      <section className="admin-panel admin-message-search-panel">
+        <h2>메시지 관리</h2>
+        <form className="admin-message-search-form" action="/admin">
+          <input type="hidden" name="section" value="notifications" />
+          <label>
+            발송 채널
+            <select name="messageChannel" defaultValue={filters.channel}>
+              <option value="all">전체</option>
+              <option value="push">푸시 알림</option>
+            </select>
+          </label>
+          <label>
+            발송 상태
+            <select name="messageStatus" defaultValue={filters.status}>
+              <option value="all">전체</option>
+              <option value="draft">저장됨</option>
+              <option value="sent">발송완료</option>
+            </select>
+          </label>
+          <label className="admin-message-query">
+            검색어
+            <input name="messageQuery" defaultValue={filters.query} placeholder="제목 또는 내용입력" />
+          </label>
+          <fieldset className="admin-message-date-filter">
+            <legend>기간</legend>
+            <input type="date" name="messageStart" defaultValue={filters.startDate} aria-label="시작일" />
+            <span>~</span>
+            <input type="date" name="messageEnd" defaultValue={filters.endDate} aria-label="종료일" />
+          </fieldset>
+          <div className="admin-message-search-actions">
+            <Link className="plain-button" href="/admin?section=notifications">초기화</Link>
+            <button type="submit">검색</button>
+          </div>
+        </form>
+      </section>
+
+      <div className="admin-message-toolbar">
+        <div>
+          <strong>전체 {formatMetricValue(summary.total)}건</strong>
+          <span>발송 {formatMetricValue(summary.sent)}건 · 저장 {formatMetricValue(summary.draft)}건</span>
+        </div>
+        <Link className="primary-button compact" href={buildAdminMessageUrl(filters, "", true)}>+ 새 메시지</Link>
+      </div>
+
+      <div className="admin-master-detail admin-message-layout">
+        <section className="admin-panel guardian-list-panel admin-message-list-panel">
+          <div className="guardian-list-heading">
+            <h2>조회</h2>
+            <AdminExportButton filename="zezari-admin-messages.csv" rows={adminMessageExportRows(messages)} />
+          </div>
+          <div className="admin-record-table-wrap">
+            <div className="admin-record-table admin-message-table" role="table" aria-label="알림 메시지 목록">
+              <div className="admin-record-header" role="row">
+                <span role="columnheader">알림번호</span>
+                <span role="columnheader">제목</span>
+                <span role="columnheader">발송 채널</span>
+                <span role="columnheader">발송 대상</span>
+                <span role="columnheader">발송 상태</span>
+                <span role="columnheader">발송 수</span>
+                <span role="columnheader">성공 수</span>
+                <span role="columnheader">실패 수</span>
+                <span role="columnheader">발송 일시</span>
+                <span role="columnheader">관리</span>
+              </div>
+              {messages.map((message) => {
+                const isSelected = selectedMessage?.id === message.id;
+                return (
+                  <Link
+                    className={isSelected ? "admin-record-row active" : "admin-record-row"}
+                    href={buildAdminMessageUrl(filters, message.id)}
+                    key={message.id}
+                    role="row"
+                  >
+                    <strong role="cell">{message.message_number}</strong>
+                    <span role="cell">{message.title || "제목 없음"}</span>
+                    <span role="cell"><b className="message-channel-chip">{adminMessageChannelLabel(message.channel)}</b></span>
+                    <span role="cell">{adminMessageTargetLabel(message)}</span>
+                    <span role="cell"><b className={`message-status-chip ${message.status || "draft"}`}>{adminMessageStatusLabel(message.status)}</b></span>
+                    <span role="cell">{formatMetricValue(message.recipient_count)}</span>
+                    <span role="cell">{formatMetricValue(message.success_count)}</span>
+                    <span role="cell">{formatMetricValue(message.failure_count)}</span>
+                    <time role="cell">{formatRecentDateTime(message.sent_at || message.created_at)}</time>
+                    <span role="cell">상세보기</span>
+                  </Link>
+                );
+              })}
+              {Array.from({ length: visibleRows }).map((_, index) => (
+                <div className="admin-record-row placeholder" role="row" key={`message-empty-${index}`}>
+                  {Array.from({ length: 10 }).map((__, columnIndex) => (
+                    <span role="cell" key={columnIndex}> </span>
+                  ))}
+                </div>
+              ))}
+              {messages.length === 0 && <p className="empty-text">조건에 맞는 메시지가 없습니다.</p>}
+            </div>
+          </div>
+          <div className="admin-table-footer">
+            <span>선택한 메시지 {selectedMessage ? "1" : "0"}건</span>
+            <select aria-label="페이지당 표시 개수" defaultValue="10">
+              <option>10개씩 보기</option>
+              <option>20개씩 보기</option>
+              <option>50개씩 보기</option>
+            </select>
+          </div>
+        </section>
+
+        <aside className="admin-panel admin-message-detail-panel">
+          {selectedMessage ? (
+            <>
+              <div className="admin-message-detail-summary">
+                <h2>상세 정보</h2>
+                <dl className="admin-detail-list">
+                  <div><dt>알림번호</dt><dd>{selectedMessage.message_number}</dd></div>
+                  <div><dt>발송상태</dt><dd><b className={`message-status-chip ${selectedMessage.status || "draft"}`}>{adminMessageStatusLabel(selectedMessage.status)}</b></dd></div>
+                  <div><dt>발송일시</dt><dd>{formatRecentDateTime(selectedMessage.sent_at)}</dd></div>
+                  <div><dt>발송채널</dt><dd>{adminMessageChannelLabel(selectedMessage.channel)}</dd></div>
+                  <div><dt>발송대상</dt><dd>{adminMessageTargetLabel(selectedMessage)}</dd></div>
+                </dl>
+              </div>
+              <AdminMessageEditor message={selectedMessage} subjects={subjects} returnTo={selectedReturnTo} />
+              <section className="admin-message-result-section">
+                <h3>발송 결과</h3>
+                <div className="admin-message-result-grid">
+                  <span><strong>{formatMetricValue(selectedMessage.recipient_count)}</strong><small>발송 수</small></span>
+                  <span><strong>{formatMetricValue(selectedMessage.success_count)}</strong><small>성공 수</small></span>
+                  <span><strong>{formatMetricValue(selectedMessage.failure_count)}</strong><small>실패 수</small></span>
+                </div>
+              </section>
+            </>
+          ) : (
+            <>
+              <h2>상세 정보</h2>
+              <p className="empty-text">메시지를 선택하거나 새 메시지를 작성해 주세요.</p>
+            </>
+          )}
+        </aside>
+      </div>
+
+      {composeMessage && (
+        <>
+          <ModalScrollLock />
+          <div className="admin-message-compose-backdrop" role="dialog" aria-modal="true" aria-labelledby="admin-message-compose-title">
+            <Link className="admin-message-compose-scrim" href={closeComposeUrl} aria-label="새 메시지 닫기" />
+            <aside className="admin-message-compose-panel">
+              <div className="admin-message-compose-header">
+                <h2 id="admin-message-compose-title">상세 정보</h2>
+                <Link className="plain-button compact" href={closeComposeUrl}>닫기</Link>
+              </div>
+              <AdminMessageEditor message={null} subjects={subjects} returnTo="/admin?section=notifications" compact />
+            </aside>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function AdminMessageEditor({ message, subjects, returnTo, compact = false }) {
+  const targetType = message?.target_type || "all";
+  const subjectId = message?.subject_id || "";
+  const title = message?.title || "";
+  const body = message?.body || "";
+
+  return (
+    <form action={saveAdminMessageAction} className={`admin-message-editor${compact ? " compact" : ""}`}>
+      <input type="hidden" name="messageId" value={message?.id || ""} />
+      <input type="hidden" name="returnTo" value={returnTo} />
+      <input type="hidden" name="messageUrl" value="/" />
+
+      <label>
+        발송 채널
+        <select name="channel" defaultValue={message?.channel || "push"}>
+          <option value="push">푸시 알림</option>
+        </select>
+      </label>
+
+      <div className="admin-message-target-row">
+        <label>
+          발송 대상
+          <select name="targetType" defaultValue={targetType}>
+            <option value="all">전체 회원</option>
+            <option value="subject">대상자 선택</option>
+          </select>
+        </label>
+        <span>또는</span>
+        <label>
+          대상자
+          <select name="subjectId" defaultValue={subjectId}>
+            <option value="">대상자 선택</option>
+            {subjects.map((subject) => (
+              <option value={subject.id} key={subject.id}>
+                {subject.name || "이름 미입력"} / {subject.guardian_name || subject.guardian_email || subject.guardian_google_email || "보호자 미입력"}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <label>
+        제목
+        <input name="title" defaultValue={title} placeholder="제목을 입력하세요" maxLength="120" />
+      </label>
+      <label>
+        내용
+        <textarea name="body" defaultValue={body} placeholder="내용을 입력하세요" rows={compact ? 4 : 5} maxLength="1000" />
+      </label>
+
+      <section className="admin-message-preview" aria-label="알림 미리보기">
+        <h3>미리보기</h3>
+        <div>
+          <strong>{title || "제목이 표시됩니다."}</strong>
+          <p>{body || "내용이 표시됩니다."}</p>
+        </div>
+      </section>
+
+      <div className="admin-message-editor-actions">
+        <FormSubmitButton className="plain-button compact" pendingText="저장중" name="command" value="save">
+          저장
+        </FormSubmitButton>
+        <FormSubmitButton className="primary-button compact" pendingText="발송중" name="command" value="send">
+          발송
+        </FormSubmitButton>
+      </div>
+    </form>
   );
 }
 
@@ -3669,6 +3922,22 @@ function locationShareExportRows(shares = []) {
   }));
 }
 
+function adminMessageExportRows(messages = []) {
+  return messages.map((message) => ({
+    알림번호: message.message_number || "-",
+    제목: message.title || "제목 없음",
+    발송채널: adminMessageChannelLabel(message.channel),
+    발송대상: adminMessageTargetLabel(message),
+    발송상태: adminMessageStatusLabel(message.status),
+    발송수: Number(message.recipient_count || 0),
+    성공수: Number(message.success_count || 0),
+    실패수: Number(message.failure_count || 0),
+    발송일시: formatRecentDateTime(message.sent_at),
+    작성일시: formatRecentDateTime(message.created_at),
+    내용: message.body || "",
+  }));
+}
+
 function inquiryExportRows(inquiries = []) {
   return inquiries.map((inquiry) => ({
     제목: inquiry.title || "제목 없음",
@@ -4055,6 +4324,24 @@ function couponServiceLabel(scope) {
   return labels[scope] || "전체";
 }
 
+function adminMessageChannelLabel(channel) {
+  return channel === "push" ? "푸시 알림" : channel || "-";
+}
+
+function adminMessageStatusLabel(status) {
+  if (status === "sent") return "발송완료";
+  return "저장됨";
+}
+
+function adminMessageTargetLabel(message) {
+  if (message?.target_type === "subject") {
+    const subjectName = message.subject_name || "대상자 선택";
+    const guardianName = message.subject_guardian_name || message.subject_guardian_email || message.subject_guardian_google_email || "";
+    return guardianName ? `${subjectName} (${guardianName})` : subjectName;
+  }
+  return "전체 회원";
+}
+
 function formatCouponPeriod(coupon) {
   const start = formatDate(coupon?.start_date);
   const end = formatDate(coupon?.end_date);
@@ -4170,6 +4457,18 @@ function buildLocationShareUrl(filters, shareId = "") {
   if (filters?.startDate) params.set("locationStart", filters.startDate);
   if (filters?.endDate) params.set("locationEnd", filters.endDate);
   if (shareId) params.set("locationShare", shareId);
+  return `/admin?${params.toString()}`;
+}
+
+function buildAdminMessageUrl(filters, messageId = "", compose = false) {
+  const params = new URLSearchParams({ section: "notifications" });
+  if (filters?.query) params.set("messageQuery", filters.query);
+  if (filters?.channel && filters.channel !== "all") params.set("messageChannel", filters.channel);
+  if (filters?.status && filters.status !== "all") params.set("messageStatus", filters.status);
+  if (filters?.startDate) params.set("messageStart", filters.startDate);
+  if (filters?.endDate) params.set("messageEnd", filters.endDate);
+  if (messageId) params.set("message", messageId);
+  if (compose) params.set("compose", "1");
   return `/admin?${params.toString()}`;
 }
 

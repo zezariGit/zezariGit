@@ -277,3 +277,14 @@ Create a Korean SaaS admin console UI mockup for "REAL_QR_FIND" coupon managemen
 
 ### Notes
 - Use when explaining coupon master data, issue limits, and how the user coupon box validates against administrator-created coupons.
+
+## 2026-06-30 - Admin Notification Management
+
+### Purpose
+- Presentation visual for the administrator notification/message management screen.
+
+### Prompt
+Create a Korean SaaS admin console UI mockup for "REAL_QR_FIND" notification management. Show a dark navy left admin sidebar with "알림 관리" selected and a white operations workspace. At the top, show a search panel titled "메시지 관리" with fields "발송 채널", "발송 상태", "검색어", and "기간" date range, plus "초기화" and purple "검색" buttons. Below, show a purple "+ 새 메시지" button. The main area is split into a wide dense grid and a right detail card. The grid columns are "알림번호, 제목, 발송 채널, 발송 대상, 발송 상태, 발송 수, 성공 수, 실패 수, 발송 일시, 관리" with small status chips for 저장됨 and 발송완료. The right detail card shows notification metadata, a form for push channel, target selection, title, message body, a preview box, and "저장" and "발송" buttons. Also show a right-side slide-in compose panel opened by "+ 새 메시지", with the background dimmed and disabled. Use the existing REAL_QR_FIND admin style: white panels, thin gray grid lines, restrained purple actions, black headings, compact Korean labels, and no real personal data.
+
+### Notes
+- Use when explaining that administrators can send operational push messages to all active guardians or to the guardian of a selected subject.

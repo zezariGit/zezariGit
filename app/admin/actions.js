@@ -8,8 +8,12 @@ import { authOptions } from "../../lib/auth";
 import {
   generateQrCodes,
   createAdminPaymentRefund,
+  getAdminMessageById,
+  getAdminMessageRecipients,
   isDbAdminSession,
+  markAdminMessageSent,
   saveAdminCoupon,
+  saveAdminMessage,
   setAdminSubjectAdMemo,
   setAdminSubjectAdStatus,
   setAdDailyRate,
@@ -25,6 +29,7 @@ import {
   setSubscriptionAdminMemo,
   setSubscriptionPlanPrice,
 } from "../../lib/db";
+import { notifyGuardiansFromAdmin } from "../../lib/push";
 
 export async function setGuardianActiveAction(formData) {
   const session = await getServerSession(authOptions);
@@ -173,6 +178,37 @@ export async function saveAdminCouponAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=coupons"), error.message || "쿠폰 저장에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin?section=coupons"), "쿠폰 정보가 저장되었습니다."));
+}
+
+export async function saveAdminMessageAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  const command = String(formData.get("command") || "save");
+  let messageId = "";
+
+  try {
+    messageId = await saveAdminMessage(formData);
+    if (command === "send") {
+      const message = await getAdminMessageById(messageId);
+      if (!message) throw new Error("저장된 알림 메시지를 찾을 수 없습니다.");
+      const recipients = await getAdminMessageRecipients(message);
+      const result = await notifyGuardiansFromAdmin({
+        guardianIds: recipients.map((guardian) => guardian.id),
+        title: message.title,
+        body: message.body || "",
+        url: message.url || "/",
+      });
+      await markAdminMessageSent(messageId, result);
+    }
+    revalidatePath("/admin");
+    revalidatePath("/");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=notifications"), error.message || "알림 메시지 저장에 실패했습니다.", "error"));
+  }
+
+  const message = command === "send" ? "알림 메시지를 발송했습니다." : "알림 메시지가 저장되었습니다.";
+  redirect(withNotice(`/admin?section=notifications&message=${encodeURIComponent(messageId)}`, message));
 }
 
 export async function setSubscriptionAdminMemoAction(formData) {

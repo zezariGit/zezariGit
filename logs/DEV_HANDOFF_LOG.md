@@ -4917,3 +4917,62 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Coupon admin UI, schema, registration validation, CSS, documentation, and local verification: about 50 minutes.
+
+## 2026-06-30 KST - Admin Notification Management And Coupon Radio Spacing
+
+### User Request
+- Fix the coupon detail-card radio button label spacing because `랜덤생성 / 직접 입력` and `사용 가능 / 사용 불가능` text was clipped or overlapping.
+- Add an administrator `알림 관리` menu and screen.
+- The notification screen should let admins send push notifications/messages to registered guardians.
+- `+ 새 메시지` should open a right-side popup/panel for composing and managing a message.
+
+### Reflected Work
+- Updated coupon form CSS so radio groups reserve enough horizontal spacing and labels do not overlap.
+- Added `admin_messages` table and indexes for administrator message drafts/sent records.
+- Added `알림 관리` to the administrator left menu.
+- Added `/admin?section=notifications` with:
+  - search filters for channel, status, keyword, and date range
+  - dense message grid
+  - CSV export
+  - selected-message detail card
+  - right-side new-message compose modal
+  - save and send actions
+- Added administrator message fields:
+  - channel
+  - target type
+  - optional subject target
+  - title
+  - body
+  - URL
+  - draft/sent status
+  - recipient/success/failure counts
+- Added `notifyGuardiansFromAdmin()`:
+  - creates guardian in-app notifications
+  - sends browser push notifications to registered push subscriptions
+  - counts push success/failure per recipient
+- Updated `FormSubmitButton` so submit buttons can pass `name` and `value`, allowing one form to distinguish save/send commands.
+- Added `deliverables/ADMIN_NOTIFICATION_MANAGEMENT.md`.
+- Added a presentation image prompt for the notification-management screen.
+
+### Files Changed
+- `app/form-submit-button.js`
+- `app/admin/actions.js`
+- `app/admin/admin-workspace.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `lib/db.js`
+- `lib/push.js`
+- `deliverables/ADMIN_NOTIFICATION_MANAGEMENT.md`
+- `deliverables/README.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with Windows line-ending warnings only.
+- Turso `admin_messages` schema check succeeded.
+- Turso `admin_messages` count query succeeded without printing secrets.
+
+### Time Spent
+- Coupon spacing fix, admin notification UI, DB/action/push wiring, documentation, and local verification: about 55 minutes.

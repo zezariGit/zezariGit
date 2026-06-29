@@ -19,6 +19,7 @@ const MENU_ITEMS = [
   { id: "ads", label: "광고 관리", href: "/admin?section=ads", icon: "megaphone" },
   { id: "missing", label: "실종신고 관리", href: "/admin?section=missing", icon: "alert" },
   { id: "locations", label: "위치공유 관리", href: "/admin?section=locations", icon: "pin" },
+  { id: "notifications", label: "알림 관리", href: "/admin?section=notifications", icon: "alert" },
   { id: "inquiries", label: "고객 문의", href: "/admin?section=inquiries", icon: "chat" },
   { id: "admins", label: "관리자 관리", href: "/admin?section=admins", icon: "shield" },
 ];
