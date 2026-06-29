@@ -72,9 +72,13 @@ export default async function BillingPage({ searchParams }) {
                   <strong>{formatCurrency(order.amount)}</strong>
                   <span>{paymentStatusLabel(order.status)}</span>
                   <span>배송: {shippingStatusLabel(order.fulfillment_status, order.status)}</span>
-                  {order.tracking_number && (
-                    <span>{order.carrier || "택배사 미입력"} · {order.tracking_number}</span>
-                  )}
+                </div>
+                <div className="account-shipping-info">
+                  <strong>배송조회 정보</strong>
+                  <span>택배사: {order.carrier || "아직 입력되지 않았습니다"}</span>
+                  <span>송장번호: {order.tracking_number || "아직 입력되지 않았습니다"}</span>
+                  {order.shipped_at && <span>발송일: {formatDate(order.shipped_at)}</span>}
+                  {order.delivered_at && <span>배송완료일: {formatDate(order.delivered_at)}</span>}
                 </div>
               </article>
             ))}

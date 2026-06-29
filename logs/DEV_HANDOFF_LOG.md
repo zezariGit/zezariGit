@@ -4646,3 +4646,46 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - QR admin data model, UI rebuild, CSS, documentation, and local verification: about 60 minutes.
+
+## 2026-06-29 KST - Admin Order Shipping Detail Refresh
+
+### User Request
+- Update the administrator order management menu to match the provided reference.
+- Put editable shipping information at the bottom of the right detail card.
+- Let administrators enter carrier and tracking number.
+- Let buyers confirm the tracking number from their My Page order history.
+
+### Reflected Work
+- Expanded admin order filters in `getAdminOrdersData()`:
+  - product name
+  - order start date
+  - order end date
+- Expanded order summary counts with cancellation and refund placeholders.
+- Rebuilt the admin order management section as:
+  - six top status cards
+  - dedicated search panel
+  - dense order grid
+  - right detail card with order, subject, product, payment, shipping, and editable fulfillment sections
+- Kept existing server-side validation:
+  - paid orders only can move to preparing/shipped/delivered
+  - shipped/delivered requires carrier and tracking number
+- Added a buyer-facing shipping info block to `/account/billing` so the guardian can see carrier, tracking number, shipped date, and delivered date.
+- Updated `deliverables/ADMIN_ORDER_GRID_MANAGEMENT.md`.
+
+### Files Changed
+- `lib/db.js`
+- `app/admin/page.js`
+- `app/account/billing/page.js`
+- `app/globals.css`
+- `deliverables/ADMIN_ORDER_GRID_MANAGEMENT.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with Windows line-ending warnings only.
+- Source checks confirmed the order product/date filters and buyer shipping-info block are present.
+- Authenticated admin order page and buyer billing page HTTP checks are planned after production deployment.
+
+### Time Spent
+- Order admin UI refresh, filter/data updates, buyer tracking display, CSS, and documentation: about 45 minutes.
