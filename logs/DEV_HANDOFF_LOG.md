@@ -4685,9 +4685,8 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `npm run build` succeeded.
 - `git diff --check` succeeded with Windows line-ending warnings only.
 - Source checks confirmed the order product/date filters and buyer shipping-info block are present.
-- Production deployment succeeded on Vercel:
-  - `https://zezari-aezilq39c-zezari.vercel.app`
-  - `https://zezari.vercel.app` alias pointed to the new deployment.
+- Production deployment succeeded on Vercel.
+- The `https://zezari.vercel.app` alias was updated to the latest production deployment.
 - Production HTTP checks returned 200:
   - `/`
   - `/admin?section=orders`
