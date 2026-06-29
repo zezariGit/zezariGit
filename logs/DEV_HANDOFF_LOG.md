@@ -4595,3 +4595,54 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Data query expansion, subject admin UI rebuild, CSS, documentation, and local verification: about 50 minutes.
+
+## 2026-06-29 KST - QR Admin Operations Layout
+
+### User Request
+- Rebuild the administrator QR management screen to match the provided reference.
+- Consider additional right-detail-card screens as in-card tabs.
+- Add horizontal scrolling for long QR numbers in the previous subject detail QR tab.
+- Apply horizontal and vertical scrolling to the new QR detail card as well.
+
+### Reflected Work
+- Rebuilt `QrManagementSection()` in `app/admin/page.js` as:
+  - top QR status metrics
+  - expanded search/filter area
+  - dense QR grid
+  - right in-card tabbed QR detail panel
+- Added QR detail tabs:
+  - base QR information and memo
+  - QR history timeline
+  - QR management actions
+- Added QR lifecycle fields and actions:
+  - `lifecycle_status`
+  - `discarded_at`
+  - `admin_memo`
+  - discard and restore action handling
+- Expanded `getQrAdminData()` in `lib/db.js` for:
+  - keyword search
+  - lifecycle status filter
+  - activation status/date filters
+  - selected QR detail
+  - QR activity history
+- Updated QR matching behavior so assigning a subject marks QR as `in_use`, clearing a subject marks it as `unused`, and discarding clears assignment and deactivates the QR.
+- Added horizontal scroll styling for long QR values and URLs.
+- Updated `deliverables/QR_MANAGEMENT.md`.
+
+### Files Changed
+- `lib/db.js`
+- `app/admin/page.js`
+- `app/admin/actions.js`
+- `app/globals.css`
+- `deliverables/QR_MANAGEMENT.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with Windows line-ending warnings only.
+- Turso `qr_codes` schema was safely extended with lifecycle and memo columns.
+- Turso QR list join query succeeded without printing secrets.
+
+### Time Spent
+- QR admin data model, UI rebuild, CSS, documentation, and local verification: about 60 minutes.

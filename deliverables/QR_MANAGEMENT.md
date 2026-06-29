@@ -37,6 +37,27 @@ Project: REAL_QR_FIND / zezari
 10. When a guardian edits an existing subject, QR assignment is preserved and the registration-complete screen is not shown.
 11. If no unassigned QR remains, the server generates a new QR and assigns it.
 
+## 2026-06-29 Admin Screen Revamp
+- Rebuilt the QR admin screen as an operations-style workspace.
+- Top status cards now show:
+  - Total QR count
+  - In-use QR count, with active/inactive split
+  - Unused QR count
+  - Discarded QR count
+- Search filters now include:
+  - QR number, managed subject, guardian keyword
+  - QR lifecycle status: all, in use, unused, discarded
+  - activation status: all, active, inactive
+  - activation date range
+- The QR list is now a dense grid with QR thumbnail, QR number, subject, guardian, lifecycle status, activation status, created date, activation date, expiry date, and detail action.
+- The right detail card now uses internal tabs:
+  - `기본 정보`: subject, guardian, contact, creation/activation/expiry dates, public URL, admin memo
+  - `이력 정보`: QR creation, match, activation, discarded, and updated timeline
+  - `관리`: matching, unmatching, active/inactive toggle, discard/restore actions
+- Detail card tabs use fixed-height internal scrolling.
+- Long QR numbers, public keys, and URLs use horizontal scrolling instead of vertical character wrapping.
+- The managed-subject detail QR tab also uses horizontal scrolling for long QR values.
+
 ## Database
 - Table: `qr_codes`
 - Unique fields:
@@ -44,6 +65,10 @@ Project: REAL_QR_FIND / zezari
   - `public_key`
 - Status field:
   - `is_active`
+- Lifecycle fields:
+  - `lifecycle_status`: `in_use`, `unused`, `discarded`
+  - `discarded_at`
+  - `admin_memo`
 
 ## URL Rule
 - Production base URL:

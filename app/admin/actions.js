@@ -15,7 +15,9 @@ import {
   setGuardianAdmin,
   setProductCatalogItem,
   setProductOrderFulfillment,
+  setQrAdminMemo,
   setQrActive,
+  setQrLifecycle,
   setQrSubject,
   setSubscriptionPlanPrice,
 } from "../../lib/db";
@@ -70,6 +72,33 @@ export async function setQrActiveAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), error.message || "QR 상태 변경에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), "QR 상태가 수정되었습니다."));
+}
+
+export async function setQrLifecycleAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  const lifecycle = String(formData.get("lifecycleStatus") || "");
+  try {
+    await setQrLifecycle(formData);
+    revalidatePath("/admin");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), error.message || "QR 처리에 실패했습니다.", "error"));
+  }
+  redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), lifecycle === "discarded" ? "QR이 폐기 처리되었습니다." : "QR 상태가 복구되었습니다."));
+}
+
+export async function setQrAdminMemoAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  try {
+    await setQrAdminMemo(formData);
+    revalidatePath("/admin");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), error.message || "QR 메모 저장에 실패했습니다.", "error"));
+  }
+  redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), "QR 메모가 저장되었습니다."));
 }
 
 export async function setQrSubjectAction(formData) {

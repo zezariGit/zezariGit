@@ -33,7 +33,9 @@ import {
   setAdDailyRateAction,
   setProductCatalogItemAction,
   setProductOrderFulfillmentAction,
+  setQrAdminMemoAction,
   setQrActiveAction,
+  setQrLifecycleAction,
   setQrSubjectAction,
   setAdminSubjectAdStatusAction,
   setSubscriptionPlanPriceAction,
@@ -95,8 +97,13 @@ export default async function AdminPage({ searchParams }) {
     guardianId: resolvedSearchParams?.guardianId || "",
   };
   const qrFilters = {
+    query: resolvedSearchParams?.qrAdminQuery || "",
+    status: resolvedSearchParams?.qrStatus || "all",
     match: resolvedSearchParams?.match || "all",
     active: resolvedSearchParams?.active || "all",
+    startDate: resolvedSearchParams?.qrStart || "",
+    endDate: resolvedSearchParams?.qrEnd || "",
+    selectedQr: resolvedSearchParams?.qr || "",
     assignQr: resolvedSearchParams?.assignQr || "",
     guardianQuery: resolvedSearchParams?.guardianQuery || "",
     subjectQuery: resolvedSearchParams?.subjectQuery || "",
@@ -2132,7 +2139,7 @@ function SubjectManagementSection({ adminSubjectsData, selectedSubjectQrImage })
                         {selectedSubjectQrImage ? <img src={selectedSubjectQrImage} alt={`${selectedSubject.name} QR 코드`} /> : <span>미매칭</span>}
                       </div>
                       <div>
-                        <div className="guardian-detail-row"><strong>QR 번호</strong><span>{selectedSubject.qr_code || "미매칭"}</span>{selectedSubject.qr_target_url && <Link href={selectedSubject.qr_target_url} target="_blank">상세보기 &gt;</Link>}</div>
+                        <div className="guardian-detail-row"><strong>QR 번호</strong><span className="inline-scroll-value">{selectedSubject.qr_code || "미매칭"}</span>{selectedSubject.qr_target_url && <Link href={selectedSubject.qr_target_url} target="_blank">상세보기 &gt;</Link>}</div>
                         <div className="guardian-detail-row"><strong>QR 상태</strong><span>{qrAdminStateLabel(selectedSubject)}</span></div>
                         <div className="guardian-detail-row"><strong>발급일</strong><span>{formatRecentDateTime(selectedSubject.qr_updated_at)}</span></div>
                         <div className="guardian-detail-row"><strong>활성화 시점</strong><span>{formatRecentDateTime(selectedSubject.qr_activated_at)}</span></div>
@@ -2227,130 +2234,264 @@ function QrManagementSection({ qrData, qrItems }) {
   const selectedQrImage = selectedQr
     ? qrItems.find((item) => item.id === selectedQr.id)?.image || ""
     : "";
+  const visibleRows = Math.max(0, 12 - qrItems.length);
+  const qrTabName = selectedQr ? `qr-detail-tab-${selectedQr.id}` : "qr-detail-tab";
+  const selectedQrReturnTo = selectedQr ? buildQrDetailUrl(qrData, selectedQr.id) : buildQrListUrl(qrData);
 
   return (
-    <div className="qr-admin-stack">
-      <section className="admin-panel qr-create-panel">
-        <div>
-          <div className="panel-heading">
-            <h2>QR 생성</h2>
-            <span>{qrData.total}개</span>
-          </div>
-          <p className="empty-text">
-            새 QR은 중복되지 않는 고유 문자열을 만들고 `/find/고유문자열` URL로 연결됩니다.
-          </p>
-        </div>
-        <form className="qr-create-form" action={generateQrCodesAction}>
-          <label htmlFor="qr-count">추가 개수</label>
-          <input id="qr-count" type="number" name="count" min="1" max="200" defaultValue="10" />
-          <input type="hidden" name="returnTo" value={buildQrListUrl(qrData)} />
-          <FormSubmitButton pendingText="생성중">
-            생성
-          </FormSubmitButton>
-        </form>
-        <div className="qr-stats" aria-label="QR 상태 요약">
-          <span>활성 {qrData.activeCount}개</span>
-          <span>비활성 {qrData.inactiveCount}개</span>
-          <span>매칭 {qrData.matchedCount}개</span>
-          <span>미매칭 {qrData.unmatchedCount}개</span>
+    <div className="qr-admin-page">
+      <section className="guardian-admin-status qr-admin-status" aria-labelledby="qr-status-title">
+        <h2 id="qr-status-title">QR관리</h2>
+        <div className="qr-stat-grid">
+          <GuardianStatCard icon="qr" title="전체 QR" value={formatCountWithUnit(qrData.total, "개")} />
+          <GuardianStatCard
+            icon="growth"
+            title="사용중 QR"
+            value={formatCountWithUnit(qrData.inUseCount, "개")}
+            note={`미활성화: ${formatMetricValue(qrData.inactiveCount)}개 / 활성화: ${formatMetricValue(qrData.activeCount)}개`}
+            noteTone="positive"
+          />
+          <GuardianStatCard icon="blocked" title="미사용" value={formatCountWithUnit(qrData.unusedCount, "개")} />
+          <GuardianStatCard icon="blocked" title="폐기" value={formatCountWithUnit(qrData.discardedCount, "개")} noteTone={Number(qrData.discardedCount || 0) > 0 ? "negative" : "neutral"} />
         </div>
       </section>
 
-      <section className="admin-panel qr-filter-panel">
-        <form className="qr-filter-form" action="/admin">
+      <section className="admin-panel guardian-search-panel qr-admin-search-panel">
+        <h2>검색</h2>
+        <form className="guardian-admin-filter qr-admin-filter" action="/admin">
           <input type="hidden" name="section" value="qr" />
           <label>
-            매칭상태
-            <select name="match" defaultValue={qrData.filters.match}>
+            검색어
+            <input name="qrAdminQuery" defaultValue={qrData.filters.query} placeholder="QR번호, 대상자명, 보호자명" />
+          </label>
+          <label>
+            QR상태
+            <select name="qrStatus" defaultValue={qrData.filters.status}>
               <option value="all">전체</option>
-              <option value="matched">관리대상 매칭됨</option>
-              <option value="unmatched">관리대상 미매칭</option>
+              <option value="in_use">사용중</option>
+              <option value="unused">미사용</option>
+              <option value="discarded">폐기</option>
             </select>
           </label>
           <label>
-            활성상태
+            활성화 상태
             <select name="active" defaultValue={qrData.filters.active}>
               <option value="all">전체</option>
               <option value="active">활성</option>
-              <option value="inactive">비활성</option>
+              <option value="inactive">미활성</option>
             </select>
           </label>
-          <FormSubmitButton pendingText="조회중">
-            필터 적용
-          </FormSubmitButton>
-          <Link className="admin-link" href="/admin?section=qr">
-            초기화
-          </Link>
+          <fieldset className="guardian-filter-date qr-filter-date">
+            <legend>활성화일</legend>
+            <input type="date" name="qrStart" defaultValue={qrData.filters.startDate} aria-label="활성화 시작일" />
+            <span>~</span>
+            <input type="date" name="qrEnd" defaultValue={qrData.filters.endDate} aria-label="활성화 종료일" />
+          </fieldset>
+          <Link className="plain-button guardian-reset-button" href="/admin?section=qr">초기화</Link>
+          <button type="submit">검색</button>
+        </form>
+        <form className="qr-inline-create-form" action={generateQrCodesAction}>
+          <label htmlFor="qr-count">QR 추가 생성</label>
+          <input id="qr-count" type="number" name="count" min="1" max="200" defaultValue="10" />
+          <input type="hidden" name="returnTo" value={buildQrListUrl(qrData)} />
+          <FormSubmitButton pendingText="생성중">생성</FormSubmitButton>
         </form>
       </section>
 
-      <section className="admin-panel">
-        <div className="panel-heading">
-          <h2>생성된 QR</h2>
-          <div className="admin-heading-actions">
-            <span>{qrData.filteredCount}/{qrData.total}개</span>
+      <div className="qr-admin-layout">
+        <section className="admin-panel guardian-list-panel qr-list-panel">
+          <div className="guardian-list-heading">
+            <h2>조회 <strong>{formatMetricValue(qrData.filteredCount)}</strong>개</h2>
             <AdminExportButton filename="zezari-qr-codes.csv" rows={qrExportRows(qrItems)} />
           </div>
-        </div>
-        <div className="qr-grid">
-          {qrItems.map((qr) => (
-            <article className="qr-card" key={qr.id}>
-              <div className="qr-image-wrap">
-                <a href={qr.image} download={`${qr.code}.png`} title={`${qr.code} QR 이미지 다운로드`}>
-                  <img src={qr.image} alt={`${qr.code} QR 코드`} />
-                </a>
+          <div className="admin-record-table-wrap guardian-admin-table-wrap qr-admin-table-wrap">
+            <div className="admin-record-table guardian-admin-table qr-admin-table" role="table" aria-label="QR 목록">
+              <div className="admin-record-header" role="row">
+                <span role="columnheader">□</span>
+                <span role="columnheader">QR</span>
+                <span role="columnheader">QR 번호</span>
+                <span role="columnheader">대상자명</span>
+                <span role="columnheader">보호자명</span>
+                <span role="columnheader">상태</span>
+                <span role="columnheader">활성화상태</span>
+                <span role="columnheader">생성일</span>
+                <span role="columnheader">활성화일</span>
+                <span role="columnheader">만료일</span>
+                <span role="columnheader">관리</span>
               </div>
-              <div className="qr-card-body">
-                <div>
-                  <strong>{qr.code}</strong>
-                  <span>{qr.public_key}</span>
-                  <span>보호자: {qr.guardian_name || "미배정"}</span>
-                  <span>관리대상: {qr.subject_name || "미배정"}</span>
+              {qrItems.map((qr) => (
+                <Link
+                  className={qr.id === selectedQr?.id ? "admin-record-row active" : "admin-record-row"}
+                  href={buildQrDetailUrl(qrData, qr.id)}
+                  key={qr.id}
+                  role="row"
+                >
+                  <span role="cell">{qr.id === selectedQr?.id ? "◉" : "□"}</span>
+                  <span role="cell" className="qr-table-image"><img src={qr.image} alt={`${qr.code} QR`} /></span>
+                  <span role="cell" className="inline-scroll-value">{qr.code || "-"}</span>
+                  <span role="cell">{formatQrSubjectLabel(qr)}</span>
+                  <span role="cell">{qr.guardian_name || "미배정"}</span>
+                  <em role="cell" className={`qr-lifecycle-badge ${qrLifecycleClass(qr)}`}>{qrLifecycleLabel(qr.lifecycle_status)}</em>
+                  <em role="cell" className={`qr-activation-badge ${qrActivationClass(qr)}`}>{qrActivationLabel(qr)}</em>
+                  <time role="cell">{formatDateOnlyValue(qr.created_at)}</time>
+                  <time role="cell">{formatDateOnlyValue(qr.activated_at)}</time>
+                  <time role="cell">{formatDateOnlyValue(qr.subscription_ends_at)}</time>
+                  <span role="cell">상세보기</span>
+                </Link>
+              ))}
+              {qrItems.length > 0 && Array.from({ length: visibleRows }, (_, index) => (
+                <div className="admin-record-row guardian-empty-row" role="row" key={`qr-empty-${index}`}>
+                  {Array.from({ length: 11 }, (_, cellIndex) => <span role="cell" key={`qr-empty-${index}-${cellIndex}`}>&nbsp;</span>)}
                 </div>
-                <a href={qr.target_url} target="_blank" rel="noreferrer">
-                  {qr.target_url}
-                </a>
-                <div className="qr-card-footer">
-                  <em className={qr.is_active ? "active-state" : "inactive-state"}>
-                    {qr.is_active ? "활성" : "비활성"}
-                  </em>
-                  <div className="qr-card-actions">
-                    {!qr.subject_id && (
-                      <Link className="activate-button" href={buildQrAssignUrl(qrData, qr.id)}>
-                        매칭대상 조회
-                      </Link>
-                    )}
-                    {qr.subject_id && (
-                      <form action={setQrSubjectAction}>
-                        <input type="hidden" name="qrId" value={qr.id} />
-                        <input type="hidden" name="subjectId" value="" />
-                        <input type="hidden" name="returnTo" value={buildQrListUrl(qrData)} />
-                        <FormSubmitButton className="danger-button compact" pendingText="해제중">
-                          매칭 해제
-                        </FormSubmitButton>
-                      </form>
-                    )}
-                    <form action={setQrActiveAction}>
-                      <input type="hidden" name="qrId" value={qr.id} />
-                      <input type="hidden" name="active" value={qr.is_active ? "0" : "1"} />
-                      <input type="hidden" name="returnTo" value={buildQrListUrl(qrData)} />
-                      <FormSubmitButton
-                        className={qr.is_active ? "danger-button compact" : "activate-button"}
-                        pendingText={qr.is_active ? "비활성화중" : "활성화중"}
-                      >
-                        {qr.is_active ? "비활성화" : "활성화"}
-                      </FormSubmitButton>
-                    </form>
-                  </div>
+              ))}
+              {qrItems.length === 0 && (
+                <div className="admin-record-row guardian-empty-result" role="row">
+                  <span role="cell">조건에 맞는 QR 코드가 없습니다.</span>
                 </div>
-              </div>
-            </article>
-          ))}
-          {qrItems.length === 0 && <p className="empty-text">생성된 QR 코드가 없습니다.</p>}
-        </div>
-      </section>
+              )}
+            </div>
+          </div>
+          <div className="guardian-list-footer">
+            <span>선택한 QR {selectedQr ? "1" : "0"}개</span>
+            <label>
+              <select defaultValue="10" aria-label="페이지당 QR 수">
+                <option value="10">10개씩 보기</option>
+                <option value="20">20개씩 보기</option>
+                <option value="50">50개씩 보기</option>
+              </select>
+            </label>
+          </div>
+        </section>
 
-      {selectedQr && !selectedQr.subject_id && (
+        <section className="admin-panel guardian-detail-card qr-detail-card">
+          {selectedQr ? (
+            <>
+              <div className="guardian-detail-header qr-detail-header">
+                <div className="qr-detail-image">
+                  {selectedQrImage && (
+                    <a href={selectedQrImage} download={`${selectedQr.code}.png`} title={`${selectedQr.code} QR 이미지 다운로드`}>
+                      <img src={selectedQrImage} alt={`${selectedQr.code} QR 코드`} />
+                    </a>
+                  )}
+                </div>
+                <div>
+                  <h2><span className="inline-scroll-value">{selectedQr.code}</span></h2>
+                  <div className="qr-detail-badges">
+                    <em className={`qr-lifecycle-badge ${qrLifecycleClass(selectedQr)}`}>{qrLifecycleLabel(selectedQr.lifecycle_status)}</em>
+                    <em className={`qr-activation-badge ${qrActivationClass(selectedQr)}`}>{qrActivationLabel(selectedQr)}</em>
+                  </div>
+                  <span>{selectedQr.subject_name || "미매칭"}</span>
+                  <span>{selectedQr.guardian_name || "보호자 미배정"}</span>
+                </div>
+              </div>
+
+              <div className="guardian-detail-tabset qr-detail-tabset">
+                <input className="guardian-tab-radio" type="radio" id={`${qrTabName}-basic`} name={qrTabName} defaultChecked />
+                <input className="guardian-tab-radio" type="radio" id={`${qrTabName}-history`} name={qrTabName} />
+                <input className="guardian-tab-radio" type="radio" id={`${qrTabName}-manage`} name={qrTabName} />
+
+                <div className="guardian-detail-tabs" role="tablist" aria-label="QR 상세 탭">
+                  <label htmlFor={`${qrTabName}-basic`} role="tab">기본 정보</label>
+                  <label htmlFor={`${qrTabName}-history`} role="tab">이력 정보</label>
+                  <label htmlFor={`${qrTabName}-manage`} role="tab">관리</label>
+                </div>
+
+                <div className="guardian-tab-panels">
+                  <section className="guardian-tab-panel qr-basic-panel">
+                    <dl className="guardian-detail-list">
+                      <div><dt>대상자명</dt><dd>{formatQrSubjectLabel(selectedQr)}</dd></div>
+                      <div><dt>보호자명</dt><dd>{selectedQr.guardian_name || "미배정"}</dd></div>
+                      <div><dt>연락처</dt><dd>{selectedQr.guardian_safe_phone || selectedQr.guardian_phone || "-"}</dd></div>
+                      <div><dt>생성일</dt><dd>{formatRecentDateTime(selectedQr.created_at)}</dd></div>
+                      <div><dt>활성화일</dt><dd>{formatRecentDateTime(selectedQr.activated_at)}</dd></div>
+                      <div><dt>만료일</dt><dd>{formatRecentDateTime(selectedQr.subscription_ends_at)}</dd></div>
+                      <div><dt>QR 번호</dt><dd><span className="inline-scroll-value">{selectedQr.code || "-"}</span></dd></div>
+                      <div><dt>고유키</dt><dd><span className="inline-scroll-value">{selectedQr.public_key || "-"}</span></dd></div>
+                      <div><dt>대상자정보페이지</dt><dd><a className="inline-scroll-value" href={selectedQr.target_url} target="_blank" rel="noreferrer">{selectedQr.target_url}</a></dd></div>
+                    </dl>
+                    <form action={setQrAdminMemoAction} className="guardian-detail-memo-form">
+                      <input type="hidden" name="qrId" value={selectedQr.id} />
+                      <input type="hidden" name="returnTo" value={selectedQrReturnTo} />
+                      <label htmlFor={`qr-admin-memo-${selectedQr.id}`}>메모</label>
+                      <textarea id={`qr-admin-memo-${selectedQr.id}`} name="adminMemo" maxLength="2000" defaultValue={selectedQr.admin_memo || ""} placeholder="QR 배송, 교체, 회수 등 내부 메모를 입력하세요." />
+                      <FormSubmitButton pendingText="저장중">메모 저장</FormSubmitButton>
+                    </form>
+                  </section>
+
+                  <section className="guardian-tab-panel qr-history-panel">
+                    <div className="guardian-tab-section-title">이력 정보</div>
+                    <ol className="guardian-activity-list">
+                      {qrData.selectedQrActivities.map((activity) => (
+                        <li key={activity.id}>
+                          <time>{formatRecentDateTime(activity.at)}</time>
+                          <span>{activity.title || "이력"}</span>
+                          {activity.body && <p>{truncateText(activity.body, 42)}</p>}
+                        </li>
+                      ))}
+                      {qrData.selectedQrActivities.length === 0 && <li className="guardian-activity-empty">QR 이력이 없습니다.</li>}
+                    </ol>
+                  </section>
+
+                  <section className="guardian-tab-panel qr-manage-panel">
+                    <div className="guardian-tab-section-title">QR 관리</div>
+                    <div className="guardian-detail-card-list">
+                      <article className="guardian-detail-mini-card">
+                        <div className="guardian-detail-row"><strong>현재 상태</strong><span>{qrLifecycleLabel(selectedQr.lifecycle_status)} / {qrActivationLabel(selectedQr)}</span></div>
+                        <div className="guardian-detail-row"><strong>매칭 대상</strong><span>{formatQrSubjectLabel(selectedQr)}</span></div>
+                        <div className="guardian-detail-row"><strong>보호자</strong><span>{selectedQr.guardian_name || "미배정"}</span></div>
+                      </article>
+                      <div className="qr-detail-action-grid">
+                        {selectedQr.lifecycle_status !== "discarded" && !selectedQr.subject_id && (
+                          <Link className="activate-button" href={buildQrAssignUrl(qrData, selectedQr.id)}>
+                            매칭대상 조회
+                          </Link>
+                        )}
+                        {selectedQr.lifecycle_status !== "discarded" && selectedQr.subject_id && (
+                          <form action={setQrSubjectAction}>
+                            <input type="hidden" name="qrId" value={selectedQr.id} />
+                            <input type="hidden" name="subjectId" value="" />
+                            <input type="hidden" name="returnTo" value={selectedQrReturnTo} />
+                            <FormSubmitButton className="plain-button" pendingText="해제중">매칭 해제</FormSubmitButton>
+                          </form>
+                        )}
+                        {selectedQr.lifecycle_status !== "discarded" && (
+                          <form action={setQrActiveAction}>
+                            <input type="hidden" name="qrId" value={selectedQr.id} />
+                            <input type="hidden" name="active" value={selectedQr.is_active ? "0" : "1"} />
+                            <input type="hidden" name="returnTo" value={selectedQrReturnTo} />
+                            <FormSubmitButton className={selectedQr.is_active ? "plain-button" : "activate-button"} pendingText={selectedQr.is_active ? "비활성화중" : "활성화중"}>
+                              {selectedQr.is_active ? "QR 비활성화" : "QR 활성화"}
+                            </FormSubmitButton>
+                          </form>
+                        )}
+                        {selectedQr.lifecycle_status !== "discarded" ? (
+                          <form action={setQrLifecycleAction}>
+                            <input type="hidden" name="qrId" value={selectedQr.id} />
+                            <input type="hidden" name="lifecycleStatus" value="discarded" />
+                            <input type="hidden" name="returnTo" value={buildQrListUrl(qrData)} />
+                            <FormSubmitButton className="danger-button compact" pendingText="폐기중">QR 폐기</FormSubmitButton>
+                          </form>
+                        ) : (
+                          <form action={setQrLifecycleAction}>
+                            <input type="hidden" name="qrId" value={selectedQr.id} />
+                            <input type="hidden" name="lifecycleStatus" value="unused" />
+                            <input type="hidden" name="returnTo" value={selectedQrReturnTo} />
+                            <FormSubmitButton className="activate-button" pendingText="복구중">미사용 복구</FormSubmitButton>
+                          </form>
+                        )}
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p className="empty-text">QR을 선택해 주세요.</p>
+          )}
+        </section>
+      </div>
+
+      {selectedQr && qrData.matchSearch.qrId && !selectedQr.subject_id && (
         <section className="modal-backdrop qr-modal-backdrop" aria-label="QR 매칭 대상 조회" role="dialog" aria-modal="true">
           <ModalScrollLock />
           <div className="modal-surface qr-modal" data-modal-surface>
@@ -2372,8 +2513,12 @@ function QrManagementSection({ qrData, qrItems }) {
 
             <form action="/admin" className="qr-modal-search-form">
               <input type="hidden" name="section" value="qr" />
-              <input type="hidden" name="match" value={qrData.filters.match} />
+              <input type="hidden" name="qrAdminQuery" value={qrData.filters.query} />
+              <input type="hidden" name="qrStatus" value={qrData.filters.status} />
               <input type="hidden" name="active" value={qrData.filters.active} />
+              <input type="hidden" name="qrStart" value={qrData.filters.startDate} />
+              <input type="hidden" name="qrEnd" value={qrData.filters.endDate} />
+              <input type="hidden" name="qr" value={selectedQr.id} />
               <input type="hidden" name="assignQr" value={selectedQr.id} />
               <label>
                 보호자
@@ -2397,7 +2542,7 @@ function QrManagementSection({ qrData, qrItems }) {
                 <form action={setQrSubjectAction} className="qr-modal-result" key={subject.id}>
                   <input type="hidden" name="qrId" value={selectedQr.id} />
                   <input type="hidden" name="subjectId" value={subject.id} />
-                  <input type="hidden" name="returnTo" value={buildQrListUrl(qrData)} />
+                  <input type="hidden" name="returnTo" value={buildQrDetailUrl(qrData, selectedQr.id)} />
                   <div>
                     <strong>{subject.name}</strong>
                     <span>
@@ -2418,7 +2563,7 @@ function QrManagementSection({ qrData, qrItems }) {
               )}
             </div>
             <div className="modal-footer">
-              <Link className="plain-button modal-close-button" href="/admin?section=qr">
+              <Link className="plain-button modal-close-button" href={buildQrDetailUrl(qrData, selectedQr.id)}>
                 닫기
               </Link>
             </div>
@@ -2430,22 +2575,31 @@ function QrManagementSection({ qrData, qrItems }) {
 }
 
 function buildQrAssignUrl(qrData, qrId) {
-  const params = new URLSearchParams({
-    section: "qr",
-    match: qrData.filters.match,
-    active: qrData.filters.active,
-    assignQr: qrId,
-  });
+  const params = buildQrParams(qrData);
+  params.set("qr", qrId);
+  params.set("assignQr", qrId);
+  return `/admin?${params.toString()}`;
+}
+
+function buildQrDetailUrl(qrData, qrId) {
+  const params = buildQrParams(qrData);
+  if (qrId) params.set("qr", qrId);
   return `/admin?${params.toString()}`;
 }
 
 function buildQrListUrl(qrData) {
-  const params = new URLSearchParams({
-    section: "qr",
-    match: qrData.filters.match,
-    active: qrData.filters.active,
-  });
+  const params = buildQrParams(qrData);
   return `/admin?${params.toString()}`;
+}
+
+function buildQrParams(qrData) {
+  const params = new URLSearchParams({ section: "qr" });
+  if (qrData.filters.query) params.set("qrAdminQuery", qrData.filters.query);
+  if (qrData.filters.status && qrData.filters.status !== "all") params.set("qrStatus", qrData.filters.status);
+  if (qrData.filters.active && qrData.filters.active !== "all") params.set("active", qrData.filters.active);
+  if (qrData.filters.startDate) params.set("qrStart", qrData.filters.startDate);
+  if (qrData.filters.endDate) params.set("qrEnd", qrData.filters.endDate);
+  return params;
 }
 
 async function withQrImages(qrCodes) {
@@ -2600,14 +2754,17 @@ function adminUserExportRows(users = []) {
 
 function qrExportRows(qrItems = []) {
   return qrItems.map((qr) => ({
-    QR코드: qr.code,
+    QR번호: qr.code,
     고유문자열: qr.public_key,
+    상태: qrLifecycleLabel(qr.lifecycle_status),
+    활성화상태: qrActivationLabel(qr),
     보호자: qr.guardian_name || "미배정",
-    관리대상: qr.subject_name || "미배정",
-    매칭상태: qr.subject_id ? "매칭" : "미매칭",
-    활성상태: qr.is_active ? "활성" : "비활성",
+    관리대상: formatQrSubjectLabel(qr),
+    보호자연락처: qr.guardian_safe_phone || qr.guardian_phone || "-",
     공개URL: qr.target_url,
     생성일: formatRecentDateTime(qr.created_at),
+    활성화일: formatRecentDateTime(qr.activated_at),
+    만료일: formatRecentDateTime(qr.subscription_ends_at),
   }));
 }
 
@@ -2833,6 +2990,32 @@ function qrAdminStateClass(subject) {
   if (!Number(subject.qr_is_active || 0)) return "inactive";
   if (subject.qr_activated_at) return "active";
   return "pending";
+}
+
+function qrLifecycleLabel(status) {
+  if (status === "discarded") return "폐기";
+  if (status === "in_use") return "사용중";
+  return "미사용";
+}
+
+function qrLifecycleClass(qr) {
+  if (qr?.lifecycle_status === "discarded") return "discarded";
+  if (qr?.lifecycle_status === "in_use") return "in-use";
+  return "unused";
+}
+
+function qrActivationLabel(qr) {
+  return Number(qr?.is_active || 0) === 1 ? "활성" : "미활성";
+}
+
+function qrActivationClass(qr) {
+  return Number(qr?.is_active || 0) === 1 ? "active" : "inactive";
+}
+
+function formatQrSubjectLabel(qr) {
+  if (!qr?.subject_name) return "미배정";
+  const meta = [qr.subject_gender, calculateAgeLabel(qr.subject_birth_date)].filter(Boolean).join("/");
+  return meta ? `${qr.subject_name} (${meta})` : qr.subject_name;
 }
 
 function formatFullAddress(address, detailAddress) {
