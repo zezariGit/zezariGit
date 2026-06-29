@@ -3164,7 +3164,13 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 프로덕션 빌드 성공.
 - 공백 검사 통과(Windows 줄바꿈 경고만 표시).
 - 주문 조회 필터와 사용자 배송조회 정보 블록이 소스에 반영된 것을 확인했다.
-- 운영 배포 후 관리자 주문관리와 사용자 결제내역 HTTP 확인 예정.
+- Vercel 운영 배포 성공.
+- `https://zezari.vercel.app` 운영 alias가 새 배포를 바라보는 것을 확인했다.
+- 운영 URL HTTP 확인 결과:
+  - `/` 200
+  - `/admin?section=orders` 200
+  - `/account/billing` 200
+- 최근 Vercel 로그에서 오류 항목은 확인되지 않았다.
 
 ### 산출물
 - `deliverables/ADMIN_ORDER_GRID_MANAGEMENT.md` 갱신

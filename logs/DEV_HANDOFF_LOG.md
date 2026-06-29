@@ -4685,7 +4685,14 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `npm run build` succeeded.
 - `git diff --check` succeeded with Windows line-ending warnings only.
 - Source checks confirmed the order product/date filters and buyer shipping-info block are present.
-- Authenticated admin order page and buyer billing page HTTP checks are planned after production deployment.
+- Production deployment succeeded on Vercel:
+  - `https://zezari-aezilq39c-zezari.vercel.app`
+  - `https://zezari.vercel.app` alias pointed to the new deployment.
+- Production HTTP checks returned 200:
+  - `/`
+  - `/admin?section=orders`
+  - `/account/billing`
+- Recent Vercel logs showed successful GET requests and no error entries.
 
 ### Time Spent
 - Order admin UI refresh, filter/data updates, buyer tracking display, CSS, and documentation: about 45 minutes.
