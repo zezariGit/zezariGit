@@ -96,3 +96,59 @@ Disabled buttons remain visible but cannot be clicked when the selected advertis
 
 ## Image Generation Prompt
 Create a clean Korean civic-tech admin UI diagram for "REAL_QR_FIND" advertisement management. Show a left admin sidebar, an advertisement daily-rate panel, a dense advertisement grid with columns "광고 번호, 관리대상, 보호자, 상태, 광고지역, 광고기간, 광고비, 클릭수", top action buttons "광고승인, 광고정지, 광고재개, 광고상세정보", and a right detail panel with Meta API placeholders for campaign ID, API status, and click count. Use white surfaces, civic blue accents, green advertising, amber paused, gray expired states, compact Korean labels, and no real personal data.
+
+## 2026-06-29 Update - Three-Tab Detail Card
+
+### Requirement
+- Rebuild the advertisement management menu to match the new reference image.
+- Add operations summary cards.
+- Add a three-tab detail card:
+  - `기본 정보`
+  - `광고 성과`
+  - `지출 내역`
+- Keep grid and detail content usable with horizontal and vertical scrolling.
+
+### Implemented Changes
+- Added top status cards:
+  - 진행 중
+  - 심사 대기
+  - 심사반려
+  - 중단
+  - 만료
+  - 월 광고비
+  - 년 광고비
+- Expanded search filters:
+  - 검색어
+  - 광고 상태
+  - 심사 상태
+  - 광고 지역
+  - 광고 기간
+- Expanded advertisement grid columns:
+  - 선택
+  - 광고 번호
+  - 대상자
+  - 광고상태
+  - 심사상태
+  - 광고지역
+  - 광고기간
+  - 일예산
+  - 총예산
+  - 광고비(%)
+  - 활성화 일시
+  - 관리
+- Added in-card detail tabs:
+  - 기본 정보: status, review state, budgets, region, period, Meta placeholders, creative preview, and admin memo
+  - 광고 성과: reach, impressions, clicks, CPC, CTR, spend, and contact count
+  - 지출 내역: spend date, campaign period, region, amount, payment method, and receipt/payment link
+- Added administrator advertisement memo storage in `subject_ads.admin_memo`.
+- Added future Meta reporting columns:
+  - `impression_count`
+  - `reach_count`
+  - `contact_count`
+  - `spent_amount`
+- Updated CSV export to include review status, budget, progress rate, and activation time.
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with Windows line-ending warnings only.
+- Turso `subject_ads` schema check and advertisement join query succeeded without printing secrets.

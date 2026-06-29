@@ -8,6 +8,7 @@ import { authOptions } from "../../lib/auth";
 import {
   generateQrCodes,
   isDbAdminSession,
+  setAdminSubjectAdMemo,
   setAdminSubjectAdStatus,
   setAdDailyRate,
   setGuardianActive,
@@ -217,6 +218,19 @@ export async function setAdminSubjectAdStatusAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=ads"), error.message || "광고 상태 변경에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin?section=ads"), messages[command] || "광고 상태가 수정되었습니다."));
+}
+
+export async function setAdminSubjectAdMemoAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  try {
+    await setAdminSubjectAdMemo(formData);
+    revalidatePath("/admin");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=ads"), error.message || "광고 메모 저장에 실패했습니다.", "error"));
+  }
+  redirect(withNotice(getReturnTo(formData, "/admin?section=ads"), "광고 메모가 저장되었습니다."));
 }
 
 function getReturnTo(formData, fallback) {

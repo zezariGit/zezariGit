@@ -38,6 +38,7 @@ import {
   setQrActiveAction,
   setQrLifecycleAction,
   setQrSubjectAction,
+  setAdminSubjectAdMemoAction,
   setAdminSubjectAdStatusAction,
   setSubscriptionAdminMemoAction,
   setSubscriptionPlanPriceAction,
@@ -136,6 +137,10 @@ export default async function AdminPage({ searchParams }) {
   const adFilters = {
     query: resolvedSearchParams?.adQuery || "",
     status: resolvedSearchParams?.adStatus || "all",
+    review: resolvedSearchParams?.adReview || "all",
+    region: resolvedSearchParams?.adRegion || "all",
+    startDate: resolvedSearchParams?.adStart || "",
+    endDate: resolvedSearchParams?.adEnd || "",
   };
   const missingFilters = {
     query: resolvedSearchParams?.missingQuery || "",
@@ -683,6 +688,20 @@ function dashboardIconPath(name) {
           <path d="M17 17 47 47" />
         </>
       );
+    case "time":
+      return (
+        <>
+          <circle cx="32" cy="32" r="23" />
+          <path d="M32 17v16l12 7" />
+        </>
+      );
+    case "check":
+      return (
+        <>
+          <circle cx="32" cy="32" r="23" />
+          <path d="M20 33.5 28.5 42 46 23" />
+        </>
+      );
     case "qr":
       return (
         <>
@@ -1226,73 +1245,112 @@ function OrderManagementSection({ ordersData }) {
 }
 
 function AdManagementSection({ adsData }) {
-  const { setting, ads, selectedAd, filters } = adsData;
-  const activeCount = ads.filter((ad) => ad.status === "active").length;
-  const pausedCount = ads.filter((ad) => ad.status === "paused").length;
-  const endedCount = ads.filter((ad) => ad.status === "ended").length;
+  const { setting, summary, regions, ads, selectedAd, selectedSpendHistory, filters } = adsData;
   const selectedAdReturnTo = buildAdListUrl(filters, selectedAd?.id);
+  const selectedTabName = selectedAd ? `ad-detail-tab-${selectedAd.id}` : "ad-detail-tab-empty";
+  const monthlyDelta = Number(summary.monthlyAmount || 0) - Number(summary.previousMonthlyAmount || 0);
+  const summaryCards = [
+    { label: "진행 중", value: `${formatMetricValue(summary.active)}건`, icon: "megaphone", note: "광고 집행" },
+    { label: "심사 대기", value: `${formatMetricValue(summary.reviewPending)}건`, icon: "time", note: "META 검토" },
+    { label: "심사반려", value: `${formatMetricValue(summary.reviewRejected)}건`, icon: "blocked", note: "확인 필요" },
+    { label: "중단", value: `${formatMetricValue(summary.paused)}건`, icon: "blocked", note: "일시정지" },
+    { label: "만료", value: `${formatMetricValue(summary.ended)}건`, icon: "check", note: "종료됨" },
+    { label: "월 광고비", value: formatCurrency(summary.monthlyAmount), icon: "money", note: `전월 대비 ${monthlyDelta >= 0 ? "+" : ""}${formatCurrency(monthlyDelta)}` },
+    { label: "년 광고비", value: formatCurrency(summary.yearlyAmount), icon: "money", note: "올해 누적" },
+  ];
 
   return (
-    <div className="qr-admin-stack">
-      <section className="admin-panel qr-create-panel">
+    <div className="ad-admin-page">
+      <section className="ad-admin-status" aria-label="광고 현황">
+        <h2>광고관리</h2>
+        <div className="ad-stat-grid">
+          {summaryCards.map((card) => (
+            <article className="guardian-stat-card ad-stat-card" key={card.label}>
+              <DashboardIcon name={card.icon} />
+              <div>
+                <h3>{card.label}</h3>
+                <strong>{card.value}</strong>
+                <span>{card.note}</span>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="admin-panel ad-rate-panel">
         <div>
-          <div className="panel-heading">
-            <h2>광고 일 단가</h2>
-            <span>{formatCurrency(setting.daily_rate)}</span>
-          </div>
-          <p className="empty-text">사용자가 선택한 광고기간 일수에 이 단가를 곱해 예상 금액을 산정합니다.</p>
+          <h3>광고 일 단가</h3>
+          <p>{formatCurrency(setting.daily_rate)} 기준으로 사용자가 선택한 광고기간 예상 금액을 산정합니다.</p>
         </div>
         <form className="ad-rate-form" action={setAdDailyRateAction}>
-          <input type="hidden" name="returnTo" value="/admin?section=ads" />
+          <input type="hidden" name="returnTo" value={selectedAdReturnTo} />
           <label>
             일 단가
             <input name="dailyRate" type="number" min="0" step="100" defaultValue={setting.daily_rate} />
           </label>
-          <FormSubmitButton pendingText="저장중">
-            저장
-          </FormSubmitButton>
+          <FormSubmitButton pendingText="저장중">저장</FormSubmitButton>
         </form>
-        <div className="qr-stats" aria-label="광고 상태 요약">
-          <span>전체 {ads.length}건</span>
-          <span>광고중 {activeCount}건</span>
-          <span>정지중 {pausedCount}건</span>
-          <span>만료 {endedCount}건</span>
-        </div>
+      </section>
+
+      <section className="admin-panel ad-search-panel">
+        <h3>조회</h3>
+        <form className="ad-search-form" action="/admin">
+          <input type="hidden" name="section" value="ads" />
+          <label>
+            검색어
+            <input name="adQuery" defaultValue={filters.query} placeholder="번호, 이름" />
+          </label>
+          <label>
+            광고 상태
+            <select name="adStatus" defaultValue={filters.status}>
+              <option value="all">전체</option>
+              <option value="active">진행중</option>
+              <option value="paused">중단</option>
+              <option value="ready">심사전</option>
+              <option value="ended">만료</option>
+              <option value="rejected">반려</option>
+            </select>
+          </label>
+          <label>
+            심사 상태
+            <select name="adReview" defaultValue={filters.review}>
+              <option value="all">전체</option>
+              <option value="pending">심사대기</option>
+              <option value="approved">승인완료</option>
+              <option value="rejected">심사반려</option>
+            </select>
+          </label>
+          <label>
+            광고 지역
+            <select name="adRegion" defaultValue={filters.region}>
+              <option value="all">전체</option>
+              {regions.map((region) => (
+                <option value={region} key={region}>{region}</option>
+              ))}
+            </select>
+          </label>
+          <div className="ad-date-filter">
+            <span>광고 기간</span>
+            <input type="date" name="adStart" defaultValue={filters.startDate} />
+            <em>~</em>
+            <input type="date" name="adEnd" defaultValue={filters.endDate} />
+          </div>
+          <div className="ad-search-actions">
+            <Link className="plain-button" href="/admin?section=ads">초기화</Link>
+            <button type="submit">검색</button>
+          </div>
+        </form>
       </section>
 
       <div className="admin-master-detail admin-ad-master-detail">
-        <section className="admin-panel admin-master-panel">
-          <div className="panel-heading">
-            <h2>광고 목록</h2>
+        <section className="admin-panel admin-master-panel ad-list-panel">
+          <div className="guardian-list-heading">
+            <h2>전체 광고 <strong>{formatMetricValue(summary.total)}</strong>건</h2>
             <div className="admin-heading-actions">
               <span>{ads.length}건 조회</span>
               <AdminExportButton filename="zezari-ads.csv" rows={adExportRows(ads)} />
             </div>
           </div>
-
-          <form className="admin-master-filter ad-master-filter" action="/admin">
-            <input type="hidden" name="section" value="ads" />
-            <label>
-              통합 검색
-              <input
-                name="adQuery"
-                defaultValue={filters.query}
-                placeholder="광고번호, 관리대상, 보호자, 연락처"
-              />
-            </label>
-            <label>
-              진행 상태
-              <select name="adStatus" defaultValue={filters.status}>
-                <option value="all">전체</option>
-                <option value="ready">승인대기</option>
-                <option value="active">광고중</option>
-                <option value="paused">정지중</option>
-                <option value="ended">만료</option>
-              </select>
-            </label>
-            <button type="submit">조회</button>
-            <Link className="plain-button" href="/admin?section=ads">초기화</Link>
-          </form>
 
           <div className="admin-ad-toolbar" aria-label="광고 관리 작업">
             <AdStatusActionButton
@@ -1331,14 +1389,18 @@ function AdManagementSection({ adsData }) {
           <div className="admin-record-table-wrap">
             <div className="admin-record-table ad-record-table" role="table" aria-label="광고 목록">
               <div className="admin-record-header" role="row">
+                <span role="columnheader">선택</span>
                 <span role="columnheader">광고 번호</span>
-                <span role="columnheader">관리대상</span>
-                <span role="columnheader">보호자</span>
-                <span role="columnheader">상태</span>
+                <span role="columnheader">대상자</span>
+                <span role="columnheader">광고상태</span>
+                <span role="columnheader">심사상태</span>
                 <span role="columnheader">광고지역</span>
                 <span role="columnheader">광고기간</span>
-                <span role="columnheader">광고비</span>
-                <span role="columnheader">클릭수</span>
+                <span role="columnheader">일예산</span>
+                <span role="columnheader">총예산</span>
+                <span role="columnheader">광고비(%)</span>
+                <span role="columnheader">활성화 일시</span>
+                <span role="columnheader">관리</span>
               </div>
               {ads.map((ad) => (
                 <Link
@@ -1347,70 +1409,144 @@ function AdManagementSection({ adsData }) {
                   key={ad.id}
                   role="row"
                 >
-                  <strong role="cell">{formatAdNumber(ad)}</strong>
+                  <span className="admin-row-selector" role="cell">{ad.id === selectedAd?.id ? "◎" : "□"}</span>
+                  <strong className="inline-scroll-value" role="cell">{formatAdNumber(ad)}</strong>
                   <span role="cell">{ad.subject_name || "관리대상 미입력"}</span>
-                  <span role="cell">{ad.guardian_name || ad.guardian_email || ad.guardian_google_email || "보호자 미입력"}</span>
                   <em role="cell" className={`ad-status-pill ${ad.status}`}>{adStatusLabel(ad.status)}</em>
+                  <em role="cell" className={`ad-review-pill ${adReviewClass(ad.review_status)}`}>{adReviewStatusLabel(ad.review_status)}</em>
                   <span role="cell">{ad.region || "지역 미입력"}</span>
                   <time role="cell">{formatDate(ad.start_date)} ~ {formatDate(ad.end_date)}</time>
+                  <span role="cell">{formatCurrency(ad.daily_rate)}</span>
                   <span role="cell">{formatCurrency(ad.amount)}</span>
-                  <span role="cell">{formatMetricValue(ad.click_count)}</span>
+                  <span role="cell">{adBudgetProgressPercent(ad)}%</span>
+                  <time role="cell">{formatRecentDateTime(ad.updated_at)}</time>
+                  <span className="admin-row-detail" role="cell">상세보기</span>
                 </Link>
               ))}
               {ads.length === 0 && <p className="empty-text">등록된 광고 진행사항이 없습니다.</p>}
             </div>
           </div>
+          <div className="guardian-list-footer">
+            <span>선택한 광고 {selectedAd ? "1건" : "0건"}</span>
+            <select defaultValue="10" aria-label="페이지당 표시 건수">
+              <option>10개씩 보기</option>
+            </select>
+          </div>
         </section>
 
-        <aside className="admin-panel admin-detail-panel admin-ad-detail-panel" id="admin-ad-detail">
+        <aside className="admin-panel guardian-detail-card ad-detail-card" id="admin-ad-detail">
           {selectedAd ? (
             <>
-              <div className="admin-detail-heading">
+              <div className="guardian-detail-header ad-detail-header">
+                <AdAvatar ad={selectedAd} />
                 <div>
-                  <span className="admin-detail-kicker">{formatAdNumber(selectedAd)}</span>
                   <h2>{selectedAd.subject_name || "관리대상 미입력"}</h2>
-                  <p>{selectedAd.guardian_name || selectedAd.guardian_email || selectedAd.guardian_google_email || "보호자 미입력"}</p>
+                  <span>{selectedAd.subject_gender ? `${selectedAd.subject_gender}, ` : ""}{formatAgeFromBirthDate(selectedAd.subject_birth_date)}</span>
+                  <span>보호자 {selectedAd.guardian_name || "보호자 미입력"}</span>
+                  <em className={`ad-status-pill ${selectedAd.status}`}>{adStatusLabel(selectedAd.status)}</em>
                 </div>
-                <em className={`ad-status-pill ${selectedAd.status}`}>{adStatusLabel(selectedAd.status)}</em>
               </div>
-
-              <section className="admin-detail-section">
-                <h3>광고 상세정보</h3>
-                <dl className="admin-detail-list">
-                  <div><dt>광고지역</dt><dd>{selectedAd.region || "-"}</dd></div>
-                  <div><dt>광고기간</dt><dd>{formatDate(selectedAd.start_date)} ~ {formatDate(selectedAd.end_date)}</dd></div>
-                  <div><dt>집행일수</dt><dd>{Number(selectedAd.days || 0).toLocaleString("ko-KR")}일</dd></div>
-                  <div><dt>광고비</dt><dd>{formatCurrency(selectedAd.amount)}</dd></div>
-                  <div><dt>일 단가</dt><dd>{formatCurrency(selectedAd.daily_rate)}</dd></div>
-                  <div><dt>클릭수</dt><dd>{formatMetricValue(selectedAd.click_count)}</dd></div>
-                </dl>
-              </section>
-
-              <section className="admin-detail-section">
-                <h3>연결 정보</h3>
-                <dl className="admin-detail-list">
-                  <div><dt>관리대상</dt><dd><Link href={`/admin?section=subjects&subject=${encodeURIComponent(selectedAd.subject_id)}`}>{selectedAd.subject_name || "대상자 보기"}</Link></dd></div>
-                  <div><dt>대상자 상태</dt><dd>{statusLabel(selectedAd.subject_status)}</dd></div>
-                  <div><dt>보호자</dt><dd><Link href={`/admin?section=guardians&guardian=${encodeURIComponent(selectedAd.guardian_id)}`}>{selectedAd.guardian_name || "보호자 보기"}</Link></dd></div>
-                  <div><dt>보호자 연락처</dt><dd>{selectedAd.guardian_phone || "-"}</dd></div>
-                </dl>
-              </section>
-
-              <section className="admin-detail-section">
-                <h3>Meta 연동 준비 정보</h3>
-                <dl className="admin-detail-list">
-                  <div><dt>캠페인 ID</dt><dd>{selectedAd.meta_campaign_id || "미연동"}</dd></div>
-                  <div><dt>Meta 상태</dt><dd>{selectedAd.meta_status || "연동 대기"}</dd></div>
-                  <div><dt>등록일시</dt><dd>{formatRecentDateTime(selectedAd.created_at)}</dd></div>
-                  <div><dt>수정일시</dt><dd>{formatRecentDateTime(selectedAd.updated_at)}</dd></div>
-                </dl>
-              </section>
+              <div className="guardian-detail-tabset ad-detail-tabset">
+                <input className="guardian-tab-radio" type="radio" name={selectedTabName} id={`${selectedTabName}-base`} defaultChecked />
+                <input className="guardian-tab-radio" type="radio" name={selectedTabName} id={`${selectedTabName}-performance`} />
+                <input className="guardian-tab-radio" type="radio" name={selectedTabName} id={`${selectedTabName}-spend`} />
+                <div className="guardian-detail-tabs">
+                  <label htmlFor={`${selectedTabName}-base`}>기본 정보</label>
+                  <label htmlFor={`${selectedTabName}-performance`}>광고 성과</label>
+                  <label htmlFor={`${selectedTabName}-spend`}>지출 내역</label>
+                </div>
+                <div className="guardian-tab-panels">
+                  <section className="guardian-tab-panel">
+                    <dl className="guardian-detail-list">
+                      <div><dt>광고상태</dt><dd>{adStatusLabel(selectedAd.status)}</dd></div>
+                      <div><dt>심사상태</dt><dd>{adReviewStatusLabel(selectedAd.review_status)}</dd></div>
+                      <div><dt>일예산</dt><dd>{formatCurrency(selectedAd.daily_rate)}</dd></div>
+                      <div><dt>총예산(%)</dt><dd>{formatCurrency(selectedAd.amount)} ({adBudgetProgressPercent(selectedAd)}% 소진)</dd></div>
+                      <div><dt>광고지역</dt><dd>{selectedAd.region || "-"}</dd></div>
+                      <div><dt>광고기간</dt><dd>{formatDate(selectedAd.start_date)} ~ {formatDate(selectedAd.end_date)}</dd></div>
+                      <div><dt>활성화 일시</dt><dd>{formatRecentDateTime(selectedAd.updated_at)}</dd></div>
+                      <div><dt>캠페인 ID</dt><dd className="inline-scroll-value">{selectedAd.meta_campaign_id || "미연동"}</dd></div>
+                      <div><dt>Meta 상태</dt><dd>{selectedAd.meta_status || "연동 대기"}</dd></div>
+                    </dl>
+                    <div className="ad-creative-row">
+                      <strong>광고 소재</strong>
+                      <AdCreativePreview ad={selectedAd} />
+                    </div>
+                    <form className="ad-memo-form" action={setAdminSubjectAdMemoAction}>
+                      <input type="hidden" name="adId" value={selectedAd.id} />
+                      <input type="hidden" name="returnTo" value={selectedAdReturnTo} />
+                      <label>
+                        메모
+                        <textarea name="adminMemo" maxLength="2000" defaultValue={selectedAd.admin_memo || ""} placeholder="광고 운영 메모" />
+                      </label>
+                      <FormSubmitButton className="plain-button compact" pendingText="저장중">수정</FormSubmitButton>
+                    </form>
+                  </section>
+                  <section className="guardian-tab-panel">
+                    <dl className="guardian-detail-list">
+                      <div><dt>도달수</dt><dd>{formatMetricValue(selectedAd.display_reach_count)}</dd></div>
+                      <div><dt>노출수</dt><dd>{formatMetricValue(selectedAd.display_impression_count)}</dd></div>
+                      <div><dt>클릭수</dt><dd>{formatMetricValue(selectedAd.click_count)}</dd></div>
+                      <div><dt>클릭비용</dt><dd>{formatCurrency(calculateAdClickCost(selectedAd))}</dd></div>
+                      <div><dt>CTR</dt><dd>{formatPercent(calculateAdCtr(selectedAd))}</dd></div>
+                      <div><dt>지출금액</dt><dd>{formatCurrency(displayAdSpentAmount(selectedAd))}</dd></div>
+                      <div><dt>연락 수</dt><dd>{formatMetricValue(selectedAd.display_contact_count)}</dd></div>
+                    </dl>
+                  </section>
+                  <section className="guardian-tab-panel">
+                    <div className="admin-record-table-wrap ad-spend-table-wrap">
+                      <div className="admin-record-table ad-spend-table" role="table" aria-label="광고 지출 내역">
+                        <div className="admin-record-header" role="row">
+                          <span role="columnheader">지출일시</span>
+                          <span role="columnheader">광고기간</span>
+                          <span role="columnheader">광고지역</span>
+                          <span role="columnheader">광고금액</span>
+                          <span role="columnheader">결제수단</span>
+                          <span role="columnheader">영수증</span>
+                        </div>
+                        {selectedSpendHistory.map((item) => (
+                          <div className="admin-record-row" role="row" key={item.id}>
+                            <time role="cell">{formatRecentDateTime(item.created_at)}</time>
+                            <span role="cell">{formatDate(item.start_date)} ~ {formatDate(item.end_date)}</span>
+                            <span role="cell">{item.region || "-"}</span>
+                            <span role="cell">{formatCurrency(item.amount)}</span>
+                            <span role="cell">광고 결제 준비</span>
+                            <Link role="cell" href={`/admin?section=payments&paymentLedgerQuery=${encodeURIComponent(formatAdNumber(item))}`}>다음</Link>
+                          </div>
+                        ))}
+                        {selectedSpendHistory.length === 0 && <p className="empty-text">지출 내역이 없습니다.</p>}
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              </div>
             </>
           ) : (
             <p className="empty-text">광고를 선택해 주세요.</p>
           )}
         </aside>
       </div>
+    </div>
+  );
+}
+
+function AdAvatar({ ad }) {
+  if (ad?.subject_photo_data_url) {
+    return <img className="subject-detail-avatar ad-detail-avatar" src={ad.subject_photo_data_url} alt={`${ad.subject_name || "관리대상"} 사진`} />;
+  }
+  return (
+    <span className="subject-detail-avatar ad-detail-avatar" aria-hidden="true">
+      <span>{String(ad?.subject_name || "대").slice(0, 1)}</span>
+    </span>
+  );
+}
+
+function AdCreativePreview({ ad }) {
+  return (
+    <div className="ad-creative-preview">
+      <strong>실종자 발견제보</strong>
+      <span>{ad.subject_name || "관리대상"}</span>
+      <small>{ad.region || "광고지역 미입력"}</small>
     </div>
   );
 }
@@ -3040,11 +3176,15 @@ function adExportRows(ads = []) {
     광고번호: formatAdNumber(ad),
     관리대상: ad.subject_name || "관리대상 미입력",
     보호자: ad.guardian_name || ad.guardian_email || ad.guardian_google_email || "보호자 미입력",
-    상태: adStatusLabel(ad.status),
+    광고상태: adStatusLabel(ad.status),
+    심사상태: adReviewStatusLabel(ad.review_status),
     광고지역: ad.region || "지역 미입력",
     광고기간: `${formatDate(ad.start_date)} ~ ${formatDate(ad.end_date)}`,
-    광고비: formatCurrency(ad.amount),
+    일예산: formatCurrency(ad.daily_rate),
+    총예산: formatCurrency(ad.amount),
+    광고비소진율: `${adBudgetProgressPercent(ad)}%`,
     클릭수: formatMetricValue(ad.click_count),
+    활성화일시: formatRecentDateTime(ad.updated_at),
     등록일: formatRecentDateTime(ad.created_at),
   }));
 }
@@ -3489,6 +3629,10 @@ function buildAdListUrl(filters, adId = "") {
   const params = new URLSearchParams({ section: "ads" });
   if (filters?.query) params.set("adQuery", filters.query);
   if (filters?.status && filters.status !== "all") params.set("adStatus", filters.status);
+  if (filters?.review && filters.review !== "all") params.set("adReview", filters.review);
+  if (filters?.region && filters.region !== "all") params.set("adRegion", filters.region);
+  if (filters?.startDate) params.set("adStart", filters.startDate);
+  if (filters?.endDate) params.set("adEnd", filters.endDate);
   if (adId) params.set("ad", adId);
   return `/admin?${params.toString()}`;
 }
@@ -3593,11 +3737,65 @@ function missingFoundClass(report) {
 }
 
 function adStatusLabel(status) {
-  if (status === "active") return "광고중";
-  if (status === "paused") return "정지중";
-  if (status === "ready") return "승인대기";
+  if (status === "active") return "진행중";
+  if (status === "paused") return "중단";
+  if (status === "ready") return "심사전";
   if (status === "ended") return "만료";
+  if (status === "rejected") return "반려";
   return "연동 대기";
+}
+
+function adReviewStatusLabel(status) {
+  if (status === "pending") return "심사대기";
+  if (status === "rejected") return "심사반려";
+  if (status === "approved") return "승인완료";
+  return "확인중";
+}
+
+function adReviewClass(status) {
+  if (status === "pending") return "pending";
+  if (status === "rejected") return "rejected";
+  if (status === "approved") return "approved";
+  return "none";
+}
+
+function displayAdSpentAmount(ad) {
+  const spent = Number(ad?.display_spent_amount || ad?.spent_amount || 0);
+  return spent > 0 ? spent : Number(ad?.amount || 0);
+}
+
+function adBudgetProgressPercent(ad) {
+  const amount = Number(ad?.amount || 0);
+  if (amount <= 0) return 0;
+  const spent = Number(ad?.display_spent_amount || ad?.spent_amount || 0);
+  if (spent > 0) return Math.max(0, Math.min(100, Math.round((spent / amount) * 100)));
+  if (ad?.status === "ended") return 100;
+
+  const start = new Date(ad?.start_date);
+  const end = new Date(ad?.end_date);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end <= start) return 0;
+  const now = new Date();
+  if (now <= start) return 0;
+  if (now >= end) return 100;
+  return Math.max(0, Math.min(100, Math.round(((now - start) / (end - start)) * 100)));
+}
+
+function calculateAdClickCost(ad) {
+  const clicks = Number(ad?.click_count || 0);
+  if (clicks <= 0) return 0;
+  return Math.round(displayAdSpentAmount(ad) / clicks);
+}
+
+function calculateAdCtr(ad) {
+  const impressions = Number(ad?.display_impression_count || ad?.impression_count || 0);
+  const clicks = Number(ad?.click_count || 0);
+  if (impressions <= 0 || clicks <= 0) return 0;
+  return (clicks / impressions) * 100;
+}
+
+function formatPercent(value) {
+  const number = Number(value || 0);
+  return `${number.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}%`;
 }
 
 function isBaseAdminUser(user) {

@@ -1554,12 +1554,114 @@ a {
   font-size: 0.9rem;
 }
 
-.admin-master-detail.admin-ad-master-detail {
-  grid-template-columns: minmax(0, 1.7fr) minmax(340px, 0.82fr);
+.ad-admin-page {
+  display: grid;
+  gap: var(--space-lg);
 }
 
-.admin-master-filter.ad-master-filter {
-  grid-template-columns: minmax(240px, 1fr) 160px auto auto;
+.ad-admin-status {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.ad-admin-status h2,
+.ad-search-panel h3,
+.ad-rate-panel h3 {
+  margin: 0;
+  color: #111111;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.ad-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(118px, 1fr));
+  gap: var(--space-sm);
+}
+
+.ad-stat-card {
+  min-height: 100px;
+}
+
+.ad-stat-card span {
+  display: block;
+  margin-top: 3px;
+  color: var(--c-text-muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.ad-rate-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+  gap: var(--space-md);
+  align-items: end;
+}
+
+.ad-rate-panel p {
+  margin: 6px 0 0;
+  color: var(--c-text-muted);
+  font-size: 0.85rem;
+}
+
+.ad-search-panel {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.ad-search-form {
+  display: grid;
+  grid-template-columns: minmax(160px, 1.1fr) repeat(3, minmax(118px, 0.75fr)) minmax(260px, 1.3fr) auto;
+  gap: var(--space-sm);
+  align-items: end;
+}
+
+.ad-search-form label,
+.ad-date-filter {
+  display: grid;
+  gap: 5px;
+  color: #111111;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.ad-date-filter {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.ad-date-filter span {
+  grid-column: 1 / -1;
+}
+
+.ad-date-filter em {
+  color: var(--c-text-muted);
+  font-style: normal;
+}
+
+.ad-search-actions {
+  display: flex;
+  gap: var(--space-xs);
+  justify-content: flex-end;
+}
+
+.ad-search-actions button,
+.ad-search-actions a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-md);
+  white-space: nowrap;
+}
+
+.admin-master-detail.admin-ad-master-detail {
+  grid-template-columns: minmax(0, 1.7fr) minmax(360px, 0.86fr);
+  align-items: start;
+}
+
+.ad-list-panel {
+  min-width: 0;
 }
 
 .admin-ad-toolbar {
@@ -1599,12 +1701,12 @@ a {
 }
 
 .ad-record-table {
-  min-width: 980px;
+  min-width: 1380px;
 }
 
 .ad-record-table .admin-record-header,
 .ad-record-table .admin-record-row {
-  grid-template-columns: 128px minmax(108px, 0.9fr) minmax(118px, 1fr) 82px minmax(104px, 0.9fr) 150px 88px 64px;
+  grid-template-columns: 34px 132px minmax(104px, 0.85fr) 78px 82px minmax(112px, 0.9fr) 154px 76px 82px 72px 126px 72px;
 }
 
 .ad-record-table .admin-record-row {
@@ -1625,6 +1727,158 @@ a {
 
 .admin-ad-detail-panel .admin-detail-heading .ad-status-pill {
   flex: 0 0 auto;
+}
+
+.ad-detail-card {
+  max-height: calc(100vh - 120px);
+  overflow: auto;
+}
+
+.ad-detail-header {
+  grid-template-columns: 72px minmax(0, 1fr);
+}
+
+.ad-detail-header > div:last-child {
+  position: relative;
+  padding-right: 74px;
+}
+
+.ad-detail-header .ad-status-pill {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.ad-detail-avatar {
+  width: 62px;
+  height: 62px;
+}
+
+.ad-detail-card .guardian-tab-panel {
+  height: 510px;
+  overflow: auto;
+  min-width: 0;
+}
+
+.ad-detail-card .guardian-tab-panels {
+  min-height: 470px;
+}
+
+.ad-review-pill {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.ad-review-pill.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.ad-review-pill.approved {
+  background: var(--c-success-bg);
+  color: var(--c-success);
+}
+
+.ad-review-pill.rejected {
+  background: var(--c-danger-bg);
+  color: var(--c-danger);
+}
+
+.ad-creative-row {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: var(--space-sm);
+  align-items: start;
+  margin-top: var(--space-md);
+}
+
+.ad-creative-row > strong {
+  color: #111111;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.ad-creative-preview {
+  width: 120px;
+  min-height: 90px;
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  padding: 10px;
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.48)),
+    linear-gradient(145deg, #fff3c4, #ff6b6b 55%, #1d4ed8);
+  color: #111111;
+  box-shadow: var(--shadow-soft);
+}
+
+.ad-creative-preview strong,
+.ad-creative-preview span,
+.ad-creative-preview small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ad-creative-preview strong {
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.ad-creative-preview span {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.ad-creative-preview small {
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.ad-memo-form {
+  display: grid;
+  justify-items: end;
+  gap: var(--space-xs);
+  margin-top: var(--space-md);
+}
+
+.ad-memo-form label {
+  width: 100%;
+  display: grid;
+  gap: 5px;
+  color: #111111;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.ad-memo-form textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.ad-spend-table-wrap {
+  max-width: 100%;
+  overflow: auto;
+}
+
+.ad-spend-table {
+  min-width: 720px;
+}
+
+.ad-spend-table .admin-record-header,
+.ad-spend-table .admin-record-row {
+  grid-template-columns: 132px 180px 140px 96px 120px 70px;
 }
 
 .admin-master-filter.missing-report-filter {
@@ -5180,6 +5434,15 @@ a.inline-scroll-value {
 
   .admin-master-detail.admin-ad-master-detail {
     grid-template-columns: 1fr;
+  }
+
+  .ad-stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ad-rate-panel,
+  .ad-search-form {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .admin-master-detail.admin-location-master-detail {
@@ -8963,17 +9226,23 @@ button:disabled:hover {
   .subscription-stat-grid,
   .subscription-search-form,
   .subscription-date-filter,
+  .ad-stat-grid,
+  .ad-rate-panel,
+  .ad-search-form,
+  .ad-date-filter,
   .account-shipping-info {
     grid-template-columns: 1fr;
   }
 
   .order-date-filter em,
-  .subscription-date-filter em {
+  .subscription-date-filter em,
+  .ad-date-filter em {
     display: none;
   }
 
   .order-search-actions,
-  .subscription-search-actions {
+  .subscription-search-actions,
+  .ad-search-actions {
     display: grid;
     grid-template-columns: 1fr;
   }
@@ -8981,7 +9250,9 @@ button:disabled:hover {
   .order-search-actions button,
   .order-search-actions a,
   .subscription-search-actions button,
-  .subscription-search-actions a {
+  .subscription-search-actions a,
+  .ad-search-actions button,
+  .ad-search-actions a {
     width: 100%;
   }
 

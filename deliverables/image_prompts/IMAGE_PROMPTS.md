@@ -244,3 +244,14 @@ Create a Korean SaaS admin console UI mockup for "REAL_QR_FIND" subscription man
 
 ### Notes
 - Use when presenting the subscription operations screen and why long payment histories stay inside a fixed detail-card area.
+
+## 2026-06-29 - Admin Advertisement Detail Tabs
+
+### Purpose
+- Presentation visual for the redesigned administrator advertisement-management screen with three detail tabs.
+
+### Prompt
+Create a Korean SaaS admin console UI mockup for "REAL_QR_FIND" advertisement management. Show a dark navy left admin sidebar with "광고 관리" selected and a white operations workspace. At the top, show seven thick-border status cards titled "진행 중", "심사 대기", "심사반려", "중단", "만료", "월 광고비", and "년 광고비" with bold black icons and compact count or currency values. Below, show a search panel with fields "검색어", "광고 상태", "심사 상태", "광고 지역", and "광고 기간" date range, plus "초기화" and purple "검색" buttons. The main area is split into a wide dense grid and a right detail card. The grid columns are "선택, 광고 번호, 대상자, 광고상태, 심사상태, 광고지역, 광고기간, 일예산, 총예산, 광고비(%), 활성화 일시, 관리". The right detail card has in-card tabs "기본 정보", "광고 성과", and "지출 내역"; show one visible tab with ad status, review state, budget, creative preview, and memo; another with reach, impressions, clicks, CPC, CTR, spend, and contacts; and another with a compact spend-history table. Include subtle vertical and horizontal scroll indicators inside the grid and detail card. Use the existing REAL_QR_FIND admin style: white panels, thin gray grid lines, restrained purple actions, black headings, compact Korean labels, and no real personal data.
+
+### Notes
+- Use when explaining future Meta Ads API integration and why advertisement performance/spend fields are already reserved.

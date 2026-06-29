@@ -4755,3 +4755,57 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Subscription admin UI rebuild, data query work, schema extension, CSS, documentation, and local verification: about 55 minutes.
+
+## 2026-06-29 KST - Admin Advertisement Detail Tabs Rebuild
+
+### User Request
+- Rebuild the administrator advertisement-management menu based on the provided reference.
+- The detail card should contain three tabs and handle the content cleanly.
+
+### Reflected Work
+- Rebuilt `/admin?section=ads` into an operations-style layout:
+  - top advertisement status and spend cards
+  - search panel
+  - dense advertisement grid
+  - right detail card with in-card tabs
+- Added advertisement summary cards:
+  - active
+  - review pending
+  - review rejected
+  - paused
+  - ended
+  - monthly advertisement cost
+  - yearly advertisement cost
+- Expanded advertisement filters:
+  - query
+  - advertisement status
+  - review status
+  - region
+  - campaign date range
+- Expanded grid columns to include review status, daily budget, total budget, budget progress, activation time, and selected-row control.
+- Added detail tabs:
+  - `기본 정보`: campaign status, review state, budget, region, period, Meta placeholders, creative preview, and admin memo
+  - `광고 성과`: reach, impressions, clicks, CPC, CTR, spend, contact count
+  - `지출 내역`: campaign spend row with payment-ledger link
+- Added `subject_ads.admin_memo`, `impression_count`, `reach_count`, `contact_count`, and `spent_amount` as Meta API-ready fields.
+- Added admin advertisement memo save action.
+- Updated advertisement CSV export and documentation.
+
+### Files Changed
+- `lib/db.js`
+- `app/admin/page.js`
+- `app/admin/actions.js`
+- `app/globals.css`
+- `deliverables/ADMIN_AD_GRID_MANAGEMENT.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with Windows line-ending warnings only.
+- Turso `subject_ads` schema check succeeded.
+- Turso advertisement summary and guardian/subject join query succeeded without printing secrets.
+
+### Time Spent
+- Advertisement admin UI rebuild, schema extension, action wiring, CSS, documentation, and local verification: about 60 minutes.
