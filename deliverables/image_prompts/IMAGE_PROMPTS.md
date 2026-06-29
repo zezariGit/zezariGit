@@ -266,3 +266,14 @@ Create a Korean SaaS admin console UI mockup for "REAL_QR_FIND" payment manageme
 
 ### Notes
 - Use when explaining that administrator refund handling is recorded internally first, while live Toss cancellation can be connected later after production policy approval.
+
+## 2026-06-30 - Admin Coupon Management
+
+### Purpose
+- Presentation visual for the administrator coupon-management screen and coupon issue settings.
+
+### Prompt
+Create a Korean SaaS admin console UI mockup for "REAL_QR_FIND" coupon management. Show a dark navy left admin sidebar with "쿠폰 관리" selected and a white operations workspace. At the top, show a search panel titled "조회" with fields "검색어", "할인 유형", and "상태", plus "초기화" and purple "검색" buttons. The main area is split into a wide dense grid and a right detail card. The grid columns are "선택, 쿠폰번호, 쿠폰 코드, 할인 유형, 할인 금액, 할인 내용, 유효 기간, 발행 수, 사용 수, 상태, 관리" with colored cells for 정률, 정액, 가능, 불가능. Below the grid, show pagination controls and a purple "+ 새 쿠폰" button. The right detail card is titled "쿠폰 수정" and contains compact form sections: 기본 설정 with random/direct coupon code, discount type, discount value, description, valid date range; 발행 설정 with minimum amount, maximum amount, service scope, issue quantity, per-user limit, memo; 상태 설정 with use possible/use impossible radio buttons; and a purple 저장 button. Use the existing REAL_QR_FIND admin style: white panels, thin gray grid lines, restrained purple actions, black headings, compact Korean labels, and no real personal data.
+
+### Notes
+- Use when explaining coupon master data, issue limits, and how the user coupon box validates against administrator-created coupons.

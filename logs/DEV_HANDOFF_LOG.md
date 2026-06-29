@@ -4862,3 +4862,58 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Payment admin UI rebuild, refund-record schema/action wiring, CSS, documentation, and local verification: about 55 minutes.
+
+## 2026-06-30 KST - Admin Coupon Management
+
+### User Request
+- Add an administrator coupon-management menu and screen based on the provided reference image.
+
+### Reflected Work
+- Added `쿠폰 관리` to the administrator left navigation.
+- Added `/admin?section=coupons` with:
+  - search panel for query, discount type, and status
+  - dense coupon grid
+  - right coupon registration/edit card
+  - `+ 새 쿠폰` entry flow
+  - CSV export
+- Added administrator coupon fields:
+  - coupon number
+  - coupon code
+  - code mode: random generation or manual input
+  - discount type: percent or fixed amount
+  - discount value
+  - description
+  - validity period
+  - minimum order amount
+  - maximum discount amount
+  - service scope
+  - issue quantity
+  - per-user limit
+  - admin memo
+  - status
+- Added `coupons` table and `guardian_coupons.coupon_id`.
+- Updated user coupon registration so `/account/coupons` validates coupon codes against the administrator coupon ledger before inserting `guardian_coupons`.
+- Added issue-limit, active-status, and validity-date checks.
+- Added `deliverables/ADMIN_COUPON_MANAGEMENT.md`.
+- Added a presentation image prompt for the coupon-management screen.
+
+### Files Changed
+- `lib/db.js`
+- `app/admin/page.js`
+- `app/admin/actions.js`
+- `app/admin/admin-workspace.js`
+- `app/globals.css`
+- `deliverables/ADMIN_COUPON_MANAGEMENT.md`
+- `deliverables/README.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with Windows line-ending warnings only.
+- Turso `coupons` schema check succeeded.
+- Turso `guardian_coupons.coupon_id` schema check succeeded.
+
+### Time Spent
+- Coupon admin UI, schema, registration validation, CSS, documentation, and local verification: about 50 minutes.

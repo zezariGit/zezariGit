@@ -8323,6 +8323,222 @@ button:disabled:hover {
   gap: var(--space-md);
 }
 
+.coupon-admin-page {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.coupon-search-panel {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.coupon-search-panel h2 {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.coupon-search-form {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(130px, 0.45fr) minmax(130px, 0.45fr) auto;
+  gap: var(--space-sm);
+  align-items: end;
+}
+
+.coupon-search-form label {
+  display: grid;
+  gap: 5px;
+  color: var(--c-text);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.coupon-search-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+}
+
+.coupon-search-actions button,
+.coupon-search-actions a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-md);
+  white-space: nowrap;
+}
+
+.coupon-admin-layout {
+  grid-template-columns: minmax(0, 1.55fr) minmax(330px, 0.75fr);
+  align-items: start;
+}
+
+.coupon-list-panel {
+  position: relative;
+  min-height: 560px;
+}
+
+.coupon-record-table {
+  min-width: 1120px;
+}
+
+.coupon-record-table .admin-record-header,
+.coupon-record-table .admin-record-row {
+  grid-template-columns: 34px 96px 118px 72px 78px minmax(120px, 1fr) 130px 70px 58px 70px 70px;
+}
+
+.coupon-record-table .admin-record-row {
+  min-height: 38px;
+}
+
+.coupon-record-table .admin-record-row > strong,
+.coupon-record-table .admin-record-row > span,
+.coupon-record-table .admin-record-row > time,
+.coupon-record-table .admin-record-row > a {
+  font-size: 11px;
+}
+
+.coupon-type-chip,
+.coupon-status-chip {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 9px;
+  border-radius: 0;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.coupon-type-chip.percent {
+  background: #fde68a;
+  color: #111111;
+}
+
+.coupon-type-chip.fixed {
+  background: #93c5fd;
+  color: #111111;
+}
+
+.coupon-status-chip.active {
+  background: #a7f36d;
+  color: #111111;
+}
+
+.coupon-status-chip.inactive {
+  background: #e57d7d;
+  color: #111111;
+}
+
+.coupon-table-footer {
+  margin-top: var(--space-sm);
+}
+
+.coupon-create-action {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-sm);
+}
+
+.coupon-create-action a {
+  min-width: 150px;
+}
+
+.coupon-detail-panel {
+  max-height: calc(100vh - 120px);
+  overflow: auto;
+}
+
+.coupon-detail-panel h2 {
+  margin: 0 0 var(--space-md);
+  color: var(--c-text);
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.coupon-detail-form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.coupon-detail-form section {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.coupon-detail-form h3 {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 0.88rem;
+  font-weight: 900;
+}
+
+.coupon-detail-form label,
+.coupon-code-mode {
+  display: grid;
+  gap: 5px;
+  color: var(--c-text);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.coupon-code-mode {
+  grid-template-columns: repeat(2, minmax(0, auto));
+  align-items: center;
+  justify-content: end;
+  border: 0;
+  padding: 0;
+}
+
+.coupon-code-mode legend {
+  grid-column: 1 / -1;
+  color: var(--c-text);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.coupon-code-mode label,
+.coupon-status-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.coupon-date-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: var(--space-xs);
+  align-items: end;
+}
+
+.coupon-date-pair span {
+  align-self: center;
+  color: var(--c-text-muted);
+}
+
+.coupon-status-options {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .order-detail-panel .admin-detail-heading span,
 .order-detail-panel .admin-detail-heading time {
   color: var(--c-text-muted);
@@ -9494,6 +9710,7 @@ button:disabled:hover {
   .payment-stat-grid,
   .payment-search-form,
   .payment-date-filter,
+  .coupon-search-form,
   .subscription-stat-grid,
   .subscription-search-form,
   .subscription-date-filter,
@@ -9514,6 +9731,7 @@ button:disabled:hover {
 
   .order-search-actions,
   .payment-search-actions,
+  .coupon-search-actions,
   .subscription-search-actions,
   .ad-search-actions {
     display: grid;
@@ -9524,6 +9742,8 @@ button:disabled:hover {
   .order-search-actions a,
   .payment-search-actions button,
   .payment-search-actions a,
+  .coupon-search-actions button,
+  .coupon-search-actions a,
   .subscription-search-actions button,
   .subscription-search-actions a,
   .ad-search-actions button,

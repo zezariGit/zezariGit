@@ -9,6 +9,7 @@ import {
   generateQrCodes,
   createAdminPaymentRefund,
   isDbAdminSession,
+  saveAdminCoupon,
   setAdminSubjectAdMemo,
   setAdminSubjectAdStatus,
   setAdDailyRate,
@@ -158,6 +159,20 @@ export async function createAdminPaymentRefundAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=payments"), error.message || "취소/환불 처리에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin?section=payments"), "취소/환불이 접수되었습니다."));
+}
+
+export async function saveAdminCouponAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  try {
+    await saveAdminCoupon(formData);
+    revalidatePath("/admin");
+    revalidatePath("/account/coupons");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=coupons"), error.message || "쿠폰 저장에 실패했습니다.", "error"));
+  }
+  redirect(withNotice(getReturnTo(formData, "/admin?section=coupons"), "쿠폰 정보가 저장되었습니다."));
 }
 
 export async function setSubscriptionAdminMemoAction(formData) {

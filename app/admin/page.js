@@ -11,6 +11,7 @@ import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
 import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
 import {
   getAdminAdsData,
+  getAdminCouponsData,
   getAdminDashboardData,
   getAdminData,
   getAdminInquiriesData,
@@ -41,6 +42,7 @@ import {
   setAdminSubjectAdMemoAction,
   setAdminSubjectAdStatusAction,
   createAdminPaymentRefundAction,
+  saveAdminCouponAction,
   setSubscriptionAdminMemoAction,
   setSubscriptionPlanPriceAction,
 } from "./actions";
@@ -79,7 +81,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "products", "orders", "subscriptions", "ads", "missing", "locations", "inquiries"].includes(resolvedSearchParams?.section)
+  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "orders", "subscriptions", "ads", "missing", "locations", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -127,6 +129,11 @@ export default async function AdminPage({ searchParams }) {
     startDate: resolvedSearchParams?.paymentStart || "",
     endDate: resolvedSearchParams?.paymentEnd || "",
   };
+  const couponFilters = {
+    query: resolvedSearchParams?.couponQuery || "",
+    discountType: resolvedSearchParams?.couponDiscountType || "all",
+    status: resolvedSearchParams?.couponStatus || "all",
+  };
   const subscriptionFilters = {
     query: resolvedSearchParams?.subscriptionQuery || "",
     plan: resolvedSearchParams?.subscriptionPlan || "all",
@@ -137,6 +144,7 @@ export default async function AdminPage({ searchParams }) {
   };
   const selectedOrderId = resolvedSearchParams?.order || "";
   const selectedPaymentId = resolvedSearchParams?.paymentRecord || "";
+  const selectedCouponId = resolvedSearchParams?.coupon || "";
   const selectedSubscriptionId = resolvedSearchParams?.subscription || "";
   const selectedAdId = resolvedSearchParams?.ad || "";
   const adFilters = {
@@ -171,6 +179,7 @@ export default async function AdminPage({ searchParams }) {
         ...(await getAdminPaymentsData(paymentFilters, selectedPaymentId)),
       }
     : null;
+  const couponsData = activeSection === "coupons" ? await getAdminCouponsData(couponFilters, selectedCouponId) : null;
   const productsData = activeSection === "products" ? await getAdminProductsData() : null;
   const ordersData = activeSection === "orders" ? await getAdminOrdersData(orderFilters, selectedOrderId) : null;
   const subscriptionsData = activeSection === "subscriptions" ? await getAdminSubscriptionsData(subscriptionFilters, selectedSubscriptionId) : null;
@@ -200,6 +209,8 @@ export default async function AdminPage({ searchParams }) {
         ? "관리자 관리"
         : activeSection === "payments"
           ? "결제 관리"
+          : activeSection === "coupons"
+            ? "쿠폰 관리"
           : activeSection === "products"
             ? "상품 관리"
             : activeSection === "orders"
@@ -226,6 +237,8 @@ export default async function AdminPage({ searchParams }) {
         ? "가입된 보호자 사용자에게 관리자 역할을 부여하거나 회수합니다."
         : activeSection === "payments"
           ? "결제내역을 조회하고 선불 이용권의 기간과 가격을 관리합니다."
+          : activeSection === "coupons"
+            ? "쿠폰 코드를 발행하고 할인 조건, 유효기간, 사용 가능 상태를 관리합니다."
           : activeSection === "products"
             ? "사용자 상품 선택 화면에 노출되는 상품 이미지, 가격, 활성 상태를 관리합니다."
             : activeSection === "orders"
@@ -264,6 +277,8 @@ export default async function AdminPage({ searchParams }) {
             <AdminRoleManagementSection adminUsersData={adminUsersData} />
           ) : activeSection === "payments" ? (
             <PaymentManagementSection paymentData={paymentData} />
+          ) : activeSection === "coupons" ? (
+            <CouponManagementSection couponsData={couponsData} />
           ) : activeSection === "products" ? (
             <ProductManagementSection productsData={productsData} />
           ) : activeSection === "orders" ? (
@@ -1856,6 +1871,227 @@ function PaymentManagementSection({ paymentData }) {
   );
 }
 
+function CouponManagementSection({ couponsData }) {
+  const { coupons, selectedCoupon, selectedCouponId, summary, filters } = couponsData;
+  const isCreating = selectedCouponId === "new" || !selectedCoupon;
+  const editingCoupon = selectedCoupon || {};
+  const returnTo = buildCouponListUrl(filters, isCreating ? "new" : editingCoupon.id);
+  const visibleRows = Math.max(0, 12 - coupons.length);
+
+  return (
+    <div className="coupon-admin-page">
+      <section className="admin-panel coupon-search-panel">
+        <h2>조회</h2>
+        <form className="coupon-search-form" action="/admin">
+          <input type="hidden" name="section" value="coupons" />
+          <label>
+            검색어
+            <input name="couponQuery" defaultValue={filters.query} placeholder="쿠폰번호, 쿠폰 코드" />
+          </label>
+          <label>
+            할인 유형
+            <select name="couponDiscountType" defaultValue={filters.discountType}>
+              <option value="all">전체</option>
+              <option value="percent">정률</option>
+              <option value="fixed">정액</option>
+            </select>
+          </label>
+          <label>
+            상태
+            <select name="couponStatus" defaultValue={filters.status}>
+              <option value="all">전체</option>
+              <option value="active">사용 가능</option>
+              <option value="inactive">사용 불가능</option>
+            </select>
+          </label>
+          <div className="coupon-search-actions">
+            <Link className="plain-button" href="/admin?section=coupons">초기화</Link>
+            <button type="submit">검색</button>
+          </div>
+        </form>
+      </section>
+
+      <div className="admin-master-detail coupon-admin-layout">
+        <section className="admin-panel guardian-list-panel coupon-list-panel">
+          <div className="guardian-list-heading">
+            <h2>전체 <b>{formatMetricValue(summary.total)}</b>건</h2>
+            <div className="admin-heading-actions">
+              <AdminExportButton filename="zezari-coupons.csv" rows={couponExportRows(coupons)} />
+            </div>
+          </div>
+          <div className="admin-record-table-wrap guardian-admin-table-wrap">
+            <div className="admin-record-table guardian-admin-table coupon-record-table" role="table" aria-label="쿠폰 목록">
+              <div className="admin-record-header" role="row">
+                <span role="columnheader">선택</span>
+                <span role="columnheader">쿠폰번호</span>
+                <span role="columnheader">쿠폰 코드</span>
+                <span role="columnheader">할인 유형</span>
+                <span role="columnheader">할인 금액</span>
+                <span role="columnheader">할인 내용</span>
+                <span role="columnheader">유효 기간</span>
+                <span role="columnheader">발행 수</span>
+                <span role="columnheader">사용 수</span>
+                <span role="columnheader">상태</span>
+                <span role="columnheader">관리</span>
+              </div>
+              {coupons.map((coupon) => {
+                const isSelected = selectedCoupon?.id === coupon.id && !isCreating;
+                return (
+                  <div className={`admin-record-row ${isSelected ? "selected" : ""}`} role="row" key={coupon.id}>
+                    <span role="cell" className="admin-row-selector">{isSelected ? "⊙" : "□"}</span>
+                    <strong role="cell">{coupon.coupon_number || formatCouponNumber(coupon)}</strong>
+                    <span role="cell">{coupon.code}</span>
+                    <span role="cell">
+                      <b className={`coupon-type-chip ${coupon.discount_type}`}>{couponDiscountTypeLabel(coupon.discount_type)}</b>
+                    </span>
+                    <span role="cell">{couponDiscountValueLabel(coupon)}</span>
+                    <span role="cell">{coupon.description || coupon.discount_label || "-"}</span>
+                    <time role="cell">{formatCouponPeriod(coupon)}</time>
+                    <span role="cell">{formatMetricValue(coupon.issued_count)} / {formatMetricValue(coupon.issue_limit)}</span>
+                    <span role="cell">{formatMetricValue(coupon.used_count)}</span>
+                    <span role="cell">
+                      <b className={`coupon-status-chip ${coupon.status}`}>{couponStatusLabel(coupon.status)}</b>
+                    </span>
+                    <Link role="cell" className="admin-row-detail" href={buildCouponListUrl(filters, coupon.id)}>
+                      상세보기
+                    </Link>
+                  </div>
+                );
+              })}
+              {Array.from({ length: visibleRows }).map((_, index) => (
+                <div className="admin-record-row placeholder" role="row" key={`coupon-empty-${index}`}>
+                  {Array.from({ length: 11 }).map((__, columnIndex) => (
+                    <span role="cell" key={columnIndex}> </span>
+                  ))}
+                </div>
+              ))}
+              {coupons.length === 0 && <p className="empty-text">조건에 맞는 쿠폰이 없습니다.</p>}
+            </div>
+          </div>
+          <div className="admin-table-footer coupon-table-footer">
+            <span>선택한 쿠폰 {isCreating ? "0" : "1"}건</span>
+            <select aria-label="페이지당 표시 개수" defaultValue="10">
+              <option>10개씩 보기</option>
+              <option>20개씩 보기</option>
+              <option>50개씩 보기</option>
+            </select>
+          </div>
+          <div className="coupon-create-action">
+            <Link className="primary-button compact" href={buildCouponListUrl(filters, "new")}>+ 새 쿠폰</Link>
+          </div>
+        </section>
+
+        <aside className="admin-panel coupon-detail-panel">
+          <h2>{isCreating ? "쿠폰 등록" : "쿠폰 수정"}</h2>
+          <form action={saveAdminCouponAction} className="coupon-detail-form">
+            <input type="hidden" name="couponId" value={isCreating ? "" : editingCoupon.id || ""} />
+            <input type="hidden" name="returnTo" value={returnTo} />
+            <section>
+              <h3>기본 설정</h3>
+              <fieldset className="coupon-code-mode">
+                <legend>쿠폰코드</legend>
+                <label>
+                  <input name="codeMode" type="radio" value="random" defaultChecked={!editingCoupon.code || editingCoupon.code_mode === "random"} />
+                  <span>랜덤생성</span>
+                </label>
+                <label>
+                  <input name="codeMode" type="radio" value="manual" defaultChecked={Boolean(editingCoupon.code && editingCoupon.code_mode !== "random")} />
+                  <span>직접 입력</span>
+                </label>
+              </fieldset>
+              <input name="couponCode" defaultValue={editingCoupon.code || ""} placeholder="쿠폰코드" />
+              <label>
+                할인 유형
+                <select name="discountType" defaultValue={editingCoupon.discount_type || "percent"}>
+                  <option value="percent">정률</option>
+                  <option value="fixed">정액</option>
+                </select>
+              </label>
+              <label>
+                할인금액
+                <input name="discountValue" type="number" min="1" step="1" defaultValue={editingCoupon.discount_value || 100} />
+              </label>
+              <label>
+                할인 내용
+                <input name="description" defaultValue={editingCoupon.description || ""} placeholder="제한없음" />
+              </label>
+              <div className="coupon-date-pair">
+                <label>
+                  유효기간
+                  <input name="startDate" type="date" defaultValue={editingCoupon.start_date || "2026-01-01"} />
+                </label>
+                <span>~</span>
+                <label>
+                  <span className="sr-only">유효기간 종료일</span>
+                  <input name="endDate" type="date" defaultValue={editingCoupon.end_date || "2026-12-31"} />
+                </label>
+              </div>
+            </section>
+
+            <section>
+              <h3>발행 설정</h3>
+              <label>
+                최소 금액
+                <input name="minOrderAmount" type="number" min="0" step="100" defaultValue={editingCoupon.min_order_amount || 0} />
+              </label>
+              <label>
+                최대 금액
+                <input name="maxDiscountAmount" type="number" min="0" step="100" defaultValue={editingCoupon.max_discount_amount || 0} />
+              </label>
+              <label>
+                적용 서비스
+                <select name="serviceScope" defaultValue={editingCoupon.service_scope || "all"}>
+                  <option value="all">전체</option>
+                  <option value="subscription">구독</option>
+                  <option value="sticker">스티커</option>
+                  <option value="bracelet">팔찌</option>
+                  <option value="necklace">목걸이</option>
+                  <option value="keyring">키링</option>
+                  <option value="ad">광고</option>
+                </select>
+              </label>
+              <label>
+                발행수량
+                <input name="issueLimit" type="number" min="0" step="1" defaultValue={editingCoupon.issue_limit || 100} />
+              </label>
+              <label>
+                1인당 사용 제한
+                <select name="perUserLimit" defaultValue={editingCoupon.per_user_limit || 1}>
+                  <option value="1">1회</option>
+                  <option value="2">2회</option>
+                  <option value="3">3회</option>
+                </select>
+              </label>
+              <label>
+                메모
+                <textarea name="adminMemo" rows="2" defaultValue={editingCoupon.admin_memo || ""} />
+              </label>
+            </section>
+
+            <section>
+              <h3>상태 설정</h3>
+              <div className="coupon-status-options">
+                <label>
+                  <input name="status" type="radio" value="active" defaultChecked={(editingCoupon.status || "active") === "active"} />
+                  <span>사용 가능</span>
+                </label>
+                <label>
+                  <input name="status" type="radio" value="inactive" defaultChecked={editingCoupon.status === "inactive"} />
+                  <span>사용 불가능</span>
+                </label>
+              </div>
+            </section>
+
+            <FormSubmitButton className="primary-button compact" pendingText="저장중">
+              저장
+            </FormSubmitButton>
+          </form>
+        </aside>
+      </div>
+    </div>
+  );
+}
+
 function SubscriptionManagementSection({ subscriptionsData }) {
   const { summary, subscriptions, selectedSubscription, selectedOrders, plans, filters } = subscriptionsData;
   const returnTo = buildSubscriptionListUrl(filters, selectedSubscription?.subscription_id);
@@ -3307,6 +3543,26 @@ function paymentExportRows(payments = []) {
   }));
 }
 
+function couponExportRows(coupons = []) {
+  return coupons.map((coupon) => ({
+    쿠폰번호: coupon.coupon_number || formatCouponNumber(coupon),
+    쿠폰코드: coupon.code || "-",
+    할인유형: couponDiscountTypeLabel(coupon.discount_type),
+    할인금액: couponDiscountValueLabel(coupon),
+    할인내용: coupon.description || coupon.discount_label || "-",
+    유효기간: formatCouponPeriod(coupon),
+    발행수량: Number(coupon.issue_limit || 0),
+    발행수: Number(coupon.issued_count || 0),
+    사용수: Number(coupon.used_count || 0),
+    상태: couponStatusLabel(coupon.status),
+    적용서비스: couponServiceLabel(coupon.service_scope),
+    최소금액: formatCurrency(coupon.min_order_amount),
+    최대할인금액: formatCurrency(coupon.max_discount_amount),
+    메모: coupon.admin_memo || "",
+    생성일: formatRecentDateTime(coupon.created_at),
+  }));
+}
+
 function subscriptionExportRows(subscriptions = []) {
   return subscriptions.map((subscription) => ({
     구독번호: formatSubscriptionNumber(subscription),
@@ -3768,6 +4024,44 @@ function formatPaymentNumber(payment) {
   return payment?.payment_number || `PAY-${String(payment?.id || "").slice(0, 8).toUpperCase() || "UNKNOWN"}`;
 }
 
+function formatCouponNumber(coupon) {
+  return coupon?.coupon_number || `CU-${String(coupon?.id || "").replace(/-/g, "").slice(0, 8).toUpperCase() || "UNKNOWN"}`;
+}
+
+function couponDiscountTypeLabel(type) {
+  return type === "fixed" ? "정액" : "정률";
+}
+
+function couponDiscountValueLabel(coupon) {
+  const value = Number(coupon?.discount_value || 0);
+  if (coupon?.discount_type === "fixed") return `${formatMetricValue(value)}원`;
+  return `${formatMetricValue(value)}%`;
+}
+
+function couponStatusLabel(status) {
+  return status === "inactive" ? "불가능" : "가능";
+}
+
+function couponServiceLabel(scope) {
+  const labels = {
+    all: "전체",
+    subscription: "구독",
+    sticker: "스티커",
+    bracelet: "팔찌",
+    necklace: "목걸이",
+    keyring: "키링",
+    ad: "광고",
+  };
+  return labels[scope] || "전체";
+}
+
+function formatCouponPeriod(coupon) {
+  const start = formatDate(coupon?.start_date);
+  const end = formatDate(coupon?.end_date);
+  if (start === "-" && end === "-") return "-";
+  return `${start}~${end}`;
+}
+
 function paymentKindLabel(payment) {
   const group = payment?.payment_group || (payment?.payment_kind === "ad" ? "광고" : "상품");
   const item = payment?.payment_item || "-";
@@ -3846,6 +4140,15 @@ function buildPaymentListUrl(filters, paymentRowId = "") {
   if (filters?.startDate) params.set("paymentStart", filters.startDate);
   if (filters?.endDate) params.set("paymentEnd", filters.endDate);
   if (paymentRowId) params.set("paymentRecord", paymentRowId);
+  return `/admin?${params.toString()}`;
+}
+
+function buildCouponListUrl(filters, couponId = "") {
+  const params = new URLSearchParams({ section: "coupons" });
+  if (filters?.query) params.set("couponQuery", filters.query);
+  if (filters?.discountType && filters.discountType !== "all") params.set("couponDiscountType", filters.discountType);
+  if (filters?.status && filters.status !== "all") params.set("couponStatus", filters.status);
+  if (couponId) params.set("coupon", couponId);
   return `/admin?${params.toString()}`;
 }
 

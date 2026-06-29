@@ -14,6 +14,7 @@ const MENU_ITEMS = [
   { id: "orders", label: "주문 관리", href: "/admin?section=orders", icon: "cart" },
   { id: "subscriptions", label: "구독 관리", href: "/admin?section=subscriptions", icon: "subscription" },
   { id: "payments", label: "결제 관리", href: "/admin?section=payments", icon: "payment" },
+  { id: "coupons", label: "쿠폰 관리", href: "/admin?section=coupons", icon: "coupon" },
   { id: "products", label: "상품 관리", href: "/admin?section=products", icon: "box" },
   { id: "ads", label: "광고 관리", href: "/admin?section=ads", icon: "megaphone" },
   { id: "missing", label: "실종신고 관리", href: "/admin?section=missing", icon: "alert" },
@@ -143,6 +144,15 @@ function iconPath(name) {
           <rect x="3.5" y="6" width="17" height="12" rx="2" />
           <path d="M3.5 10h17" />
           <path d="M7 15h5" />
+        </>
+      );
+    case "coupon":
+      return (
+        <>
+          <path d="M4 8.5V6.8C4 5.8 4.8 5 5.8 5h12.4c1 0 1.8.8 1.8 1.8v1.7a3 3 0 0 0 0 6v2.7c0 1-.8 1.8-1.8 1.8H5.8c-1 0-1.8-.8-1.8-1.8v-2.7a3 3 0 0 0 0-6z" />
+          <path d="M9 9.5h.01" />
+          <path d="M15 14.5h.01" />
+          <path d="M15.5 9 8.5 16" />
         </>
       );
     case "subscription":
