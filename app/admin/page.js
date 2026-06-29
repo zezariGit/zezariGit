@@ -40,6 +40,7 @@ import {
   setQrSubjectAction,
   setAdminSubjectAdMemoAction,
   setAdminSubjectAdStatusAction,
+  createAdminPaymentRefundAction,
   setSubscriptionAdminMemoAction,
   setSubscriptionPlanPriceAction,
 } from "./actions";
@@ -122,6 +123,9 @@ export default async function AdminPage({ searchParams }) {
   const paymentFilters = {
     query: resolvedSearchParams?.paymentLedgerQuery || "",
     type: resolvedSearchParams?.paymentLedgerType || "all",
+    status: resolvedSearchParams?.paymentLedgerStatus || "all",
+    startDate: resolvedSearchParams?.paymentStart || "",
+    endDate: resolvedSearchParams?.paymentEnd || "",
   };
   const subscriptionFilters = {
     query: resolvedSearchParams?.subscriptionQuery || "",
@@ -132,6 +136,7 @@ export default async function AdminPage({ searchParams }) {
     endDate: resolvedSearchParams?.subscriptionEnd || "",
   };
   const selectedOrderId = resolvedSearchParams?.order || "";
+  const selectedPaymentId = resolvedSearchParams?.paymentRecord || "";
   const selectedSubscriptionId = resolvedSearchParams?.subscription || "";
   const selectedAdId = resolvedSearchParams?.ad || "";
   const adFilters = {
@@ -163,7 +168,7 @@ export default async function AdminPage({ searchParams }) {
   const paymentData = activeSection === "payments"
     ? {
         ...(await getAdminSubscriptionPlansData()),
-        ...(await getAdminPaymentsData(paymentFilters)),
+        ...(await getAdminPaymentsData(paymentFilters, selectedPaymentId)),
       }
     : null;
   const productsData = activeSection === "products" ? await getAdminProductsData() : null;
@@ -1565,70 +1570,262 @@ function AdStatusActionButton({ ad, command, returnTo, disabled, children }) {
 }
 
 function PaymentManagementSection({ paymentData }) {
-  const { plans, payments, filters } = paymentData;
+  const { plans, payments, selectedPayment, selectedRefunds, summary, filters } = paymentData;
+  const selectedPaymentReturnTo = buildPaymentListUrl(filters, selectedPayment?.payment_row_id);
+  const refundableAmount = paymentRefundableAmount(selectedPayment);
+  const summaryCards = [
+    { label: "총 매출액", value: summary.totalRevenue, icon: "money", hint: "전체 결제완료" },
+    { label: "주문 매출", value: summary.orderRevenue, icon: "linked", hint: "상품 단독구매" },
+    { label: "구독 매출", value: summary.subscriptionRevenue, icon: "check", hint: "기간 구독" },
+    { label: "광고 매출", value: summary.adRevenue, icon: "megaphone", hint: "온라인 광고" },
+    { label: "취소/환불 비용", value: summary.refundAmount, icon: "blocked", hint: "접수/완료 합산" },
+  ];
 
   return (
-    <div className="qr-admin-stack">
-      <section className="admin-panel">
-        <div className="panel-heading">
-          <h2>결제내역</h2>
-          <div className="admin-heading-actions">
-            <span>최근 최대 300건 / {payments.length}건 조회</span>
-            <AdminExportButton filename="zezari-payments.csv" rows={paymentExportRows(payments)} />
-          </div>
-        </div>
-
-        <form className="admin-master-filter payment-ledger-filter" action="/admin">
-          <input type="hidden" name="section" value="payments" />
-          <label>
-            통합 검색
-            <input
-              name="paymentLedgerQuery"
-              defaultValue={filters.query}
-              placeholder="결제번호, 보호자, 대상자, 구분, 결제수단"
-            />
-          </label>
-          <label>
-            구분
-            <select name="paymentLedgerType" defaultValue={filters.type}>
-              <option value="all">전체</option>
-              <option value="subscription">이용권</option>
-              <option value="product">상품</option>
-              <option value="ad">광고</option>
-            </select>
-          </label>
-          <button type="submit">조회</button>
-          <Link className="plain-button" href="/admin?section=payments">초기화</Link>
-        </form>
-
-        <div className="admin-record-table-wrap">
-          <div className="admin-record-table payment-record-table" role="table" aria-label="결제내역">
-            <div className="admin-record-header" role="row">
-              <span role="columnheader">결제번호</span>
-              <span role="columnheader">보호자</span>
-              <span role="columnheader">대상자</span>
-              <span role="columnheader">구분</span>
-              <span role="columnheader">결제수단</span>
-              <span role="columnheader">결제금액</span>
-              <span role="columnheader">결제일</span>
-            </div>
-            {payments.map((payment) => (
-              <div className="admin-record-row" role="row" key={`${payment.payment_kind}-${payment.id}`}>
-                <strong role="cell">{formatPaymentNumber(payment)}</strong>
-                <span role="cell">{payment.guardian_name || "보호자 미입력"}</span>
-                <span role="cell">{payment.subject_name || "대상자 미선택"}</span>
-                <span role="cell">{paymentKindLabel(payment)}</span>
-                <span role="cell">{payment.payment_method || "-"}</span>
-                <span role="cell">{formatCurrency(payment.amount)}</span>
-                <time role="cell">{formatRecentDateTime(payment.payment_date)}</time>
+    <div className="payment-admin-page">
+      <section className="payment-admin-status" aria-label="결제 현황">
+        <h2>현황</h2>
+        <div className="payment-stat-grid">
+          {summaryCards.map((card) => (
+            <article className="guardian-stat-card payment-stat-card" key={card.label}>
+              <DashboardIcon name={card.icon} />
+              <div>
+                <h3>{card.label}</h3>
+                <strong>{formatCurrency(card.value)}</strong>
+                <span>{card.hint}</span>
               </div>
-            ))}
-            {payments.length === 0 && <p className="empty-text">조건에 맞는 결제내역이 없습니다.</p>}
-          </div>
+            </article>
+          ))}
         </div>
       </section>
 
-      <section className="admin-panel">
+      <section className="admin-panel payment-search-panel">
+        <h3>조회</h3>
+        <form className="payment-search-form" action="/admin">
+          <input type="hidden" name="section" value="payments" />
+          <label>
+            검색어
+            <input
+              name="paymentLedgerQuery"
+              defaultValue={filters.query}
+              placeholder="번호, 이름"
+            />
+          </label>
+          <label className="compact-select-label">
+            거래구분
+            <select name="paymentLedgerType" defaultValue={filters.type}>
+              <option value="all">전체</option>
+              <option value="order">주문</option>
+              <option value="subscription">구독</option>
+              <option value="ad">광고</option>
+            </select>
+          </label>
+          <label className="compact-select-label">
+            결제상태
+            <select name="paymentLedgerStatus" defaultValue={filters.status}>
+              <option value="all">전체</option>
+              <option value="paid">결제완료</option>
+              <option value="pending">결제대기</option>
+              <option value="cancelled">결제취소</option>
+              <option value="refunded">환불접수</option>
+              <option value="failed">결제실패</option>
+            </select>
+          </label>
+          <div className="payment-date-filter">
+            <span>기간</span>
+            <input type="date" name="paymentStart" defaultValue={filters.startDate} />
+            <em>~</em>
+            <input type="date" name="paymentEnd" defaultValue={filters.endDate} />
+          </div>
+          <div className="payment-search-actions">
+            <Link className="plain-button" href="/admin?section=payments">초기화</Link>
+            <button type="submit">검색</button>
+          </div>
+        </form>
+      </section>
+
+      <div className="admin-master-detail payment-admin-layout">
+        <section className="admin-panel guardian-list-panel payment-list-panel">
+          <div className="guardian-list-heading">
+            <h2>전체 <b>{formatMetricValue(payments.length)}</b>건</h2>
+            <div className="admin-heading-actions">
+              <AdminExportButton filename="zezari-payments.csv" rows={paymentExportRows(payments)} />
+            </div>
+          </div>
+          <div className="admin-record-table-wrap guardian-admin-table-wrap">
+            <div className="admin-record-table guardian-admin-table payment-record-table" role="table" aria-label="결제 목록">
+              <div className="admin-record-header" role="row">
+                <span role="columnheader">선택</span>
+                <span role="columnheader">주문/구독/광고 번호</span>
+                <span role="columnheader">거래구분</span>
+                <span role="columnheader">대상자(보호자)</span>
+                <span role="columnheader">거래일시</span>
+                <span role="columnheader">금액</span>
+                <span role="columnheader">결제상태</span>
+                <span role="columnheader">관리</span>
+              </div>
+              {payments.map((payment) => {
+                const isSelected = selectedPayment?.payment_row_id === payment.payment_row_id;
+                return (
+                  <div className={`admin-record-row ${isSelected ? "selected" : ""}`} role="row" key={payment.payment_row_id}>
+                    <span role="cell" className="admin-row-selector">{isSelected ? "⊙" : "□"}</span>
+                    <strong role="cell">{formatPaymentNumber(payment)}</strong>
+                    <span role="cell">
+                      <b className={`admin-status-chip payment-kind-chip ${payment.payment_kind}`}>{paymentTypeLabel(payment)}</b>
+                    </span>
+                    <span role="cell" className="payment-record-party">
+                      <strong>{payment.subject_name || "대상자 미선택"}</strong>
+                      <small>{payment.guardian_name || "보호자 미입력"}</small>
+                    </span>
+                    <time role="cell">{formatRecentDateTime(payment.payment_date)}</time>
+                    <span role="cell">{formatCurrency(payment.amount)}</span>
+                    <span role="cell">
+                      <b className={`order-state ${paymentStateClass(payment.payment_state)}`}>{paymentStatusLabel(payment.payment_state)}</b>
+                    </span>
+                    <Link role="cell" className="admin-row-detail" href={buildPaymentListUrl(filters, payment.payment_row_id)}>
+                      상세보기
+                    </Link>
+                  </div>
+                );
+              })}
+              {payments.length === 0 && <p className="empty-text">조건에 맞는 결제내역이 없습니다.</p>}
+            </div>
+          </div>
+          <div className="admin-table-footer">
+            <span>선택한 결제 {selectedPayment ? "1" : "0"}건</span>
+            <select aria-label="페이지당 표시 개수" defaultValue="10">
+              <option>10개씩 보기</option>
+              <option>20개씩 보기</option>
+              <option>50개씩 보기</option>
+            </select>
+          </div>
+        </section>
+
+        <aside className="admin-panel payment-detail-panel">
+          <h2>상세 정보</h2>
+          {selectedPayment ? (
+            <>
+              <section className="admin-detail-section payment-detail-section">
+                <h3>결제 정보</h3>
+                <dl className="admin-detail-list">
+                  <div>
+                    <dt>주문/구독/광고 번호</dt>
+                    <dd>{formatPaymentNumber(selectedPayment)}</dd>
+                  </div>
+                  <div>
+                    <dt>거래 구분</dt>
+                    <dd>{paymentTypeLabel(selectedPayment)}</dd>
+                  </div>
+                  <div>
+                    <dt>거래 상품</dt>
+                    <dd>{selectedPayment.payment_item || "-"}</dd>
+                  </div>
+                  <div>
+                    <dt>거래 일시</dt>
+                    <dd>{formatRecentDateTime(selectedPayment.payment_date)}</dd>
+                  </div>
+                  <div>
+                    <dt>거래 금액</dt>
+                    <dd>{formatCurrency(selectedPayment.amount)}</dd>
+                  </div>
+                  <div>
+                    <dt>결제 상태</dt>
+                    <dd><b className={`order-state ${paymentStateClass(selectedPayment.payment_state)}`}>{paymentStatusLabel(selectedPayment.payment_state)}</b></dd>
+                  </div>
+                  <div>
+                    <dt>결제 수단</dt>
+                    <dd>{selectedPayment.payment_method || "-"}</dd>
+                  </div>
+                  <div>
+                    <dt>환불 금액</dt>
+                    <dd>{formatCurrency(selectedPayment.refund_amount)}</dd>
+                  </div>
+                </dl>
+              </section>
+
+              <section className="admin-detail-section payment-detail-section">
+                <h3>대상자정보</h3>
+                <dl className="admin-detail-list">
+                  <div>
+                    <dt>대상자</dt>
+                    <dd>{selectedPayment.subject_name || "대상자 미선택"}</dd>
+                  </div>
+                  <div>
+                    <dt>보호자</dt>
+                    <dd>{selectedPayment.guardian_name || "보호자 미입력"}</dd>
+                  </div>
+                  <div>
+                    <dt>연락처</dt>
+                    <dd>{selectedPayment.guardian_phone || "-"}</dd>
+                  </div>
+                  <div>
+                    <dt>이메일</dt>
+                    <dd>{selectedPayment.guardian_email || "-"}</dd>
+                  </div>
+                </dl>
+              </section>
+
+              {selectedRefunds.length > 0 && (
+                <section className="admin-detail-section payment-detail-section">
+                  <h3>취소/환불 이력</h3>
+                  <div className="payment-refund-history">
+                    {selectedRefunds.map((refund) => (
+                      <article key={refund.id}>
+                        <strong>{formatCurrency(refund.amount)}</strong>
+                        <span>{refund.reason}</span>
+                        <time>{formatRecentDateTime(refund.created_at)}</time>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              <div className="payment-detail-actions">
+                <input className="payment-refund-toggle" type="checkbox" id="payment-refund-modal" />
+                <label className="primary-button compact" htmlFor="payment-refund-modal">
+                  취소/환불
+                </label>
+                <div className="payment-refund-modal-backdrop">
+                  <label className="payment-refund-modal-scrim" htmlFor="payment-refund-modal" aria-label="취소/환불 팝업 닫기" />
+                  <section className="payment-refund-modal" role="dialog" aria-modal="true" aria-labelledby="payment-refund-title">
+                    <h2 id="payment-refund-title">취소/환불</h2>
+                    <form action={createAdminPaymentRefundAction} className="payment-refund-form">
+                      <input type="hidden" name="paymentKind" value={selectedPayment.payment_kind} />
+                      <input type="hidden" name="paymentId" value={selectedPayment.id} />
+                      <input type="hidden" name="returnTo" value={selectedPaymentReturnTo} />
+                      <label>
+                        거래 구분
+                        <select defaultValue={paymentTypeLabel(selectedPayment)} disabled>
+                          <option>{paymentTypeLabel(selectedPayment)}</option>
+                        </select>
+                      </label>
+                      <label>
+                        환불 금액
+                        <input name="refundAmount" type="number" min="1" step="1" defaultValue={refundableAmount} disabled={refundableAmount <= 0} />
+                      </label>
+                      <label>
+                        환불 사유
+                        <textarea name="refundReason" rows="3" placeholder="내용 입력" required />
+                      </label>
+                      <div className="payment-refund-actions">
+                        <label className="plain-button" htmlFor="payment-refund-modal">닫기</label>
+                        <FormSubmitButton className="primary-button compact" pendingText="처리중" disabled={refundableAmount <= 0}>
+                          환불하기
+                        </FormSubmitButton>
+                      </div>
+                      <p>현재 버튼은 운영 기록과 상태 변경을 수행합니다. 실제 토스 결제 취소 API는 별도 승인 후 연결합니다.</p>
+                    </form>
+                  </section>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p className="empty-text">결제내역을 선택해 주세요.</p>
+          )}
+        </aside>
+      </div>
+
+      <section className="admin-panel payment-plan-section">
         <div className="panel-heading">
           <h2>이용권 옵션 가격</h2>
           <span>{plans.length}개</span>
@@ -3098,13 +3295,15 @@ async function withQrImages(qrCodes) {
 
 function paymentExportRows(payments = []) {
   return payments.map((payment) => ({
-    결제번호: formatPaymentNumber(payment),
-    보호자: payment.guardian_name || "보호자 미입력",
-    대상자: payment.subject_name || "대상자 미선택",
-    구분: paymentKindLabel(payment),
+    "주문/구독/광고 번호": formatPaymentNumber(payment),
+    거래구분: paymentTypeLabel(payment),
+    "대상자(보호자)": `${payment.subject_name || "대상자 미선택"} (${payment.guardian_name || "보호자 미입력"})`,
+    거래상품: payment.payment_item || "-",
     결제수단: payment.payment_method || "-",
-    결제금액: formatCurrency(payment.amount),
-    결제일: formatRecentDateTime(payment.payment_date),
+    거래금액: formatCurrency(payment.amount),
+    환불금액: formatCurrency(payment.refund_amount),
+    결제상태: paymentStatusLabel(payment.payment_state),
+    거래일시: formatRecentDateTime(payment.payment_date),
   }));
 }
 
@@ -3575,20 +3774,34 @@ function paymentKindLabel(payment) {
   return `${group} - ${item}`;
 }
 
+function paymentTypeLabel(payment) {
+  if (payment?.payment_group) return payment.payment_group;
+  if (payment?.payment_kind === "subscription") return "구독";
+  if (payment?.payment_kind === "ad") return "광고";
+  return "주문";
+}
+
+function paymentRefundableAmount(payment) {
+  if (!payment) return 0;
+  return Math.max(0, Number(payment.amount || 0) - Number(payment.refund_amount || 0));
+}
+
 function isPaidOrder(status) {
   return ["paid", "paid_waiting_activation", "activated"].includes(status);
 }
 
 function paymentStatusLabel(status) {
-  if (isPaidOrder(status)) return "결제 완료";
-  if (["draft", "payment_pending", "subscription_pending"].includes(status)) return "결제 대기";
+  if (isPaidOrder(status)) return "결제완료";
+  if (["draft", "payment_pending", "subscription_pending", "subscription_processing", "pending"].includes(status)) return "결제대기";
+  if (status === "refunded") return "환불접수";
   if (status === "failed") return "결제 실패";
-  if (status === "cancelled") return "결제 취소";
+  if (status === "cancelled") return "결제취소";
   return status || "상태 미확인";
 }
 
 function paymentStateClass(status) {
   if (isPaidOrder(status)) return "payment-paid";
+  if (status === "refunded") return "payment-refunded";
   if (["failed", "cancelled"].includes(status)) return "payment-failed";
   return "payment-pending";
 }
@@ -3622,6 +3835,17 @@ function buildSubscriptionListUrl(filters, subscriptionId = "") {
   if (filters.startDate) params.set("subscriptionStart", filters.startDate);
   if (filters.endDate) params.set("subscriptionEnd", filters.endDate);
   if (subscriptionId) params.set("subscription", subscriptionId);
+  return `/admin?${params.toString()}`;
+}
+
+function buildPaymentListUrl(filters, paymentRowId = "") {
+  const params = new URLSearchParams({ section: "payments" });
+  if (filters?.query) params.set("paymentLedgerQuery", filters.query);
+  if (filters?.type && filters.type !== "all") params.set("paymentLedgerType", filters.type);
+  if (filters?.status && filters.status !== "all") params.set("paymentLedgerStatus", filters.status);
+  if (filters?.startDate) params.set("paymentStart", filters.startDate);
+  if (filters?.endDate) params.set("paymentEnd", filters.endDate);
+  if (paymentRowId) params.set("paymentRecord", paymentRowId);
   return `/admin?${params.toString()}`;
 }
 

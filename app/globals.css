@@ -8042,13 +8042,107 @@ button:disabled:hover {
   text-overflow: ellipsis;
 }
 
+.payment-admin-page {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.payment-admin-status {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.payment-admin-status h2 {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 1.1rem;
+}
+
+.payment-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(150px, 1fr));
+  gap: var(--space-md);
+}
+
+.payment-stat-card {
+  grid-template-columns: 56px minmax(0, 1fr);
+  min-height: 86px;
+}
+
+.payment-stat-card span {
+  color: var(--c-text-muted);
+  font-size: 0.75rem;
+}
+
+.payment-search-panel {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.payment-search-panel h3 {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 1rem;
+}
+
+.payment-search-form {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.1fr) minmax(130px, 0.65fr) minmax(130px, 0.65fr) minmax(260px, 1.2fr) auto;
+  gap: var(--space-sm);
+  align-items: end;
+}
+
+.payment-search-form label,
+.payment-date-filter {
+  display: grid;
+  gap: 5px;
+  color: var(--c-text);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.payment-date-filter {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+}
+
+.payment-date-filter span {
+  grid-column: 1 / -1;
+}
+
+.payment-date-filter em {
+  align-self: center;
+  color: var(--c-text-muted);
+  font-style: normal;
+}
+
+.payment-search-actions {
+  display: flex;
+  gap: var(--space-xs);
+  justify-content: flex-end;
+}
+
+.payment-search-actions button,
+.payment-search-actions a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-md);
+  white-space: nowrap;
+}
+
+.payment-admin-layout {
+  grid-template-columns: minmax(0, 1.75fr) minmax(340px, 0.85fr);
+  align-items: start;
+}
+
 .payment-record-table {
-  min-width: 900px;
+  min-width: 1050px;
 }
 
 .payment-record-table .admin-record-header,
 .payment-record-table .admin-record-row {
-  grid-template-columns: 140px minmax(112px, 0.9fr) minmax(112px, 0.9fr) minmax(170px, 1.35fr) 100px 92px 132px;
+  grid-template-columns: 34px 168px 86px minmax(148px, 1fr) 128px 96px 96px 76px;
 }
 
 .payment-record-table .admin-record-row {
@@ -8057,8 +8151,176 @@ button:disabled:hover {
 
 .payment-record-table .admin-record-row > strong,
 .payment-record-table .admin-record-row > span,
-.payment-record-table .admin-record-row > time {
+.payment-record-table .admin-record-row > time,
+.payment-record-table .admin-record-row > a {
   font-size: 12px;
+}
+
+.payment-record-party {
+  display: grid;
+  gap: 3px;
+}
+
+.payment-record-party strong {
+  font-size: 12px;
+}
+
+.payment-record-party small {
+  color: var(--c-text-muted);
+  font-size: 11px;
+}
+
+.payment-kind-chip {
+  justify-content: center;
+}
+
+.payment-kind-chip.order {
+  background: #f5d5f3;
+  color: #7a2375;
+}
+
+.payment-kind-chip.subscription {
+  background: #b7efc2;
+  color: #10672b;
+}
+
+.payment-kind-chip.ad {
+  background: #f2d0ff;
+  color: #5e2b92;
+}
+
+.payment-detail-panel {
+  min-height: 520px;
+  max-height: calc(100vh - 120px);
+  display: grid;
+  align-content: start;
+  gap: var(--space-md);
+  overflow: auto;
+}
+
+.payment-detail-panel h2 {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 1.08rem;
+}
+
+.payment-detail-section {
+  padding-bottom: var(--space-md);
+  border-bottom: 0.5px solid var(--c-border-strong);
+}
+
+.payment-detail-section h3 {
+  margin: 0 0 var(--space-xs);
+  color: var(--c-text);
+  font-size: 0.9rem;
+}
+
+.payment-refund-history {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.payment-refund-history article {
+  display: grid;
+  gap: 3px;
+  padding: var(--space-xs);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-bg);
+  font-size: 0.78rem;
+}
+
+.payment-refund-history span {
+  color: var(--c-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.payment-refund-history time {
+  color: var(--c-text-muted);
+  font-size: 0.72rem;
+}
+
+.payment-detail-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.payment-refund-toggle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.payment-refund-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: none;
+  place-items: center;
+  padding: var(--space-lg);
+}
+
+.payment-refund-toggle:checked ~ .payment-refund-modal-backdrop {
+  display: grid;
+}
+
+.payment-refund-modal-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  cursor: pointer;
+}
+
+.payment-refund-modal {
+  position: relative;
+  z-index: 1;
+  width: min(420px, 100%);
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 0.5px solid var(--c-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-strong);
+}
+
+.payment-refund-modal h2 {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 1.1rem;
+}
+
+.payment-refund-form {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.payment-refund-form label {
+  display: grid;
+  gap: 5px;
+  color: var(--c-text);
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.payment-refund-form p {
+  margin: 0;
+  color: var(--c-danger);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.payment-refund-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+}
+
+.payment-plan-section {
+  display: grid;
+  gap: var(--space-md);
 }
 
 .order-detail-panel .admin-detail-heading span,
@@ -8488,6 +8750,12 @@ button:disabled:hover {
   border-color: var(--c-warn-border);
   background: var(--c-warn-bg);
   color: var(--c-warn);
+}
+
+.order-state.payment-refunded {
+  border-color: #d8c7ff;
+  background: #f1ebff;
+  color: #5d3ebc;
 }
 
 .order-state.fulfillment-shipped {
@@ -9223,6 +9491,9 @@ button:disabled:hover {
   .order-stat-grid,
   .order-search-form,
   .order-date-filter,
+  .payment-stat-grid,
+  .payment-search-form,
+  .payment-date-filter,
   .subscription-stat-grid,
   .subscription-search-form,
   .subscription-date-filter,
@@ -9235,12 +9506,14 @@ button:disabled:hover {
   }
 
   .order-date-filter em,
+  .payment-date-filter em,
   .subscription-date-filter em,
   .ad-date-filter em {
     display: none;
   }
 
   .order-search-actions,
+  .payment-search-actions,
   .subscription-search-actions,
   .ad-search-actions {
     display: grid;
@@ -9249,6 +9522,8 @@ button:disabled:hover {
 
   .order-search-actions button,
   .order-search-actions a,
+  .payment-search-actions button,
+  .payment-search-actions a,
   .subscription-search-actions button,
   .subscription-search-actions a,
   .ad-search-actions button,

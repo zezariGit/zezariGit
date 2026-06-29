@@ -7,6 +7,7 @@ import { isAdminSession } from "../../lib/admin";
 import { authOptions } from "../../lib/auth";
 import {
   generateQrCodes,
+  createAdminPaymentRefund,
   isDbAdminSession,
   setAdminSubjectAdMemo,
   setAdminSubjectAdStatus,
@@ -142,6 +143,21 @@ export async function setSubscriptionPlanPriceAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=payments"), error.message || "가격 저장에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin?section=payments"), "이용권 가격이 저장되었습니다."));
+}
+
+export async function createAdminPaymentRefundAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  try {
+    await createAdminPaymentRefund(formData);
+    revalidatePath("/admin");
+    revalidatePath("/account/billing");
+    revalidatePath("/account/ads");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=payments"), error.message || "취소/환불 처리에 실패했습니다.", "error"));
+  }
+  redirect(withNotice(getReturnTo(formData, "/admin?section=payments"), "취소/환불이 접수되었습니다."));
 }
 
 export async function setSubscriptionAdminMemoAction(formData) {

@@ -4809,3 +4809,56 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Advertisement admin UI rebuild, schema extension, action wiring, CSS, documentation, and local verification: about 60 minutes.
+
+## 2026-06-29 KST - Admin Payment Management Detail And Refund Popup
+
+### User Request
+- Rebuild the administrator payment-management menu based on the provided reference.
+- The detail card should include a cancel/refund button that opens a popup.
+
+### Reflected Work
+- Rebuilt `/admin?section=payments` into an operations-style payment screen:
+  - top payment summary cards
+  - search panel
+  - dense payment grid
+  - right payment detail card
+  - cancel/refund popup form
+- Added summary metrics:
+  - total paid revenue
+  - order revenue
+  - subscription revenue
+  - advertisement revenue
+  - cancel/refund amount
+- Expanded payment filters:
+  - query
+  - transaction type
+  - payment status
+  - payment date range
+- Expanded grid columns to match the reference:
+  - selection, order/subscription/ad number, transaction type, subject/guardian, transaction datetime, amount, payment status, and detail action.
+- Added `payment_refunds` for administrator refund/cancel request records.
+- Added `createAdminPaymentRefund()` and `createAdminPaymentRefundAction()`:
+  - validates remaining refundable amount
+  - records refund reason and amount
+  - updates related product order, subscription, or advertisement state to cancelled/ended as an operations record
+- Important: this implementation does not call the live Toss cancel/refund API yet. It intentionally records the administrator operation first; a direct Toss cancellation call should be attached only after explicit production approval and policy confirmation.
+- Updated payment CSV export to include transaction type, product, refund amount, payment status, and transaction datetime.
+
+### Files Changed
+- `lib/db.js`
+- `app/admin/page.js`
+- `app/admin/actions.js`
+- `app/globals.css`
+- `deliverables/ADMIN_PAYMENT_EXPORT_MANAGEMENT.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with Windows line-ending warnings only.
+- Turso `payment_refunds` schema check succeeded.
+- Turso order/subscription/ad payment summary query succeeded without printing secrets.
+
+### Time Spent
+- Payment admin UI rebuild, refund-record schema/action wiring, CSS, documentation, and local verification: about 55 minutes.

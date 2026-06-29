@@ -255,3 +255,14 @@ Create a Korean SaaS admin console UI mockup for "REAL_QR_FIND" advertisement ma
 
 ### Notes
 - Use when explaining future Meta Ads API integration and why advertisement performance/spend fields are already reserved.
+
+## 2026-06-29 - Admin Payment Management And Refund Popup
+
+### Purpose
+- Presentation visual for the redesigned administrator payment-management screen and the cancel/refund popup.
+
+### Prompt
+Create a Korean SaaS admin console UI mockup for "REAL_QR_FIND" payment management. Show a dark navy left admin sidebar with "결제 관리" selected and a white operations workspace. At the top, show five thick-border summary cards titled "총 매출액", "주문 매출", "구독 매출", "광고 매출", and "취소/환불 비용" with bold black icons and compact currency values. Below, show a search panel with fields "검색어", "거래구분", "결제상태", and "기간" date range, plus "초기화" and purple "검색" buttons. The main area is split into a wide dense grid and a right detail card. The grid columns are "선택, 주문/구독/광고 번호, 거래구분, 대상자(보호자), 거래일시, 금액, 결제상태, 관리" with colored transaction chips for 주문, 구독, 광고. The right detail card shows "결제 정보" and "대상자정보", then a purple "취소/환불" button. Also show a centered modal popup titled "취소/환불" with a 거래구분 select, 환불금액 input, 환불사유 textarea, and "환불하기" button. Use the existing REAL_QR_FIND admin style: white panels, thin gray grid lines, restrained purple actions, black headings, compact Korean labels, and no real personal data.
+
+### Notes
+- Use when explaining that administrator refund handling is recorded internally first, while live Toss cancellation can be connected later after production policy approval.
