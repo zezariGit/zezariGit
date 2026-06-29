@@ -233,3 +233,14 @@ Create a Korean SaaS admin console UI mockup for "REAL_QR_FIND" guardian managem
 ### Notes
 - Use when presenting the guardian-management screen conversion from a simple master-detail list to an operations-grade grid and detail workspace.
 - Updated on 2026-06-29: the right detail panel tabs are in-card tabs that switch content in place, not page-navigation links. Show separate visible tab states for 기본정보, 대상자, 구독/주문, 광고, and 활동 내역.
+
+## 2026-06-29 - Admin Subscription Management
+
+### Purpose
+- Presentation visual for the redesigned administrator subscription-management menu.
+
+### Prompt
+Create a Korean SaaS admin console UI mockup for "REAL_QR_FIND" subscription management. Show a left dark navy admin sidebar with "구독 관리" selected and a white operations workspace. At the top of the page, show four thick-border summary cards titled "전체 구독", "구독중", "일시정지", and "취소 / 환불" with bold black icons and compact counts. Below, show a search panel with fields "검색어", "구독상품", "구독상태", "결제상태", and "구독기간" date range, plus "초기화" and purple "검색" buttons. The main area is split into a wide dense grid and a right detail card. The grid columns are "선택, 구독번호, 대상자(보호자), 구독상품, 구독기간, 다음결제일, 금액, 구독상태, 결제상태, 관리" with colored state chips for 구독중, QR활성화 대기, 일시정지, 만료, 취소. The right detail card has in-card tabs "기본정보" and "결제내역"; show one state with 대상자정보, 구독정보, and 관리자 메모, and another state with recent payment cards and receipt links. Include subtle vertical and horizontal scroll indicators inside the detail card and grid. Use the existing REAL_QR_FIND admin style: white panels, thin gray grid lines, restrained purple actions, black headings, compact Korean labels, and no real personal data.
+
+### Notes
+- Use when presenting the subscription operations screen and why long payment histories stay inside a fixed detail-card area.

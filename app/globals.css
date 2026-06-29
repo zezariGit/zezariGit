@@ -7893,6 +7893,266 @@ button:disabled:hover {
   }
 }
 
+.subscription-admin-page {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.subscription-admin-status {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.subscription-admin-status h2,
+.subscription-search-panel h3 {
+  margin: 0;
+  color: #111111;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.subscription-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  gap: var(--space-md);
+}
+
+.subscription-stat-card {
+  min-height: 98px;
+}
+
+.subscription-search-panel {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.subscription-search-form {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.2fr) repeat(3, minmax(132px, 0.7fr)) minmax(260px, 1.3fr) auto;
+  gap: var(--space-sm);
+  align-items: end;
+}
+
+.subscription-search-form label,
+.subscription-date-filter {
+  display: grid;
+  gap: 5px;
+  color: #111111;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.subscription-date-filter {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.subscription-date-filter span {
+  grid-column: 1 / -1;
+}
+
+.subscription-date-filter em {
+  color: var(--c-text-muted);
+  font-style: normal;
+}
+
+.subscription-search-actions {
+  display: flex;
+  gap: var(--space-xs);
+  justify-content: flex-end;
+}
+
+.subscription-search-actions button,
+.subscription-search-actions a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-md);
+  white-space: nowrap;
+}
+
+.subscription-admin-layout {
+  grid-template-columns: minmax(0, 1.7fr) minmax(340px, 0.85fr);
+  align-items: start;
+}
+
+.subscription-admin-table {
+  min-width: 1060px;
+}
+
+.subscription-admin-table .admin-record-header,
+.subscription-admin-table .admin-record-row {
+  grid-template-columns: 34px 132px minmax(132px, 1fr) 90px minmax(148px, 1fr) 86px 82px 78px 82px 72px;
+}
+
+.subscription-admin-table .admin-record-row {
+  min-height: 54px;
+}
+
+.subscription-state {
+  justify-self: center;
+  min-width: 68px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.subscription-state.active,
+.guardian-status-pill.active {
+  background: #dff8c7;
+  color: #15803d;
+}
+
+.subscription-state.ready,
+.guardian-status-pill.ready {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.subscription-state.paused,
+.guardian-status-pill.paused {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.subscription-state.expired,
+.guardian-status-pill.expired {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.subscription-state.cancelled,
+.subscription-state.none,
+.guardian-status-pill.cancelled,
+.guardian-status-pill.none {
+  background: var(--c-danger-bg);
+  color: var(--c-danger);
+}
+
+.subscription-detail-card {
+  max-height: calc(100vh - 120px);
+  overflow: auto;
+}
+
+.subscription-detail-header {
+  grid-template-columns: 62px minmax(0, 1fr);
+}
+
+.subscription-detail-header .guardian-status-pill {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.subscription-detail-header > div:last-child {
+  position: relative;
+  padding-right: 58px;
+}
+
+.subscription-avatar {
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 0.5px solid var(--c-border);
+  background: #d7f7ff;
+  object-fit: cover;
+}
+
+.subscription-avatar.empty {
+  display: grid;
+  place-items: center;
+}
+
+.subscription-avatar.empty span {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #111111;
+  box-shadow: 0 20px 0 9px #111111;
+  transform: translateY(-6px);
+}
+
+.subscription-detail-card .guardian-tab-panels {
+  min-height: 420px;
+}
+
+.subscription-detail-card .guardian-tab-panel {
+  height: 460px;
+  overflow: auto;
+  min-width: 0;
+}
+
+.subscription-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.subscription-section-heading a {
+  color: var(--c-primary);
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.subscription-memo-form {
+  display: grid;
+  justify-items: end;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+.subscription-memo-form label {
+  width: 100%;
+  display: grid;
+  gap: 5px;
+  color: #111111;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.subscription-memo-form textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.subscription-payment-list {
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 300px;
+}
+
+.subscription-payment-card {
+  min-width: 320px;
+  padding: var(--space-sm);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+}
+
+@media (max-width: 1200px) {
+  .subscription-admin-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .subscription-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .subscription-search-form {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 .admin-order-list {
   display: grid;
 }
@@ -8700,21 +8960,28 @@ button:disabled:hover {
   .order-stat-grid,
   .order-search-form,
   .order-date-filter,
+  .subscription-stat-grid,
+  .subscription-search-form,
+  .subscription-date-filter,
   .account-shipping-info {
     grid-template-columns: 1fr;
   }
 
-  .order-date-filter em {
+  .order-date-filter em,
+  .subscription-date-filter em {
     display: none;
   }
 
-  .order-search-actions {
+  .order-search-actions,
+  .subscription-search-actions {
     display: grid;
     grid-template-columns: 1fr;
   }
 
   .order-search-actions button,
-  .order-search-actions a {
+  .order-search-actions a,
+  .subscription-search-actions button,
+  .subscription-search-actions a {
     width: 100%;
   }
 

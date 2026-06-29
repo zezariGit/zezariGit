@@ -19,6 +19,7 @@ import {
   getAdminOrdersData,
   getAdminPaymentsData,
   getAdminProductsData,
+  getAdminSubscriptionsData,
   getAdminSubscriptionPlansData,
   getAdminSubjectsData,
   getAdminUsersData,
@@ -38,6 +39,7 @@ import {
   setQrLifecycleAction,
   setQrSubjectAction,
   setAdminSubjectAdStatusAction,
+  setSubscriptionAdminMemoAction,
   setSubscriptionPlanPriceAction,
 } from "./actions";
 
@@ -75,7 +77,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "products", "orders", "ads", "missing", "locations", "inquiries"].includes(resolvedSearchParams?.section)
+  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "products", "orders", "subscriptions", "ads", "missing", "locations", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -120,7 +122,16 @@ export default async function AdminPage({ searchParams }) {
     query: resolvedSearchParams?.paymentLedgerQuery || "",
     type: resolvedSearchParams?.paymentLedgerType || "all",
   };
+  const subscriptionFilters = {
+    query: resolvedSearchParams?.subscriptionQuery || "",
+    plan: resolvedSearchParams?.subscriptionPlan || "all",
+    status: resolvedSearchParams?.subscriptionStatus || "all",
+    payment: resolvedSearchParams?.subscriptionPayment || "all",
+    startDate: resolvedSearchParams?.subscriptionStart || "",
+    endDate: resolvedSearchParams?.subscriptionEnd || "",
+  };
   const selectedOrderId = resolvedSearchParams?.order || "";
+  const selectedSubscriptionId = resolvedSearchParams?.subscription || "";
   const selectedAdId = resolvedSearchParams?.ad || "";
   const adFilters = {
     query: resolvedSearchParams?.adQuery || "",
@@ -152,6 +163,7 @@ export default async function AdminPage({ searchParams }) {
     : null;
   const productsData = activeSection === "products" ? await getAdminProductsData() : null;
   const ordersData = activeSection === "orders" ? await getAdminOrdersData(orderFilters, selectedOrderId) : null;
+  const subscriptionsData = activeSection === "subscriptions" ? await getAdminSubscriptionsData(subscriptionFilters, selectedSubscriptionId) : null;
   const adsData = activeSection === "ads" ? await getAdminAdsData(adFilters, selectedAdId) : null;
   const missingReportsData = activeSection === "missing" ? await getAdminMissingReportsData(missingFilters) : null;
   const locationSharesData = activeSection === "locations" ? await getAdminLocationSharesData(locationFilters, selectedLocationShareId) : null;
@@ -182,6 +194,8 @@ export default async function AdminPage({ searchParams }) {
             ? "상품 관리"
             : activeSection === "orders"
               ? "주문/배송 관리"
+              : activeSection === "subscriptions"
+                ? "구독 관리"
             : activeSection === "ads"
               ? "광고 관리"
               : activeSection === "missing"
@@ -206,6 +220,8 @@ export default async function AdminPage({ searchParams }) {
             ? "사용자 상품 선택 화면에 노출되는 상품 이미지, 가격, 활성 상태를 관리합니다."
             : activeSection === "orders"
               ? "주문과 결제 상태를 조회하고 배송상태, 택배사, 송장번호를 관리합니다."
+              : activeSection === "subscriptions"
+                ? "이용권 구독 상태, 기간, 결제내역과 운영 메모를 관리합니다."
             : activeSection === "ads"
               ? "광고 일 단가를 설정하고 사용자별 광고 진행사항을 조회합니다."
               : activeSection === "missing"
@@ -242,6 +258,8 @@ export default async function AdminPage({ searchParams }) {
             <ProductManagementSection productsData={productsData} />
           ) : activeSection === "orders" ? (
             <OrderManagementSection ordersData={ordersData} />
+          ) : activeSection === "subscriptions" ? (
+            <SubscriptionManagementSection subscriptionsData={subscriptionsData} />
           ) : activeSection === "ads" ? (
             <AdManagementSection adsData={adsData} />
           ) : activeSection === "missing" ? (
@@ -1505,6 +1523,259 @@ function PaymentManagementSection({ paymentData }) {
   );
 }
 
+function SubscriptionManagementSection({ subscriptionsData }) {
+  const { summary, subscriptions, selectedSubscription, selectedOrders, plans, filters } = subscriptionsData;
+  const returnTo = buildSubscriptionListUrl(filters, selectedSubscription?.subscription_id);
+  const summaryCards = [
+    { label: "전체 구독", value: summary.total, icon: "money" },
+    { label: "구독중", value: summary.active, icon: "person" },
+    { label: "일시정지", value: summary.paused, icon: "blocked" },
+    { label: "취소 / 환불", value: summary.cancelledRefund, icon: "blocked" },
+  ];
+  const selectedTabName = selectedSubscription ? `subscription-tab-${selectedSubscription.subscription_id}` : "subscription-tab-empty";
+
+  return (
+    <div className="subscription-admin-page">
+      <section className="subscription-admin-status" aria-label="구독 현황">
+        <h2>구독관리</h2>
+        <div className="subscription-stat-grid">
+          {summaryCards.map((card) => (
+            <article className="guardian-stat-card subscription-stat-card" key={card.label}>
+              <DashboardIcon name={card.icon} />
+              <div>
+                <h3>{card.label}</h3>
+                <strong>{formatMetricValue(card.value)} 건</strong>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="admin-panel subscription-search-panel">
+        <h3>검색</h3>
+        <form className="subscription-search-form" action="/admin">
+          <input type="hidden" name="section" value="subscriptions" />
+          <label>
+            검색어
+            <input
+              name="subscriptionQuery"
+              defaultValue={filters.query}
+              placeholder="구독번호, 대상자명, 보호자명"
+            />
+          </label>
+          <label>
+            구독상품
+            <select name="subscriptionPlan" defaultValue={filters.plan}>
+              <option value="all">전체</option>
+              {plans.map((plan) => (
+                <option value={String(plan.months)} key={plan.months}>{plan.name || `${plan.months}개월`}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            구독상태
+            <select name="subscriptionStatus" defaultValue={filters.status}>
+              <option value="all">전체</option>
+              <option value="active">구독중</option>
+              <option value="ready">QR활성화 대기</option>
+              <option value="paused">일시정지</option>
+              <option value="expired">만료</option>
+              <option value="cancelled">취소</option>
+            </select>
+          </label>
+          <label>
+            결제상태
+            <select name="subscriptionPayment" defaultValue={filters.payment}>
+              <option value="all">전체</option>
+              <option value="paid">결제완료</option>
+              <option value="pending">결제대기</option>
+              <option value="failed">결제실패</option>
+            </select>
+          </label>
+          <div className="subscription-date-filter">
+            <span>구독기간</span>
+            <input type="date" name="subscriptionStart" defaultValue={filters.startDate} />
+            <em>~</em>
+            <input type="date" name="subscriptionEnd" defaultValue={filters.endDate} />
+          </div>
+          <div className="subscription-search-actions">
+            <Link className="plain-button" href="/admin?section=subscriptions">초기화</Link>
+            <button type="submit">검색</button>
+          </div>
+        </form>
+      </section>
+
+      <div className="admin-master-detail subscription-admin-layout">
+        <section className="admin-panel guardian-list-panel subscription-list-panel">
+          <div className="guardian-list-heading">
+            <h2>조회</h2>
+            <div className="admin-heading-actions">
+              <span>{subscriptions.length}건 조회</span>
+              <AdminExportButton filename="zezari-subscriptions.csv" rows={subscriptionExportRows(subscriptions)} />
+            </div>
+          </div>
+          <div className="admin-record-table-wrap guardian-admin-table-wrap">
+            <div className="admin-record-table guardian-admin-table subscription-admin-table" role="table" aria-label="구독 목록">
+              <div className="admin-record-header" role="row">
+                <span role="columnheader">선택</span>
+                <span role="columnheader">구독번호</span>
+                <span role="columnheader">대상자(보호자)</span>
+                <span role="columnheader">구독상품</span>
+                <span role="columnheader">구독기간</span>
+                <span role="columnheader">다음결제일</span>
+                <span role="columnheader">금액</span>
+                <span role="columnheader">구독상태</span>
+                <span role="columnheader">결제상태</span>
+                <span role="columnheader">관리</span>
+              </div>
+              {subscriptions.map((subscription) => (
+                <Link
+                  className={`admin-record-row ${selectedSubscription?.subscription_id === subscription.subscription_id ? "active" : ""}`}
+                  href={buildSubscriptionListUrl(filters, subscription.subscription_id)}
+                  key={subscription.subscription_id}
+                  role="row"
+                >
+                  <span className="admin-row-selector" role="cell">
+                    {selectedSubscription?.subscription_id === subscription.subscription_id ? "◎" : "□"}
+                  </span>
+                  <strong className="inline-scroll-value" role="cell">{formatSubscriptionNumber(subscription)}</strong>
+                  <span className="order-record-party" role="cell">
+                    <strong>{subscription.subject_name || "대상자 미선택"}</strong>
+                    <small>{subscription.guardian_name || "보호자 미입력"}</small>
+                  </span>
+                  <span role="cell">{subscriptionPlanLabel(subscription)}</span>
+                  <span role="cell">{formatSubscriptionPeriod(subscription)}</span>
+                  <span role="cell">{formatDate(subscription.current_period_end)}</span>
+                  <span role="cell">{formatCurrency(subscription.amount)}</span>
+                  <em className={`subscription-state ${subscriptionAdminStateClass(subscription.status)}`} role="cell">
+                    {subscriptionStatusLabel(subscription.status)}
+                  </em>
+                  <em className={`order-state ${paymentStateClass(subscription.latest_order_status)}`} role="cell">
+                    {paymentStatusLabel(subscription.latest_order_status)}
+                  </em>
+                  <span className="admin-row-detail" role="cell">상세보기</span>
+                </Link>
+              ))}
+              {subscriptions.length === 0 && <p className="empty-text">조건에 맞는 구독이 없습니다.</p>}
+            </div>
+          </div>
+          <div className="guardian-list-footer">
+            <span>선택한 구독 {selectedSubscription ? "1건" : "0건"}</span>
+            <select defaultValue="10" aria-label="페이지당 표시 건수">
+              <option>10개씩 보기</option>
+            </select>
+          </div>
+        </section>
+
+        <aside className="admin-panel guardian-detail-card subscription-detail-card">
+          {selectedSubscription ? (
+            <>
+              <div className="guardian-detail-header subscription-detail-header">
+                <SubscriptionAvatar subscription={selectedSubscription} />
+                <div>
+                  <h2>{selectedSubscription.subject_name || "대상자 미선택"}</h2>
+                  <span>{subscriptionPlanLabel(selectedSubscription)}</span>
+                  <span>{formatSubscriptionPeriod(selectedSubscription)}</span>
+                  <em className={`guardian-status-pill ${subscriptionAdminStateClass(selectedSubscription.status)}`}>
+                    {subscriptionStatusLabel(selectedSubscription.status)}
+                  </em>
+                </div>
+              </div>
+              <div className="guardian-detail-tabset">
+                <input className="guardian-tab-radio" type="radio" name={selectedTabName} id={`${selectedTabName}-base`} defaultChecked />
+                <input className="guardian-tab-radio" type="radio" name={selectedTabName} id={`${selectedTabName}-payments`} />
+                <div className="guardian-detail-tabs">
+                  <label htmlFor={`${selectedTabName}-base`}>기본정보</label>
+                  <label htmlFor={`${selectedTabName}-payments`}>결제내역</label>
+                </div>
+                <div className="guardian-tab-panels">
+                  <div className="guardian-tab-panel">
+                    <section className="guardian-detail-section">
+                      <div className="subscription-section-heading">
+                        <h3 className="guardian-tab-section-title">대상자정보</h3>
+                        {selectedSubscription.subject_id && (
+                          <Link href={`/admin?section=subjects&subject=${encodeURIComponent(selectedSubscription.subject_id)}`}>상세보기 &gt;</Link>
+                        )}
+                      </div>
+                      <dl className="guardian-detail-list">
+                        <div><dt>대상자명</dt><dd>{selectedSubscription.subject_name || "대상자 미선택"}</dd></div>
+                        <div><dt>생년월일</dt><dd>{formatDate(selectedSubscription.subject_birth_date)}</dd></div>
+                        <div><dt>보호자명</dt><dd>{selectedSubscription.guardian_name || "보호자 미입력"}</dd></div>
+                        <div><dt>연락처</dt><dd>{selectedSubscription.guardian_phone || "연락처 미입력"}</dd></div>
+                      </dl>
+                    </section>
+                    <section className="guardian-detail-section">
+                      <div className="subscription-section-heading">
+                        <h3 className="guardian-tab-section-title">구독정보</h3>
+                        <Link href={`/admin?section=payments&paymentLedgerQuery=${encodeURIComponent(formatSubscriptionNumber(selectedSubscription))}`}>상세보기 &gt;</Link>
+                      </div>
+                      <dl className="guardian-detail-list">
+                        <div><dt>구독상품</dt><dd>{subscriptionPlanLabel(selectedSubscription)}</dd></div>
+                        <div><dt>구독기간</dt><dd>{formatSubscriptionPeriod(selectedSubscription)}</dd></div>
+                        <div><dt>다음결제일</dt><dd>{formatDate(selectedSubscription.current_period_end)}</dd></div>
+                        <div><dt>구독상태</dt><dd>{subscriptionStatusLabel(selectedSubscription.status)}</dd></div>
+                        <div><dt>결제상태</dt><dd>{paymentStatusLabel(selectedSubscription.latest_order_status)}</dd></div>
+                        <div><dt>금액</dt><dd>{formatCurrency(selectedSubscription.amount)}</dd></div>
+                      </dl>
+                      <form className="subscription-memo-form" action={setSubscriptionAdminMemoAction}>
+                        <input type="hidden" name="subscriptionId" value={selectedSubscription.subscription_id} />
+                        <input type="hidden" name="returnTo" value={returnTo} />
+                        <label>
+                          메모
+                          <textarea name="adminMemo" defaultValue={selectedSubscription.admin_memo || ""} placeholder="구독 운영 메모" />
+                        </label>
+                        <FormSubmitButton className="plain-button compact" pendingText="저장중">메모저장</FormSubmitButton>
+                      </form>
+                    </section>
+                  </div>
+                  <div className="guardian-tab-panel">
+                    <section className="guardian-detail-section">
+                      <div className="subscription-section-heading">
+                        <h3 className="guardian-tab-section-title">결제 내역</h3>
+                        <Link href={`/admin?section=payments&paymentLedgerQuery=${encodeURIComponent(selectedSubscription.guardian_name || "")}`}>상세보기 &gt;</Link>
+                      </div>
+                      <div className="subscription-payment-list">
+                        {selectedOrders.map((order) => (
+                          <article className="subscription-payment-card" key={order.id}>
+                            <dl className="guardian-detail-list">
+                              <div><dt>결제 일시</dt><dd>{formatDateTime(order.paid_at || order.updated_at || order.created_at)}</dd></div>
+                              <div><dt>결제 상품</dt><dd>{order.product_name || subscriptionPlanLabel(order)}</dd></div>
+                              <div><dt>결제 금액</dt><dd>{formatCurrency(order.amount)}</dd></div>
+                              <div><dt>결제 수단</dt><dd>{order.payment_method || "결제위젯"}</dd></div>
+                              <div><dt>결제 상태</dt><dd>{paymentStatusLabel(order.status)}</dd></div>
+                              <div><dt>구독번호</dt><dd className="inline-scroll-value">{formatSubscriptionNumber(selectedSubscription)}</dd></div>
+                              <div><dt>영수증</dt><dd><Link className="plain-button compact" href={`/admin?section=payments&paymentLedgerQuery=${encodeURIComponent(order.payment_number || order.id)}`}>조회</Link></dd></div>
+                            </dl>
+                          </article>
+                        ))}
+                        {selectedOrders.length === 0 && <p className="empty-text">구독 결제내역이 없습니다.</p>}
+                      </div>
+                    </section>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p className="empty-text">조회된 구독이 없습니다. 검색 조건을 변경해 주세요.</p>
+          )}
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+function SubscriptionAvatar({ subscription }) {
+  const photoSrc = subscription?.subject_photo_data_url;
+  if (photoSrc) {
+    return <img className="subscription-avatar" src={photoSrc} alt={`${subscription.subject_name || "대상자"} 사진`} />;
+  }
+  return (
+    <div className="subscription-avatar empty" aria-hidden="true">
+      <span />
+    </div>
+  );
+}
+
 function ProductManagementSection({ productsData }) {
   const { products } = productsData;
 
@@ -2701,6 +2972,21 @@ function paymentExportRows(payments = []) {
   }));
 }
 
+function subscriptionExportRows(subscriptions = []) {
+  return subscriptions.map((subscription) => ({
+    구독번호: formatSubscriptionNumber(subscription),
+    보호자: subscription.guardian_name || "보호자 미입력",
+    대상자: subscription.subject_name || "대상자 미선택",
+    구독상품: subscriptionPlanLabel(subscription),
+    구독기간: formatSubscriptionPeriod(subscription),
+    다음결제일: formatDate(subscription.current_period_end),
+    금액: formatCurrency(subscription.amount),
+    구독상태: subscriptionStatusLabel(subscription.status),
+    결제상태: paymentStatusLabel(subscription.latest_order_status),
+    최근주문번호: subscription.latest_order_number || "-",
+  }));
+}
+
 function guardianExportRows(guardians = []) {
   return guardians.map((guardian) => ({
     회원번호: formatMemberNumber(guardian.id),
@@ -3103,6 +3389,34 @@ function formatOrderNumber(order) {
   return order.toss_order_id || `ORDER-${String(order.id || "").slice(0, 8).toUpperCase()}`;
 }
 
+function formatSubscriptionNumber(subscription) {
+  const compactId = String(subscription?.subscription_id || subscription?.id || "").replace(/-/g, "").slice(0, 12).toUpperCase();
+  return `SS-${compactId || "UNKNOWN"}`;
+}
+
+function subscriptionPlanLabel(subscription) {
+  if (!subscription) return "-";
+  if (subscription.plan_name) return subscription.plan_name;
+  if (subscription.plan_months) return `${subscription.plan_months}개월 이용권`;
+  return "이용권";
+}
+
+function formatSubscriptionPeriod(subscription) {
+  const start = formatDate(subscription?.current_period_start);
+  const end = formatDate(subscription?.current_period_end);
+  if (start === "-" && end === "-") return "-";
+  return `${start} ~ ${end}`;
+}
+
+function subscriptionAdminStateClass(status) {
+  if (status === "active") return "active";
+  if (status === "ready") return "ready";
+  if (status === "paused") return "paused";
+  if (status === "expired") return "expired";
+  if (status === "cancelled") return "cancelled";
+  return "none";
+}
+
 function formatAdNumber(ad) {
   const compactId = String(ad?.id || "").replace(/-/g, "").slice(0, 10).toUpperCase();
   return `AD-${compactId || "UNKNOWN"}`;
@@ -3156,6 +3470,18 @@ function buildOrderListUrl(filters, orderId = "") {
   if (filters.startDate) params.set("orderStart", filters.startDate);
   if (filters.endDate) params.set("orderEnd", filters.endDate);
   if (orderId) params.set("order", orderId);
+  return `/admin?${params.toString()}`;
+}
+
+function buildSubscriptionListUrl(filters, subscriptionId = "") {
+  const params = new URLSearchParams({ section: "subscriptions" });
+  if (filters.query) params.set("subscriptionQuery", filters.query);
+  if (filters.plan && filters.plan !== "all") params.set("subscriptionPlan", filters.plan);
+  if (filters.status && filters.status !== "all") params.set("subscriptionStatus", filters.status);
+  if (filters.payment && filters.payment !== "all") params.set("subscriptionPayment", filters.payment);
+  if (filters.startDate) params.set("subscriptionStart", filters.startDate);
+  if (filters.endDate) params.set("subscriptionEnd", filters.endDate);
+  if (subscriptionId) params.set("subscription", subscriptionId);
   return `/admin?${params.toString()}`;
 }
 

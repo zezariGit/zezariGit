@@ -12,6 +12,7 @@ const MENU_ITEMS = [
   { id: "subjects", label: "대상자 관리", href: "/admin?section=subjects", icon: "group" },
   { id: "qr", label: "QR 관리", href: "/admin?section=qr", icon: "qr" },
   { id: "orders", label: "주문 관리", href: "/admin?section=orders", icon: "cart" },
+  { id: "subscriptions", label: "구독 관리", href: "/admin?section=subscriptions", icon: "subscription" },
   { id: "payments", label: "결제 관리", href: "/admin?section=payments", icon: "payment" },
   { id: "products", label: "상품 관리", href: "/admin?section=products", icon: "box" },
   { id: "ads", label: "광고 관리", href: "/admin?section=ads", icon: "megaphone" },
@@ -142,6 +143,14 @@ function iconPath(name) {
           <rect x="3.5" y="6" width="17" height="12" rx="2" />
           <path d="M3.5 10h17" />
           <path d="M7 15h5" />
+        </>
+      );
+    case "subscription":
+      return (
+        <>
+          <circle cx="12" cy="12" r="7.5" />
+          <path d="M10 8.5v7" />
+          <path d="M10 8.5 15.5 12 10 15.5" />
         </>
       );
     case "box":

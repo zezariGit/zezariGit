@@ -4695,3 +4695,63 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Order admin UI refresh, filter/data updates, buyer tracking display, CSS, and documentation: about 45 minutes.
+
+## 2026-06-29 KST - Admin Subscription Management Rebuild
+
+### User Request
+- Rebuild the administrator subscription-management menu to match the provided reference.
+- The detail information card must have two tabs and must handle both vertical and horizontal scrolling.
+
+### Reflected Work
+- Added the `구독 관리` menu to the administrator left navigation.
+- Added `/admin?section=subscriptions` as the admin subscription-management view.
+- Added four subscription summary cards:
+  - total subscriptions
+  - active subscriptions
+  - paused subscriptions
+  - cancelled/refund-related subscriptions
+- Added subscription search filters:
+  - query
+  - subscription product
+  - subscription status
+  - payment status
+  - subscription period
+- Rebuilt the subscription list as a dense grid with:
+  - subscription number
+  - subject and guardian
+  - subscription product
+  - subscription period
+  - next payment date
+  - amount
+  - subscription status
+  - payment status
+  - detail action
+- Added CSV export for the current subscription grid result.
+- Added a right detail card with in-card tabs:
+  - `기본정보`: subject information, subscription information, admin memo
+  - `결제내역`: recent subscription payment/order history
+- Added `subscriptions.admin_memo` for administrator-only subscription operation notes.
+- Added scroll behavior for the subscription grid, detail card, tab panels, and long subscription/payment values.
+- Added `deliverables/ADMIN_SUBSCRIPTION_MANAGEMENT.md`.
+- Added a presentation image prompt for the subscription-management screen.
+
+### Files Changed
+- `lib/db.js`
+- `app/admin/page.js`
+- `app/admin/actions.js`
+- `app/admin/admin-workspace.js`
+- `app/globals.css`
+- `deliverables/ADMIN_SUBSCRIPTION_MANAGEMENT.md`
+- `deliverables/README.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with Windows line-ending warnings only.
+- Turso `subscriptions.admin_memo` schema check succeeded.
+- Turso subscription summary and subscription/order join query succeeded without printing secrets.
+
+### Time Spent
+- Subscription admin UI rebuild, data query work, schema extension, CSS, documentation, and local verification: about 55 minutes.
