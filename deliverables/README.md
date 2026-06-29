@@ -30,6 +30,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `ADMIN_PAYMENT_EXPORT_MANAGEMENT.md`: admin payment ledger grid, product/pass/ad payment data source, and Excel-compatible CSV exports for admin grids.
 - `ADMIN_COUPON_MANAGEMENT.md`: admin coupon ledger, discount conditions, issue limits, status management, and user coupon registration validation.
 - `ADMIN_NOTIFICATION_MANAGEMENT.md`: admin notification/message grid, right-side compose panel, push delivery action, and delivery result tracking.
+- `ADMIN_MESSAGE_TEMPLATE_MANAGEMENT.md`: admin message template grid, locked automatic templates, push/KakaoTalk channel settings, and template seed data.
 - `USER_MANUAL.md`: Google Docs user manual link, coverage, and maintenance rule.
 - Current UI feedback pattern: submit buttons show inline progress bars, and server actions show bottom status messages via `notice` query parameters.
 

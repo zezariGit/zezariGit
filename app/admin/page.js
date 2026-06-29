@@ -17,6 +17,7 @@ import {
   getAdminInquiriesData,
   getAdminLocationSharesData,
   getAdminMessagesData,
+  getAdminMessageTemplatesData,
   getAdminMissingReportsData,
   getAdminOrdersData,
   getAdminPaymentsData,
@@ -45,6 +46,7 @@ import {
   createAdminPaymentRefundAction,
   saveAdminCouponAction,
   saveAdminMessageAction,
+  saveAdminMessageTemplateAction,
   setSubscriptionAdminMemoAction,
   setSubscriptionPlanPriceAction,
 } from "./actions";
@@ -83,7 +85,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "orders", "subscriptions", "ads", "missing", "locations", "notifications", "inquiries"].includes(resolvedSearchParams?.section)
+  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "orders", "subscriptions", "ads", "missing", "locations", "notifications", "message-templates", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -177,6 +179,12 @@ export default async function AdminPage({ searchParams }) {
     startDate: resolvedSearchParams?.messageStart || "",
     endDate: resolvedSearchParams?.messageEnd || "",
   };
+  const selectedTemplateId = resolvedSearchParams?.template || "";
+  const templateFilters = {
+    query: resolvedSearchParams?.templateQuery || "",
+    channel: resolvedSearchParams?.templateChannel || "all",
+    auto: resolvedSearchParams?.templateAuto || "all",
+  };
   const dashboardData = activeSection === "dashboard" ? await getAdminDashboardData(resolvedSearchParams?.month) : null;
   const adminData = activeSection === "guardians" ? await getAdminData(selectedGuardianId, guardianFilters) : null;
   const adminSubjectsData = activeSection === "subjects"
@@ -198,6 +206,7 @@ export default async function AdminPage({ searchParams }) {
   const missingReportsData = activeSection === "missing" ? await getAdminMissingReportsData(missingFilters) : null;
   const locationSharesData = activeSection === "locations" ? await getAdminLocationSharesData(locationFilters, selectedLocationShareId) : null;
   const messagesData = activeSection === "notifications" ? await getAdminMessagesData(messageFilters, composeMessage ? "new" : selectedMessageId) : null;
+  const messageTemplatesData = activeSection === "message-templates" ? await getAdminMessageTemplatesData(templateFilters, selectedTemplateId) : null;
   const inquiriesData = activeSection === "inquiries" ? await getAdminInquiriesData() : null;
   const qrItems = qrData ? await withQrImages(qrData.qrCodes) : [];
   const selectedSubjectQrImage = adminSubjectsData?.selectedSubject?.qr_target_url
@@ -237,6 +246,8 @@ export default async function AdminPage({ searchParams }) {
                   ? "위치공유 관리"
                   : activeSection === "notifications"
                     ? "알림 관리"
+                    : activeSection === "message-templates"
+                      ? "메시지 템플릿"
               : activeSection === "inquiries"
                 ? "고객문의 관리"
                 : "보호자 관리";
@@ -267,6 +278,8 @@ export default async function AdminPage({ searchParams }) {
                   ? "QR 공개 페이지에서 공유된 발견 위치와 지도 링크를 조회합니다."
                   : activeSection === "notifications"
                     ? "가입 보호자에게 푸시 알림 메시지를 작성, 저장, 발송하고 결과를 확인합니다."
+                    : activeSection === "message-templates"
+                      ? "자동/수동 메시지 템플릿의 채널, 대상, 제목과 내용을 관리합니다."
               : activeSection === "inquiries"
                 ? "접수된 고객문의의 제목, 작성자, 상태와 작성일시를 조회합니다."
                 : "보호자 목록을 조회하고 배송지, 등록대상자, 이용권, 결제, 광고와 관리메모를 확인합니다.";
@@ -309,6 +322,8 @@ export default async function AdminPage({ searchParams }) {
             <LocationShareManagementSection locationSharesData={locationSharesData} />
           ) : activeSection === "notifications" ? (
             <NotificationManagementSection messagesData={messagesData} composeMessage={composeMessage} />
+          ) : activeSection === "message-templates" ? (
+            <MessageTemplateManagementSection templatesData={messageTemplatesData} />
           ) : activeSection === "inquiries" ? (
             <InquiryManagementSection inquiriesData={inquiriesData} />
           ) : (
@@ -987,6 +1002,7 @@ function NotificationManagementSection({ messagesData, composeMessage }) {
             <select name="messageChannel" defaultValue={filters.channel}>
               <option value="all">전체</option>
               <option value="push">푸시 알림</option>
+              <option value="kakao">카카오톡</option>
             </select>
           </label>
           <label>
@@ -1151,6 +1167,7 @@ function AdminMessageEditor({ message, subjects, returnTo, compact = false }) {
         발송 채널
         <select name="channel" defaultValue={message?.channel || "push"}>
           <option value="push">푸시 알림</option>
+          <option value="kakao">카카오톡</option>
         </select>
       </label>
 
@@ -1202,6 +1219,203 @@ function AdminMessageEditor({ message, subjects, returnTo, compact = false }) {
         </FormSubmitButton>
       </div>
     </form>
+  );
+}
+
+function MessageTemplateManagementSection({ templatesData }) {
+  const { templates, selectedTemplate, selectedTemplateId, summary, filters } = templatesData;
+  const isCreating = selectedTemplateId === "new" || !selectedTemplate;
+  const editingTemplate = selectedTemplate || {};
+  const locked = Number(editingTemplate.is_locked || 0) === 1;
+  const returnTo = buildMessageTemplateUrl(filters, isCreating ? "new" : editingTemplate.id);
+  const visibleRows = Math.max(0, 12 - templates.length);
+
+  return (
+    <div className="message-template-page">
+      <section className="admin-panel message-template-search-panel">
+        <h2>템플릿 관리</h2>
+        <form className="message-template-search-form" action="/admin">
+          <input type="hidden" name="section" value="message-templates" />
+          <label>
+            검색어
+            <input name="templateQuery" defaultValue={filters.query} placeholder="이벤트, 제목, 내용" />
+          </label>
+          <label>
+            발송 채널
+            <select name="templateChannel" defaultValue={filters.channel}>
+              <option value="all">전체</option>
+              <option value="push">푸시 알림</option>
+              <option value="kakao">카카오톡</option>
+            </select>
+          </label>
+          <label>
+            자동 여부
+            <select name="templateAuto" defaultValue={filters.auto}>
+              <option value="all">전체</option>
+              <option value="auto">자동 메시지</option>
+              <option value="manual">수동 메시지</option>
+            </select>
+          </label>
+          <div className="message-template-search-actions">
+            <Link className="plain-button" href="/admin?section=message-templates">초기화</Link>
+            <button type="submit">검색</button>
+          </div>
+        </form>
+      </section>
+
+      <div className="admin-master-detail message-template-layout">
+        <section className="admin-panel guardian-list-panel message-template-list-panel">
+          <div className="guardian-list-heading">
+            <h2>템플릿 메시지 <small>총 {formatMetricValue(summary.total)}개</small></h2>
+            <AdminExportButton filename="zezari-message-templates.csv" rows={messageTemplateExportRows(templates)} />
+          </div>
+          <div className="admin-record-table-wrap">
+            <div className="admin-record-table message-template-table" role="table" aria-label="메시지 템플릿 목록">
+              <div className="admin-record-header" role="row">
+                <span role="columnheader">이벤트</span>
+                <span role="columnheader">설명</span>
+                <span role="columnheader">발송채널</span>
+                <span role="columnheader">내용</span>
+                <span role="columnheader">발송 대상</span>
+                <span role="columnheader">자동 메시지</span>
+                <span role="columnheader">관리</span>
+              </div>
+              {templates.map((template) => {
+                const isSelected = selectedTemplate?.id === template.id && !isCreating;
+                return (
+                  <Link
+                    className={isSelected ? "admin-record-row active" : "admin-record-row"}
+                    href={buildMessageTemplateUrl(filters, template.id)}
+                    key={template.id}
+                    role="row"
+                  >
+                    <strong role="cell">{template.event_key || "-"}</strong>
+                    <span role="cell">{template.description || template.title || "-"}</span>
+                    <span role="cell"><b className={`message-channel-chip ${template.channel || "push"}`}>{adminMessageChannelLabel(template.channel)}</b></span>
+                    <span role="cell">{truncateText(template.body || "-", 32)}</span>
+                    <span role="cell">{adminMessageTargetTypeLabel(template.target_type)}</span>
+                    <span role="cell">
+                      <b className={`template-auto-chip ${Number(template.is_auto || 0) ? "on" : "off"}`}>
+                        {Number(template.is_auto || 0) ? "ON" : "OFF"}
+                      </b>
+                    </span>
+                    <span role="cell">설정</span>
+                  </Link>
+                );
+              })}
+              {Array.from({ length: visibleRows }).map((_, index) => (
+                <div className="admin-record-row placeholder" role="row" key={`template-empty-${index}`}>
+                  {Array.from({ length: 7 }).map((__, columnIndex) => (
+                    <span role="cell" key={columnIndex}> </span>
+                  ))}
+                </div>
+              ))}
+              {templates.length === 0 && <p className="empty-text">조건에 맞는 메시지 템플릿이 없습니다.</p>}
+            </div>
+          </div>
+          <div className="admin-table-footer">
+            <span>선택한 템플릿 {isCreating ? "0" : "1"}개</span>
+            <Link className="primary-button compact" href={buildMessageTemplateUrl(filters, "new")}>+ 새 템플릿</Link>
+          </div>
+        </section>
+
+        <aside className="admin-panel message-template-detail-panel">
+          <h2>{isCreating ? "메시지 등록" : "메시지 수정"}</h2>
+          {locked && <p className="template-lock-note">자동 메시지는 제목과 내용만 수정할 수 있습니다.</p>}
+          <form action={saveAdminMessageTemplateAction} className="message-template-detail-form">
+            <input type="hidden" name="templateId" value={isCreating ? "" : editingTemplate.id || ""} />
+            <input type="hidden" name="returnTo" value={returnTo} />
+            {locked && (
+              <>
+                <input type="hidden" name="channel" value={editingTemplate.channel || "push"} />
+                <input type="hidden" name="targetType" value={editingTemplate.target_type || "all"} />
+                <input type="hidden" name="isAuto" value={Number(editingTemplate.is_auto || 0) ? "1" : "0"} />
+              </>
+            )}
+
+            {!locked && (
+              <>
+                <label>
+                  이벤트
+                  <input name="eventKey" defaultValue={editingTemplate.event_key || ""} placeholder="예: 결제 완료" maxLength="80" />
+                </label>
+                <label>
+                  설명
+                  <input name="description" defaultValue={editingTemplate.description || ""} placeholder="템플릿 설명" maxLength="160" />
+                </label>
+              </>
+            )}
+
+            <label>
+              알림 채널
+              <select name={locked ? undefined : "channel"} defaultValue={editingTemplate.channel || "push"} disabled={locked}>
+                <option value="push">푸시 알림</option>
+                <option value="kakao">카카오톡</option>
+              </select>
+            </label>
+
+            <label>
+              발송 대상
+              <select name={locked ? undefined : "targetType"} defaultValue={editingTemplate.target_type || "all"} disabled={locked}>
+                <option value="all">전체 회원</option>
+                <option value="subject">대상자 선택</option>
+              </select>
+            </label>
+
+            <label>
+              제목
+              <input name="title" defaultValue={editingTemplate.title || ""} placeholder="제목을 입력하세요" maxLength="120" />
+            </label>
+            <label>
+              내용
+              <textarea name="body" defaultValue={editingTemplate.body || ""} placeholder="내용을 입력하세요" rows="7" maxLength="1000" />
+            </label>
+
+            {!locked && (
+              <section className="message-template-radio-section">
+                <h3>자동 메시지</h3>
+                <div className="message-template-radio-row">
+                  <label>
+                    <input name="isAuto" type="radio" value="1" defaultChecked={Number(editingTemplate.is_auto || 0) === 1} />
+                    <span>ON</span>
+                  </label>
+                  <label>
+                    <input name="isAuto" type="radio" value="0" defaultChecked={Number(editingTemplate.is_auto || 0) !== 1} />
+                    <span>OFF</span>
+                  </label>
+                </div>
+              </section>
+            )}
+
+            <section className="message-template-radio-section">
+              <h3>사용 상태</h3>
+              <div className="message-template-radio-row">
+                <label>
+                  <input name="isActive" type="radio" value="1" defaultChecked={Number(editingTemplate.is_active ?? 1) !== 0} />
+                  <span>사용 가능</span>
+                </label>
+                <label>
+                  <input name="isActive" type="radio" value="0" defaultChecked={Number(editingTemplate.is_active || 0) === 0} />
+                  <span>사용 불가능</span>
+                </label>
+              </div>
+            </section>
+
+            <section className="admin-message-preview" aria-label="템플릿 미리보기">
+              <h3>미리보기</h3>
+              <div>
+                <strong>{editingTemplate.title || "제목이 표시됩니다."}</strong>
+                <p>{editingTemplate.body || "내용이 표시됩니다."}</p>
+              </div>
+            </section>
+
+            <FormSubmitButton className="primary-button compact" pendingText="저장중">
+              저장
+            </FormSubmitButton>
+          </form>
+        </aside>
+      </div>
+    </div>
   );
 }
 
@@ -3938,6 +4152,22 @@ function adminMessageExportRows(messages = []) {
   }));
 }
 
+function messageTemplateExportRows(templates = []) {
+  return templates.map((template) => ({
+    템플릿번호: template.template_number || "-",
+    이벤트: template.event_key || "-",
+    설명: template.description || "",
+    발송채널: adminMessageChannelLabel(template.channel),
+    제목: template.title || "",
+    내용: template.body || "",
+    발송대상: adminMessageTargetTypeLabel(template.target_type),
+    자동메시지: Number(template.is_auto || 0) ? "ON" : "OFF",
+    수정제한: Number(template.is_locked || 0) ? "제목/내용만 수정" : "전체 수정",
+    상태: Number(template.is_active || 0) ? "사용 가능" : "사용 불가능",
+    수정일시: formatRecentDateTime(template.updated_at),
+  }));
+}
+
 function inquiryExportRows(inquiries = []) {
   return inquiries.map((inquiry) => ({
     제목: inquiry.title || "제목 없음",
@@ -4325,6 +4555,7 @@ function couponServiceLabel(scope) {
 }
 
 function adminMessageChannelLabel(channel) {
+  if (channel === "kakao") return "카카오톡";
   return channel === "push" ? "푸시 알림" : channel || "-";
 }
 
@@ -4340,6 +4571,10 @@ function adminMessageTargetLabel(message) {
     return guardianName ? `${subjectName} (${guardianName})` : subjectName;
   }
   return "전체 회원";
+}
+
+function adminMessageTargetTypeLabel(targetType) {
+  return targetType === "subject" ? "대상자 보호자" : "전체 회원";
 }
 
 function formatCouponPeriod(coupon) {
@@ -4469,6 +4704,15 @@ function buildAdminMessageUrl(filters, messageId = "", compose = false) {
   if (filters?.endDate) params.set("messageEnd", filters.endDate);
   if (messageId) params.set("message", messageId);
   if (compose) params.set("compose", "1");
+  return `/admin?${params.toString()}`;
+}
+
+function buildMessageTemplateUrl(filters, templateId = "") {
+  const params = new URLSearchParams({ section: "message-templates" });
+  if (filters?.query) params.set("templateQuery", filters.query);
+  if (filters?.channel && filters.channel !== "all") params.set("templateChannel", filters.channel);
+  if (filters?.auto && filters.auto !== "all") params.set("templateAuto", filters.auto);
+  if (templateId) params.set("template", templateId);
   return `/admin?${params.toString()}`;
 }
 

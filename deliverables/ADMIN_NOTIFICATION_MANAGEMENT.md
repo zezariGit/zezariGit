@@ -2,7 +2,9 @@
 
 ## Scope
 - Adds an administrator `알림 관리` menu for composing, saving, sending, searching, and exporting guardian notifications.
-- The first supported channel is browser push notification.
+- Supported channels:
+  - browser push notification
+  - KakaoTalk message API bridge
 - Messages are also saved into each guardian's in-app notification history so the bell list can show the message after login.
 
 ## Administrator Screen
@@ -30,7 +32,7 @@
 - `+ 새 메시지` opens a right-side modal panel.
 - The modal prevents background selection while it is open.
 - Fields:
-  - 발송 채널: push notification
+  - 발송 채널: push notification or KakaoTalk
   - 발송 대상: all active guardians or one selected subject's guardian
   - 제목
   - 내용
@@ -55,6 +57,29 @@
 - A guardian is counted as a push success only when at least one registered push subscription accepts the notification.
 - If the guardian has no push subscription, the in-app notification is still saved, but the push result is counted as failure for operational visibility.
 - VAPID keys must be configured for browser push delivery.
+
+## KakaoTalk Delivery Notes
+- KakaoTalk delivery uses an external Kakao/Biz message API bridge.
+- Required runtime environment variables:
+  - `KAKAO_MESSAGE_API_URL`
+  - `KAKAO_MESSAGE_API_KEY` or `KAKAO_REST_API_KEY`
+  - optional `KAKAO_MESSAGE_SENDER_KEY`
+  - optional `KAKAO_MESSAGE_SENDER_NO`
+- When Kakao credentials are missing, the administrator message is still saved and guardian in-app notification records are created, but Kakao delivery is counted as failure for operational visibility.
+- The current generic request payload includes receiver phone, title, body, URL, sender key, and sender number so it can be mapped to an AlimTalk/provider endpoint.
+
+## Template Management
+- Added administrator menu: `메시지 템플릿`.
+- Templates can define:
+  - event key
+  - description
+  - delivery channel
+  - target type
+  - title
+  - body
+  - auto-message flag
+  - active status
+- Locked automatic templates only allow title/body editing.
 
 ## Coupon Detail UI Fix
 - Coupon registration/edit radio groups were adjusted so labels do not overlap:

@@ -4976,3 +4976,63 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Coupon spacing fix, admin notification UI, DB/action/push wiring, documentation, and local verification: about 55 minutes.
+
+## 2026-06-30 KST - KakaoTalk Notification Channel And Message Templates
+
+### User Request
+- Add `카카오톡` as a delivery channel in administrator notification management.
+- KakaoTalk messages should be sendable from the message screen.
+- Add a `메시지 템플릿` administrator menu based on the provided reference image.
+- Automatic messages should only allow title/body edits.
+
+### Reflected Work
+- Added `카카오톡` option to notification channel filters and compose/edit forms.
+- Extended admin message sending so channel `kakao` is routed through a Kakao/Biz message API bridge.
+- Added Kakao delivery environment variable support:
+  - `KAKAO_MESSAGE_API_URL`
+  - `KAKAO_MESSAGE_API_KEY` or `KAKAO_REST_API_KEY`
+  - optional `KAKAO_MESSAGE_SENDER_KEY`
+  - optional `KAKAO_MESSAGE_SENDER_NO`
+- Kakao sends use guardian phone/safe-phone values from the selected recipients.
+- If Kakao API configuration is missing, messages are still saved and guardian in-app notifications are created, but delivery is counted as failure.
+- Added `message_templates` table and indexes.
+- Added seeded message templates:
+  - QR 미활성화 안내
+  - 구독 / 갱신
+  - 실종광고 종료
+  - 취소/환불
+- Added `/admin?section=message-templates` with:
+  - search filters
+  - dense template grid
+  - CSV export
+  - right detail/edit card
+  - locked automatic-template behavior
+- Added `saveAdminMessageTemplateAction()`.
+- Updated `DB_SCHEMA_VERSION` from 11 to 12.
+- Added `deliverables/ADMIN_MESSAGE_TEMPLATE_MANAGEMENT.md`.
+- Updated notification deliverable and presentation image prompts.
+
+### Files Changed
+- `app/admin/actions.js`
+- `app/admin/admin-workspace.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `lib/db.js`
+- `lib/push.js`
+- `deliverables/ADMIN_NOTIFICATION_MANAGEMENT.md`
+- `deliverables/ADMIN_MESSAGE_TEMPLATE_MANAGEMENT.md`
+- `deliverables/README.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with Windows line-ending warnings only.
+- Turso `message_templates` schema check succeeded.
+- Turso default message-template seed check returned 4 rows, including 1 KakaoTalk template.
+- Local `/admin?section=notifications` returned HTTP 200.
+- Local `/admin?section=message-templates` returned HTTP 200.
+
+### Time Spent
+- Kakao channel foundation, template management UI/schema/actions, documentation, DB verification, and local route verification: about 65 minutes.

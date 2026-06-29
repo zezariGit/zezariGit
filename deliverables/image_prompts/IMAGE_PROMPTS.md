@@ -288,3 +288,15 @@ Create a Korean SaaS admin console UI mockup for "REAL_QR_FIND" notification man
 
 ### Notes
 - Use when explaining that administrators can send operational push messages to all active guardians or to the guardian of a selected subject.
+- Updated on 2026-06-30: include "카카오톡" as a selectable 발송 채널 and show delivery result counts for channels that may require external provider configuration.
+
+## 2026-06-30 - Admin Message Template Management
+
+### Purpose
+- Presentation visual for the administrator message-template management screen.
+
+### Prompt
+Create a Korean SaaS admin console UI mockup for "REAL_QR_FIND" message template management. Show a dark navy left admin sidebar with "메시지 템플릿" selected and a white operations workspace. The page title is "템플릿 관리". The main area is split into a large left grid and a right detail card. The left grid is titled "템플릿 메시지" and has columns "이벤트, 설명, 발송채널, 내용, 발송 대상, 자동 메시지, 관리". Show example rows for "QR 미활성화 안내", "구독 / 갱신", "실종광고 종료", and "취소/환불". Use small channel chips for "푸시 알림" and "카카오톡"; show ON/OFF pill toggles for automatic messages. The right detail card is titled "메시지 수정" and contains fields for "알림 채널", "발송 대상", "제목", "내용", and a preview box. Also show a locked automatic-template state with a red note: "자동 메시지는 제목과 내용만 수정할 수 있습니다." Use the existing REAL_QR_FIND admin style: white panels, thin gray grid lines, restrained purple actions, black headings, compact Korean labels, and no real personal data.
+
+### Notes
+- Use when explaining that common operational messages can be managed centrally before being used by push or KakaoTalk delivery flows.

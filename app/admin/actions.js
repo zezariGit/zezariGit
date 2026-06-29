@@ -14,6 +14,7 @@ import {
   markAdminMessageSent,
   saveAdminCoupon,
   saveAdminMessage,
+  saveAdminMessageTemplate,
   setAdminSubjectAdMemo,
   setAdminSubjectAdStatus,
   setAdDailyRate,
@@ -194,7 +195,8 @@ export async function saveAdminMessageAction(formData) {
       if (!message) throw new Error("저장된 알림 메시지를 찾을 수 없습니다.");
       const recipients = await getAdminMessageRecipients(message);
       const result = await notifyGuardiansFromAdmin({
-        guardianIds: recipients.map((guardian) => guardian.id),
+        recipients,
+        channel: message.channel,
         title: message.title,
         body: message.body || "",
         url: message.url || "/",
@@ -209,6 +211,21 @@ export async function saveAdminMessageAction(formData) {
 
   const message = command === "send" ? "알림 메시지를 발송했습니다." : "알림 메시지가 저장되었습니다.";
   redirect(withNotice(`/admin?section=notifications&message=${encodeURIComponent(messageId)}`, message));
+}
+
+export async function saveAdminMessageTemplateAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  let templateId = "";
+  try {
+    templateId = await saveAdminMessageTemplate(formData);
+    revalidatePath("/admin");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=message-templates"), error.message || "메시지 템플릿 저장에 실패했습니다.", "error"));
+  }
+
+  redirect(withNotice(`/admin?section=message-templates&template=${encodeURIComponent(templateId)}`, "메시지 템플릿이 저장되었습니다."));
 }
 
 export async function setSubscriptionAdminMemoAction(formData) {

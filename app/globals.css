@@ -8686,6 +8686,11 @@ button:disabled:hover {
   color: #075985;
 }
 
+.message-channel-chip.kakao {
+  background: #fef3c7;
+  color: #92400e;
+}
+
 .message-status-chip.draft {
   background: #eef2ff;
   color: #4338ca;
@@ -8848,6 +8853,165 @@ button:disabled:hover {
   color: var(--c-text);
   font-size: 1.1rem;
   font-weight: 900;
+}
+
+.message-template-page {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.message-template-search-panel {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.message-template-search-panel h2,
+.message-template-detail-panel h2 {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 1.08rem;
+  font-weight: 900;
+}
+
+.message-template-search-form {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 150px 150px auto;
+  gap: var(--space-sm);
+  align-items: end;
+}
+
+.message-template-search-form label,
+.message-template-detail-form label {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  color: var(--c-text);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.message-template-search-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+}
+
+.message-template-search-actions button,
+.message-template-search-actions a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-md);
+  white-space: nowrap;
+}
+
+.message-template-search-actions button {
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--c-primary);
+  color: #ffffff;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.message-template-layout {
+  grid-template-columns: minmax(0, 1.5fr) minmax(340px, 0.72fr);
+}
+
+.message-template-list-panel {
+  min-height: 560px;
+}
+
+.message-template-table {
+  min-width: 980px;
+}
+
+.message-template-table .admin-record-header,
+.message-template-table .admin-record-row {
+  grid-template-columns: 124px minmax(130px, 1fr) 82px minmax(170px, 1.45fr) 110px 92px 70px;
+}
+
+.message-template-table .admin-record-row {
+  min-height: 42px;
+}
+
+.message-template-table .admin-record-row > strong,
+.message-template-table .admin-record-row > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 11px;
+}
+
+.template-auto-chip {
+  min-width: 54px;
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.template-auto-chip.on {
+  background: #22c55e;
+}
+
+.template-auto-chip.off {
+  background: #ef4444;
+}
+
+.message-template-detail-panel {
+  max-height: calc(100vh - 120px);
+  display: grid;
+  align-content: start;
+  gap: var(--space-md);
+  overflow: auto;
+}
+
+.template-lock-note {
+  margin: 0;
+  color: var(--c-danger);
+  font-size: 0.82rem;
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+.message-template-detail-form {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.message-template-radio-section {
+  display: grid;
+  gap: 7px;
+}
+
+.message-template-radio-section h3 {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.message-template-radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 30px;
+  align-items: center;
+}
+
+.message-template-radio-row label {
+  min-width: 92px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.message-template-radio-row input[type="radio"] {
+  flex: 0 0 auto;
 }
 
 .sr-only {
@@ -10295,7 +10459,9 @@ button:disabled:hover {
 
 @media (max-width: 1100px) {
   .admin-message-search-form,
-  .admin-message-layout {
+  .admin-message-layout,
+  .message-template-search-form,
+  .message-template-layout {
     grid-template-columns: 1fr;
   }
 
@@ -10327,5 +10493,11 @@ button:disabled:hover {
     height: calc(100vh - 24px);
     margin: 12px;
     padding: var(--space-md);
+  }
+
+  .message-template-search-actions,
+  .message-template-radio-row {
+    align-items: stretch;
+    display: grid;
   }
 }
