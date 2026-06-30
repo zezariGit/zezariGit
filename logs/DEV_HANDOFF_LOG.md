@@ -5090,7 +5090,14 @@ This file is the cumulative technical handoff log. It must be updated whenever r
   - correct code returned a 64-character verification token.
   - signup completion succeeded with a valid token.
   - token reuse/wrong-phone signup attempt was rejected with 400.
-- Deployment verification is pending until the GitHub/Vercel publish step completes.
+- GitHub commit: `b7ed5f6 Add server phone verification for signup`.
+- GitHub push to `origin/main` succeeded.
+- Vercel production deployment: `https://zezari-ql0y3boes-zezari.vercel.app`.
+- Deployment status: Ready.
+- Production alias `https://zezari.vercel.app` was reassigned to the new deployment after it was found pointing to an older deployment.
+- Production checks:
+  - `https://zezari.vercel.app` returned HTTP 200.
+  - `POST /api/signup/phone/send` returned the expected validation error for an invalid phone number, confirming the new route is live.
 
 ### Time Spent
 - Server verification API, DB schema, signup UI rewiring, SMS adapter, documentation, and local verification: about 55 minutes.

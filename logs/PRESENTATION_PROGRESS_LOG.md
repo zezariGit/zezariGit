@@ -3495,7 +3495,14 @@ This file is the cumulative presentation-ready project log. It is written so the
   - 올바른 인증번호 검증 성공.
   - 검증 토큰 기반 회원가입 성공.
   - 토큰 재사용/다른 전화번호 사용 실패.
-- GitHub push 및 Vercel 배포 확인은 최종 배포 단계에서 진행한다.
+- GitHub commit: `b7ed5f6 Add server phone verification for signup`
+- GitHub push to `origin/main` 완료.
+- Vercel 운영 배포: `https://zezari-ql0y3boes-zezari.vercel.app`
+- 배포 상태: Ready.
+- `https://zezari.vercel.app` 별칭이 이전 배포를 보고 있어 최신 배포로 재연결했다.
+- 운영 확인:
+  - `https://zezari.vercel.app` HTTP 200 확인.
+  - 잘못된 휴대폰 번호로 `POST /api/signup/phone/send` 호출 시 정상 라우트의 검증 오류가 반환됨을 확인.
 
 ### 산출물
 - `deliverables/AUTH_PHONE_VERIFICATION.md` 생성
