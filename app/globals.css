@@ -180,17 +180,18 @@ a {
 
 .verification-code-row {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
 }
 
 .verification-code-row input {
   width: 100%;
+  min-width: 0;
   aspect-ratio: 1;
   border: 1.5px solid #111827;
-  border-radius: 13px;
+  border-radius: 11px;
   text-align: center;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 900;
 }
 

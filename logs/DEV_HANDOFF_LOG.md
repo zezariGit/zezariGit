@@ -5101,3 +5101,30 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Server verification API, DB schema, signup UI rewiring, SMS adapter, documentation, and local verification: about 55 minutes.
+
+## 2026-06-30 KST - Signup Verification Code Layout Adjustment
+
+### User Request
+- The six phone verification code inputs wrap so the last input moves to the next line.
+- Make all six inputs display on one line.
+- Explain where `SMS_API_URL`, `SMS_API_KEY`, `SMS_API_SECRET`, and `SMS_SENDER_NO` should be obtained.
+
+### Reflected Work
+- Updated `.verification-code-row` from a five-column grid to a six-column grid.
+- Reduced the verification input gap, radius, and font size so the six boxes fit on narrow mobile screens.
+- Kept the same component markup so both direct signup and SNS signup completion inherit the fix.
+
+### Files Changed
+- `app/globals.css`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+
+### Notes
+- SMS credentials must come from the chosen SMS provider console.
+- Recommended Korean providers to evaluate first are SOLAPI/CoolSMS, NHN Cloud SMS, or Naver Cloud SENS.
+
+### Time Spent
+- Layout correction, build verification, and provider guidance: about 15 minutes.
