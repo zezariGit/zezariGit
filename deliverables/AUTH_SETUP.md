@@ -42,7 +42,9 @@ Project: REAL_QR_FIND
 - SNS first login also uses the same guardian signup completion flow when the account is not complete yet.
 - When SNS provider data includes name or email, those values are prefilled in the signup information step.
 - Existing complete guardians go directly to the dashboard after SNS login.
-- Phone verification is currently implemented in test mode. It shows a temporary code in the screen message until a real SMS provider is connected.
+- Phone verification is implemented through server-issued SMS verification APIs. The screen no longer displays test codes.
+- Production SMS delivery requires the SMS environment variables documented in `AUTH_PHONE_VERIFICATION.md`.
+- Local development can use `SMS_DEV_BYPASS_CODE`; this bypass is disabled in production.
 - Guardian ID/password login works after the guardian profile has saved `아이디` and `비밀번호`.
 
 ## Google Cloud Console Requirements

@@ -5036,3 +5036,61 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Kakao channel foundation, template management UI/schema/actions, documentation, DB verification, and local route verification: about 65 minutes.
+
+## 2026-06-30 KST - Signup Phone Verification Server Integration
+
+### User Request
+- Replace temporary client-side phone verification during signup with the real signup verification flow modeled after the legacy `reference/wp` site.
+- The legacy backup should be referenced, but secrets and unavailable plugin internals must not be copied into the app.
+
+### Reference Finding
+- `reference/wp` contains WordPress core and SQL data, but the MShop plugin source files are not present.
+- `reference/wp.sql` confirms the legacy signup used MShop Members, MShop SMS, and MShop User Certification fields for required mobile phone certification.
+- The current app reimplements the behavior in Next.js/Turso instead of porting unavailable PHP plugin code.
+
+### Reflected Work
+- Added `phone_verifications` table and indexes.
+- Updated `DB_SCHEMA_VERSION` from 12 to 13.
+- Added server APIs:
+  - `POST /api/signup/phone/send`
+  - `POST /api/signup/phone/verify`
+- Added SMS adapter foundation using:
+  - `SMS_PROVIDER`
+  - `SMS_API_URL`
+  - `SMS_API_KEY`
+  - `SMS_API_SECRET`
+  - `SMS_SENDER_NO`
+  - development-only `SMS_DEV_BYPASS_CODE`
+- Removed client-side generated test codes from direct signup and SNS signup completion.
+- Direct signup and SNS signup completion now require a one-time `phoneVerificationToken`.
+- Verification codes and verification tokens are stored as hashes only.
+- Added `deliverables/AUTH_PHONE_VERIFICATION.md`.
+- Updated authentication deliverables.
+
+### Files Changed
+- `app/auth-actions.js`
+- `app/social-signup-completion.js`
+- `app/api/signup/phone/send/route.js`
+- `app/api/signup/phone/verify/route.js`
+- `lib/db.js`
+- `lib/sms.js`
+- `deliverables/AUTH_PHONE_VERIFICATION.md`
+- `deliverables/AUTH_SETUP.md`
+- `deliverables/README.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with Windows line-ending warnings only.
+- Local temporary libSQL API scenario checks succeeded:
+  - invalid phone rejected with 400.
+  - verification send succeeded with development-only `SMS_DEV_BYPASS_CODE`.
+  - wrong code rejected with 400.
+  - correct code returned a 64-character verification token.
+  - signup completion succeeded with a valid token.
+  - token reuse/wrong-phone signup attempt was rejected with 400.
+- Deployment verification is pending until the GitHub/Vercel publish step completes.
+
+### Time Spent
+- Server verification API, DB schema, signup UI rewiring, SMS adapter, documentation, and local verification: about 55 minutes.

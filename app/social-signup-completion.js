@@ -15,14 +15,13 @@ export default function SocialSignupCompletion({ guardian, session }) {
     privacyAgreed: false,
     serviceAgreed: false,
   });
-  const [verificationCode, setVerificationCode] = useState("");
-  const [codeInput, setCodeInput] = useState(["", "", "", "", ""]);
-  const [verifiedPhone, setVerifiedPhone] = useState(
-    guardian?.phone && guardian?.phone_verified_at ? guardian.phone : ""
-  );
+  const [codeInput, setCodeInput] = useState(["", "", "", "", "", ""]);
+  const [verifiedPhone, setVerifiedPhone] = useState("");
+  const [phoneVerificationToken, setPhoneVerificationToken] = useState("");
   const [seconds, setSeconds] = useState(0);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [phoneVerificationLoading, setPhoneVerificationLoading] = useState(false);
 
   useEffect(() => {
     if (seconds <= 0) return undefined;
@@ -34,21 +33,46 @@ export default function SocialSignupCompletion({ guardian, session }) {
 
   const update = (key, value) => {
     setForm((current) => ({ ...current, [key]: value }));
+    if (key === "phone") {
+      setVerifiedPhone("");
+      setPhoneVerificationToken("");
+      setCodeInput(["", "", "", "", "", ""]);
+    }
   };
 
-  const requestCode = () => {
+  const requestCode = async () => {
     const digits = form.phone.replace(/\D/g, "");
     if (!/^01[016789]\d{7,8}$/.test(digits)) {
       setMessage("휴대폰 번호를 정확히 입력해 주세요.");
       return;
     }
 
-    const nextCode = String(Math.floor(10000 + Math.random() * 90000));
-    setVerificationCode(nextCode);
-    setCodeInput(["", "", "", "", ""]);
-    setVerifiedPhone("");
-    setSeconds(180);
-    setMessage(`테스트 인증코드 ${nextCode}를 입력해 주세요. 실제 문자 발송은 SMS 연동 후 교체됩니다.`);
+    setPhoneVerificationLoading(true);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/signup/phone/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: form.phone, purpose: "signup" }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) {
+        setMessage(data.message || "인증번호 발송에 실패했습니다.");
+        setPhoneVerificationLoading(false);
+        return;
+      }
+
+      setCodeInput(["", "", "", "", "", ""]);
+      setVerifiedPhone("");
+      setPhoneVerificationToken("");
+      setSeconds(data.expiresInSeconds || 180);
+      setMessage("인증번호를 발송했습니다. 문자로 받은 6자리 번호를 입력해 주세요.");
+    } catch {
+      setMessage("인증번호 발송 중 오류가 발생했습니다.");
+    } finally {
+      setPhoneVerificationLoading(false);
+    }
   };
 
   const updateCode = (index, value) => {
@@ -59,24 +83,47 @@ export default function SocialSignupCompletion({ guardian, session }) {
     }
   };
 
-  const verifyCode = () => {
-    if (!verificationCode || seconds <= 0) {
+  const verifyCode = async () => {
+    const code = codeInput.join("");
+    if (!code || seconds <= 0) {
       setMessage("인증코드를 다시 받아 주세요.");
       return;
     }
-    if (codeInput.join("") !== verificationCode) {
-      setMessage("인증코드가 일치하지 않습니다.");
+    if (!/^\d{6}$/.test(code)) {
+      setMessage("6자리 인증번호를 입력해 주세요.");
       return;
     }
 
-    setVerifiedPhone(form.phone);
-    setStep("profile");
-    setMessage("휴대폰 인증이 완료되었습니다.");
+    setPhoneVerificationLoading(true);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/signup/phone/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: form.phone, code, purpose: "signup" }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) {
+        setMessage(data.message || "인증번호가 일치하지 않습니다.");
+        setPhoneVerificationLoading(false);
+        return;
+      }
+
+      setVerifiedPhone(data.phone || form.phone);
+      setPhoneVerificationToken(data.phoneVerificationToken || "");
+      setStep("profile");
+      setMessage("휴대폰 인증이 완료되었습니다.");
+    } catch {
+      setMessage("인증번호 확인 중 오류가 발생했습니다.");
+    } finally {
+      setPhoneVerificationLoading(false);
+    }
   };
 
   const submit = async (event) => {
     event.preventDefault();
-    if (!verifiedPhone) {
+    if (!verifiedPhone || !phoneVerificationToken) {
       setStep("phone");
       setMessage("휴대폰 인증을 먼저 완료해 주세요.");
       return;
@@ -92,6 +139,7 @@ export default function SocialSignupCompletion({ guardian, session }) {
         body: JSON.stringify({
           ...form,
           phone: verifiedPhone,
+          phoneVerificationToken,
         }),
       });
       const data = await response.json();
@@ -139,8 +187,8 @@ export default function SocialSignupCompletion({ guardian, session }) {
                 inputMode="tel"
               />
             </label>
-            <button className="login-submit" type="button" onClick={requestCode}>
-              인증코드 받기
+            <button className="login-submit" type="button" onClick={requestCode} disabled={phoneVerificationLoading}>
+              {phoneVerificationLoading ? "발송 중" : "인증코드 받기"}
             </button>
             <div className="signup-separator" />
             <div className="code-heading">
@@ -165,10 +213,10 @@ export default function SocialSignupCompletion({ guardian, session }) {
                 />
               ))}
             </div>
-            <button className="login-submit" type="button" onClick={verifyCode}>
-              확인
+            <button className="login-submit" type="button" onClick={verifyCode} disabled={phoneVerificationLoading}>
+              {phoneVerificationLoading ? "확인 중" : "확인"}
             </button>
-            <button className="signup-link centered-link" type="button" onClick={requestCode}>
+            <button className="signup-link centered-link" type="button" onClick={requestCode} disabled={phoneVerificationLoading}>
               인증번호가 오지 않았나요? 재전송
             </button>
           </div>
