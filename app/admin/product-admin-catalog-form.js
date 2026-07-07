@@ -40,8 +40,6 @@ export default function ProductAdminCatalogForm({ product }) {
       <form action={setProductCatalogItemAction} className="product-admin-form">
         <input type="hidden" name="productId" value={product.id} />
         <input type="hidden" name="returnTo" value="/admin?section=products" />
-        <input type="hidden" name="existingImage" value={product.image_data_url || ""} />
-        <input type="hidden" name="existingImageName" value={product.image_name || ""} />
         <input type="hidden" name="designCount" value={designRows.length} />
 
         <label>
@@ -91,10 +89,6 @@ export default function ProductAdminCatalogForm({ product }) {
           {designRows.map((design, index) => (
             <div className="product-design-admin-row" key={design.id || design.draftKey}>
               <input type="hidden" name={`designId_${index}`} value={design.id || ""} />
-              <input type="hidden" name={`existingDesignOptionImage_${index}`} value={design.option_image_data_url || ""} />
-              <input type="hidden" name={`existingDesignOptionImageName_${index}`} value={design.option_image_name || ""} />
-              <input type="hidden" name={`existingDesignDetailImage_${index}`} value={design.detail_image_data_url || ""} />
-              <input type="hidden" name={`existingDesignDetailImageName_${index}`} value={design.detail_image_name || ""} />
               <div className="product-design-admin-header">
                 <strong>{design.id ? design.name || `디자인 ${index + 1}` : "신규 디자인"}</strong>
                 <div className="product-design-admin-header-actions">

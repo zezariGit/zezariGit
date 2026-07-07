@@ -3589,3 +3589,28 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 관리자 폼 분리, 디자인 추가 버튼, 체크박스 CSS, 디자인 조회 필터, 사용자 디자인 선택 화면 수정, 빌드 검증: 약 45분.
+
+## 2026-07-08 - 상품 디자인 추가 서버 오류 개선
+
+### 요구내용
+- 관리자 상품관리에서 디자인을 추가하면 `This page couldn't load` 서버 오류 화면이 표시된다.
+
+### 원인분석
+- Vercel 운영 로그에서 `POST /admin` 요청이 `Body exceeded 1 MB limit` 오류로 실패하는 것을 확인했다.
+- 새 이미지 업로드 파일과 함께 기존 상품/디자인 이미지 base64 데이터가 hidden input으로 다시 전송되어 Server Action 기본 용량 제한을 초과했다.
+
+### 반영내용
+- Server Action 요청 허용량을 `8mb`로 설정했다.
+- 기존 상품 대표 이미지와 디자인 이미지를 hidden input으로 전송하지 않도록 제거했다.
+- 새 파일을 올리지 않은 경우 서버가 DB에 저장된 기존 이미지를 그대로 유지하도록 저장 로직을 수정했다.
+- 이미지 파일 1개당 1MB 제한은 유지했다.
+- 상품 디자인 산출물 문서에 업로드 방식과 제한 사항을 기록했다.
+
+### 검증결과
+- 프로덕션 빌드 성공.
+
+### 산출물
+- `deliverables/PRODUCT_DESIGN_CATALOG.md` 갱신.
+
+### 반영시간
+- 운영 로그 확인, 원인 분석, 소스 수정, 문서화, 빌드 검증: 약 25분.

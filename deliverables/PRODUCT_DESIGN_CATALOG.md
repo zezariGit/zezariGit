@@ -28,6 +28,13 @@
 4. In the design section, edit each design name, description, option image, detail image, optional price, active state, and sort order.
 5. Click `+ 디자인 추가` only when another design is needed.
 6. Each click adds one editable design row with thumbnail and detail-image upload controls.
+7. Existing product and design images are retained from the database when no new file is uploaded.
+
+## Upload Notes
+- Image uploads are stored as data URLs in the database.
+- Each image file is limited to 1MB by server validation.
+- The admin form does not resubmit existing base64 image data in hidden fields; this prevents Server Action request bodies from growing every time a product is saved.
+- `next.config.mjs` sets the Server Action body size limit to 8MB so a representative image plus design thumbnail/detail images can be submitted without hitting the default 1MB limit.
 
 ## User Flow
 1. Guardian opens `/shop`.

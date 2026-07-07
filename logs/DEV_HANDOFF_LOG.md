@@ -5210,3 +5210,34 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Admin form extraction, add-design interaction, checkbox CSS fix, product design filtering, shop picker adjustment, and build verification: about 45 minutes.
+
+## 2026-07-08 KST - Product Design Upload Server Error Fix
+
+### User Request
+- Adding a product design in the admin product management screen shows the generic server error page: `This page couldn't load`.
+
+### Analysis
+- Production logs for `POST /admin` showed `Body exceeded 1 MB limit`.
+- The product admin Server Action was receiving newly uploaded image files and hidden fields containing existing product/design image data URLs.
+- Because existing images are base64 strings, every save resent large image data even when the administrator did not change those images.
+
+### Reflected Work
+- Added `next.config.mjs` and configured Server Action `bodySizeLimit` to `8mb`.
+- Removed hidden form fields that posted existing image data URLs from `ProductAdminCatalogForm`.
+- Changed `setProductCatalogItem()` so it loads the current product and product-design image data from the database when no new file is uploaded.
+- Kept the existing 1MB per-image validation in `fileToDataUrl()`.
+- Updated `deliverables/PRODUCT_DESIGN_CATALOG.md` with upload behavior and limits.
+
+### Files Changed
+- `next.config.mjs`
+- `app/admin/product-admin-catalog-form.js`
+- `lib/db.js`
+- `deliverables/PRODUCT_DESIGN_CATALOG.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+
+### Time Spent
+- Production log analysis, form payload reduction, Server Action limit configuration, documentation, and build verification: about 25 minutes.
