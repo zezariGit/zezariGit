@@ -1579,7 +1579,7 @@ function OrderManagementSection({ ordersData }) {
                       <small>{order.guardian_name || "보호자 미입력"}</small>
                     </span>
                     <span role="cell">{order.display_recipient_phone || order.guardian_phone || "-"}</span>
-                    <span role="cell">{order.product_name || "상품 미확인"} ({order.order_type === "standalone" ? "단독" : `${order.plan_months || "-"}개월`})</span>
+                    <span role="cell">{formatOrderProductName(order)} ({order.order_type === "standalone" ? "단독" : `${order.plan_months || "-"}개월`})</span>
                     <span role="cell">{order.quantity || 1}개</span>
                     <span role="cell">{formatCurrency(order.amount)}</span>
                     <span role="cell">{formatCurrency(order.amount)}</span>
@@ -1640,14 +1640,14 @@ function OrderManagementSection({ ordersData }) {
                 <h3>주문 상품</h3>
                 <div className="order-detail-product">
                   <div className="order-detail-product-image">
-                    {selectedOrder.product_image_data_url ? (
-                      <img src={selectedOrder.product_image_data_url} alt={`${selectedOrder.product_name || "상품"} 이미지`} />
+                    {selectedOrder.design_option_image_data_url || selectedOrder.product_image_data_url ? (
+                      <img src={selectedOrder.design_option_image_data_url || selectedOrder.product_image_data_url} alt={`${formatOrderProductName(selectedOrder)} 이미지`} />
                     ) : (
                       <span aria-hidden="true">QR</span>
                     )}
                   </div>
                   <dl className="admin-detail-list">
-                    <div><dt>상품명</dt><dd>{selectedOrder.product_name || "상품 미확인"}</dd></div>
+                    <div><dt>상품명</dt><dd>{formatOrderProductName(selectedOrder)}</dd></div>
                     <div><dt>옵션</dt><dd>{selectedOrder.order_type === "standalone" ? "상품 단독 구매" : `${selectedOrder.plan_months || "-"}개월 이용권`}</dd></div>
                     <div><dt>수량</dt><dd>{selectedOrder.quantity || 1}개</dd></div>
                     <div><dt>결제금액</dt><dd>{formatCurrency(selectedOrder.amount)}</dd></div>
@@ -2827,60 +2827,131 @@ function ProductManagementSection({ productsData }) {
         </div>
         <p className="empty-text">업로드한 상품 이미지는 사용자 상품 선택 화면에 노출됩니다. 이미지는 1MB 이하만 저장됩니다.</p>
         <div className="product-admin-grid">
-          {products.map((product) => (
-            <article className="product-admin-card" key={product.id}>
-              <div className="product-admin-preview">
-                {product.image_data_url ? (
-                  <img src={product.image_data_url} alt={`${product.name} 상품 이미지`} />
-                ) : (
-                  <span aria-hidden="true">{productFallbackIcon(product.slug)}</span>
-                )}
-              </div>
-              <form action={setProductCatalogItemAction} className="product-admin-form">
-                <input type="hidden" name="productId" value={product.id} />
-                <input type="hidden" name="returnTo" value="/admin?section=products" />
-                <input type="hidden" name="existingImage" value={product.image_data_url || ""} />
-                <input type="hidden" name="existingImageName" value={product.image_name || ""} />
-                <label>
-                  상품명
-                  <input name="name" defaultValue={product.name || ""} required />
-                </label>
-                <label>
-                  설명
-                  <input name="description" defaultValue={product.description || ""} placeholder="상품 설명" />
-                </label>
-                <label>
-                  단독 구매 가격
-                  <input name="unitPrice" type="number" min="0" step="100" defaultValue={product.unit_price || 0} />
-                </label>
-                <label>
-                  정렬
-                  <input name="sortOrder" type="number" step="1" defaultValue={product.sort_order || 0} />
-                </label>
-                <label>
-                  상품 이미지
-                  <input name="image" type="file" accept="image/*" />
-                </label>
-                <div className="product-admin-options">
-                  <label>
-                    <input name="isActive" type="checkbox" value="1" defaultChecked={product.is_active !== 0} />
-                    <span>사용자 화면에 노출</span>
-                  </label>
-                  <label>
-                    <input name="removeImage" type="checkbox" value="1" />
-                    <span>이미지 삭제</span>
-                  </label>
+          {products.map((product) => {
+            const designRows = [...(product.designs || []), { id: "", name: "", description: "", sort_order: (product.designs || []).length + 1, is_active: 1 }];
+            return (
+              <article className="product-admin-card" key={product.id}>
+                <div className="product-admin-preview">
+                  {product.image_data_url ? (
+                    <img src={product.image_data_url} alt={`${product.name} 상품 이미지`} />
+                  ) : (
+                    <span aria-hidden="true">{productFallbackIcon(product.slug)}</span>
+                  )}
                 </div>
-                <FormSubmitButton pendingText="저장중">
-                  상품 저장
-                </FormSubmitButton>
-              </form>
-            </article>
-          ))}
+                <form action={setProductCatalogItemAction} className="product-admin-form">
+                  <input type="hidden" name="productId" value={product.id} />
+                  <input type="hidden" name="returnTo" value="/admin?section=products" />
+                  <input type="hidden" name="existingImage" value={product.image_data_url || ""} />
+                  <input type="hidden" name="existingImageName" value={product.image_name || ""} />
+                  <input type="hidden" name="designCount" value={designRows.length} />
+                  <label>
+                    상품명
+                    <input name="name" defaultValue={product.name || ""} required />
+                  </label>
+                  <label>
+                    설명
+                    <input name="description" defaultValue={product.description || ""} placeholder="상품 설명" />
+                  </label>
+                  <label>
+                    단독 구매 기본 가격
+                    <input name="unitPrice" type="number" min="0" step="100" defaultValue={product.unit_price || 0} />
+                  </label>
+                  <label>
+                    정렬
+                    <input name="sortOrder" type="number" step="1" defaultValue={product.sort_order || 0} />
+                  </label>
+                  <label>
+                    상품 대표 이미지
+                    <input name="image" type="file" accept="image/*" />
+                  </label>
+                  <div className="product-admin-options">
+                    <label>
+                      <input name="isActive" type="checkbox" value="1" defaultChecked={product.is_active !== 0} />
+                      <span>사용자 화면에 노출</span>
+                    </label>
+                    <label>
+                      <input name="removeImage" type="checkbox" value="1" />
+                      <span>대표 이미지 삭제</span>
+                    </label>
+                  </div>
+
+                  <fieldset className="product-design-admin-list">
+                    <legend>디자인별 이미지와 상세페이지</legend>
+                    {designRows.map((design, index) => (
+                      <div className="product-design-admin-row" key={design.id || `new-${product.id}`}>
+                        <input type="hidden" name={`designId_${index}`} value={design.id || ""} />
+                        <input type="hidden" name={`existingDesignOptionImage_${index}`} value={design.option_image_data_url || ""} />
+                        <input type="hidden" name={`existingDesignOptionImageName_${index}`} value={design.option_image_name || ""} />
+                        <input type="hidden" name={`existingDesignDetailImage_${index}`} value={design.detail_image_data_url || ""} />
+                        <input type="hidden" name={`existingDesignDetailImageName_${index}`} value={design.detail_image_name || ""} />
+                        <div className="product-design-admin-header">
+                          <strong>{design.id ? design.name || `디자인 ${index + 1}` : "신규 디자인"}</strong>
+                          <label>
+                            <input name={`designIsActive_${index}`} type="checkbox" value="1" defaultChecked={design.is_active !== 0} />
+                            <span>노출</span>
+                          </label>
+                        </div>
+                        <label>
+                          디자인명
+                          <input name={`designName_${index}`} defaultValue={design.name || ""} placeholder="예: 강아지 디자인" />
+                        </label>
+                        <label>
+                          설명
+                          <input name={`designDescription_${index}`} defaultValue={design.description || ""} placeholder="상세페이지 설명" />
+                        </label>
+                        <div className="product-design-admin-fields">
+                          <label>
+                            디자인 가격
+                            <input name={`designUnitPrice_${index}`} type="number" min="0" step="100" defaultValue={design.unit_price ?? ""} placeholder="기본가 사용" />
+                          </label>
+                          <label>
+                            정렬
+                            <input name={`designSortOrder_${index}`} type="number" step="1" defaultValue={design.sort_order || index + 1} />
+                          </label>
+                        </div>
+                        <div className="product-design-admin-images">
+                          <div>
+                            <span>선택 이미지</span>
+                            <div className="product-design-admin-thumb">
+                              {design.option_image_data_url ? <img src={design.option_image_data_url} alt={`${design.name || "디자인"} 선택 이미지`} /> : <ProductAdminFallback product={product} />}
+                            </div>
+                            <input name={`designOptionImage_${index}`} type="file" accept="image/*" />
+                            <label className="product-design-admin-check">
+                              <input name={`removeDesignOptionImage_${index}`} type="checkbox" value="1" />
+                              <span>삭제</span>
+                            </label>
+                          </div>
+                          <div>
+                            <span>상세페이지 이미지</span>
+                            <div className="product-design-admin-thumb detail">
+                              {design.detail_image_data_url ? <img src={design.detail_image_data_url} alt={`${design.name || "디자인"} 상세 이미지`} /> : <ProductAdminFallback product={product} />}
+                            </div>
+                            <input name={`designDetailImage_${index}`} type="file" accept="image/*" />
+                            <label className="product-design-admin-check">
+                              <input name={`removeDesignDetailImage_${index}`} type="checkbox" value="1" />
+                              <span>삭제</span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </fieldset>
+
+                  <FormSubmitButton pendingText="저장중">
+                    상품/디자인 저장
+                  </FormSubmitButton>
+                </form>
+              </article>
+            );
+          })}
         </div>
       </section>
     </div>
   );
+}
+
+function ProductAdminFallback({ product }) {
+  return <span aria-hidden="true">{productFallbackIcon(product.slug)}</span>;
 }
 
 function AdminRoleManagementSection({ adminUsersData }) {
@@ -4079,7 +4150,7 @@ function orderExportRows(orders = []) {
     주문번호: formatOrderNumber(order),
     보호자: order.guardian_name || "이름 미입력",
     대상자: order.subject_name || "대상자 미선택",
-    상품: order.product_name || "상품 미확인",
+    상품: formatOrderProductName(order),
     구매유형: order.order_type === "standalone" ? "상품 단독 구매" : `${order.plan_months || "-"}개월 이용권`,
     결제금액: formatCurrency(order.amount),
     결제상태: paymentStatusLabel(order.status),
@@ -4186,6 +4257,7 @@ function productExportRows(products = []) {
     노출상태: product.is_active !== 0 ? "노출" : "숨김",
     정렬순서: Number(product.sort_order || 0),
     이미지파일: product.image_name || "-",
+    디자인수: (product.designs || []).length,
   }));
 }
 
@@ -4433,6 +4505,11 @@ function subscriptionStatusLabel(status) {
 
 function orderTypeLabel(type) {
   return type === "subscription" ? "이용권 주문" : "상품 주문";
+}
+
+function formatOrderProductName(order) {
+  const productName = order?.product_name || "상품 미확인";
+  return order?.design_name ? `${productName} - ${order.design_name}` : productName;
 }
 
 function qrAdminStateLabel(subject) {

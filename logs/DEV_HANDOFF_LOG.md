@@ -5128,3 +5128,51 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Layout correction, build verification, and provider guidance: about 15 minutes.
+
+## 2026-07-07 KST - Product Design-Level Image And Detail Management
+
+### User Request
+- Product purchase currently reuses the same uploaded product image for every design option.
+- Each design should be treated as a separate product design with its own image.
+- Administrators should upload per-design images and per-design detail pages.
+- The guardian product order flow should display and store the selected design.
+
+### Reflected Work
+- Added `product_designs` table and indexes.
+- Updated `DB_SCHEMA_VERSION` from 13 to 14.
+- Added `product_orders.design_id` while preserving legacy `design_index`.
+- Seeded four default design slots for each default product category.
+- Extended product reads so `getProducts()` returns `product.designs`.
+- Extended admin product management:
+  - product representative image remains for product category selection.
+  - each design can store name, description, option image, detail image, optional design price, active state, and sort order.
+  - one blank new-design row is shown per product save.
+- Extended shop checkout:
+  - design picker now uses per-design option images.
+  - preview step uses the selected design detail image.
+  - Toss product and subscription prepare APIs now submit `designId`.
+  - standalone product amount uses design-level price if present; otherwise product default price.
+- Extended order/billing/admin reads to display selected design names and images where available.
+- Added deliverable `deliverables/PRODUCT_DESIGN_CATALOG.md`.
+
+### Files Changed
+- `lib/db.js`
+- `app/shop-checkout-client.js`
+- `app/admin/page.js`
+- `app/account/billing/page.js`
+- `app/api/payments/toss/product/prepare/route.js`
+- `app/api/payments/toss/subscription/prepare/route.js`
+- `app/api/products/orders/route.js`
+- `app/globals.css`
+- `deliverables/PRODUCT_DESIGN_CATALOG.md`
+- `deliverables/README.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with Windows line-ending warnings only.
+- Direct Node ESM local DB smoke test was attempted, but this project's extensionless internal imports are resolved by Next/Turbopack and not by plain Node ESM. Build verification remains the authoritative check for this code path.
+
+### Time Spent
+- Product design schema, admin upload UI, shop order flow, display integration, documentation, and build verification: about 75 minutes.

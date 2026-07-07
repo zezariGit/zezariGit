@@ -7581,6 +7581,14 @@ button:disabled:hover {
   font-weight: 900;
 }
 
+.bracelet-preview-card small {
+  max-width: 100%;
+  color: var(--c-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
 .preview-note-card {
   background: var(--c-accent-light);
 }
@@ -7799,6 +7807,101 @@ button:disabled:hover {
   gap: var(--space-xs);
   color: var(--c-text-muted);
   font-size: 0.86rem;
+}
+
+.product-design-admin-list {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: var(--space-sm);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+}
+
+.product-design-admin-list legend {
+  padding: 0 var(--space-xs);
+  color: var(--c-text);
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.product-design-admin-row {
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: #f9fbfa;
+}
+
+.product-design-admin-header,
+.product-design-admin-fields,
+.product-design-admin-images {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.product-design-admin-header {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.product-design-admin-header strong {
+  color: var(--c-text);
+  font-size: 0.92rem;
+}
+
+.product-design-admin-header label,
+.product-design-admin-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--c-text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.product-design-admin-fields,
+.product-design-admin-images {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.product-design-admin-images > div {
+  display: grid;
+  gap: 6px;
+}
+
+.product-design-admin-images span {
+  color: var(--c-text-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.product-design-admin-thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-primary-light);
+}
+
+.product-design-admin-thumb.detail {
+  aspect-ratio: 4 / 3;
+}
+
+.product-design-admin-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.product-design-admin-thumb > span {
+  color: var(--c-primary);
+  font-size: 1.8rem;
+  font-weight: 900;
 }
 
 .order-summary-panel,

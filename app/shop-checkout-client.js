@@ -12,6 +12,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
   const [planMonths, setPlanMonths] = useState(String(plans[0]?.months || 1));
   const [mode, setMode] = useState("subscription");
   const [designIndex, setDesignIndex] = useState(0);
+  const [designId, setDesignId] = useState(product.designs?.[0]?.id || "");
   const [shippingAddress, setShippingAddress] = useState(guardian?.address || "");
   const [shippingAddressDetail, setShippingAddressDetail] = useState(guardian?.address_detail || "");
   const [sdkReady, setSdkReady] = useState(false);
@@ -22,11 +23,16 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
 
   const subscribed = subscription?.status === "active";
   const selectedSubject = subjects.find((subject) => subject.id === subjectId) || null;
+  const selectedDesign = useMemo(() => {
+    const designs = product.designs || [];
+    return designs.find((design) => design.id === designId) || designs[designIndex] || designs[0] || null;
+  }, [designId, designIndex, product.designs]);
   const selectedPlan = useMemo(
     () => plans.find((plan) => String(plan.months) === String(planMonths)) || plans[0] || null,
     [plans, planMonths]
   );
-  const productAmount = Number(product.unit_price || 0) * quantity;
+  const productUnitPrice = getDesignUnitPrice(product, selectedDesign);
+  const productAmount = productUnitPrice * quantity;
   const paymentAmount = mode === "subscription" ? Number(selectedPlan?.amount || 0) : productAmount;
 
   useEffect(() => {
@@ -114,6 +120,10 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
       setMessage("상품을 연결할 대상자를 선택해 주세요.");
       return false;
     }
+    if ((product.designs || []).length > 0 && !selectedDesign) {
+      setMessage("상품 디자인을 선택해 주세요.");
+      return false;
+    }
     if (mode === "standalone" && !subscribed) {
       setMessage("상품 단독 구매는 이용권 사용중인 고객만 선택할 수 있습니다.");
       return false;
@@ -156,6 +166,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
         subjectId,
         quantity,
         designIndex,
+        designId: selectedDesign?.id || "",
         shippingAddress,
         shippingAddressDetail,
         paymentMethod: "WIDGET",
@@ -194,6 +205,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
         subjectId,
         quantity,
         designIndex,
+        designId: selectedDesign?.id || "",
         shippingAddress,
         shippingAddressDetail,
         paymentMethod: "WIDGET",
@@ -273,6 +285,9 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
             changeQuantity={changeQuantity}
             designIndex={designIndex}
             setDesignIndex={setDesignIndex}
+            designId={designId}
+            setDesignId={setDesignId}
+            selectedDesign={selectedDesign}
             mode={mode}
             chooseMode={chooseMode}
             subscribed={subscribed}
@@ -289,7 +304,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
 
       {step === "preview" && (
         <>
-          <ProductPreview product={product} subject={selectedSubject} quantity={quantity} />
+          <ProductPreview product={product} design={selectedDesign} subject={selectedSubject} quantity={quantity} />
           <button className="shop-next-button" type="button" onClick={goOrder}>
             주문정보입력
           </button>
@@ -300,6 +315,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
         <>
           <OrderInformation
             product={product}
+            design={selectedDesign}
             quantity={quantity}
             subject={selectedSubject}
             shippingAddress={shippingAddress}
@@ -334,6 +350,9 @@ function ProductConfiguration({
   changeQuantity,
   designIndex,
   setDesignIndex,
+  designId,
+  setDesignId,
+  selectedDesign,
   mode,
   chooseMode,
   subscribed,
@@ -342,22 +361,32 @@ function ProductConfiguration({
   setPlanMonths,
   productAmount,
 }) {
+  const designs = product.designs || [];
   return (
     <>
       <div className="shop-field">
         <strong>디자인 선택</strong>
         <div className="design-grid" role="listbox" aria-label="디자인 선택">
-          {[0, 1, 2, 3].map((index) => (
+          {designs.map((design, index) => (
             <button
-              className={designIndex === index ? "design-option active" : "design-option"}
+              className={(selectedDesign?.id || designId) === design.id ? "design-option active" : "design-option"}
               type="button"
-              key={index}
-              onClick={() => setDesignIndex(index)}
-              aria-label={`디자인 ${index + 1}`}
+              key={design.id}
+              onClick={() => {
+                setDesignIndex(index);
+                setDesignId(design.id);
+              }}
+              aria-label={design.name || `디자인 ${index + 1}`}
+              title={design.name || `디자인 ${index + 1}`}
             >
-              <ProductVisual product={product} />
+              <ProductVisual product={product} design={design} />
             </button>
           ))}
+          {designs.length === 0 && (
+            <button className="design-option active" type="button" aria-label="기본 디자인">
+              <ProductVisual product={product} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -436,20 +465,21 @@ function ProductConfiguration({
   );
 }
 
-function ProductPreview({ product, subject, quantity }) {
+function ProductPreview({ product, design, subject, quantity }) {
   return (
     <div className="product-preview-stack">
       <p className="intro-kicker">주문할 상품 미리보기</p>
       <div className="product-preview-card">
-        <ProductVisual product={product} />
+        <ProductVisual product={product} design={design} />
         <div>
           <strong>{subject?.name || "대상자 미선택"}</strong>
-          <span>{product.name} / {quantity}개</span>
+          <span>{formatProductDesignName(product, design)} / {quantity}개</span>
         </div>
       </div>
       <div className="bracelet-preview-card">
-        <ProductVisual product={product} />
-        <span>{product.name} 디자인 미리보기</span>
+        <ProductDetailVisual product={product} design={design} />
+        <span>{formatProductDesignName(product, design)} 상세 미리보기</span>
+        {design?.description && <small>{design.description}</small>}
       </div>
       <div className="preview-note-card">
         <strong>QR 안심 서비스 연결</strong>
@@ -461,6 +491,7 @@ function ProductPreview({ product, subject, quantity }) {
 
 function OrderInformation({
   product,
+  design,
   quantity,
   subject,
   shippingAddress,
@@ -476,10 +507,10 @@ function OrderInformation({
         <h2>1. 구매 상품</h2>
         <div className="order-product-row">
           <div className="order-product-image">
-            <ProductVisual product={product} />
+            <ProductVisual product={product} design={design} />
           </div>
           <div>
-            <strong>{product.name}</strong>
+            <strong>{formatProductDesignName(product, design)}</strong>
             <span>{subject?.name || "대상자 미선택"} 대상 / {quantity}개</span>
             <em>{formatCurrency(amount)}</em>
           </div>
@@ -525,11 +556,31 @@ function OrderInformation({
   );
 }
 
-function ProductVisual({ product }) {
-  if (product.image_data_url) {
-    return <img src={product.image_data_url} alt="" />;
+function ProductVisual({ product, design = null }) {
+  const image = design?.option_image_data_url || product.image_data_url;
+  if (image) {
+    return <img src={image} alt="" />;
   }
   return <span>{productFallbackIcon(product.slug)}</span>;
+}
+
+function ProductDetailVisual({ product, design = null }) {
+  const image = design?.detail_image_data_url || design?.option_image_data_url || product.image_data_url;
+  if (image) {
+    return <img src={image} alt="" />;
+  }
+  return <span>{productFallbackIcon(product.slug)}</span>;
+}
+
+function getDesignUnitPrice(product, design = null) {
+  if (design && design.unit_price !== null && design.unit_price !== undefined && design.unit_price !== "") {
+    return Number(design.unit_price || 0);
+  }
+  return Number(product.unit_price || 0);
+}
+
+function formatProductDesignName(product, design = null) {
+  return design?.name ? `${product.name} - ${design.name}` : product.name;
 }
 
 function productFallbackIcon(slug) {

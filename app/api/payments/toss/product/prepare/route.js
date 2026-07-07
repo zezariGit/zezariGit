@@ -23,6 +23,7 @@ export async function POST(request) {
       subjectId: body.subjectId,
       quantity: body.quantity,
       designIndex: body.designIndex,
+      designId: body.designId,
       shippingAddress: body.shippingAddress,
       shippingAddressDetail: body.shippingAddressDetail,
       paymentMethod: body.paymentMethod,
@@ -38,7 +39,7 @@ export async function POST(request) {
       productOrderId: order.id,
       orderId: order.tossOrderId,
       amount: order.amount,
-      orderName: `${order.product.name} 단독 구매`,
+      orderName: `${order.product.name}${order.product.selected_design?.name ? ` - ${order.product.selected_design.name}` : ""} 단독 구매`,
       successUrl,
       failUrl,
     });

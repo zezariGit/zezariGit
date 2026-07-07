@@ -16,6 +16,8 @@ export async function POST(request) {
       productId: body.productId,
       subjectId: body.subjectId,
       quantity: body.quantity,
+      designIndex: body.designIndex,
+      designId: body.designId,
       orderType: "standalone",
     });
     return NextResponse.json({ ok: true, orderId: order.id, amount: order.amount });

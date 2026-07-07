@@ -64,7 +64,7 @@ export default async function BillingPage({ searchParams }) {
             {productOrders.map((order) => (
               <article className="account-history-card" key={order.id}>
                 <div>
-                  <strong>{order.product_name || "상품"}</strong>
+                  <strong>{formatOrderProductName(order)}</strong>
                   <span>{order.subject_name || "대상자 미선택"} · {order.order_type === "standalone" ? "상품 단독 구매" : "이용권 포함 상품"}</span>
                   <span>{formatDate(order.created_at)}</span>
                 </div>
@@ -111,6 +111,11 @@ function paymentStatusLabel(status) {
   if (status === "payment_pending") return "결제대기";
   if (status === "failed") return "결제실패";
   return status || "-";
+}
+
+function formatOrderProductName(order) {
+  const productName = order?.product_name || "상품";
+  return order?.design_name ? `${productName} - ${order.design_name}` : productName;
 }
 
 function shippingStatusLabel(fulfillmentStatus, paymentStatus) {
