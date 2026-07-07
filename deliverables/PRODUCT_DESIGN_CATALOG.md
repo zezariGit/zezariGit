@@ -26,15 +26,17 @@
 2. Edit a product card.
 3. Upload product representative image for the product selection screen.
 4. In the design section, edit each design name, description, option image, detail image, optional price, active state, and sort order.
-5. Use the blank "new design" row to add one new design per save.
+5. Click `+ 디자인 추가` only when another design is needed.
+6. Each click adds one editable design row with thumbnail and detail-image upload controls.
 
 ## User Flow
 1. Guardian opens `/shop`.
 2. Product category is selected.
-3. Design picker shows each active design with its own image.
-4. Preview step shows the selected design detail image if uploaded.
-5. Checkout stores the selected `design_id`.
-6. Admin orders and guardian billing history show the selected design name.
+3. Design picker shows only the active designs configured by the administrator.
+4. If no design is configured yet, checkout continues with the product representative image instead of showing fake design options.
+5. Preview step shows the selected design detail image if uploaded.
+6. Checkout stores the selected `design_id`.
+7. Admin orders and guardian billing history show the selected design name.
 
 ## Image Generation Prompt
 Create a Korean mobile commerce UI mockup for a QR safety product shop. Show four product categories and, inside one category, a row of animal-shaped design thumbnails, each with a unique design image and a detailed product preview page. Use a restrained public-service style with white cards, civic blue accents, compact Korean labels, and clear checkout progression from product selection to design preview to payment.

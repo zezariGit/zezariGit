@@ -364,31 +364,30 @@ function ProductConfiguration({
   const designs = product.designs || [];
   return (
     <>
-      <div className="shop-field">
-        <strong>디자인 선택</strong>
-        <div className="design-grid" role="listbox" aria-label="디자인 선택">
-          {designs.map((design, index) => (
-            <button
-              className={(selectedDesign?.id || designId) === design.id ? "design-option active" : "design-option"}
-              type="button"
-              key={design.id}
-              onClick={() => {
-                setDesignIndex(index);
-                setDesignId(design.id);
-              }}
-              aria-label={design.name || `디자인 ${index + 1}`}
-              title={design.name || `디자인 ${index + 1}`}
-            >
-              <ProductVisual product={product} design={design} />
-            </button>
-          ))}
-          {designs.length === 0 && (
-            <button className="design-option active" type="button" aria-label="기본 디자인">
-              <ProductVisual product={product} />
-            </button>
-          )}
+      {designs.length > 0 ? (
+        <div className="shop-field">
+          <strong>디자인 선택</strong>
+          <div className="design-grid" role="listbox" aria-label="디자인 선택">
+            {designs.map((design, index) => (
+              <button
+                className={(selectedDesign?.id || designId) === design.id ? "design-option active" : "design-option"}
+                type="button"
+                key={design.id}
+                onClick={() => {
+                  setDesignIndex(index);
+                  setDesignId(design.id);
+                }}
+                aria-label={design.name || `디자인 ${index + 1}`}
+                title={design.name || `디자인 ${index + 1}`}
+              >
+                <ProductVisual product={product} design={design} />
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <p className="shop-note">등록된 디자인이 없어 상품 대표 이미지로 주문이 진행됩니다.</p>
+      )}
 
       <div className="shop-field">
         <strong>수량</strong>

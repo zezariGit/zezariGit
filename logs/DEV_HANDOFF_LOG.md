@@ -5141,12 +5141,12 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Added `product_designs` table and indexes.
 - Updated `DB_SCHEMA_VERSION` from 13 to 14.
 - Added `product_orders.design_id` while preserving legacy `design_index`.
-- Seeded four default design slots for each default product category.
+- Added default design seeding for new product categories while preserving legacy compatibility.
 - Extended product reads so `getProducts()` returns `product.designs`.
 - Extended admin product management:
   - product representative image remains for product category selection.
   - each design can store name, description, option image, detail image, optional design price, active state, and sort order.
-  - one blank new-design row is shown per product save.
+  - one blank new-design row was initially shown per product save.
 - Extended shop checkout:
   - design picker now uses per-design option images.
   - preview step uses the selected design detail image.
@@ -5176,3 +5176,37 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Product design schema, admin upload UI, shop order flow, display integration, documentation, and build verification: about 75 minutes.
+
+## 2026-07-08 KST - Product Design Add Button And Checkbox Layout Fix
+
+### User Request
+- Admin product management checkboxes such as "사용자 화면에 노출" and image delete controls are too large and cause nearby text to overflow.
+- Product design entry should not force four fixed design rows.
+- Add a button that creates one design upload row at a time.
+- The guardian product design picker should reflect the administrator-configured design count and images.
+
+### Reflected Work
+- Added `app/admin/product-admin-catalog-form.js` as a focused client component for the product catalog form.
+- Replaced the always-visible blank design row with a `+ 디자인 추가` button.
+- Each button click adds one new design row with thumbnail and detail-page upload controls.
+- Scoped product-admin checkbox CSS so checkbox inputs are 16px instead of inheriting the global full-width input style.
+- Added label wrapping rules so product/admin checkbox text no longer overflows.
+- Changed product design seeding to one default name for new installs and filtered legacy empty seed placeholders from product reads.
+- Updated the shop design picker so it renders only configured active designs; if no design is configured, it proceeds with the product representative image without displaying fake options.
+- Updated `deliverables/PRODUCT_DESIGN_CATALOG.md`.
+
+### Files Changed
+- `app/admin/product-admin-catalog-form.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `app/shop-checkout-client.js`
+- `lib/db.js`
+- `deliverables/PRODUCT_DESIGN_CATALOG.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+
+### Time Spent
+- Admin form extraction, add-design interaction, checkbox CSS fix, product design filtering, shop picker adjustment, and build verification: about 45 minutes.
