@@ -15,12 +15,13 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
   const paymentKey = String(params?.paymentKey || "").trim();
   const orderId = String(params?.orderId || "").trim();
   const amount = Number(params?.amount || 0);
+  const freeOrder = String(params?.free || "") === "1";
 
   if (!session) {
     return <PaymentResult title="로그인이 필요합니다" message="이용권 결제 완료 처리를 위해 다시 로그인해 주세요." />;
   }
 
-  if (!productOrderId || !paymentKey || !orderId || !amount) {
+  if (!productOrderId || !orderId || (!freeOrder && (!paymentKey || !amount))) {
     return <PaymentResult title="결제 인증값이 없습니다" message="Toss Payments 인증 결과를 확인할 수 없습니다." />;
   }
 
@@ -46,6 +47,34 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
   }
 
   try {
+    if (freeOrder) {
+      if (Number(productOrder.amount || 0) !== 0) {
+        throw new Error("전액 할인 이용권 주문 정보가 일치하지 않습니다.");
+      }
+      const result = await completePrepaidSubscriptionPurchase({
+        guardianId: productOrder.guardian_id,
+        productOrderId,
+        payment: {
+          orderId,
+          paymentKey: `coupon-free-${productOrderId.slice(0, 8)}`,
+          method: "쿠폰 전액할인",
+          status: "DONE",
+        },
+      });
+      const order = await getProductOrderForGuardian(session, productOrderId);
+      const waitingForActivation = result.status === "ready";
+
+      return (
+        <ShopComplete
+          title="주문이 완료되었습니다!"
+          message={waitingForActivation
+            ? "쿠폰 전액 할인으로 결제가 완료되었습니다. 상품을 수령한 뒤 QR을 활성화하면 이용기간이 시작됩니다."
+            : "쿠폰 전액 할인으로 결제가 완료되었고, 이용기간이 추가되었습니다."}
+          order={order}
+        />
+      );
+    }
+
     const payment = await confirmWidgetPayment({ paymentKey, orderId, amount });
     if (payment.orderId !== orderId || Number(payment.totalAmount || 0) !== Number(productOrder.amount) || payment.status !== "DONE") {
       throw new Error("토스페이먼츠 승인 결과가 이용권 주문과 일치하지 않습니다.");

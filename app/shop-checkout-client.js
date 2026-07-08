@@ -5,7 +5,7 @@ import KakaoPostcodeAddress from "./kakao-postcode-address";
 
 const TOSS_SDK_URL = "https://js.tosspayments.com/v2/standard";
 
-export default function ShopCheckoutClient({ product, subjects = [], plans = [], subscription = null, guardian = null }) {
+export default function ShopCheckoutClient({ product, subjects = [], plans = [], subscription = null, guardian = null, coupons = [] }) {
   const [step, setStep] = useState("configure");
   const [quantity, setQuantity] = useState(1);
   const [subjectId, setSubjectId] = useState(subjects[0]?.id || "");
@@ -13,6 +13,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
   const [mode, setMode] = useState("subscription");
   const [designIndex, setDesignIndex] = useState(0);
   const [designId, setDesignId] = useState(product.designs?.[0]?.id || "");
+  const [couponId, setCouponId] = useState("");
   const [shippingAddress, setShippingAddress] = useState(guardian?.address || "");
   const [shippingAddressDetail, setShippingAddressDetail] = useState(guardian?.address_detail || "");
   const [sdkReady, setSdkReady] = useState(false);
@@ -33,7 +34,21 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
   );
   const productUnitPrice = getDesignUnitPrice(product, selectedDesign);
   const productAmount = productUnitPrice * quantity;
-  const paymentAmount = mode === "subscription" ? Number(selectedPlan?.amount || 0) : productAmount;
+  const subtotalAmount = mode === "subscription" ? Number(selectedPlan?.amount || 0) : productAmount;
+  const applicableCoupons = useMemo(
+    () => coupons.filter((coupon) => isCouponApplicableToOrder(coupon, mode, product.slug, subtotalAmount)),
+    [coupons, mode, product.slug, subtotalAmount]
+  );
+  const selectedCoupon = applicableCoupons.find((coupon) => coupon.id === couponId) || null;
+  const discountAmount = selectedCoupon ? calculateCouponDiscount(selectedCoupon, subtotalAmount) : 0;
+  const paymentAmount = Math.max(0, subtotalAmount - discountAmount);
+  const freePayment = paymentAmount <= 0;
+
+  useEffect(() => {
+    if (couponId && !applicableCoupons.some((coupon) => coupon.id === couponId)) {
+      setCouponId("");
+    }
+  }, [applicableCoupons, couponId]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -57,7 +72,17 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
   }, []);
 
   useEffect(() => {
-    if (step !== "order" || !sdkReady) {
+    if (step !== "order") {
+      widgetRef.current = null;
+      setWidgetStatus("idle");
+      return undefined;
+    }
+    if (freePayment) {
+      widgetRef.current = null;
+      setWidgetStatus("ready");
+      return undefined;
+    }
+    if (!sdkReady) {
       widgetRef.current = null;
       setWidgetStatus("idle");
       return undefined;
@@ -100,7 +125,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
       cancelled = true;
       widgetRef.current = null;
     };
-  }, [paymentAmount, sdkReady, step]);
+  }, [freePayment, paymentAmount, sdkReady, step]);
 
   const changeQuantity = (next) => {
     setQuantity(Math.max(1, Math.min(99, Number(next) || 1)));
@@ -151,10 +176,6 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
   };
 
   const startSubscription = async () => {
-    if (!widgetRef.current || widgetStatus !== "ready") {
-      throw new Error("결제수단을 준비 중입니다. 잠시 후 다시 시도해 주세요.");
-    }
-
     const response = await fetch("/api/payments/toss/subscription/prepare", {
       method: "POST",
       headers: {
@@ -167,6 +188,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
         quantity,
         designIndex,
         designId: selectedDesign?.id || "",
+        couponId,
         shippingAddress,
         shippingAddressDetail,
         paymentMethod: "WIDGET",
@@ -177,8 +199,18 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
     if (!response.ok) {
       throw new Error(data?.message || "이용권 결제 준비에 실패했습니다.");
     }
+    if (data.freeOrder) {
+      window.location.href = data.redirectUrl || "/?tab=dashboard";
+      return;
+    }
     if (!data.configured) {
       throw new Error("Toss Payments 키 설정이 필요합니다.");
+    }
+    if (!widgetRef.current || widgetStatus !== "ready") {
+      throw new Error("결제수단을 준비 중입니다. 잠시 후 다시 시도해 주세요.");
+    }
+    if (Number(data.amount || 0) !== paymentAmount) {
+      await widgetRef.current.setAmount({ currency: "KRW", value: Number(data.amount || 0) });
     }
     await widgetRef.current.requestPayment({
       orderId: data.orderId,
@@ -191,10 +223,6 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
   };
 
   const startStandalonePayment = async () => {
-    if (!widgetRef.current || widgetStatus !== "ready") {
-      throw new Error("결제수단을 준비 중입니다. 잠시 후 다시 시도해 주세요.");
-    }
-
     const response = await fetch("/api/payments/toss/product/prepare", {
       method: "POST",
       headers: {
@@ -206,6 +234,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
         quantity,
         designIndex,
         designId: selectedDesign?.id || "",
+        couponId,
         shippingAddress,
         shippingAddressDetail,
         paymentMethod: "WIDGET",
@@ -216,8 +245,18 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
     if (!response.ok) {
       throw new Error(data?.message || "상품 결제 준비에 실패했습니다.");
     }
+    if (data.freeOrder) {
+      window.location.href = data.redirectUrl || "/?tab=dashboard";
+      return;
+    }
     if (!data.configured) {
       throw new Error("Toss Payments 키 설정이 필요합니다.");
+    }
+    if (!widgetRef.current || widgetStatus !== "ready") {
+      throw new Error("결제수단을 준비 중입니다. 잠시 후 다시 시도해 주세요.");
+    }
+    if (Number(data.amount || 0) !== paymentAmount) {
+      await widgetRef.current.setAmount({ currency: "KRW", value: Number(data.amount || 0) });
     }
     const request = {
       orderId: data.orderId,
@@ -232,11 +271,11 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
 
   const pay = async () => {
     if (!validateSelection()) return;
-    if (!sdkReady) {
+    if (!freePayment && !sdkReady) {
       setMessage("결제 SDK를 준비 중입니다. 잠시 후 다시 시도해 주세요.");
       return;
     }
-    if (widgetStatus !== "ready") {
+    if (!freePayment && widgetStatus !== "ready") {
       setMessage("결제수단을 준비 중입니다. 잠시 후 다시 시도해 주세요.");
       return;
     }
@@ -294,6 +333,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
             plans={plans}
             planMonths={planMonths}
             setPlanMonths={setPlanMonths}
+            productUnitPrice={productUnitPrice}
             productAmount={productAmount}
           />
           <button className="shop-next-button" type="button" onClick={goPreview} disabled={subjects.length === 0}>
@@ -322,7 +362,13 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
             setShippingAddress={setShippingAddress}
             shippingAddressDetail={shippingAddressDetail}
             setShippingAddressDetail={setShippingAddressDetail}
+            coupons={applicableCoupons}
+            couponId={couponId}
+            setCouponId={setCouponId}
+            selectedCoupon={selectedCoupon}
             widgetStatus={widgetStatus}
+            subtotalAmount={subtotalAmount}
+            discountAmount={discountAmount}
             amount={paymentAmount}
           />
           <button
@@ -331,7 +377,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
             onClick={pay}
             disabled={loading || widgetStatus !== "ready"}
           >
-            {loading ? "결제 준비중" : widgetStatus !== "ready" ? "결제수단 준비중" : "결제하기"}
+            {loading ? "결제 준비중" : freePayment ? "쿠폰으로 주문완료" : widgetStatus !== "ready" ? "결제수단 준비중" : "결제하기"}
           </button>
         </>
       )}
@@ -359,6 +405,7 @@ function ProductConfiguration({
   plans,
   planMonths,
   setPlanMonths,
+  productUnitPrice,
   productAmount,
 }) {
   const designs = product.designs || [];
@@ -451,7 +498,7 @@ function ProductConfiguration({
         <div className="standalone-info-panel">
           <div className="shop-summary-list">
             <span>상품 금액</span>
-            <strong>{formatCurrency(product.unit_price)} / 개</strong>
+            <strong>{formatCurrency(productUnitPrice)} / 개</strong>
             <span>상품 수량</span>
             <strong>{quantity}개</strong>
             <span>결제예정금액</span>
@@ -497,7 +544,13 @@ function OrderInformation({
   setShippingAddress,
   shippingAddressDetail,
   setShippingAddressDetail,
+  coupons,
+  couponId,
+  setCouponId,
+  selectedCoupon,
   widgetStatus,
+  subtotalAmount,
+  discountAmount,
   amount,
 }) {
   return (
@@ -532,10 +585,38 @@ function OrderInformation({
       </section>
 
       <section className="order-section">
-        <h2>3. 주문 요약</h2>
+        <h2>3. 쿠폰 선택</h2>
+        <div className="coupon-select-box">
+          <label>
+            쿠폰 선택
+            {coupons.length > 0 ? (
+              <select value={couponId} onChange={(event) => setCouponId(event.target.value)}>
+                <option value="">쿠폰 사용 안함</option>
+                {coupons.map((coupon) => (
+                  <option value={coupon.id} key={coupon.id}>
+                    {couponOptionLabel(coupon)}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <a href="/account/coupons">사용 가능한 쿠폰이 없습니다. 쿠폰함에서 등록해 주세요.</a>
+            )}
+          </label>
+          {selectedCoupon && (
+            <p>
+              {selectedCoupon.name} 적용: {formatCurrency(discountAmount)} 할인
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section className="order-section">
+        <h2>4. 주문 요약</h2>
         <div className="shop-summary-list">
           <span>상품 금액</span>
-          <strong>{formatCurrency(amount)}</strong>
+          <strong>{formatCurrency(subtotalAmount)}</strong>
+          <span>쿠폰 할인</span>
+          <strong>{discountAmount > 0 ? `-${formatCurrency(discountAmount)}` : "0원"}</strong>
           <span>배송비</span>
           <strong>0원</strong>
           <span>총 결제 금액</span>
@@ -544,12 +625,19 @@ function OrderInformation({
       </section>
 
       <section className="order-section">
-        <h2>4. 결제 방법</h2>
-        <div className="toss-widget-shell" aria-busy={widgetStatus === "loading"}>
-          <div id="toss-payment-methods" className="toss-widget-container" />
-          <div id="toss-payment-agreement" className="toss-widget-container" />
-          {widgetStatus === "loading" && <p className="toss-widget-status">안전한 결제수단을 불러오고 있습니다.</p>}
-        </div>
+        <h2>5. 결제 방법</h2>
+        {amount <= 0 ? (
+          <div className="free-payment-box">
+            <strong>쿠폰 전액 할인</strong>
+            <span>결제수단 입력 없이 주문을 완료합니다.</span>
+          </div>
+        ) : (
+          <div className="toss-widget-shell" aria-busy={widgetStatus === "loading"}>
+            <div id="toss-payment-methods" className="toss-widget-container" />
+            <div id="toss-payment-agreement" className="toss-widget-container" />
+            {widgetStatus === "loading" && <p className="toss-widget-status">안전한 결제수단을 불러오고 있습니다.</p>}
+          </div>
+        )}
       </section>
     </div>
   );
@@ -580,6 +668,42 @@ function getDesignUnitPrice(product, design = null) {
 
 function formatProductDesignName(product, design = null) {
   return design?.name ? `${product.name} - ${design.name}` : product.name;
+}
+
+function isCouponApplicableToOrder(coupon, mode, productSlug, subtotalAmount) {
+  if (!coupon || coupon.status !== "available" || coupon.coupon_status !== "active") return false;
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" });
+  if (coupon.start_date && coupon.start_date > today) return false;
+  if (coupon.end_date && coupon.end_date < today) return false;
+  const minOrderAmount = Math.max(0, Number(coupon.min_order_amount || 0));
+  if (minOrderAmount > 0 && Number(subtotalAmount || 0) < minOrderAmount) return false;
+
+  const scope = String(coupon.service_scope || "all");
+  if (scope === "all") return true;
+  if (scope === "subscription") return mode === "subscription";
+  if (scope === "ad") return false;
+  return scope === productSlug;
+}
+
+function calculateCouponDiscount(coupon, subtotalAmount) {
+  const subtotal = Math.max(0, Math.floor(Number(subtotalAmount || 0)));
+  const discountValue = Math.max(0, Math.floor(Number(coupon?.discount_value || 0)));
+  if (subtotal <= 0 || discountValue <= 0) return 0;
+  let discount = coupon?.discount_type === "fixed"
+    ? discountValue
+    : Math.floor(subtotal * Math.min(discountValue, 100) / 100);
+  const maxDiscountAmount = Math.max(0, Math.floor(Number(coupon?.max_discount_amount || 0)));
+  if (maxDiscountAmount > 0) {
+    discount = Math.min(discount, maxDiscountAmount);
+  }
+  return Math.min(subtotal, Math.max(0, discount));
+}
+
+function couponOptionLabel(coupon) {
+  const label = coupon.master_discount_label || coupon.discount_label || "할인";
+  const minOrderAmount = Math.max(0, Number(coupon.min_order_amount || 0));
+  const minText = minOrderAmount > 0 ? ` · ${formatCurrency(minOrderAmount)} 이상` : "";
+  return `${coupon.name || coupon.code} (${label}${minText})`;
 }
 
 function productFallbackIcon(slug) {

@@ -70,6 +70,9 @@ export default async function BillingPage({ searchParams }) {
                 </div>
                 <div>
                   <strong>{formatCurrency(order.amount)}</strong>
+                  {Number(order.discount_amount || 0) > 0 && (
+                    <span>쿠폰 할인: -{formatCurrency(order.discount_amount)}</span>
+                  )}
                   <span>{paymentStatusLabel(order.status)}</span>
                   <span>배송: {shippingStatusLabel(order.fulfillment_status, order.status)}</span>
                 </div>

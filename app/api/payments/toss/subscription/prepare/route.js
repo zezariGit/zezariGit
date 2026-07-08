@@ -25,6 +25,7 @@ export async function POST(request) {
       quantity: body.quantity,
       designIndex: body.designIndex,
       designId: body.designId,
+      couponId: body.couponId,
       shippingAddress: body.shippingAddress,
       shippingAddressDetail: body.shippingAddressDetail,
       paymentMethod: "WIDGET",
@@ -33,18 +34,23 @@ export async function POST(request) {
     });
     const configured = isTossWidgetConfigured();
     const { successUrl, failUrl } = getTossCallbackUrls(productOrder.id);
+    const freeSuccessUrl = `${successUrl}${successUrl.includes("?") ? "&" : "?"}free=1&orderId=${encodeURIComponent(productOrder.tossOrderId)}&amount=0`;
 
     return NextResponse.json({
       configured,
+      freeOrder: Number(productOrder.amount || 0) === 0,
       clientKey: configured ? getTossWidgetClientKey() : "",
       customerKey: createTossCustomerKey(session.user?.id || session.user?.email),
       productOrderId: productOrder.id,
       orderId: productOrder.tossOrderId,
       planMonths: productOrder.plan.months,
+      subtotalAmount: productOrder.subtotalAmount,
+      discountAmount: productOrder.discountAmount,
       amount: productOrder.amount,
       orderName: `${productOrder.product.name}${productOrder.product.selected_design?.name ? ` - ${productOrder.product.selected_design.name}` : ""} + ${productOrder.plan.name}`,
       successUrl,
       failUrl,
+      redirectUrl: Number(productOrder.amount || 0) === 0 ? freeSuccessUrl : "",
       customerName: productOrder.guardian.name || session.user?.name || "",
       customerEmail: productOrder.guardian.email || session.user?.email || "",
     });

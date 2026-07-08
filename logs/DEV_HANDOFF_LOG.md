@@ -5269,3 +5269,58 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Layout analysis, CSS alignment fix, documentation, and build verification: about 15 minutes.
+
+## 2026-07-08 KST - Checkout Coupon Discount Application
+
+### User Request
+- During guardian product/order payment, if the user has registered coupons, they should be able to select a coupon.
+- The selected coupon's fixed or percentage discount should reduce the actual payment amount.
+
+### Reflected Work
+- Increased `DB_SCHEMA_VERSION` from 14 to 15.
+- Extended `product_orders` with coupon tracking fields:
+  - `subtotal_amount`
+  - `discount_amount`
+  - `guardian_coupon_id`
+  - `coupon_id`
+  - `coupon_code`
+  - `coupon_name`
+  - `coupon_discount_label`
+- Updated `getGuardianCoupons()` to join the guardian coupon row with the admin coupon source row so checkout can access discount type, value, minimum order amount, maximum discount amount, service scope, and validity dates.
+- Added server-side coupon validation and discount calculation in `saveProductOrderDraft()`.
+- Supported coupon scopes:
+  - `all`
+  - `subscription`
+  - product-specific scopes such as `sticker`, `bracelet`, `necklace`, `keyring`
+  - `ad` is not applicable to product checkout.
+- Updated Toss product and subscription prepare APIs to receive `couponId`.
+- Returned server-calculated `subtotalAmount`, `discountAmount`, and final `amount` from prepare APIs.
+- Added 0 KRW coupon order handling:
+  - checkout skips Toss widget when final amount is 0.
+  - success pages can complete `free=1` coupon orders internally.
+- Marked coupons as used only after successful payment/order completion.
+- Updated guardian billing history to show coupon discount amounts.
+- Added coupon selection UI to the order-information step of `/shop`.
+- Updated `deliverables/ADMIN_COUPON_MANAGEMENT.md`.
+
+### Files Changed
+- `lib/db.js`
+- `app/shop/page.js`
+- `app/shop-checkout-client.js`
+- `app/api/payments/toss/product/prepare/route.js`
+- `app/api/payments/toss/subscription/prepare/route.js`
+- `app/payments/toss/product/success/page.js`
+- `app/payments/toss/subscription/success/page.js`
+- `app/account/billing/page.js`
+- `app/globals.css`
+- `deliverables/ADMIN_COUPON_MANAGEMENT.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with line-ending warnings only.
+- Product order INSERT placeholder count was checked against the argument count after adding coupon columns.
+
+### Time Spent
+- Coupon data flow analysis, DB migration, checkout UI, server discount validation, 0 KRW completion path, billing display, documentation, and build verification: about 70 minutes.

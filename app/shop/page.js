@@ -4,7 +4,7 @@ import Link from "next/link";
 import StatusToast from "../status-toast";
 import ShopCheckoutClient from "../shop-checkout-client";
 import { authOptions } from "../../lib/auth";
-import { getDashboardData, getProducts } from "../../lib/db";
+import { getDashboardData, getGuardianCoupons, getProducts } from "../../lib/db";
 
 export default async function ShopPage({ searchParams }) {
   const session = await getServerSession(authOptions);
@@ -16,13 +16,15 @@ export default async function ShopPage({ searchParams }) {
   const notice = params?.notice || "";
   const noticeType = params?.noticeType || "success";
   const selectedProductId = params?.product || "";
-  const [{ guardian, subjects, subscription, subscriptionPlans }, products] = await Promise.all([
+  const [{ guardian, subjects, subscription, subscriptionPlans }, products, couponData] = await Promise.all([
     getDashboardData(session, {
       includeSubjectDetails: false,
       includeAdDailyRate: false,
     }),
     getProducts(),
+    getGuardianCoupons(session),
   ]);
+  const availableCoupons = couponData.coupons.filter((coupon) => coupon.status === "available");
   const selectedProduct = products.find((product) => product.id === selectedProductId || product.slug === selectedProductId) || null;
 
   return (
@@ -55,6 +57,7 @@ export default async function ShopPage({ searchParams }) {
           plans={subscriptionPlans}
           subscription={subscription}
           guardian={guardian}
+          coupons={availableCoupons}
         />
       )}
       <StatusToast message={notice} type={noticeType} />
