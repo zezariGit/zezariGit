@@ -5241,3 +5241,31 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Production log analysis, form payload reduction, Server Action limit configuration, documentation, and build verification: about 25 minutes.
+
+## 2026-07-08 KST - Product Admin Card Layout Isolation
+
+### User Request
+- After adding one design to a product in the admin product management screen, other product category cards such as bracelet, necklace, and keyring show a large blank space.
+- A design added to one product should not affect the layout of other products.
+
+### Analysis
+- The product management screen uses a CSS grid for product cards.
+- CSS grid items were stretching to the tallest card in the same row, and the card/form grid content stretched internally, creating visible blank space in cards with fewer design rows.
+
+### Reflected Work
+- Set `.product-admin-grid` to align items to the start.
+- Set `.product-admin-card` to align itself and its internal grid content to the start.
+- Set `.product-admin-form` content alignment to the start.
+- Updated `deliverables/PRODUCT_DESIGN_CATALOG.md` with the admin layout behavior.
+
+### Files Changed
+- `app/globals.css`
+- `deliverables/PRODUCT_DESIGN_CATALOG.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+
+### Time Spent
+- Layout analysis, CSS alignment fix, documentation, and build verification: about 15 minutes.

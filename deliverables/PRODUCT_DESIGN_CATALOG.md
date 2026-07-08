@@ -36,6 +36,10 @@
 - The admin form does not resubmit existing base64 image data in hidden fields; this prevents Server Action request bodies from growing every time a product is saved.
 - `next.config.mjs` sets the Server Action body size limit to 8MB so a representative image plus design thumbnail/detail images can be submitted without hitting the default 1MB limit.
 
+## Admin Layout Notes
+- Product cards are aligned to the top of the product-management grid.
+- A product with many design rows can grow vertically without stretching the internal layout of the other product cards in the same row.
+
 ## User Flow
 1. Guardian opens `/shop`.
 2. Product category is selected.

@@ -7769,11 +7769,14 @@ button:disabled:hover {
 .product-admin-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  align-items: start;
   gap: var(--space-md);
 }
 
 .product-admin-card {
   display: grid;
+  align-self: start;
+  align-content: start;
   gap: var(--space-md);
   padding: var(--space-md);
   border: 0.5px solid var(--c-border);
@@ -7793,6 +7796,7 @@ button:disabled:hover {
 
 .product-admin-form {
   display: grid;
+  align-content: start;
   gap: var(--space-sm);
 }
 
