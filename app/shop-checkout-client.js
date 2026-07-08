@@ -21,6 +21,8 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const widgetRef = useRef(null);
+  const latestPaymentAmountRef = useRef(0);
+  const widgetAmountRef = useRef(null);
 
   const subscribed = subscription?.status === "active";
   const selectedSubject = subjects.find((subject) => subject.id === subjectId) || null;
@@ -43,6 +45,10 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
   const discountAmount = selectedCoupon ? calculateCouponDiscount(selectedCoupon, subtotalAmount) : 0;
   const paymentAmount = Math.max(0, subtotalAmount - discountAmount);
   const freePayment = paymentAmount <= 0;
+
+  useEffect(() => {
+    latestPaymentAmountRef.current = paymentAmount;
+  }, [paymentAmount]);
 
   useEffect(() => {
     if (couponId && !applicableCoupons.some((coupon) => coupon.id === couponId)) {
@@ -74,16 +80,19 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
   useEffect(() => {
     if (step !== "order") {
       widgetRef.current = null;
+      widgetAmountRef.current = null;
       setWidgetStatus("idle");
       return undefined;
     }
     if (freePayment) {
       widgetRef.current = null;
+      widgetAmountRef.current = null;
       setWidgetStatus("ready");
       return undefined;
     }
     if (!sdkReady) {
       widgetRef.current = null;
+      widgetAmountRef.current = null;
       setWidgetStatus("idle");
       return undefined;
     }
@@ -100,9 +109,12 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
         if (!data.configured) throw new Error("Toss Payments 결제위젯 키 설정이 필요합니다.");
         if (!window.TossPayments) throw new Error("결제 SDK가 아직 준비되지 않았습니다.");
 
+        clearTossWidgetContainers();
         const tossPayments = window.TossPayments(data.clientKey);
         const widgets = tossPayments.widgets({ customerKey: data.customerKey });
-        await widgets.setAmount({ currency: "KRW", value: paymentAmount });
+        const initialAmount = latestPaymentAmountRef.current;
+        await widgets.setAmount({ currency: "KRW", value: initialAmount });
+        widgetAmountRef.current = initialAmount;
         if (cancelled) return;
 
         widgetRef.current = widgets;
@@ -125,7 +137,32 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
       cancelled = true;
       widgetRef.current = null;
     };
-  }, [freePayment, paymentAmount, sdkReady, step]);
+  }, [freePayment, sdkReady, step]);
+
+  useEffect(() => {
+    if (step !== "order" || freePayment || widgetStatus !== "ready" || !widgetRef.current) return;
+    if (widgetAmountRef.current === paymentAmount) return;
+
+    let cancelled = false;
+    const updateWidgetAmount = async () => {
+      try {
+        await widgetRef.current.setAmount({ currency: "KRW", value: paymentAmount });
+        if (!cancelled) {
+          widgetAmountRef.current = paymentAmount;
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setWidgetStatus("error");
+          setMessage(error.message || "결제금액을 갱신하지 못했습니다.");
+        }
+      }
+    };
+
+    updateWidgetAmount();
+    return () => {
+      cancelled = true;
+    };
+  }, [freePayment, paymentAmount, step, widgetStatus]);
 
   const changeQuantity = (next) => {
     setQuantity(Math.max(1, Math.min(99, Number(next) || 1)));
@@ -704,6 +741,12 @@ function couponOptionLabel(coupon) {
   const minOrderAmount = Math.max(0, Number(coupon.min_order_amount || 0));
   const minText = minOrderAmount > 0 ? ` · ${formatCurrency(minOrderAmount)} 이상` : "";
   return `${coupon.name || coupon.code} (${label}${minText})`;
+}
+
+function clearTossWidgetContainers() {
+  if (typeof document === "undefined") return;
+  document.getElementById("toss-payment-methods")?.replaceChildren();
+  document.getElementById("toss-payment-agreement")?.replaceChildren();
 }
 
 function productFallbackIcon(slug) {

@@ -5324,3 +5324,34 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Coupon data flow analysis, DB migration, checkout UI, server discount validation, 0 KRW completion path, billing display, documentation, and build verification: about 70 minutes.
+
+## 2026-07-08 KST - Toss Widget Duplicate Agreement Fix After Coupon Change
+
+### User Request
+- After applying a coupon during checkout, the page remains in `결제수단 준비중`.
+- Toss Payments shows an error similar to `하나의 약관 위젯만 사용할 수 있어요`.
+
+### Analysis
+- `ShopCheckoutClient` re-initialized and re-rendered Toss payment methods and agreement widgets every time `paymentAmount` changed.
+- Coupon selection changes `paymentAmount`, so `renderAgreement()` was called again on the same checkout page.
+- Toss Payments allows only one agreement widget per widget instance/page flow, so the duplicate render blocked the payment widget.
+
+### Reflected Work
+- Removed `paymentAmount` from the Toss widget initialization effect dependency.
+- Added refs to keep the latest payment amount and the amount currently applied to the widget.
+- Toss payment methods and agreement widgets now render once when entering the order step.
+- Coupon, quantity, or plan amount changes now call `widgets.setAmount()` only.
+- Added `clearTossWidgetContainers()` before a fresh widget render to avoid stale containers when returning to the order step.
+- Updated `deliverables/ADMIN_COUPON_MANAGEMENT.md` with the widget behavior note.
+
+### Files Changed
+- `app/shop-checkout-client.js`
+- `deliverables/ADMIN_COUPON_MANAGEMENT.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+
+### Time Spent
+- Toss widget issue analysis, effect separation, container cleanup, documentation, and build verification: about 20 minutes.
