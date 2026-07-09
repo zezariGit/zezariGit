@@ -1950,6 +1950,7 @@ function AdManagementSection({ adsData }) {
                       <div><dt>일예산</dt><dd>{formatCurrency(selectedAd.daily_rate)}</dd></div>
                       <div><dt>총예산(%)</dt><dd>{formatCurrency(selectedAd.amount)} ({adBudgetProgressPercent(selectedAd)}% 소진)</dd></div>
                       <div><dt>광고지역</dt><dd>{selectedAd.region || "-"}</dd></div>
+                      <div><dt>지도 반경</dt><dd className="inline-scroll-value">{formatAdTargetLocation(selectedAd)}</dd></div>
                       <div><dt>광고기간</dt><dd>{formatDate(selectedAd.start_date)} ~ {formatDate(selectedAd.end_date)}</dd></div>
                       <div><dt>활성화 일시</dt><dd>{formatRecentDateTime(selectedAd.updated_at)}</dd></div>
                       <div><dt>캠페인 ID</dt><dd className="inline-scroll-value">{selectedAd.meta_campaign_id || "미연동"}</dd></div>
@@ -4473,6 +4474,15 @@ function subscriptionAdminStateClass(status) {
 function formatAdNumber(ad) {
   const compactId = String(ad?.id || "").replace(/-/g, "").slice(0, 10).toUpperCase();
   return `AD-${compactId || "UNKNOWN"}`;
+}
+
+function formatAdTargetLocation(ad) {
+  const lat = Number(ad?.region_latitude);
+  const lng = Number(ad?.region_longitude);
+  const radius = Number(ad?.region_radius_km || 0);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return "지도 위치 미설정";
+  const radiusLabel = radius > 0 ? `반경 ${radius}km` : "반경 미설정";
+  return `${radiusLabel} / ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
 }
 
 function formatPaymentNumber(payment) {

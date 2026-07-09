@@ -13,7 +13,8 @@ Project: REAL_QR_FIND / zezari
 2. Each registered managed subject card shows an `광고` button.
 3. Clicking `광고` opens a modal overlay and disables the main screen behind it.
 4. The guardian enters:
-   - advertising region
+   - advertising center location by clicking the map or using current device location
+   - advertising radius in kilometers
    - start date
    - end date
 5. The modal calculates:
@@ -66,6 +67,12 @@ Project: REAL_QR_FIND / zezari
   - `active`
   - `paused`
 - Ended ads remain as history with `status = ended`.
+- Map targeting fields:
+  - `region`: human-readable selected location label
+  - `region_latitude`: selected map center latitude
+  - `region_longitude`: selected map center longitude
+  - `region_radius_km`: selected radius in kilometers
+  - `region_source`: currently `map`
 
 ## Meta Marketing API Integration
 - Server-side module: `lib/meta-marketing.js`
@@ -88,6 +95,11 @@ Project: REAL_QR_FIND / zezari
   - Campaign active/pause status update
   - Campaign ID and integration status persistence
 - Meta campaign creation explicitly sends `is_adset_budget_sharing_enabled=false` because the current first-stage integration does not create campaign-budget optimization/ad set budget sharing.
+- Map-selected ad locations can be converted to Meta targeting with `buildMetaCustomLocationTargeting()`:
+  - `geo_locations.custom_locations[].latitude`
+  - `geo_locations.custom_locations[].longitude`
+  - `geo_locations.custom_locations[].radius`
+  - `geo_locations.custom_locations[].distance_unit = kilometer`
 - Next Meta integration scope:
   - Ad set creation
   - Ad creative creation from the missing-person ad content
@@ -101,4 +113,5 @@ Project: REAL_QR_FIND / zezari
 - Vercel production/development environment variables were updated for populated Meta keys without printing secret values.
 - Safe Meta account access check succeeded against the configured ad account.
 - Meta campaign creation validation with `execution_options=["validate_only"]` succeeded after adding `is_adset_budget_sharing_enabled=false`.
+- `npm run build` succeeded after the map-based advertisement region selection change.
 - Full campaign creation was not executed during verification to avoid creating an unwanted live Meta campaign object.

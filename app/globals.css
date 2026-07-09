@@ -1322,6 +1322,90 @@ a {
   gap: var(--space-sm);
 }
 
+.ad-map-field {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface-muted);
+}
+
+.ad-map-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.ad-map-toolbar div {
+  display: grid;
+  gap: 3px;
+}
+
+.ad-map-toolbar strong {
+  color: var(--c-text);
+}
+
+.ad-map-toolbar span,
+.ad-location-summary span {
+  color: var(--c-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.ad-location-map-wrap {
+  position: relative;
+  min-height: 250px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-primary-light);
+  color: var(--c-text-muted);
+  z-index: 0;
+}
+
+.ad-location-map {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.ad-location-map.leaflet-container {
+  width: 100%;
+  height: 100%;
+}
+
+.ad-location-map .leaflet-control-attribution {
+  font-size: 10px;
+}
+
+.ad-location-map-placeholder {
+  position: relative;
+  z-index: 2;
+  padding: var(--space-sm);
+  color: var(--c-text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.ad-location-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 140px;
+  gap: var(--space-sm);
+  align-items: end;
+}
+
+.ad-location-summary label {
+  margin: 0;
+}
+
+.ad-location-summary select {
+  min-height: 40px;
+}
+
 .ad-quote {
   display: grid;
   gap: 4px;
@@ -10400,6 +10484,7 @@ button:disabled:hover {
   .qr-modal-result,
   .qr-modal-summary,
   .ad-request-form,
+  .ad-location-summary,
   .ad-rate-form,
   .find-location-fields,
   .find-profile,

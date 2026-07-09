@@ -5437,3 +5437,56 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Error reproduction, Meta validation, parameter fix, build, documentation, and deployment preparation: about 20 minutes.
+
+## 2026-07-10 KST - Map-Based Advertisement Region Selection
+
+### User Request
+- Replace manual text entry for the managed subject advertisement region.
+- Let the guardian set the advertisement region through a map so the data can be used for Meta API location targeting.
+
+### Analysis
+- Meta location targeting for ad sets uses `geo_locations.custom_locations` with latitude, longitude, radius, and distance unit.
+- Meta Targeting Search was checked, but the current token/app returned `API access blocked`, so the implementation does not rely on that endpoint for the user flow.
+- The current production Meta integration creates and pauses/resumes campaigns only; ad set creation is still the next integration stage.
+
+### Reflected Work
+- Replaced the advertisement region text input in `app/ad-campaign-modal.js` with a map picker.
+- The map picker loads Leaflet dynamically in the browser and does not require a project map API key.
+- Guardians can:
+  - click the map to choose an advertisement center point
+  - use the browser's current location permission
+  - choose a targeting radius of 1, 3, 5, 10, or 20 km
+- Added hidden form fields for:
+  - `region`
+  - `regionLatitude`
+  - `regionLongitude`
+  - `regionRadiusKm`
+- Server-side `createSubjectAd()` now validates map selection and stores latitude, longitude, radius, and source.
+- Added `subject_ads` columns:
+  - `region_latitude`
+  - `region_longitude`
+  - `region_radius_km`
+  - `region_source`
+- Bumped `DB_SCHEMA_VERSION` from `16` to `17`.
+- Added `buildMetaCustomLocationTargeting()` in `lib/meta-marketing.js` to convert stored map data into Meta `custom_locations` targeting payloads for the future ad set creation step.
+- Displayed selected radius/location data in:
+  - guardian advertisement dashboard
+  - admin advertisement detail card
+
+### Files Changed
+- `app/ad-campaign-modal.js`
+- `app/account/ads/page.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `lib/db.js`
+- `lib/meta-marketing.js`
+- `deliverables/ADVERTISING_SETUP.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with line-ending warnings only.
+
+### Time Spent
+- Meta targeting review, DB extension, map UI implementation, server validation, admin/user display updates, documentation, and build verification: about 60 minutes.

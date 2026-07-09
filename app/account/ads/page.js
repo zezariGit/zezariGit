@@ -43,7 +43,7 @@ export default async function AccountAdsPage({ searchParams }) {
                 </div>
                 <dl>
                   <dt>광고지역</dt>
-                  <dd>{ad.region}</dd>
+                  <dd>{formatAdLocation(ad)}</dd>
                   <dt>광고기간</dt>
                   <dd>{formatDate(ad.start_date)} ~ {formatDate(ad.end_date)}</dd>
                   <dt>광고금액</dt>
@@ -79,4 +79,10 @@ function AdThumb({ ad }) {
       AD
     </div>
   );
+}
+
+function formatAdLocation(ad) {
+  const radius = Number(ad?.region_radius_km || 0);
+  if (ad?.region && radius > 0) return `${ad.region} / 반경 ${radius}km`;
+  return ad?.region || "지역 미입력";
 }
