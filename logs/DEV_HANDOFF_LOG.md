@@ -5355,3 +5355,54 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Toss widget issue analysis, effect separation, container cleanup, documentation, and build verification: about 20 minutes.
+
+## 2026-07-09 KST - Meta Marketing API Environment and Ad Button Connection
+
+### User Request
+- `.env.local` contains Meta access information under `#메타 접근 정보`.
+- Reflect the Meta environment variables in Vercel and GitHub.
+- Connect the next-step advertisement management buttons to Meta Marketing API calls.
+
+### Reflected Work
+- Added `lib/meta-marketing.js`:
+  - Reads Meta credentials only on the server side.
+  - Calls the Meta Graph API with `META_ACCESS_TOKEN` and `META_AD_ACCOUNT_ID`.
+  - Uses `META_APP_SECRET` for `appsecret_proof` when available.
+  - Defaults `META_API_VERSION` to `v23.0`.
+  - Defaults `META_CAMPAIGN_OBJECTIVE` to `OUTCOME_AWARENESS`.
+- Connected admin advertisement status buttons:
+  - `approve`: create a Meta campaign if `meta_campaign_id` is empty, otherwise set the campaign to `ACTIVE`.
+  - `pause`: set the existing Meta campaign to `PAUSED`.
+  - `resume`: set the existing Meta campaign to `ACTIVE`, creating one if no campaign ID exists.
+- Connected guardian advertisement pause/resume/end actions to Meta status updates when an ad already has `meta_campaign_id`.
+- Persisted returned campaign IDs to `subject_ads.meta_campaign_id`.
+- Persisted integration status to `subject_ads.meta_status`.
+- Bumped `DB_SCHEMA_VERSION` from `15` to `16`.
+- Added defensive schema migrations for `subject_ads.meta_campaign_id` and `subject_ads.meta_status`.
+- Updated advertising deliverables with the new integration scope and remaining next steps.
+
+### Environment Handling
+- Vercel Production and Development received populated Meta keys from `.env.local`:
+  - `META_APP_ID`
+  - `META_APP_SECRET`
+  - `META_ACCESS_TOKEN`
+  - `META_AD_ACCOUNT_ID`
+- `META_PAGE_ID` was skipped because it was not populated in `.env.local`.
+- Preview env insertion was attempted, but Vercel CLI required branch-specific handling and did not persist Preview values in `vercel env ls preview`.
+- GitHub repository secrets were not updated because GitHub CLI is not installed and no `GITHUB_TOKEN` is available in the shell environment.
+
+### Verification
+- `npm run build` succeeded.
+- Safe Meta ad-account lookup succeeded against the configured ad account.
+- Full campaign creation was intentionally not executed as a test to avoid creating an unwanted live Meta campaign object.
+
+### Files Changed
+- `lib/meta-marketing.js`
+- `lib/db.js`
+- `deliverables/ADVERTISING_SETUP.md`
+- `deliverables/ADMIN_AD_GRID_MANAGEMENT.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Time Spent
+- Meta env inspection, Vercel env update, Graph API adapter, admin/user ad action wiring, schema safeguard, safe account verification, documentation, and build verification: about 55 minutes.

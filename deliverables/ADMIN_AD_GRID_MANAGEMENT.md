@@ -152,3 +152,30 @@ Create a clean Korean civic-tech admin UI diagram for "REAL_QR_FIND" advertiseme
 - `npm run build` succeeded.
 - `git diff --check` succeeded with Windows line-ending warnings only.
 - Turso `subject_ads` schema check and advertisement join query succeeded without printing secrets.
+
+## 2026-07-09 Update - Meta Marketing API Button Connection
+
+### Requirement
+- Reflect Meta environment variables in Vercel/GitHub where possible.
+- Connect administrator advertisement buttons to Meta Marketing API calls.
+
+### Implemented Changes
+- Added `lib/meta-marketing.js` as a server-only Graph API adapter.
+- Connected admin advertisement buttons:
+  - `광고승인`: create a Meta campaign if needed, then mark it active.
+  - `광고정지`: pause the linked Meta campaign.
+  - `광고재개`: reactivate the linked Meta campaign, or create it if no campaign ID exists.
+- Connected guardian advertisement pause/resume/end controls to Meta status updates when `meta_campaign_id` exists.
+- Stored the returned campaign ID in `subject_ads.meta_campaign_id`.
+- Stored integration state in `subject_ads.meta_status`.
+- Bumped `DB_SCHEMA_VERSION` to `16` and added fallback migrations for `meta_campaign_id` and `meta_status`.
+
+### Environment
+- Vercel Production and Development received populated Meta keys from `.env.local`.
+- `META_PAGE_ID` was skipped because no value was present.
+- GitHub repository secrets could not be updated from this machine because `gh` is not installed and no `GITHUB_TOKEN` is available.
+
+### Verification
+- `npm run build` succeeded.
+- Safe Meta ad-account lookup succeeded.
+- Campaign creation was not executed as a test because it would create a real Meta campaign object.

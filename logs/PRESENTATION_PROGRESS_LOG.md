@@ -3692,3 +3692,39 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 원인 분석, 결제위젯 effect 분리, 컨테이너 초기화, 문서화, 빌드 검증: 약 20분.
+
+## 2026-07-09 - Meta 마케팅 API 환경변수 반영 및 광고 버튼 연동
+
+### 요구내용
+- `.env.local`의 `#메타 접근 정보` 아래에 작성한 Meta 정보를 Vercel과 GitHub에 반영한다.
+- 관리자페이지 광고관리의 버튼을 Meta 마케팅 API 호출과 연결한다.
+
+### 반영내용
+- Vercel 운영/개발 환경에 Meta 관련 키를 반영했다.
+  - `META_APP_ID`
+  - `META_APP_SECRET`
+  - `META_ACCESS_TOKEN`
+  - `META_AD_ACCOUNT_ID`
+- `META_PAGE_ID`는 값이 없어 반영 대상에서 제외했다.
+- GitHub secrets는 현재 PC에 GitHub CLI가 없고 `GITHUB_TOKEN`도 없어 자동 반영하지 못했다.
+- 서버 전용 Meta API 연동 파일 `lib/meta-marketing.js`를 추가했다.
+- 관리자 광고관리 버튼과 Meta 캠페인 상태를 연결했다.
+  - `광고승인`: Meta 캠페인 생성 또는 활성화
+  - `광고정지`: Meta 캠페인 일시정지
+  - `광고재개`: Meta 캠페인 재활성화
+- 보호자 화면의 광고 일시정지/재개/종료도 이미 Meta 캠페인이 연결된 경우 함께 상태가 변경되도록 했다.
+- Meta에서 반환되는 캠페인 ID는 `subject_ads.meta_campaign_id`에 저장한다.
+- Meta 연동 상태는 `subject_ads.meta_status`에 저장한다.
+- 기존 DB 호환을 위해 광고 테이블에 Meta 관련 컬럼 보강 마이그레이션을 추가했다.
+
+### 검증결과
+- 프로덕션 빌드 성공.
+- Meta 광고계정 조회 테스트 성공.
+- 실제 캠페인 생성 테스트는 실제 Meta 캠페인 객체가 만들어질 수 있어 수행하지 않았다.
+
+### 산출물
+- `deliverables/ADVERTISING_SETUP.md` 갱신.
+- `deliverables/ADMIN_AD_GRID_MANAGEMENT.md` 갱신.
+
+### 반영시간
+- 환경변수 확인/반영, API 어댑터 구현, 광고 버튼 연결, DB 보강, 문서화, 빌드 검증: 약 55분.

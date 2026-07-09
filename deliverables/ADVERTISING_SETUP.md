@@ -4,7 +4,8 @@ Project: REAL_QR_FIND / zezari
 
 ## Status
 - Implemented as an internal advertising request and status-management foundation.
-- Meta API integration is not connected yet.
+- Meta Marketing API campaign-level integration is connected for admin approval, pause, and resume buttons.
+- Guardian pause/resume/end buttons also sync to Meta when a campaign ID already exists.
 - Payment integration for advertisement placement is not connected yet.
 
 ## User Flow
@@ -43,9 +44,9 @@ Project: REAL_QR_FIND / zezari
    - total amount
    - click count
 5. Admin can select one advertisement and use:
-   - `광고승인`
-   - `광고정지`
-   - `광고재개`
+   - `광고승인`: creates a Meta campaign when no campaign ID exists, or sets the existing campaign to `ACTIVE`.
+   - `광고정지`: sets the existing Meta campaign to `PAUSED`.
+   - `광고재개`: sets the existing Meta campaign to `ACTIVE`, or creates a campaign if the existing ad has no campaign ID.
    - `광고상세정보`
 6. The detail panel shows the selected advertisement, guardian, subject, Meta campaign placeholder, Meta API status, registration time, and update time.
 
@@ -66,20 +67,36 @@ Project: REAL_QR_FIND / zezari
   - `paused`
 - Ended ads remain as history with `status = ended`.
 
-## Meta API Preparation
-- `subject_ads.meta_campaign_id` is reserved for Meta campaign/ad set identifiers.
-- `subject_ads.meta_status` currently stores `meta_api_pending`.
-- `subject_ads.click_count` stores the synced or manually imported click count. It defaults to `0` until Meta API reporting is connected.
-- Future API integration should add:
-  - Meta access token environment variables
-  - campaign creation API call
-  - pause/resume API call
-  - stop/delete API call
-  - webhook or polling sync for Meta delivery status and click count
-  - error code/message columns if needed
+## Meta Marketing API Integration
+- Server-side module: `lib/meta-marketing.js`
+- Runtime environment variables:
+  - `META_APP_ID`
+  - `META_APP_SECRET`
+  - `META_ACCESS_TOKEN`
+  - `META_AD_ACCOUNT_ID`
+  - Optional: `META_API_VERSION`, defaults to `v23.0`
+  - Optional: `META_CAMPAIGN_OBJECTIVE`, defaults to `OUTCOME_AWARENESS`
+- `subject_ads.meta_campaign_id` stores the Meta campaign ID returned from the Campaigns API.
+- `subject_ads.meta_status` stores the latest local integration state:
+  - `campaign_active`
+  - `campaign_paused`
+  - `campaign_not_created`
+  - `campaign_ended_paused`
+  - `meta_api_pending`
+- Current integration scope:
+  - Campaign create
+  - Campaign active/pause status update
+  - Campaign ID and integration status persistence
+- Next Meta integration scope:
+  - Ad set creation
+  - Ad creative creation from the missing-person ad content
+  - Page/Instagram actor configuration
+  - targeting, budget, and schedule mapping
+  - webhook or polling sync for Meta delivery status, impressions, reach, spend, and click count
+  - structured storage for Meta error code/message if needed
 
 ## Verification
 - `npm run build` succeeded.
-- Turso verification:
-  - `ad_settings.default.daily_rate = 10000`
-  - `subject_ads` table exists and currently has `0` rows.
+- Vercel production/development environment variables were updated for populated Meta keys without printing secret values.
+- Safe Meta account access check succeeded against the configured ad account.
+- Full campaign creation was not executed during verification to avoid creating an unwanted live Meta campaign object.
