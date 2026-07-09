@@ -36,20 +36,23 @@ export default function AdCampaignModal({
   const [radiusKm, setRadiusKm] = useState(Number(subject?.ad_region_radius_km || 3));
   const [mapReady, setMapReady] = useState(false);
   const [mapMessage, setMapMessage] = useState("지도를 불러오고 있습니다.");
+  const [step, setStep] = useState("setup");
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const circleRef = useRef(null);
   const quote = calculateQuote(startDate, endDate, dailyRate);
   const activeAd = ["active", "paused", "ready"].includes(subject?.ad_status || "");
+  const canPreview = Boolean(location.selected && quote.valid);
 
   useEffect(() => {
     setLocation(initialLocation);
     setRadiusKm(Number(subject?.ad_region_radius_km || 3));
+    setStep("setup");
   }, [initialLocation, subject?.ad_region_radius_km]);
 
   useEffect(() => {
-    if (!subject || activeAd || !mapContainerRef.current) return undefined;
+    if (!subject || activeAd || step !== "setup" || !mapContainerRef.current) return undefined;
     let disposed = false;
 
     loadLeaflet()
@@ -94,7 +97,7 @@ export default function AdCampaignModal({
       circleRef.current = null;
       setMapReady(false);
     };
-  }, [activeAd, subject]);
+  }, [activeAd, step, subject]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -172,6 +175,15 @@ export default function AdCampaignModal({
     ? `${location.label} (${location.lat.toFixed(5)}, ${location.lng.toFixed(5)})`
     : "";
 
+  function showPreview() {
+    if (!location.selected) {
+      setMapMessage("지도에서 광고 중심 위치를 먼저 선택해 주세요.");
+      return;
+    }
+    if (!quote.valid) return;
+    setStep("preview");
+  }
+
   return (
     <section className="modal-backdrop ad-modal-backdrop" aria-label="광고 신청" role="dialog" aria-modal="true">
       <ModalScrollLock />
@@ -221,72 +233,183 @@ export default function AdCampaignModal({
             </div>
           </div>
         ) : (
-          <form action={createAction} className="ad-request-form">
-            <input type="hidden" name="subjectId" value={subject.id} />
-            <input type="hidden" name="region" value={regionLabel} />
-            <input type="hidden" name="regionLatitude" value={location.selected ? location.lat : ""} />
-            <input type="hidden" name="regionLongitude" value={location.selected ? location.lng : ""} />
-            <section className="ad-map-field full-field" aria-label="광고지역 지도 선택">
-              <div className="ad-map-toolbar">
-                <div>
-                  <strong>광고지역</strong>
-                  <span>{mapMessage}</span>
+          <>
+            {step === "setup" ? (
+              <div className="ad-request-form">
+                <section className="ad-map-field full-field" aria-label="광고지역 지도 선택">
+                  <div className="ad-map-toolbar">
+                    <div>
+                      <strong>광고지역</strong>
+                      <span>{mapMessage}</span>
+                    </div>
+                    <button type="button" className="plain-button compact" onClick={useCurrentLocation}>
+                      현재 위치
+                    </button>
+                  </div>
+                  <div className="ad-location-map-wrap">
+                    <div className="ad-location-map" ref={mapContainerRef} />
+                    {!mapReady && <span className="ad-location-map-placeholder">{mapMessage}</span>}
+                  </div>
+                  <div className="ad-location-summary">
+                    <span>{location.selected ? regionLabel : "선택된 위치가 없습니다."}</span>
+                    <label>
+                      반경
+                      <select value={radiusKm} onChange={(event) => setRadiusKm(Number(event.target.value))}>
+                        {RADIUS_OPTIONS.map((option) => (
+                          <option value={option} key={option}>{option}km</option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                </section>
+                <label>
+                  시작일
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(event) => setStartDate(event.target.value)}
+                    required
+                  />
+                </label>
+                <label>
+                  종료일
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(event) => setEndDate(event.target.value)}
+                    required
+                  />
+                </label>
+                <div className="ad-quote full-field">
+                  <span>일 단가 {formatCurrency(dailyRate)}</span>
+                  <strong>{quote.valid ? formatCurrency(quote.amount) : "기간을 확인해 주세요"}</strong>
+                  <span>{quote.valid ? `${quote.days}일 기준` : "종료일은 시작일 이후여야 합니다."}</span>
                 </div>
-                <button type="button" className="plain-button compact" onClick={useCurrentLocation}>
-                  현재 위치
+                <button type="button" className="action full-field" disabled={!canPreview} onClick={showPreview}>
+                  확인
                 </button>
               </div>
-              <div className="ad-location-map-wrap">
-                <div className="ad-location-map" ref={mapContainerRef} />
-                {!mapReady && <span className="ad-location-map-placeholder">{mapMessage}</span>}
-              </div>
-              <div className="ad-location-summary">
-                <span>{location.selected ? regionLabel : "선택된 위치가 없습니다."}</span>
-                <label>
-                  반경
-                  <select name="regionRadiusKm" value={radiusKm} onChange={(event) => setRadiusKm(Number(event.target.value))}>
-                    {RADIUS_OPTIONS.map((option) => (
-                      <option value={option} key={option}>{option}km</option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-            </section>
-            <label>
-              시작일
-              <input
-                name="startDate"
-                type="date"
-                value={startDate}
-                onChange={(event) => setStartDate(event.target.value)}
-                required
-              />
-            </label>
-            <label>
-              종료일
-              <input
-                name="endDate"
-                type="date"
-                value={endDate}
-                onChange={(event) => setEndDate(event.target.value)}
-                required
-              />
-            </label>
-            <div className="ad-quote full-field">
-              <span>일 단가 {formatCurrency(dailyRate)}</span>
-              <strong>{quote.valid ? formatCurrency(quote.amount) : "기간을 확인해 주세요"}</strong>
-              <span>{quote.valid ? `${quote.days}일 기준` : "종료일은 시작일 이후여야 합니다."}</span>
-            </div>
-            <FormSubmitButton className="action full-field" pendingText="저장중" disabled={!location.selected}>
-              광고 신청 저장
-            </FormSubmitButton>
-          </form>
+            ) : (
+              <form action={createAction} className="ad-request-form ad-preview-form">
+                <input type="hidden" name="subjectId" value={subject.id} />
+                <input type="hidden" name="region" value={regionLabel} />
+                <input type="hidden" name="regionLatitude" value={location.selected ? location.lat : ""} />
+                <input type="hidden" name="regionLongitude" value={location.selected ? location.lng : ""} />
+                <input type="hidden" name="regionRadiusKm" value={radiusKm} />
+                <input type="hidden" name="startDate" value={startDate} />
+                <input type="hidden" name="endDate" value={endDate} />
+                <MissingAdPreview
+                  subject={subject}
+                  quote={quote}
+                  startDate={startDate}
+                  endDate={endDate}
+                  regionLabel={regionLabel}
+                  radiusKm={radiusKm}
+                />
+                <div className="ad-preview-actions full-field">
+                  <button type="button" className="plain-button" onClick={() => setStep("setup")}>
+                    다시 선택
+                  </button>
+                  <FormSubmitButton className="action" pendingText="결제 준비중" disabled={!canPreview}>
+                    결제하기
+                  </FormSubmitButton>
+                </div>
+              </form>
+            )}
+          </>
         )}
         <div className="modal-footer">
           <a className="plain-button modal-close-button" href="/?tab=dashboard">
             닫기
           </a>
         </div>
+      </div>
+    </section>
+  );
+}
+
+function MissingAdPreview({ subject, quote, startDate, endDate, regionLabel, radiusKm }) {
+  const photoSrc = subjectPhotoSrc(subject);
+  const age = calculateAge(subject?.birth_date);
+  const gender = formatGender(subject?.gender);
+  const message = String(subject?.guardian_message || "").trim()
+    || "보호자가 작성한 메시지가 이 영역에 표시됩니다.";
+  const qrTargetUrl = subject?.qr_target_url || "";
+
+  return (
+    <section className="ad-preview-step full-field" aria-label="광고 미리보기">
+      <div className="ad-preview-heading">
+        <div>
+          <strong>광고 미리보기</strong>
+          <span>결제 후 이 화면 구성을 이미지화해서 Meta 광고 소재로 등록할 수 있도록 준비합니다.</span>
+        </div>
+        <em>{formatCurrency(quote.amount)}</em>
+      </div>
+
+      <article
+        className="missing-ad-poster"
+        data-ad-creative="missing-person-preview"
+        data-subject-id={subject.id}
+      >
+        <header className="missing-ad-poster-header">
+          <strong>실종자를 찾습니다</strong>
+          <span>여러분의 작은 제보가 가족을 만날 수 있게 합니다.</span>
+        </header>
+        <div className="missing-ad-poster-body">
+          <div className="missing-ad-photos">
+            <div className="missing-ad-main-photo">
+              {photoSrc ? <img src={photoSrc} alt={`${subject.name} 사진`} /> : <span aria-hidden="true" />}
+            </div>
+            <div className="missing-ad-thumb-row" aria-hidden="true">
+              {[0, 1, 2].map((index) => (
+                <span key={index}>
+                  {photoSrc ? <img src={photoSrc} alt="" /> : null}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="missing-ad-info">
+            <dl>
+              <div>
+                <dt>이름</dt>
+                <dd>{subject.name || "-"}</dd>
+              </div>
+              <div>
+                <dt>나이</dt>
+                <dd>{age ? `${age}세` : "-"}</dd>
+              </div>
+              <div>
+                <dt>성별</dt>
+                <dd>{gender}</dd>
+              </div>
+            </dl>
+            <div className="missing-ad-message">
+              <strong>보호자 메시지</strong>
+              <p>{message}</p>
+            </div>
+          </div>
+        </div>
+        <footer className="missing-ad-poster-footer">
+          <div className="missing-ad-contact">
+            <strong>QR 안심 서비스</strong>
+            <span>QR코드로 관리대상 정보를 확인해 주세요.</span>
+          </div>
+          <div className="missing-ad-qr">
+            {subject?.qr_image ? <img src={subject.qr_image} alt={`${subject.name} QR 코드`} /> : <span>QR</span>}
+          </div>
+        </footer>
+      </article>
+
+      <div className="ad-preview-meta">
+        <span>기간: {formatDate(startDate)} ~ {formatDate(endDate)} / {quote.days}일</span>
+        <span>지역: {regionLabel} / 반경 {radiusKm}km</span>
+        {qrTargetUrl ? (
+          <a href={qrTargetUrl} target="_blank" rel="noreferrer">
+            관리대상정보 페이지 열기
+          </a>
+        ) : (
+          <span>관리대상정보 링크는 QR 매칭 후 표시됩니다.</span>
+        )}
       </div>
     </section>
   );
@@ -391,4 +514,27 @@ function formatMetaStatus(status) {
   if (status === "meta_api_access_blocked") return "Meta 권한 승인 필요";
   if (status === "meta_api_pending") return "연동 대기";
   return status || "연동 대기";
+}
+
+function subjectPhotoSrc(subject) {
+  return subject?.photo_url || subject?.photo_data_url || "";
+}
+
+function calculateAge(birthDate) {
+  const birth = parseDate(birthDate);
+  if (!birth) return 0;
+  const now = new Date();
+  let age = now.getFullYear() - birth.getUTCFullYear();
+  const currentMonth = now.getMonth();
+  const birthMonth = birth.getUTCMonth();
+  if (currentMonth < birthMonth || (currentMonth === birthMonth && now.getDate() < birth.getUTCDate())) {
+    age -= 1;
+  }
+  return Math.max(0, age);
+}
+
+function formatGender(value) {
+  if (value === "남" || value === "남성") return "남";
+  if (value === "여" || value === "여성") return "여";
+  return value || "-";
 }

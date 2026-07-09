@@ -5531,3 +5531,60 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Error isolation, Meta validation check, local-state fallback, status labeling, documentation, and build verification: about 30 minutes.
+
+## 2026-07-10 KST - Advertisement Preview and Payment-Entry Prework
+
+### User Request
+- Meta API keys/access are not ready yet, but prepare the ad request flow so the advertisement feature can be used quickly once keys are issued.
+- In the guardian advertisement modal, change `광고신청저장` to `확인`.
+- After map and date selection, show an advertisement preview in the popup before payment.
+- The preview should resemble a missing-person poster:
+  - managed subject photo
+  - name, age, gender
+  - guardian message
+  - QR code
+  - managed subject information page link
+- Add a bottom `결제하기` button leading to a payment page.
+- After payment completion in a future step, the same content should be image-captured and registered as a Meta advertisement creative.
+
+### Reflected Work
+- Updated `app/ad-campaign-modal.js`.
+  - Split the modal into `setup` and `preview` steps.
+  - Map/date/radius step now uses a `확인` button.
+  - Preview step displays a missing-person ad poster with subject photo, subject info, guardian message, QR image, and target page link.
+  - The preview submit button is now `결제하기`.
+- Updated `app/page.js` so dashboard ad modal loads subject detail fields when `adSubject` is opened.
+- Updated `lib/db.js`.
+  - `createSubjectAd()` returns the created advertisement ID.
+  - New ad requests now start with `status = ready`, not `active`, so unpaid/unapproved ads do not appear as already running.
+  - Added `getGuardianAdCheckoutData()` for the payment-entry page.
+- Updated `app/actions.js`.
+  - After creating an ad request, redirect to `/ads/checkout/[id]`.
+- Added `app/ads/checkout/[id]/page.js`.
+  - Shows the same ad creative in an image-capture-ready DOM marked with `data-ad-creative="missing-person-payment"`.
+  - Shows order summary, selected region, radius, period, daily rate, and amount.
+  - Keeps the actual Toss ad payment button disabled until the external advertisement payment/API approval scope is complete.
+- Updated CSS in `app/globals.css` for preview poster, checkout page, and mobile layout.
+- Updated `deliverables/ADVERTISING_SETUP.md`.
+
+### Important Next Step
+- Wire actual Toss advertisement payment on `/ads/checkout/[id]`.
+- On successful payment, capture the `data-ad-creative="missing-person-payment"` element as an image, store it, and pass it into the next Meta creative/ad creation flow.
+- Current Meta campaign approval fallback still handles `API access blocked` by saving local state and setting `meta_api_access_blocked`.
+
+### Files Changed
+- `app/ad-campaign-modal.js`
+- `app/ads/checkout/[id]/page.js`
+- `app/actions.js`
+- `app/page.js`
+- `app/globals.css`
+- `lib/db.js`
+- `deliverables/ADVERTISING_SETUP.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+
+### Time Spent
+- Modal flow change, ad preview UI, checkout-entry route, DB/action wiring, documentation, and build verification: about 45 minutes.

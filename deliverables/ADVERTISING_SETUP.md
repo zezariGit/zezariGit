@@ -6,7 +6,8 @@ Project: REAL_QR_FIND / zezari
 - Implemented as an internal advertising request and status-management foundation.
 - Meta Marketing API campaign-level integration is connected for admin approval, pause, and resume buttons.
 - Guardian pause/resume/end buttons also sync to Meta when a campaign ID already exists.
-- Payment integration for advertisement placement is not connected yet.
+- Advertisement creative preview and payment-entry screen are prepared.
+- Actual Toss advertisement payment confirmation is not connected yet; the checkout button is kept in a disabled waiting state until the external payment/API scope is approved.
 
 ## User Flow
 1. A logged-in guardian opens the dashboard.
@@ -21,11 +22,19 @@ Project: REAL_QR_FIND / zezari
    - inclusive advertising days
    - daily rate from admin settings
    - estimated total amount
-6. Saving creates a `subject_ads` row with status `active`.
-7. If an advertisement is running, the modal shows:
+6. The guardian selects `확인`.
+7. The modal changes to a missing-person advertisement preview:
+   - managed subject photo
+   - name, age, gender
+   - guardian message
+   - QR code
+   - managed subject info page link
+8. Selecting `결제하기` creates a `subject_ads` row with status `ready` and moves to `/ads/checkout/[id]`.
+9. The checkout page shows the same image-capture-ready creative markup plus order summary.
+10. If an advertisement is running, the modal shows:
    - `일시정지`
    - `광고끝내기`
-8. If an advertisement is paused, the modal shows:
+11. If an advertisement is paused, the modal shows:
    - `광고 재개`
    - `광고끝내기`
 
@@ -102,6 +111,8 @@ Project: REAL_QR_FIND / zezari
   - `geo_locations.custom_locations[].radius`
   - `geo_locations.custom_locations[].distance_unit = kilometer`
 - Next Meta integration scope:
+  - enable actual advertisement payment from `/ads/checkout/[id]`
+  - capture the DOM marked with `data-ad-creative="missing-person-payment"` as an image after payment success
   - Ad set creation
   - Ad creative creation from the missing-person ad content
   - Page/Instagram actor configuration

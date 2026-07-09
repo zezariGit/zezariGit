@@ -60,13 +60,14 @@ export async function deleteSubjectAction(formData) {
 export async function createSubjectAdAction(formData) {
   const session = await getServerSession(authOptions);
   if (!session) throw new Error("로그인이 필요합니다.");
+  let result;
   try {
-    await createSubjectAd(session, formData);
+    result = await createSubjectAd(session, formData);
     revalidatePath("/");
   } catch (error) {
     redirect(withNotice("/?tab=dashboard", error.message || "광고 신청 정보를 확인해 주세요.", "error"));
   }
-  redirect(withNotice("/?tab=dashboard", "광고 신청이 저장되었습니다."));
+  redirect(withNotice(`/ads/checkout/${encodeURIComponent(result.id)}`, "광고 신청 정보가 저장되었습니다. 결제를 진행해 주세요."));
 }
 
 export async function pauseSubjectAdAction(formData) {
