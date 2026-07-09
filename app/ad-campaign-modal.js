@@ -193,7 +193,7 @@ export default function AdCampaignModal({
                 {formatDate(subject.ad_start_date)} ~ {formatDate(subject.ad_end_date)}
               </span>
               <span>{formatAdLocation(subject)}</span>
-              <span>Meta API: {subject.ad_meta_status || "연동 대기"}</span>
+              <span>Meta API: {formatMetaStatus(subject.ad_meta_status)}</span>
             </div>
             <div className="ad-state-actions">
               {subject.ad_status === "active" && (
@@ -383,4 +383,12 @@ function formatAdLocation(subject) {
   const radius = Number(subject?.ad_region_radius_km || 0);
   if (subject?.ad_region && radius > 0) return `${subject.ad_region} / 반경 ${radius}km`;
   return subject?.ad_region || "지역 미입력";
+}
+
+function formatMetaStatus(status) {
+  if (status === "campaign_active") return "캠페인 활성";
+  if (status === "campaign_paused") return "캠페인 일시정지";
+  if (status === "meta_api_access_blocked") return "Meta 권한 승인 필요";
+  if (status === "meta_api_pending") return "연동 대기";
+  return status || "연동 대기";
 }

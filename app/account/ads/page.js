@@ -49,7 +49,7 @@ export default async function AccountAdsPage({ searchParams }) {
                   <dt>광고금액</dt>
                   <dd>{formatCurrency(ad.amount)}</dd>
                   <dt>Meta 상태</dt>
-                  <dd>{ad.meta_status || "운영 준비 중"}</dd>
+                  <dd>{formatMetaStatus(ad.meta_status)}</dd>
                 </dl>
               </div>
             </article>
@@ -85,4 +85,12 @@ function formatAdLocation(ad) {
   const radius = Number(ad?.region_radius_km || 0);
   if (ad?.region && radius > 0) return `${ad.region} / 반경 ${radius}km`;
   return ad?.region || "지역 미입력";
+}
+
+function formatMetaStatus(status) {
+  if (status === "campaign_active") return "캠페인 활성";
+  if (status === "campaign_paused") return "캠페인 일시정지";
+  if (status === "meta_api_access_blocked") return "Meta 권한 승인 필요";
+  if (status === "meta_api_pending") return "운영 준비 중";
+  return status || "운영 준비 중";
 }

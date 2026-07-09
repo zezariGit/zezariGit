@@ -5490,3 +5490,44 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Meta targeting review, DB extension, map UI implementation, server validation, admin/user display updates, documentation, and build verification: about 60 minutes.
+
+## 2026-07-10 KST - Meta API Access Blocked Approval Handling
+
+### User Request
+- After a guardian selects an advertisement region on the map, the admin `광고승인` button shows `API access blocked. code=200 type=OAuthException`.
+
+### Analysis
+- The error is returned by Meta before campaign creation and is not caused by the stored map latitude/longitude.
+- A direct validation request to the campaign endpoint also returned `API access blocked`, so the current Meta app/token needs Meta-side API access/permission review before live campaign creation can succeed.
+- The service should not block the internal admin approval workflow while Meta API access is pending.
+
+### Reflected Work
+- Preserved Meta error metadata in `lib/meta-marketing.js`:
+  - `metaCode`
+  - `metaType`
+  - `metaSubcode`
+- Added `isMetaApiAccessBlocked()`.
+- Updated admin advertisement status sync so Meta OAuth code `200` access blocking:
+  - does not throw to the UI
+  - still saves the requested local status
+  - stores `subject_ads.meta_status = meta_api_access_blocked`
+- Updated guardian advertisement pause/resume/end sync with the same fallback.
+- Added user-facing status labels:
+  - `meta_api_access_blocked` -> `Meta 권한 승인 필요`
+- Updated `deliverables/ADVERTISING_SETUP.md`.
+
+### Files Changed
+- `lib/meta-marketing.js`
+- `lib/db.js`
+- `app/admin/page.js`
+- `app/ad-campaign-modal.js`
+- `app/account/ads/page.js`
+- `deliverables/ADVERTISING_SETUP.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+
+### Time Spent
+- Error isolation, Meta validation check, local-state fallback, status labeling, documentation, and build verification: about 30 minutes.

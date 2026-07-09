@@ -89,6 +89,7 @@ Project: REAL_QR_FIND / zezari
   - `campaign_paused`
   - `campaign_not_created`
   - `campaign_ended_paused`
+  - `meta_api_access_blocked`
   - `meta_api_pending`
 - Current integration scope:
   - Campaign create
@@ -114,4 +115,5 @@ Project: REAL_QR_FIND / zezari
 - Safe Meta account access check succeeded against the configured ad account.
 - Meta campaign creation validation with `execution_options=["validate_only"]` succeeded after adding `is_adset_budget_sharing_enabled=false`.
 - `npm run build` succeeded after the map-based advertisement region selection change.
+- When Meta returns `API access blocked` with OAuth code `200`, admin approval/pause/resume now persists the local service state and records `meta_api_access_blocked` instead of blocking the administrator workflow.
 - Full campaign creation was not executed during verification to avoid creating an unwanted live Meta campaign object.

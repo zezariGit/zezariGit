@@ -1954,7 +1954,7 @@ function AdManagementSection({ adsData }) {
                       <div><dt>광고기간</dt><dd>{formatDate(selectedAd.start_date)} ~ {formatDate(selectedAd.end_date)}</dd></div>
                       <div><dt>활성화 일시</dt><dd>{formatRecentDateTime(selectedAd.updated_at)}</dd></div>
                       <div><dt>캠페인 ID</dt><dd className="inline-scroll-value">{selectedAd.meta_campaign_id || "미연동"}</dd></div>
-                      <div><dt>Meta 상태</dt><dd>{selectedAd.meta_status || "연동 대기"}</dd></div>
+                      <div><dt>Meta 상태</dt><dd>{formatAdMetaStatus(selectedAd.meta_status)}</dd></div>
                     </dl>
                     <div className="ad-creative-row">
                       <strong>광고 소재</strong>
@@ -4483,6 +4483,16 @@ function formatAdTargetLocation(ad) {
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return "지도 위치 미설정";
   const radiusLabel = radius > 0 ? `반경 ${radius}km` : "반경 미설정";
   return `${radiusLabel} / ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+}
+
+function formatAdMetaStatus(status) {
+  if (status === "campaign_active") return "캠페인 활성";
+  if (status === "campaign_paused") return "캠페인 일시정지";
+  if (status === "campaign_not_created") return "캠페인 미생성";
+  if (status === "campaign_ended_paused") return "종료 처리됨";
+  if (status === "meta_api_access_blocked") return "Meta 권한 승인 필요";
+  if (status === "meta_api_pending") return "연동 대기";
+  return status || "연동 대기";
 }
 
 function formatPaymentNumber(payment) {

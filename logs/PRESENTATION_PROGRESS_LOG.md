@@ -3783,3 +3783,28 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - Meta 위치 타겟팅 확인, DB 확장, 지도 UI, 서버 검증, 관리자/사용자 표시, 문서화, 빌드 검증: 약 60분.
+
+## 2026-07-10 - Meta API Access Blocked 승인 오류 처리
+
+### 요구내용
+- 사용자가 지도에서 광고지역을 설정한 뒤 관리자가 `광고승인`을 누르면 `API access blocked. code=200 type=OAuthException` 오류가 발생한다.
+
+### 원인분석
+- 지도 좌표 저장 문제는 아니며, Meta 캠페인 생성 요청이 Meta 쪽 앱/토큰 권한 상태에서 차단되고 있었다.
+- 동일 토큰으로 캠페인 검증 요청을 해도 `API access blocked`가 발생했다.
+- Meta API 권한 검수/앱 권한이 완료되기 전까지는 실제 캠페인 생성이 불가능할 수 있다.
+
+### 반영내용
+- Meta API가 권한 차단 오류를 반환해도 관리자 내부 승인 흐름은 막히지 않게 했다.
+- 관리자 승인/정지/재개 요청은 로컬 DB 상태를 저장하고, Meta 상태는 `Meta 권한 승인 필요`로 표시한다.
+- 보호자 광고 일시정지/재개/종료도 같은 방식으로 화면 오류 없이 처리되도록 보강했다.
+- Meta 오류 코드와 타입을 내부에서 보존하도록 개선했다.
+
+### 검증결과
+- 프로덕션 빌드 성공.
+
+### 산출물
+- `deliverables/ADVERTISING_SETUP.md` 갱신.
+
+### 반영시간
+- 오류 분리, Meta 검증 확인, 로컬 승인 fallback, 화면 상태 라벨, 문서화, 빌드 검증: 약 30분.
