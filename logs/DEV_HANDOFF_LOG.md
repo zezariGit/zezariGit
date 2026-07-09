@@ -5406,3 +5406,34 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Meta env inspection, Vercel env update, Graph API adapter, admin/user ad action wiring, schema safeguard, safe account verification, documentation, and build verification: about 55 minutes.
+
+## 2026-07-09 KST - Meta Campaign Approval Invalid Parameter Fix
+
+### User Request
+- Pressing `광고승인` in the admin advertisement grid shows `Invalid parameter code=100 type=OAuthException`.
+
+### Analysis
+- The Meta Campaign create request reached the Marketing API.
+- Running a non-mutating validation request with `execution_options=["validate_only"]` exposed the real Meta error details:
+  - `error_subcode = 4834011`
+  - Meta required `is_adset_budget_sharing_enabled` to be explicitly true or false.
+- The current first-stage integration creates only the campaign object and does not create campaign budget optimization/ad set budget sharing, so the correct explicit value is `false`.
+
+### Reflected Work
+- Added `is_adset_budget_sharing_enabled=false` to the campaign create request in `lib/meta-marketing.js`.
+- Improved Meta error handling to include `error_user_title` and `error_user_msg` when Meta returns field-level guidance.
+- Updated `deliverables/ADVERTISING_SETUP.md`.
+
+### Verification
+- `npm run build` succeeded.
+- Meta campaign creation validation succeeded with `execution_options=["validate_only"]`.
+- A live campaign creation test was not executed to avoid creating unnecessary Meta campaign objects.
+
+### Files Changed
+- `lib/meta-marketing.js`
+- `deliverables/ADVERTISING_SETUP.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Time Spent
+- Error reproduction, Meta validation, parameter fix, build, documentation, and deployment preparation: about 20 minutes.

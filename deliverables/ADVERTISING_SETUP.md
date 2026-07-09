@@ -87,6 +87,7 @@ Project: REAL_QR_FIND / zezari
   - Campaign create
   - Campaign active/pause status update
   - Campaign ID and integration status persistence
+- Meta campaign creation explicitly sends `is_adset_budget_sharing_enabled=false` because the current first-stage integration does not create campaign-budget optimization/ad set budget sharing.
 - Next Meta integration scope:
   - Ad set creation
   - Ad creative creation from the missing-person ad content
@@ -99,4 +100,5 @@ Project: REAL_QR_FIND / zezari
 - `npm run build` succeeded.
 - Vercel production/development environment variables were updated for populated Meta keys without printing secret values.
 - Safe Meta account access check succeeded against the configured ad account.
+- Meta campaign creation validation with `execution_options=["validate_only"]` succeeded after adding `is_adset_budget_sharing_enabled=false`.
 - Full campaign creation was not executed during verification to avoid creating an unwanted live Meta campaign object.

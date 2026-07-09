@@ -3728,3 +3728,29 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 환경변수 확인/반영, API 어댑터 구현, 광고 버튼 연결, DB 보강, 문서화, 빌드 검증: 약 55분.
+
+## 2026-07-09 - 광고승인 Meta Invalid Parameter 오류 개선
+
+### 요구내용
+- 관리자 광고관리에서 `광고승인` 버튼을 누르면 `Invalid parameter code=100 type=OAuthException` 오류가 발생한다.
+
+### 원인분석
+- Meta Marketing API 호출은 정상적으로 도달하고 있었다.
+- 실제 캠페인을 만들지 않는 검증 요청으로 확인한 결과, Meta가 `is_adset_budget_sharing_enabled` 값을 명시하라고 응답했다.
+- 현재 1차 연동은 캠페인만 생성하고 광고세트 예산 공유 기능은 사용하지 않으므로 값을 `false`로 지정해야 한다.
+
+### 반영내용
+- Meta 캠페인 생성 요청에 `is_adset_budget_sharing_enabled=false`를 추가했다.
+- Meta에서 상세 오류 안내를 내려주는 경우 화면에도 더 구체적인 메시지가 보이도록 오류 메시지 처리를 개선했다.
+- 광고 연동 산출물 문서를 갱신했다.
+
+### 검증결과
+- 프로덕션 빌드 성공.
+- Meta 캠페인 생성 검증 요청 성공.
+- 실제 캠페인 생성 테스트는 불필요한 Meta 캠페인을 만들 수 있어 수행하지 않았다.
+
+### 산출물
+- `deliverables/ADVERTISING_SETUP.md` 갱신.
+
+### 반영시간
+- 오류 확인, Meta 검증, 파라미터 수정, 문서화, 빌드 검증: 약 20분.
