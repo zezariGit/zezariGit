@@ -3867,3 +3867,40 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 문구 변경, 지도 검색 API/UI, CSS, 문서화, 빌드 검증: 약 30분.
+
+## 2026-07-10 - 광고 결제 페이지 구성 및 Toss 결제 연결
+
+### 요구내용
+- 광고 결제 페이지를 첨부 화면처럼 구성한다.
+- 비용 안내, 예상노출수, 안내사항, 결제수단, 하단 결제 버튼을 보여준다.
+- Toss 결제를 실제로 연결한다.
+
+### 반영내용
+- `/ads/checkout/[id]`를 모바일 카드형 광고 결제 화면으로 변경했다.
+- 비용 안내 영역에 기간 비용, 범위 비용, 총 광고금액을 표시한다.
+- 예상노출수 영역을 추가했다.
+- 광고 결제 안내사항 영역을 추가했다.
+- 결제수단 영역에 Toss Payments 결제위젯을 연결했다.
+- 하단 버튼은 `13,000원 결제하기`처럼 실제 광고 금액을 포함해 표시된다.
+- 광고 전용 Toss API를 추가했다.
+  - `POST /api/payments/toss/ad/prepare`
+  - `/payments/toss/ad/success`
+  - `/payments/toss/ad/fail`
+- Toss 결제 성공 시 서버에서 결제승인을 검증하고 광고 결제정보를 저장한다.
+- `subject_ads`에 광고 결제 필드를 추가했다.
+  - Toss 주문번호
+  - 결제키
+  - 결제수단
+  - 결제완료일시
+- 광고 결제 완료 후에도 광고 상태는 `준비중`으로 유지해 관리자 승인/Meta 등록 흐름과 분리했다.
+- 관리자 결제관리에서 광고 결제도 결제대기/결제완료로 구분되도록 했다.
+
+### 검증결과
+- 프로덕션 빌드 성공.
+
+### 산출물
+- `deliverables/ADVERTISING_SETUP.md` 갱신.
+- `deliverables/DATABASE_SCHEMA.md` 갱신.
+
+### 반영시간
+- 광고 결제 UI, Toss 결제 API/콜백, DB 스키마, 관리자 결제관리 반영, 문서화, 빌드 검증: 약 75분.

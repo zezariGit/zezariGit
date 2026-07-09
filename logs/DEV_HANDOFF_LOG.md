@@ -5633,3 +5633,72 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Copy update, location search API/UI, CSS, documentation, and build verification: about 30 minutes.
+
+## 2026-07-10 KST - Advertisement Checkout UI and Toss Payment Connection
+
+### User Request
+- Change the advertisement payment page to match the attached mobile layout:
+  - title `온라인 광고`
+  - cost guide
+  - estimated impressions
+  - notices
+  - payment method section
+  - bottom `결제하기` button
+- Connect Toss Payments for advertisement checkout.
+
+### Reflected Work
+- Replaced `/ads/checkout/[id]` with a compact mobile payment page.
+- Added `app/ad-payment-client.js`.
+  - Loads Toss Payments v2 SDK.
+  - Renders dedicated Toss widget containers:
+    - `#ad-toss-payment-methods`
+    - `#ad-toss-payment-agreement`
+  - Uses separate container IDs from product checkout to prevent widget/agreement collision.
+  - Calls the advertisement prepare API before `requestPayment()`.
+- Added advertisement Toss API and callback routes:
+  - `POST /api/payments/toss/ad/prepare`
+  - `/payments/toss/ad/success`
+  - `/payments/toss/ad/fail`
+- Added `getTossAdCallbackUrls()` in `lib/toss-payments.js`.
+- Extended `subject_ads` with advertisement payment fields and bumped `DB_SCHEMA_VERSION` from `17` to `18`:
+  - `payment_method`
+  - `toss_order_id`
+  - `payment_key`
+  - `paid_at`
+- Added advertisement payment DB helpers:
+  - `prepareSubjectAdPayment()`
+  - `markSubjectAdPaid()`
+  - `markSubjectAdPaymentFailedForGuardian()`
+- Updated admin payment ledger mapping:
+  - unpaid advertisement rows now show `pending`
+  - paid advertisement rows show `paid`
+  - payment number uses Toss order ID when available
+  - payment method uses saved Toss method when available
+- Updated documentation:
+  - `deliverables/ADVERTISING_SETUP.md`
+  - `deliverables/DATABASE_SCHEMA.md`
+
+### Behavior Notes
+- Successful advertisement payment stores payment details but keeps the advertisement `status = ready`.
+- Admin approval remains the controlled step that moves an ad into running/Meta registration flow.
+- The Toss payment confirmation is server-side through `confirmWidgetPayment()` before `paid_at` is saved.
+
+### Files Changed
+- `app/ad-payment-client.js`
+- `app/ads/checkout/[id]/page.js`
+- `app/api/payments/toss/ad/prepare/route.js`
+- `app/payments/toss/ad/success/page.js`
+- `app/payments/toss/ad/fail/page.js`
+- `app/globals.css`
+- `lib/db.js`
+- `lib/toss-payments.js`
+- `deliverables/ADVERTISING_SETUP.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+
+### Time Spent
+- Advertisement payment UI, Toss prepare/success/fail routes, DB schema/payment ledger updates, documentation, and build verification: about 75 minutes.

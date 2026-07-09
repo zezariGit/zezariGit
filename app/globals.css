@@ -7720,6 +7720,192 @@ button:disabled:hover {
   background: var(--c-bg);
 }
 
+.ad-payment-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: start center;
+  padding: var(--space-lg);
+  background: var(--c-bg);
+}
+
+.ad-payment-phone {
+  width: min(100%, 430px);
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.ad-payment-card,
+.ad-payment-reach,
+.ad-payment-notice,
+.ad-payment-method {
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+}
+
+.ad-payment-card h2,
+.ad-payment-notice h2,
+.ad-payment-method h2,
+.ad-payment-card p {
+  margin: 0;
+}
+
+.ad-payment-card h2,
+.ad-payment-notice h2,
+.ad-payment-method h2 {
+  color: var(--c-text);
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.ad-payment-card p {
+  color: var(--c-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.ad-payment-cost-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+}
+
+.ad-payment-cost-list div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-sm);
+  align-items: center;
+  min-height: 32px;
+  border-bottom: 0.5px solid var(--c-border);
+}
+
+.ad-payment-cost-list div:last-child {
+  border-bottom: 0;
+}
+
+.ad-payment-cost-list dt,
+.ad-payment-cost-list dd {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.ad-payment-cost-list dd {
+  text-align: right;
+}
+
+.ad-payment-cost-list .total dt,
+.ad-payment-cost-list .total dd {
+  color: var(--c-primary-dark);
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+.ad-payment-reach {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  border-color: var(--c-primary-border);
+  background: var(--c-primary-light);
+}
+
+.ad-payment-reach span {
+  color: var(--c-primary-dark);
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.ad-payment-reach strong {
+  color: var(--c-primary-dark);
+  font-size: 1.08rem;
+  font-weight: 900;
+  text-align: right;
+}
+
+.ad-payment-reach small {
+  grid-column: 1 / -1;
+  color: var(--c-text-muted);
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
+.ad-payment-notice {
+  border-color: var(--c-warn-border);
+  background: var(--c-warn-bg);
+}
+
+.ad-payment-notice h2 {
+  color: var(--c-warn);
+}
+
+.ad-payment-notice ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--c-text);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.ad-payment-method {
+  gap: var(--space-sm);
+}
+
+.ad-toss-widget-shell {
+  display: grid;
+  gap: var(--space-xs);
+  overflow: hidden;
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+}
+
+.ad-toss-widget-container {
+  min-width: 0;
+}
+
+.ad-payment-paid-box {
+  display: grid;
+  gap: 4px;
+  padding: var(--space-sm);
+  border: 0.5px solid var(--c-success-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-success-bg);
+  color: var(--c-success);
+}
+
+.ad-payment-paid-box span {
+  color: var(--c-text-muted);
+  font-size: 0.82rem;
+}
+
+.ad-payment-button {
+  width: 100%;
+  min-height: 52px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--c-primary);
+  color: #ffffff;
+  font-size: 1.02rem;
+  font-weight: 900;
+  box-shadow: 0 10px 24px rgba(40, 105, 160, 0.22);
+}
+
+.ad-payment-button:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 .shop-shell,
 .shop-phone-panel,
 .shop-summary-panel {

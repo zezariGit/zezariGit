@@ -232,6 +232,10 @@ Stores advertisement requests and status by managed subject.
 | `daily_rate` | INTEGER | Daily rate captured at request time |
 | `amount` | INTEGER | `days * daily_rate` |
 | `currency` | TEXT | Currency, currently `KRW` |
+| `payment_method` | TEXT | Toss payment method after advertisement checkout |
+| `toss_order_id` | TEXT | Toss order ID used for advertisement checkout |
+| `payment_key` | TEXT | Toss payment key after successful confirmation |
+| `paid_at` | TEXT | Advertisement payment completion timestamp |
 | `status` | TEXT | `ready`, `active`, `paused`, `ended` |
 | `meta_campaign_id` | TEXT | Reserved Meta API campaign identifier |
 | `meta_status` | TEXT | Reserved Meta API status, currently `meta_api_pending` |

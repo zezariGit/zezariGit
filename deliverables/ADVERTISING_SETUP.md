@@ -7,7 +7,8 @@ Project: REAL_QR_FIND / zezari
 - Meta Marketing API campaign-level integration is connected for admin approval, pause, and resume buttons.
 - Guardian pause/resume/end buttons also sync to Meta when a campaign ID already exists.
 - Advertisement creative preview and payment-entry screen are prepared.
-- Actual Toss advertisement payment confirmation is not connected yet; the checkout button is kept in a disabled waiting state until the external payment/API scope is approved.
+- Toss Payments advertisement checkout is connected through the payment widget.
+- Payment completion stores the Toss order ID, payment key, payment method, and paid timestamp on `subject_ads`.
 
 ## User Flow
 1. A logged-in guardian opens the dashboard.
@@ -33,11 +34,17 @@ Project: REAL_QR_FIND / zezari
    - managed subject info page link
    - contact guidance text: `발견즉시 연락부탁드립니다 / qr을 스캔하시면 보호자에게 연락할 수 있습니다`
 8. Selecting `결제하기` creates a `subject_ads` row with status `ready` and moves to `/ads/checkout/[id]`.
-9. The checkout page shows the same image-capture-ready creative markup plus order summary.
-10. If an advertisement is running, the modal shows:
+9. The checkout page shows the advertisement payment card:
+   - cost breakdown
+   - estimated impressions
+   - notices
+   - Toss payment widget
+   - bottom payment button
+10. On successful Toss confirmation, the advertisement stores payment details and remains `ready` for admin approval and Meta registration.
+11. If an advertisement is running, the modal shows:
    - `일시정지`
    - `광고끝내기`
-11. If an advertisement is paused, the modal shows:
+12. If an advertisement is paused, the modal shows:
    - `광고 재개`
    - `광고끝내기`
 
@@ -85,6 +92,19 @@ Project: REAL_QR_FIND / zezari
   - `region_longitude`: selected map center longitude
   - `region_radius_km`: selected radius in kilometers
   - `region_source`: currently `map`
+- Payment fields:
+  - `payment_method`: selected/confirmed Toss payment method label
+  - `toss_order_id`: Toss order ID used for advertisement payment
+  - `payment_key`: Toss payment key after successful confirmation
+  - `paid_at`: advertisement payment completion timestamp
+
+## Toss Payments Advertisement Checkout
+- Client component: `app/ad-payment-client.js`
+- Prepare API: `POST /api/payments/toss/ad/prepare`
+- Success callback: `/payments/toss/ad/success`
+- Fail callback: `/payments/toss/ad/fail`
+- Server confirmation uses `confirmWidgetPayment()` before storing `paid_at`.
+- Successful payment does not directly publish Meta ads. It leaves the ad in `ready` so admin approval and Meta campaign/ad creation remain controlled.
 
 ## Meta Marketing API Integration
 - Server-side module: `lib/meta-marketing.js`
@@ -118,8 +138,7 @@ Project: REAL_QR_FIND / zezari
   - currently uses OpenStreetMap Nominatim with Korean result priority and no project API key
   - can be replaced later with Kakao/Naver/Google Places if higher production search throughput is required
 - Next Meta integration scope:
-  - enable actual advertisement payment from `/ads/checkout/[id]`
-  - capture the DOM marked with `data-ad-creative="missing-person-payment"` as an image after payment success
+  - capture/store the missing-person advertisement creative image after payment success
   - Ad set creation
   - Ad creative creation from the missing-person ad content
   - Page/Instagram actor configuration
