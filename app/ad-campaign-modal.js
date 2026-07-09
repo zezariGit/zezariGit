@@ -37,6 +37,10 @@ export default function AdCampaignModal({
   const [mapReady, setMapReady] = useState(false);
   const [mapMessage, setMapMessage] = useState("지도를 불러오고 있습니다.");
   const [step, setStep] = useState("setup");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchStatus, setSearchStatus] = useState("");
+  const [searching, setSearching] = useState(false);
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markerRef = useRef(null);
@@ -49,6 +53,9 @@ export default function AdCampaignModal({
     setLocation(initialLocation);
     setRadiusKm(Number(subject?.ad_region_radius_km || 3));
     setStep("setup");
+    setSearchQuery("");
+    setSearchResults([]);
+    setSearchStatus("");
   }, [initialLocation, subject?.ad_region_radius_km]);
 
   useEffect(() => {
@@ -146,6 +153,52 @@ export default function AdCampaignModal({
       lng: Number(nextLng.toFixed(6)),
       label,
     });
+  }
+
+  async function searchMapLocation(event) {
+    event.preventDefault();
+    const query = searchQuery.trim();
+    if (query.length < 2) {
+      setSearchStatus("검색어를 2글자 이상 입력해 주세요.");
+      setSearchResults([]);
+      return;
+    }
+
+    setSearching(true);
+    setSearchStatus("지역을 검색하고 있습니다.");
+    setSearchResults([]);
+
+    try {
+      const response = await fetch(`/api/maps/search?query=${encodeURIComponent(query)}`, {
+        cache: "no-store",
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data?.message || "지역 검색에 실패했습니다.");
+
+      const results = Array.isArray(data.results) ? data.results : [];
+      setSearchResults(results);
+      setSearchStatus(results.length > 0 ? "검색 결과에서 광고지역을 선택해 주세요." : "검색 결과가 없습니다.");
+    } catch (error) {
+      setSearchStatus(error.message || "지역 검색에 실패했습니다.");
+      setSearchResults([]);
+    } finally {
+      setSearching(false);
+    }
+  }
+
+  function selectSearchResult(result) {
+    const lat = Number(result?.lat);
+    const lng = Number(result?.lng);
+    const label = String(result?.label || result?.address || searchQuery || "검색 선택 위치");
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+    updateLocationFromMap(lat, lng, label);
+    if (mapRef.current) {
+      mapRef.current.setView([lat, lng], 14, { animate: true });
+    }
+    setMapMessage(`${label} 위치가 광고 중심으로 설정되었습니다.`);
+    setSearchStatus("");
+    setSearchResults([]);
   }
 
   function useCurrentLocation() {
@@ -246,6 +299,38 @@ export default function AdCampaignModal({
                       현재 위치
                     </button>
                   </div>
+                  <form className="ad-location-search" onSubmit={searchMapLocation}>
+                    <label>
+                      <span>지역 검색</span>
+                      <input
+                        type="search"
+                        value={searchQuery}
+                        onChange={(event) => setSearchQuery(event.target.value)}
+                        placeholder="예: 논현동, 서울 강남구"
+                        autoComplete="off"
+                      />
+                    </label>
+                    <button type="submit" className="plain-button compact" disabled={searching}>
+                      {searching ? "검색중" : "검색"}
+                    </button>
+                  </form>
+                  {(searchStatus || searchResults.length > 0) && (
+                    <div className="ad-location-search-results" aria-live="polite">
+                      {searchStatus && <span>{searchStatus}</span>}
+                      {searchResults.length > 0 && (
+                        <ul>
+                          {searchResults.map((result) => (
+                            <li key={result.id}>
+                              <button type="button" onClick={() => selectSearchResult(result)}>
+                                <strong>{result.label}</strong>
+                                <small>{result.address}</small>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  )}
                   <div className="ad-location-map-wrap">
                     <div className="ad-location-map" ref={mapContainerRef} />
                     {!mapReady && <span className="ad-location-map-placeholder">{mapMessage}</span>}
@@ -391,8 +476,8 @@ function MissingAdPreview({ subject, quote, startDate, endDate, regionLabel, rad
         </div>
         <footer className="missing-ad-poster-footer">
           <div className="missing-ad-contact">
-            <strong>QR 안심 서비스</strong>
-            <span>QR코드로 관리대상 정보를 확인해 주세요.</span>
+            <strong>발견즉시 연락부탁드립니다</strong>
+            <span>qr을 스캔하시면 보호자에게 연락할 수 있습니다</span>
           </div>
           <div className="missing-ad-qr">
             {subject?.qr_image ? <img src={subject.qr_image} alt={`${subject.name} QR 코드`} /> : <span>QR</span>}

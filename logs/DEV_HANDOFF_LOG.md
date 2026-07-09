@@ -5588,3 +5588,48 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Modal flow change, ad preview UI, checkout-entry route, DB/action wiring, documentation, and build verification: about 45 minutes.
+
+## 2026-07-10 KST - Ad Preview Copy and Map Location Search
+
+### User Request
+- In the advertisement preview, change:
+  - `QR 안심 서비스 / QR코드로 관리대상 정보를 확인해 주세요.`
+  - to `발견즉시 연락부탁드립니다 / qr을 스캔하시면 보호자에게 연락할 수 있습니다`.
+- In the map-based advertisement region selector, add a search feature.
+- Typing a place such as `논현동` should show related location results, and selecting one should move the map there.
+
+### Reflected Work
+- Updated advertisement preview copy in:
+  - `app/ad-campaign-modal.js`
+  - `app/ads/checkout/[id]/page.js`
+- Added a location search UI to the advertisement map selector:
+  - search input
+  - search button
+  - result status message
+  - selectable result list
+  - result selection updates the selected advertisement center and moves the map to zoom level 14
+- Added `GET /api/maps/search`.
+  - Server-side route calls OpenStreetMap Nominatim.
+  - Searches are limited to Korea with Korean language preference.
+  - No public browser-side API key is required.
+- Added CSS for search input, result list, and mobile layout.
+- Updated `deliverables/ADVERTISING_SETUP.md`.
+
+### Notes
+- Nominatim is appropriate for this no-key prework stage.
+- If search volume grows, replace `/api/maps/search` internals with a contracted provider such as Kakao Local API, Naver Local/Map API, or Google Places without changing the modal UI contract.
+
+### Files Changed
+- `app/ad-campaign-modal.js`
+- `app/ads/checkout/[id]/page.js`
+- `app/api/maps/search/route.js`
+- `app/globals.css`
+- `deliverables/ADVERTISING_SETUP.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+
+### Time Spent
+- Copy update, location search API/UI, CSS, documentation, and build verification: about 30 minutes.

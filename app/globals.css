@@ -1354,6 +1354,79 @@ a {
   line-height: 1.35;
 }
 
+.ad-location-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-xs);
+  align-items: end;
+}
+
+.ad-location-search label {
+  margin: 0;
+}
+
+.ad-location-search label span {
+  color: var(--c-text);
+  font-weight: 800;
+}
+
+.ad-location-search .plain-button {
+  min-height: 44px;
+  align-items: center;
+}
+
+.ad-location-search-results {
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+}
+
+.ad-location-search-results > span {
+  color: var(--c-text-muted);
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.ad-location-search-results ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ad-location-search-results button {
+  width: 100%;
+  display: grid;
+  gap: 3px;
+  padding: 8px 10px;
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-muted);
+  color: var(--c-text);
+  text-align: left;
+}
+
+.ad-location-search-results button:hover,
+.ad-location-search-results button:focus-visible {
+  border-color: var(--c-primary-border);
+  background: var(--c-primary-light);
+}
+
+.ad-location-search-results strong,
+.ad-location-search-results small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ad-location-search-results small {
+  color: var(--c-text-muted);
+  line-height: 1.35;
+}
+
 .ad-location-map-wrap {
   position: relative;
   min-height: 250px;
@@ -10818,6 +10891,7 @@ button:disabled:hover {
   .qr-modal-result,
   .qr-modal-summary,
   .ad-request-form,
+  .ad-location-search,
   .ad-location-summary,
   .ad-rate-form,
   .find-location-fields,

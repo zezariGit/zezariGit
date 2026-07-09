@@ -14,6 +14,8 @@ Project: REAL_QR_FIND / zezari
 2. Each registered managed subject card shows an `광고` button.
 3. Clicking `광고` opens a modal overlay and disables the main screen behind it.
 4. The guardian enters:
+   - optional location search keyword such as `논현동` or `서울 강남구`
+   - selected location from the search result list, when used
    - advertising center location by clicking the map or using current device location
    - advertising radius in kilometers
    - start date
@@ -29,6 +31,7 @@ Project: REAL_QR_FIND / zezari
    - guardian message
    - QR code
    - managed subject info page link
+   - contact guidance text: `발견즉시 연락부탁드립니다 / qr을 스캔하시면 보호자에게 연락할 수 있습니다`
 8. Selecting `결제하기` creates a `subject_ads` row with status `ready` and moves to `/ads/checkout/[id]`.
 9. The checkout page shows the same image-capture-ready creative markup plus order summary.
 10. If an advertisement is running, the modal shows:
@@ -110,6 +113,10 @@ Project: REAL_QR_FIND / zezari
   - `geo_locations.custom_locations[].longitude`
   - `geo_locations.custom_locations[].radius`
   - `geo_locations.custom_locations[].distance_unit = kilometer`
+- Location search endpoint:
+  - `GET /api/maps/search?query=...`
+  - currently uses OpenStreetMap Nominatim with Korean result priority and no project API key
+  - can be replaced later with Kakao/Naver/Google Places if higher production search throughput is required
 - Next Meta integration scope:
   - enable actual advertisement payment from `/ads/checkout/[id]`
   - capture the DOM marked with `data-ad-creative="missing-person-payment"` as an image after payment success

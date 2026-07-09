@@ -97,8 +97,8 @@ export default async function AdCheckoutPage({ params, searchParams }) {
               </div>
               <footer className="missing-ad-poster-footer">
                 <div className="missing-ad-contact">
-                  <strong>QR 안심 서비스</strong>
-                  <span>QR코드로 관리대상 정보를 확인해 주세요.</span>
+                  <strong>발견즉시 연락부탁드립니다</strong>
+                  <span>qr을 스캔하시면 보호자에게 연락할 수 있습니다</span>
                 </div>
                 <div className="missing-ad-qr">
                   {qrImage ? <img src={qrImage} alt={`${ad.subject_name} QR 코드`} /> : <span>QR</span>}
