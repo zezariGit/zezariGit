@@ -3904,3 +3904,35 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 광고 결제 UI, Toss 결제 API/콜백, DB 스키마, 관리자 결제관리 반영, 문서화, 빌드 검증: 약 75분.
+
+## 2026-07-19 - 로그인 화면 Apple 버튼을 Facebook으로 변경
+
+### 요구내용
+- 로그인 화면의 Apple 버튼을 Facebook 버튼으로 교체한다.
+- 메타 개발자센터의 Facebook Login 안내를 참고한다.
+
+### 반영내용
+- 기존 Apple 아이콘 placeholder를 제거하고 Facebook 아이콘 버튼으로 교체했다.
+- Facebook OAuth Provider를 NextAuth에 추가했다.
+- 환경변수는 다음 둘 중 하나의 조합을 사용할 수 있게 했다.
+  - `FACEBOOK_CLIENT_ID`, `FACEBOOK_CLIENT_SECRET`
+  - `META_APP_ID`, `META_APP_SECRET`
+- 로그인 화면의 SNS 버튼 순서는 Kakao, Naver, Google, Facebook으로 구성했다.
+- Facebook 최초 로그인 사용자는 기존 SNS 회원가입 완료 화면으로 이동해 휴대폰 인증과 기본정보 입력을 진행한다.
+- 인증/설정 문서에 Facebook 콜백 URL을 추가했다.
+
+### 참고사항
+- 현재 프로젝트는 NextAuth 기반 세션 구조이므로 브라우저 단독 Facebook SDK 로그인 대신 NextAuth OAuth 방식으로 구현했다.
+- Meta Developer Center의 Valid OAuth Redirect URIs에 아래 주소가 필요하다.
+  - `https://zezari.vercel.app/api/auth/callback/facebook`
+
+### 검증결과
+- 프로덕션 빌드 성공.
+- 공백 오류 검사 통과.
+- Vercel 운영 환경에 `META_APP_ID`, `META_APP_SECRET`이 이미 설정되어 있음을 확인했다.
+
+### 산출물
+- `deliverables/AUTH_SETUP.md` 갱신.
+
+### 반영시간
+- Facebook 로그인 버튼/Provider 반영 및 문서화: 약 25분.

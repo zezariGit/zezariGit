@@ -6,6 +6,7 @@ Project: REAL_QR_FIND
 - Google login/signup.
 - Kakao login/signup.
 - Naver login/signup.
+- Facebook login/signup.
 
 ## Implementation Status
 - Implemented.
@@ -17,10 +18,11 @@ Project: REAL_QR_FIND
   - Google
   - Kakao
   - Naver
+  - Facebook
 - JWT session strategy.
 - Turso remains configured for application data after login is confirmed.
 - Providers are registered only when both client ID and client secret are present in the environment.
-- Apple login icon is displayed as a prepared UI placeholder, but backend Apple OAuth is not connected yet.
+- Facebook can use either `FACEBOOK_CLIENT_ID` / `FACEBOOK_CLIENT_SECRET` or the existing Meta app values `META_APP_ID` / `META_APP_SECRET`.
 
 ## Current Login Screen
 - After the three-page onboarding flow, the logged-out user sees a compact login screen.
@@ -32,7 +34,7 @@ Project: REAL_QR_FIND
   - `비밀번호 찾기` helper action
   - Main `로그인` button
   - `또는` divider
-  - SNS icon login row: Kakao, Naver, Google, Apple
+  - SNS icon login row: Kakao, Naver, Google, Facebook
   - Bottom signup helper: `계정이 없으신가요? 회원가입`
 - `자동로그인` currently remembers the guardian login ID only. Passwords are never saved in browser storage.
 - `회원가입` opens the direct guardian signup flow:
@@ -101,6 +103,14 @@ KAKAO_CLIENT_SECRET=your-kakao-client-secret
 // naver oauth
 NAVER_CLIENT_ID=your-naver-client-id
 NAVER_CLIENT_SECRET=your-naver-client-secret
+
+// facebook oauth
+FACEBOOK_CLIENT_ID=your-facebook-app-id
+FACEBOOK_CLIENT_SECRET=your-facebook-app-secret
+
+// or reuse existing Meta app values
+META_APP_ID=your-meta-app-id
+META_APP_SECRET=your-meta-app-secret
 ```
 
 ## OAuth Callback URLs
@@ -123,6 +133,17 @@ NAVER_CLIENT_SECRET=your-naver-client-secret
 - Local development:
   - `http://localhost:3000/api/auth/callback/naver`
 
+### Facebook
+- Production:
+  - `https://zezari.vercel.app/api/auth/callback/facebook`
+- Local development:
+  - `http://localhost:3000/api/auth/callback/facebook`
+- Meta Developer Center notes:
+  - Enable Facebook Login for the Meta app.
+  - Add the production callback URL above to Valid OAuth Redirect URIs.
+  - Add the local callback URL for local development tests when needed.
+  - The app can keep using the Meta App ID and App Secret already configured for marketing API prework.
+
 ## Configured Environment Variables
 - Local `.env.local`:
   - `GOOGLE_CLIENT_ID`
@@ -131,6 +152,7 @@ NAVER_CLIENT_SECRET=your-naver-client-secret
   - `KAKAO_CLIENT_SECRET`
   - `NAVER_CLIENT_ID`
   - `NAVER_CLIENT_SECRET`
+  - `FACEBOOK_CLIENT_ID` / `FACEBOOK_CLIENT_SECRET` or `META_APP_ID` / `META_APP_SECRET`
   - `NEXTAUTH_SECRET`
   - `NEXTAUTH_URL=http://localhost:3000`
 - Vercel Production:
@@ -140,6 +162,7 @@ NAVER_CLIENT_SECRET=your-naver-client-secret
   - `KAKAO_CLIENT_SECRET`
   - `NAVER_CLIENT_ID`
   - `NAVER_CLIENT_SECRET`
+  - `FACEBOOK_CLIENT_ID` / `FACEBOOK_CLIENT_SECRET` or `META_APP_ID` / `META_APP_SECRET`
   - `NEXTAUTH_SECRET`
   - `NEXTAUTH_URL=https://zezari.vercel.app`
 - Vercel Development:
@@ -149,6 +172,7 @@ NAVER_CLIENT_SECRET=your-naver-client-secret
   - `KAKAO_CLIENT_SECRET`
   - `NAVER_CLIENT_ID`
   - `NAVER_CLIENT_SECRET`
+  - `FACEBOOK_CLIENT_ID` / `FACEBOOK_CLIENT_SECRET` or `META_APP_ID` / `META_APP_SECRET`
   - `NEXTAUTH_SECRET`
   - `NEXTAUTH_URL=http://localhost:3000`
 
@@ -156,10 +180,9 @@ NAVER_CLIENT_SECRET=your-naver-client-secret
 - `/`
   - Shows login state.
   - Shows the onboarding flow first unless the user selected `다시보지 않기`.
-  - Shows guardian ID/password login and Kakao, Naver, Google, Apple icon buttons when logged out.
+  - Shows guardian ID/password login and Kakao, Naver, Google, Facebook icon buttons when logged out.
   - Supports direct signup view through the `회원가입` button or `/?signup=1`.
   - Buttons are disabled until the corresponding provider keys are configured.
-  - Apple is a UI placeholder until Apple OAuth is implemented.
   - Shows the guardian dashboard when logged in.
 - `/api/signup/guardian`
   - Creates a guardian account before login.
@@ -175,6 +198,7 @@ NAVER_CLIENT_SECRET=your-naver-client-secret
     - `/api/auth/callback/google`
     - `/api/auth/callback/kakao`
     - `/api/auth/callback/naver`
+    - `/api/auth/callback/facebook`
 
 ## Security Notes
 - Never commit OAuth client secrets.

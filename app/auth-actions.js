@@ -22,6 +22,12 @@ const socialProviders = [
     className: "naver-action",
     Logo: NaverLogo,
   },
+  {
+    id: "facebook",
+    label: "Facebook",
+    className: "facebook-action",
+    Logo: FacebookLogo,
+  },
 ];
 
 export function LoginAuthPanel({ enabledProviders = [], authError = "", initialMode = "login" }) {
@@ -500,14 +506,14 @@ export function SocialLoginButtons({ enabledProviders = [], variant = "stack" })
 function SocialLoginButtonsInner({ enabledProviders = [], variant = "stack" }) {
   const enabled = new Set(enabledProviders);
   const providers = variant === "icons"
-    ? [socialProviders[1], socialProviders[2], socialProviders[0], appleProvider]
+    ? [socialProviders[1], socialProviders[2], socialProviders[0], socialProviders[3]]
     : socialProviders;
 
   return (
     <div className={variant === "icons" ? "social-icon-row" : "social-login-stack"}>
       {providers.map(({ id, label, fullLabel, className, Logo }) => {
         const configured = enabled.has(id);
-        const disabled = id === "apple" || !configured;
+        const disabled = !configured;
 
         return (
           <button
@@ -654,19 +660,12 @@ function NaverLogo() {
   );
 }
 
-const appleProvider = {
-  id: "apple",
-  label: "Apple",
-  className: "apple-action",
-  Logo: AppleLogo,
-};
-
-function AppleLogo() {
+function FacebookLogo() {
   return (
     <svg className="social-logo" viewBox="0 0 24 24" aria-hidden="true">
       <path
-        fill="currentColor"
-        d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.9-1.5-.1-2.8.9-3.6.9-.7 0-1.9-.9-3.1-.8-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.6.8 1.2 1.8 2.5 3.1 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8 2.2-1.2 3-2.4c.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9ZM14 5.7c.7-.8 1.1-1.9 1-3-.9 0-2 .6-2.7 1.4-.6.7-1.1 1.8-1 2.9 1 .1 2-.5 2.7-1.3Z"
+        fill="#ffffff"
+        d="M14.2 8.1V6.7c0-.68.45-.84.77-.84h1.96V2.52L14.23 2.5c-3 0-4.64 1.78-4.64 5.05v2.35H6.95v3.73h2.64V22h3.95v-8.37h3.05l.48-3.73h-3.53V8.83c0-.54.14-.73.66-.73Z"
       />
     </svg>
   );

@@ -5702,3 +5702,46 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Advertisement payment UI, Toss prepare/success/fail routes, DB schema/payment ledger updates, documentation, and build verification: about 75 minutes.
+
+## 2026-07-19 KST - Replace Apple Login Placeholder with Facebook Login
+
+### User Request
+- Replace the Apple button on the login screen with Facebook.
+- Use the Meta Developer Center Facebook Login guide as reference.
+
+### Reflected Work
+- Added Facebook as a real NextAuth OAuth provider in `lib/auth.js`.
+- The provider is enabled when either of these environment pairs is present:
+  - `FACEBOOK_CLIENT_ID` and `FACEBOOK_CLIENT_SECRET`
+  - `META_APP_ID` and `META_APP_SECRET`
+- Replaced the Apple icon placeholder in `app/auth-actions.js` with a Facebook icon button.
+- Kept the existing SNS button order as:
+  - Kakao
+  - Naver
+  - Google
+  - Facebook
+- Added Facebook button styling in `app/globals.css`.
+- Updated `deliverables/AUTH_SETUP.md` with Facebook callback URLs and environment variable notes.
+
+### Behavior Notes
+- The app uses NextAuth's server OAuth flow instead of a standalone browser-only Facebook SDK login, because the existing authentication/session architecture is NextAuth based.
+- Meta Developer Center must allow this redirect URL before production login will complete:
+  - `https://zezari.vercel.app/api/auth/callback/facebook`
+- First-time Facebook users continue through the existing SNS signup completion flow with phone verification.
+
+### Files Changed
+- `lib/auth.js`
+- `app/auth-actions.js`
+- `app/globals.css`
+- `deliverables/AUTH_SETUP.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with line-ending warnings only.
+- Vercel environment check confirmed `META_APP_ID` and `META_APP_SECRET` exist in Production and Development.
+- GitHub push and Vercel production deploy are performed after this committed change.
+
+### Time Spent
+- Facebook provider/UI replacement and documentation: about 25 minutes.

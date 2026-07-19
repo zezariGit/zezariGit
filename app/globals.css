@@ -478,8 +478,8 @@ a {
   border: 1px solid #d8e0dc;
 }
 
-.social-icon-button.apple-action {
-  background: #000000;
+.social-icon-button.facebook-action {
+  background: #1877f2;
   color: #ffffff;
 }
 
@@ -730,6 +730,16 @@ a {
 
 .naver-action:hover {
   background: #02b351;
+}
+
+.facebook-action {
+  background: #1877f2;
+  color: #ffffff;
+  border: 1px solid #166fe5;
+}
+
+.facebook-action:hover {
+  background: #166fe5;
 }
 
 .action.secondary {
