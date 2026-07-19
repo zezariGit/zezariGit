@@ -5745,3 +5745,31 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Facebook provider/UI replacement and documentation: about 25 minutes.
+
+## 2026-07-19 KST - Refresh Meta App Credentials in Vercel
+
+### User Request
+- Use the Meta Developer Center values saved in `.env.local` and continue configuration.
+
+### Reflected Work
+- Checked Meta environment-variable presence without printing any credential values.
+- Confirmed the newly saved local values:
+  - `META_APP_ID`
+  - `META_APP_SECRET`
+- Replaced `META_APP_ID` and `META_APP_SECRET` in the Vercel Production and Development environments.
+- Kept all Meta secrets out of Git-tracked files and command output.
+
+### Configuration Status
+- Facebook Login credentials are ready for a fresh Vercel deployment.
+- Local `.env.local` does not currently contain:
+  - `META_ACCESS_TOKEN`
+  - `META_AD_ACCOUNT_ID`
+- Vercel has encrypted variables with those names, but sensitive values cannot be downloaded by the CLI for a local Graph API verification.
+- A new access token and ad account ID must be added locally before the Meta Marketing API account-access test can be completed safely.
+
+### Verification
+- Vercel confirmed successful replacement of both Facebook Login variables in Production and Development.
+- No secret value was printed or committed.
+
+### Time Spent
+- Credential presence validation and Vercel synchronization: about 10 minutes.

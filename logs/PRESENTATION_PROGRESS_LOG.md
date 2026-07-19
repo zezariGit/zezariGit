@@ -3936,3 +3936,26 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - Facebook 로그인 버튼/Provider 반영 및 문서화: 약 25분.
+
+## 2026-07-19 - Meta 앱 키 운영환경 갱신
+
+### 요구내용
+- Meta 개발자센터에서 확인한 값을 `.env.local`에 저장한 뒤 실제 운영환경 설정을 이어서 진행한다.
+
+### 반영내용
+- 비밀값을 출력하지 않고 Meta 환경변수의 설정 여부만 검사했다.
+- 로컬에 새로 저장된 `META_APP_ID`, `META_APP_SECRET`을 확인했다.
+- Vercel Production과 Development 환경의 두 값을 새 값으로 갱신했다.
+- 키와 토큰은 GitHub 소스 및 로그에 기록하지 않았다.
+
+### 현재상태
+- Facebook 로그인 키는 운영 재배포가 가능한 상태다.
+- Meta 광고 API 검증에 필요한 `META_ACCESS_TOKEN`, `META_AD_ACCOUNT_ID`는 로컬 파일에 아직 없다.
+- Vercel에는 같은 이름의 암호화 변수가 존재하지만 CLI로 실제 값을 다시 읽을 수 없어 로컬 API 검증에는 사용할 수 없다.
+
+### 검증결과
+- Vercel Production/Development 환경변수 갱신 성공.
+- 민감정보 출력 및 Git 커밋 없음.
+
+### 반영시간
+- 설정 확인 및 Vercel 환경변수 갱신: 약 10분.
