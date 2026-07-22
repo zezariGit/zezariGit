@@ -5773,3 +5773,49 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Credential presence validation and Vercel synchronization: about 10 minutes.
+
+## 2026-07-22 KST - Production-Wide Read-Only Function Verification
+
+### User Request
+- Thoroughly test the overall functionality of the signed-in production service at `https://zezari.vercel.app`.
+
+### Reflected Work
+- Attempted to connect to the signed-in VS Code browser tab; the tab was not exposed as a controllable in-app browser.
+- Completed the safe production verification available without reusing or extracting the user's authentication cookie:
+  - public pages and auth provider endpoints
+  - OAuth initiation for Google, Kakao, Naver, and Facebook
+  - invalid credential rejection
+  - unauthenticated API authorization boundaries
+  - invalid-input validation
+  - map search and coordinate response
+  - PWA manifest, service worker, and icons
+  - VAPID public key endpoint
+  - local production build
+  - Vercel runtime log review
+  - Turso schema, aggregate counts, and referential-integrity queries
+  - QR domain and privacy-state checks
+  - product/order/coupon aggregate validation
+- Created `deliverables/PRODUCTION_FUNCTION_TEST_2026-07-22.md`.
+
+### Main Findings
+- Production SMS provider variables are missing; completely new signup cannot finish real phone verification.
+- Kakao administrator message delivery variables are missing; Web Push is configured but Kakao delivery is not.
+- Only 2 of 17 active product designs have option images and none have uploaded detail images.
+- Nineteen legacy orders have total amounts but no subtotal/discount backfill.
+- `npm run lint` is obsolete because the project still uses removed `next lint` behavior on Next.js 16.
+- Invalid QR notify and location APIs reject safely but return inconsistent 404/400 statuses.
+
+### Verification Highlights
+- `npm run build`: passed.
+- 22/22 expected DB tables present; DB schema version 18 matches source.
+- No orphan or duplicate QR/guardian/subject/order records were found.
+- All 30 stored QR targets use `zezari.vercel.app`.
+- Google, Kakao, Naver, and Facebook OAuth initiation targets were correct.
+- No 5xx response appeared in the Vercel logs generated during this test.
+
+### Safety and Limitation
+- No real payment, campaign approval, QR activation, message send, save, update, or delete was executed.
+- Authenticated visual/button testing remains required because the signed-in VS Code browser session was not controllable by Codex.
+
+### Time Spent
+- Production HTTP/API, OAuth, database, configuration, log, and build verification plus reporting: about 45 minutes.
