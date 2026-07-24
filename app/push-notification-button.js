@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 export default function PushNotificationButton() {
   const [supported, setSupported] = useState(false);
   const [enabled, setEnabled] = useState(false);
+  const [installRequired, setInstallRequired] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -14,7 +15,14 @@ export default function PushNotificationButton() {
       "serviceWorker" in navigator &&
       "PushManager" in window &&
       "Notification" in window;
+    const standalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true;
+    const iosDevice =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     setSupported(canUsePush);
+    setInstallRequired(iosDevice && !standalone);
     setEnabled(canUsePush && Notification.permission === "granted");
   }, []);
 
@@ -57,8 +65,9 @@ export default function PushNotificationButton() {
         throw new Error(saveData?.message || "푸시 구독 저장에 실패했습니다.");
       }
 
+      await syncUnreadBadge();
       setEnabled(true);
-      setMessage("푸시 알림이 켜졌습니다.");
+      setMessage("알림센터 수신과 앱 아이콘 배지가 켜졌습니다.");
     } catch (error) {
       setMessage(error.message || "푸시 알림 설정에 실패했습니다.");
     } finally {
@@ -66,7 +75,10 @@ export default function PushNotificationButton() {
     }
   };
 
-  if (!supported) return null;
+  if (!supported) {
+    if (!installRequired) return null;
+    return <p className="push-message">iPhone에서는 홈 화면에 설치한 앱 아이콘으로 연 뒤 알림을 켜 주세요.</p>;
+  }
 
   return (
     <div className="push-action-wrap">
@@ -76,6 +88,22 @@ export default function PushNotificationButton() {
       {message && <p className="push-message">{message}</p>}
     </div>
   );
+}
+
+async function syncUnreadBadge() {
+  try {
+    const response = await fetch("/api/notifications", { cache: "no-store" });
+    if (!response.ok) return;
+    const data = await response.json().catch(() => ({}));
+    const count = Math.max(0, Number(data.unreadCount) || 0);
+    if (count > 0 && typeof navigator.setAppBadge === "function") {
+      await navigator.setAppBadge(Math.min(Math.floor(count), 999));
+    } else if (count === 0 && typeof navigator.clearAppBadge === "function") {
+      await navigator.clearAppBadge();
+    }
+  } catch {
+    // The next notification refresh will retry badge synchronization.
+  }
 }
 
 function urlBase64ToUint8Array(base64String) {

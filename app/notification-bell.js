@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { formatDateTime } from "../lib/date-format";
 
 export default function NotificationBell() {
@@ -8,11 +8,7 @@ export default function NotificationBell() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [notifications, setNotifications] = useState([]);
-
-  const unreadCount = useMemo(
-    () => notifications.filter((notification) => !notification.read_at).length,
-    [notifications]
-  );
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const loadNotifications = useCallback(async () => {
     setLoading(true);
@@ -26,7 +22,13 @@ export default function NotificationBell() {
       if (!response.ok) {
         throw new Error(data?.message || "알림을 조회하지 못했습니다.");
       }
-      setNotifications(Array.isArray(data.notifications) ? data.notifications : []);
+      const nextNotifications = Array.isArray(data.notifications) ? data.notifications : [];
+      setNotifications(nextNotifications);
+      setUnreadCount(
+        Number.isFinite(Number(data.unreadCount))
+          ? Math.max(0, Number(data.unreadCount))
+          : nextNotifications.filter((notification) => !notification.read_at).length
+      );
     } catch (error) {
       setMessage(error.message || "알림을 조회하지 못했습니다.");
     } finally {
@@ -51,6 +53,8 @@ export default function NotificationBell() {
           read_at: item.read_at || readAt,
         }))
       );
+      setUnreadCount(0);
+      await notifyServiceWorker({ type: "ZEZARI_NOTIFICATIONS_READ" });
     } catch {
       // The next refresh will recover the read state.
     }
@@ -59,6 +63,9 @@ export default function NotificationBell() {
   const deleteNotification = useCallback(async (notification) => {
     setMessage("");
     setNotifications((items) => items.filter((item) => item.id !== notification.id));
+    if (!notification.read_at) {
+      setUnreadCount((count) => Math.max(0, count - 1));
+    }
 
     try {
       const response = await fetch("/api/notifications", {
@@ -72,6 +79,10 @@ export default function NotificationBell() {
       if (!response.ok) {
         throw new Error(data?.message || "알림을 삭제하지 못했습니다.");
       }
+      await notifyServiceWorker({
+        type: "ZEZARI_NOTIFICATION_DELETED",
+        notificationId: notification.id,
+      });
     } catch (error) {
       setNotifications((items) => {
         if (items.some((item) => item.id === notification.id)) return items;
@@ -79,6 +90,9 @@ export default function NotificationBell() {
           (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
       });
+      if (!notification.read_at) {
+        setUnreadCount((count) => count + 1);
+      }
       setMessage(error.message || "알림을 삭제하지 못했습니다.");
     }
   }, []);
@@ -92,12 +106,20 @@ export default function NotificationBell() {
 
     const handleMessage = (event) => {
       if (event.data?.type !== "ZEZARI_PUSH_MESSAGE") return;
+      const nextUnreadCount = Number(event.data?.payload?.unreadCount);
+      if (Number.isFinite(nextUnreadCount)) {
+        setUnreadCount(Math.max(0, nextUnreadCount));
+      }
       loadNotifications();
     };
 
     navigator.serviceWorker.addEventListener("message", handleMessage);
     return () => navigator.serviceWorker.removeEventListener("message", handleMessage);
   }, [loadNotifications]);
+
+  useEffect(() => {
+    updateInstalledAppBadge(unreadCount);
+  }, [unreadCount]);
 
   const toggleOpen = async () => {
     const nextOpen = !open;
@@ -318,4 +340,23 @@ function BellIcon() {
 
 function formatNotificationTime(value) {
   return formatDateTime(value, "");
+}
+
+async function updateInstalledAppBadge(value) {
+  const count = Math.max(0, Number(value) || 0);
+  try {
+    if (count > 0 && typeof navigator?.setAppBadge === "function") {
+      await navigator.setAppBadge(Math.min(Math.floor(count), 999));
+    } else if (count === 0 && typeof navigator?.clearAppBadge === "function") {
+      await navigator.clearAppBadge();
+    }
+  } catch {
+    // Badge visibility is controlled by the installed app and device settings.
+  }
+}
+
+async function notifyServiceWorker(message) {
+  if (typeof navigator === "undefined" || !navigator.serviceWorker) return;
+  const registration = await navigator.serviceWorker.ready.catch(() => null);
+  registration?.active?.postMessage(message);
 }

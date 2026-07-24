@@ -1,6 +1,7 @@
 {
   "name": "zezari",
   "short_name": "zezari",
+  "id": "/",
   "description": "QR people-finding service",
   "start_url": "/",
   "scope": "/",

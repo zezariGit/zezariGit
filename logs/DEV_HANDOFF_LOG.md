@@ -5883,3 +5883,50 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Analysis, implementation, verification, documentation, and deployment preparation: about 35 minutes.
+
+## 2026-07-24 KST - Installed PWA Notification Center, Sound, and App Badge
+
+### User Request
+- Deliver notifications to the Android or iPhone notification center when zezari is installed.
+- Play a simple notification sound.
+- Show the unread notification count on the installed app icon.
+
+### Reflected Work
+- Kept standards-based Web Push as the OS notification delivery mechanism.
+- Added the complete unread guardian notification count to each push payload.
+- Added foreground and service-worker Badging API synchronization.
+- Updated the service worker to:
+  - display a user-visible notification with `silent: false`
+  - request the Android vibration pattern when supported
+  - set the installed app badge count during background push handling
+  - mark notifications read and clear the badge when an OS notification is clicked
+  - clear displayed OS notifications when the in-app bell marks all messages read
+  - close the matching OS notification after an in-app swipe deletion
+- Updated the notification API to return both recent rows and the full unread count.
+- Updated the in-app notification bell to keep its counter and the installed app badge synchronized after load, push, read, and delete operations.
+- Added an iPhone Home Screen guidance state when push is unavailable in a normal browser tab.
+- Added the Web App Manifest `id` field for stable installed-app identity.
+- Bumped the service-worker cache from `zezari-v15` to `zezari-v16`.
+- Documented that Web Push cannot choose a custom sound file; the operating system default notification sound is used.
+
+### Files Changed
+- `lib/db.js`
+- `lib/push.js`
+- `app/api/notifications/route.js`
+- `app/notification-bell.js`
+- `app/push-notification-button.js`
+- `public/sw.js`
+- `public/manifest.webmanifest`
+- `deliverables/PUSH_NOTIFICATION_SETUP.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `node --check public/sw.js` succeeded.
+- Local `/sw.js` returned HTTP 200 and contained cache v16, app badge, and non-silent notification logic.
+- Unauthenticated `/api/notifications` remained protected with HTTP 401.
+- Real notification sound and launcher badge visibility require final checks on physical Android and iOS 16.4+ devices.
+
+### Time Spent
+- Platform research, implementation, verification, and documentation: about 35 minutes.

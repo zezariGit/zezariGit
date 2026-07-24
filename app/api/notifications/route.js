@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { authOptions } from "../../../lib/auth";
 import {
   deleteGuardianNotification,
-  getGuardianNotifications,
+  getGuardianNotificationInbox,
   markGuardianNotificationsRead,
 } from "../../../lib/db";
 
@@ -13,8 +13,8 @@ export async function GET() {
     return NextResponse.json({ message: "로그인이 필요합니다." }, { status: 401 });
   }
 
-  const notifications = await getGuardianNotifications(session);
-  return NextResponse.json({ notifications });
+  const inbox = await getGuardianNotificationInbox(session);
+  return NextResponse.json(inbox);
 }
 
 export async function POST(request) {
