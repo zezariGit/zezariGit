@@ -6037,3 +6037,22 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Source analysis, implementation, data-backed page verification, and documentation: about 20 minutes.
+
+## 2026-07-24 KST - Public Guardian Voice Button Visibility Follow-up
+
+### User Report
+- The deployed public QR page did not show the newly added guardian voice playback button.
+
+### Root Cause
+- The production deployment was current.
+- The checked subject `매칭테스트` had no saved `voice_data_url` or `voice_name`.
+- The first implementation intentionally rendered the button only when a saved recording existed, which made the feature appear missing.
+
+### Reflected Work
+- The public managed-subject page now always renders the guardian voice playback button.
+- When no recording exists, the button is disabled and `보호자 음성이 등록되지 않았습니다.` is displayed.
+- When a recording exists, the existing play, pause, playing, and error states remain available.
+- Updated `deliverables/PUBLIC_GUARDIAN_VOICE_PLAYBACK.md`.
+
+### Time Spent
+- Production data diagnosis, visibility improvement, verification, and deployment: about 15 minutes.

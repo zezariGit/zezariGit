@@ -11,8 +11,9 @@ Date: 2026-07-24
 - The QR exists and is enabled.
 - The guardian activated the QR.
 - The guardian has an active service period.
-- The selected subject has `subjects.voice_data_url`.
-- When no guardian voice is saved, the playback button is not rendered.
+- The playback button is always rendered on an accessible managed-subject page.
+- When `subjects.voice_data_url` exists, the button plays the saved guardian recording.
+- When no guardian voice is saved, the button is disabled and displays `보호자 음성이 등록되지 않았습니다.`.
 
 ## Interaction
 - Initial/finished state: `보호자 음성 재생(심신안정용)`

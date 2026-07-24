@@ -7574,6 +7574,15 @@ button:disabled:hover {
   background: var(--c-text);
 }
 
+.guardian-voice-play-button:disabled,
+.guardian-voice-play-button:disabled:hover {
+  border-color: var(--c-border-strong);
+  background: var(--c-surface-muted);
+  color: var(--c-text-muted);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
 .guardian-voice-play-button > span:last-child {
   min-width: 0;
   color: inherit;
@@ -7603,6 +7612,12 @@ button:disabled:hover {
 .find-audio-error {
   margin: 0;
   color: var(--c-danger) !important;
+  font-size: 0.78rem !important;
+}
+
+.find-audio-empty {
+  margin: 0;
+  color: var(--c-text-muted) !important;
   font-size: 0.78rem !important;
 }
 
