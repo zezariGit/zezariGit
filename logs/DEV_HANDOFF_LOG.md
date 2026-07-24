@@ -6113,3 +6113,55 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Data-model analysis, implementation, concurrency guard, UI, tests, documentation, and deployment: about 55 minutes.
+
+## 2026-07-24 KST - Bizcall 050 Safe Phone Integration
+
+### User Request
+- Show the guardian's contact phone as a Bizcall safe number on the managed-subject public page.
+- Use the attached `Bizcall 서비스 [안심번호] HTTPS 연동규격서_v_1_29(2024).pdf`.
+- Prepare the integration against the guardian's currently configured Bizcall account.
+
+### Source And Specification Analysis
+- Visually reviewed the PDF and extracted all 20 pages for parameter-level inspection.
+- Confirmed HTTPS POST, UTF-8, form-urlencoded request bodies, and JSON responses.
+- Confirmed `/link/auto_mapp.do` for automatic unused 050 assignment.
+- Confirmed `/link/set_vn.do` for existing 050 registration, remapping, and release.
+- Confirmed the authentication rule: MD5 over `iid + target number`, then Base64 encoding.
+- The PDF provides relative API paths only. The contract-specific API base URL and Interface ID must come from the Bizcall account.
+
+### Reflected Work
+- Added `lib/bizcall.js` as the server-only Bizcall adapter.
+- Added API configuration validation, request timeout, result-code mapping, phone normalization, safe-number formatting, and credential-free error handling.
+- Increased DB schema version to `20`.
+- Added guardian fields for safe-number state, provider, successful sync time, and last error.
+- Added automatic safe-number assignment after direct signup and SNS signup completion.
+- Added automatic remapping when the guardian's contact phone changes.
+- Replaced the guardian's manual safe-number input with a read-only issuance status.
+- Added an administrator `안심번호 발급/재연결` action to guardian details.
+- Changed the public QR query to return a safe number only while its status is `active`.
+- Added a click-to-call `tel:` link for an active 050 number.
+- Provider configuration failures never fall back to the guardian's private phone.
+
+### Environment Variables
+- `BIZCALL_ENABLED`
+- `BIZCALL_API_BASE_URL`
+- `BIZCALL_INTERFACE_ID`
+- `BIZCALL_TIMEOUT_MS`
+- No Bizcall credential or account value is committed to source control.
+
+### Deliverables
+- `deliverables/BIZCALL_SAFE_PHONE_INTEGRATION.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/README.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+
+### Verification
+- `npm run build` succeeded after the implementation.
+- PDF API pages were rendered and visually checked.
+- Bizcall adapter mock verification passed for POST path, form content type, phone normalization, MD5/Base64 auth, and 050 display formatting.
+- Turso migrated to schema version `20` and contains all five `safe_phone*` columns.
+- An eligible local QR public page returned HTTP 200, displayed `안심번호 준비중`, and did not contain either formatted or digits-only private phone data.
+- Live issuance remains pending until the contract-specific API base URL and Interface ID are available in local/Vercel environment variables.
+
+### Time Spent
+- Specification analysis, privacy design, implementation, UI/admin workflow, build verification, and documentation: about 45 minutes.

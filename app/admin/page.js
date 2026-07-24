@@ -40,6 +40,7 @@ import {
   setGuardianActiveAction,
   setGuardianAdminMemoAction,
   setGuardianAdminAction,
+  syncGuardianSafePhoneAction,
   setAdDailyRateAction,
   setProductOrderFulfillmentAction,
   setQrAdminMemoAction,
@@ -3150,6 +3151,7 @@ function GuardianManagementSection({ adminData }) {
                       <div><dt>보호자 구분</dt><dd>{selectedGuardianType}</dd></div>
                       <div><dt>보호자 상태</dt><dd>{Number(selectedGuardian.is_active || 0) ? "일반" : "휴면/비활성"}</dd></div>
                       <div><dt>연락처</dt><dd>{selectedGuardian.phone || "-"}</dd></div>
+                      <div><dt>안심번호</dt><dd>{selectedGuardian.safe_phone || "-"} ({safePhoneStatusLabel(selectedGuardian.safe_phone_status)})</dd></div>
                       <div><dt>생년월일</dt><dd>{formatDate(selectedGuardian.birth_date)}{selectedGuardian.birth_date ? ` (${calculateAgeLabel(selectedGuardian.birth_date)})` : ""}</dd></div>
                       <div><dt>성별</dt><dd>-</dd></div>
                       <div><dt>주소</dt><dd>{formatFullAddress(selectedGuardian.address, selectedGuardian.address_detail)}</dd></div>
@@ -3173,6 +3175,14 @@ function GuardianManagementSection({ adminData }) {
                         pendingText={Number(selectedGuardian.is_active || 0) ? "처리중" : "재활성화중"}
                       >
                         {Number(selectedGuardian.is_active || 0) ? "탈퇴 처리" : "재활성화"}
+                      </FormSubmitButton>
+                    </form>
+
+                    <form action={syncGuardianSafePhoneAction} className="guardian-withdraw-form">
+                      <input type="hidden" name="guardianId" value={selectedGuardian.id} />
+                      <input type="hidden" name="returnTo" value={returnTo} />
+                      <FormSubmitButton className="activate-button" pendingText="연결중">
+                        안심번호 발급/재연결
                       </FormSubmitButton>
                     </form>
                   </section>
@@ -4376,6 +4386,13 @@ function guardianTypeClass(guardian, subscription = null) {
   if (label === "VIP") return "vip";
   if (label === "관리자") return "admin";
   return "normal";
+}
+
+function safePhoneStatusLabel(status) {
+  if (status === "active") return "연결됨";
+  if (status === "provisioning") return "발급중";
+  if (status === "failed") return "재연결 필요";
+  return "준비중";
 }
 
 function subscriptionStateClass(status) {

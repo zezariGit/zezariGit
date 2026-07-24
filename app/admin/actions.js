@@ -30,6 +30,7 @@ import {
   setSubscriptionAdminMemo,
   setSubscriptionAdminTest,
   setSubscriptionPlanPrice,
+  syncGuardianSafePhoneForAdmin,
 } from "../../lib/db";
 import { notifyGuardiansFromAdmin } from "../../lib/push";
 
@@ -57,6 +58,24 @@ export async function setGuardianAdminMemoAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=guardians"), error.message || "관리 메모 저장에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin?section=guardians"), "관리 메모가 저장되었습니다."));
+}
+
+export async function syncGuardianSafePhoneAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  let result;
+  try {
+    result = await syncGuardianSafePhoneForAdmin(formData);
+    revalidatePath("/admin");
+    revalidatePath("/");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=guardians"), error.message || "안심번호 발급에 실패했습니다.", "error"));
+  }
+  redirect(withNotice(
+    getReturnTo(formData, "/admin?section=guardians"),
+    `${result.safePhone} 안심번호가 보호자 연락처에 연결되었습니다.`
+  ));
 }
 
 export async function generateQrCodesAction(formData) {

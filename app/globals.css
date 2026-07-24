@@ -7702,6 +7702,15 @@ button:disabled:hover {
   overflow-wrap: anywhere;
 }
 
+.find-safe-phone-link {
+  width: fit-content;
+  color: var(--c-primary-dark);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
 .push-action-wrap {
   display: grid;
   gap: 6px;

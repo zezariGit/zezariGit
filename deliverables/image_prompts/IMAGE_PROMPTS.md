@@ -300,3 +300,14 @@ Create a Korean SaaS admin console UI mockup for "REAL_QR_FIND" message template
 
 ### Notes
 - Use when explaining that common operational messages can be managed centrally before being used by push or KakaoTalk delivery flows.
+
+## 2026-07-24 - Bizcall 050 Safe Number Flow
+
+### Purpose
+- Presentation diagram for how a guardian's private phone number is protected by Bizcall on the public QR page.
+
+### Prompt
+Create a clean Korean system-flow infographic for the "REAL_QR_FIND" service. Use four horizontally connected stages: 1) a guardian enters "연락받을 전화번호" in a protected account screen, 2) the REAL_QR_FIND Next.js server securely calls the Bizcall HTTPS API using server-only environment variables, 3) Bizcall assigns a 050 virtual safe number and maps it to the guardian's private phone, 4) a finder scans a subject's QR code and sees only the 050 safe number with a "전화하기" action. Add a separate failure path showing "설정 누락 또는 API 오류" leading to "안심번호 준비중", explicitly stating that the private phone number is never used as a public fallback. Include compact status labels "pending, provisioning, active, failed". Use the existing REAL_QR_FIND visual language: white background, thin gray lines, restrained blue and purple accents, clear Korean labels, 8px or smaller corner radius, no decorative gradients, no real phone numbers, and a professional privacy-focused tone.
+
+### Notes
+- Use for architecture reviews, privacy explanations, and Bizcall onboarding discussions.

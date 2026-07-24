@@ -265,7 +265,12 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
         <InfoRow label="연락처" value={guardian.phone || "연락처 미입력"} />
         <InfoRow label="수령인" value={guardian.name || "이름 미입력"} actionLabel="주소록관리 >" href="/?tab=guardian" />
         <InfoRow label="주소" value={formatFullAddress(guardian.address, guardian.address_detail)} />
-        <InfoRow label="연락처" value={guardian.safe_phone ? `안심번호 ${guardian.safe_phone}` : "안심번호 준비중"} />
+        <InfoRow
+          label="연락처"
+          value={guardian.safe_phone_status === "active" && guardian.safe_phone
+            ? `안심번호 ${guardian.safe_phone}`
+            : "안심번호 준비중"}
+        />
       </div>
 
       <div className="my-page-section">
@@ -480,10 +485,13 @@ function GuardianForm({ guardian, session }) {
               <label>
                 안심번호
                 <input
-                  name="safePhone"
-                  defaultValue={guardian.safe_phone || ""}
-                  placeholder="안심번호 발급 후 입력"
+                  value={safePhoneDisplayValue(guardian)}
+                  readOnly
+                  aria-readonly="true"
                 />
+                <small className="field-helper">
+                  연락받을 전화번호 저장 시 비즈콜 050 번호가 자동 발급·연결됩니다.
+                </small>
               </label>
               <label className="full-field">
                 주소
@@ -654,6 +662,15 @@ function formatDate(value) {
 
 function formatFullAddress(address, detailAddress) {
   return [address, detailAddress].filter(Boolean).join(" ") || "주소 미입력";
+}
+
+function safePhoneDisplayValue(guardian) {
+  if (guardian?.safe_phone_status === "active" && guardian?.safe_phone) {
+    return guardian.safe_phone;
+  }
+  if (guardian?.safe_phone_status === "failed") return "발급 재시도 필요";
+  if (guardian?.safe_phone_status === "provisioning") return "안심번호 발급 중";
+  return "안심번호 준비중";
 }
 
 function subjectPhotoSrc(subject) {

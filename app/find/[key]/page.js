@@ -163,7 +163,13 @@ export default async function FindPage({ params, searchParams }) {
           </div>
           <div className="find-key-box">
             <span>안심번호</span>
-            <strong>{data.safe_phone || "안심번호 준비중"}</strong>
+            {data.safe_phone ? (
+              <a className="find-safe-phone-link" href={`tel:${String(data.safe_phone).replace(/\D/g, "")}`}>
+                {data.safe_phone}
+              </a>
+            ) : (
+              <strong>안심번호 준비중</strong>
+            )}
           </div>
           <div className="find-key-box">
             <span>이메일</span>

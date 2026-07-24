@@ -21,6 +21,10 @@ Stores one guardian profile per logged-in Google user.
 | `password_hash` | TEXT | PBKDF2 password hash, never plaintext |
 | `phone` | TEXT | Private guardian contact phone number, not shown on public QR pages |
 | `safe_phone` | TEXT | Public QR page safe/relay phone number, nullable until issued |
+| `safe_phone_status` | TEXT | Bizcall sync state: `pending`, `provisioning`, `active`, or `failed` |
+| `safe_phone_provider` | TEXT | Safe-number provider, currently `bizcall` or migrated `legacy` |
+| `safe_phone_synced_at` | TEXT | Last successful safe-number mapping timestamp |
+| `safe_phone_last_error` | TEXT | Last provisioning/remapping error without credentials or phone values |
 | `address` | TEXT | Guardian contact address shown on assigned QR find page |
 | `birth_date` | TEXT | Guardian birth date captured during direct signup or profile edit |
 | `phone_verified_at` | TEXT | Timestamp when phone verification was completed during direct signup |
