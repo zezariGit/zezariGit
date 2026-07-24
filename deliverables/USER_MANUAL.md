@@ -41,6 +41,7 @@ The manual explains the current implemented service from both user and admin per
 - Safe-number privacy behavior: the public QR page does not expose the guardian's raw phone number.
 - Admin guardian management, admin role management, QR management, payment management, product image/price management, and advertisement management.
 - Shared progress indicators and bottom status messages.
+- User privacy policy at `/privacy`, accessible from the bottom of both the onboarding/login view and authenticated guardian dashboard.
 - High-level data explanations for guardians, subjects, QR codes, subscriptions, products, product orders, push subscriptions, guardian notifications, and advertisements.
 - Actual screenshot examples for onboarding, login, admin login, public QR unmatched state, and public QR matched state with private information redacted.
 - Latest login redesign screenshot: `deliverables/user_manual_screenshots/login_redesign.png`.
@@ -74,6 +75,8 @@ Screenshots supplied during planning are structure references. Final UI styling 
 The guardian's private `phone` value remains available for authenticated owner/admin workflows, but the public QR page uses `safe_phone` only. If no safe number has been issued yet, the public page shows `안심번호 준비중`.
 
 The active public QR page does not display the guardian's name, email, or address. It provides the safe-number call link, guardian message/audio, and one `위치공유` button. The location action does not ask the finder to enter a phone number or location description.
+
+The current privacy policy is available at `https://zezari.vercel.app/privacy`. It documents the protected account data, public QR disclosure scope, location sharing, external processors, retention rules, user rights, and privacy contact information.
 
 ## Current Signup Note
 

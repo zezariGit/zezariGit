@@ -3,6 +3,7 @@ import { LoginAuthPanel } from "./auth-actions";
 import GuardianDashboard from "./dashboard";
 import OnboardingGate from "./onboarding-gate";
 import StatusToast from "./status-toast";
+import UserPolicyFooter from "./user-policy-footer";
 import { authOptions, getConfiguredProviderIds } from "../lib/auth";
 import { getDashboardData } from "../lib/db";
 
@@ -43,6 +44,7 @@ export default async function HomePage({ searchParams }) {
           adSubjectId={adSubjectId}
           registeredSubjectId={registeredSubjectId}
         />
+        <UserPolicyFooter />
         <StatusToast message={notice} type={noticeType} />
       </>
     );
@@ -57,6 +59,7 @@ export default async function HomePage({ searchParams }) {
   return (
     <>
       <OnboardingGate enabled={!session}>{loginPanel}</OnboardingGate>
+      <UserPolicyFooter />
       <StatusToast message={notice} type={noticeType} />
     </>
   );

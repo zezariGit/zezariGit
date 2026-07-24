@@ -341,3 +341,14 @@ Create a Korean civic-tech administrator and guardian workflow diagram for "REAL
 
 ### Prompt
 Create a compact Korean authentication decision-flow diagram for "REAL_QR_FIND". Start with "SNS 로그인 완료", then a decision diamond "관리자 권한인가?" using both "ADMIN_EMAILS" and "guardians.is_admin = 1". The yes path goes directly to "로그인 완료 / 관리자 기능 사용" without phone verification. The no path checks "보호자 가입정보 완료?" and sends incomplete guardians to "휴대폰 인증 및 가입정보 입력". Add a small security note that administrator bypass does not mark a phone as verified and inactive accounts remain blocked. Use a white background, thin gray connectors, restrained blue and purple accents, compact Korean labels, no gradients, and no personal email addresses.
+
+## 2026-07-24 - Privacy Policy and Data Flow
+
+### Purpose
+- Presentation visual for the REAL_QR_FIND privacy policy and the data exposed through a public QR page.
+
+### Prompt
+Create a clean Korean privacy data-flow infographic for "REAL_QR_FIND". Place the guardian account and protected service database on the left, the managed subject and assigned QR code in the center, and a finder's mobile public QR page on the right. Clearly separate "서비스 내부 보관" from "공개 페이지 표시". Inside protected storage show guardian contact details, address, authentication data, subject records, orders, subscriptions, payments, push endpoints, and location-share history. On the public side show only the managed subject's approved profile, guardian message and voice, and a Bizcall 050 safe number; explicitly cross out guardian name, email, address, and raw phone number. Add a consent path where the finder taps "위치공유", grants browser location permission, and shares latitude, longitude, and accuracy with the guardian through a Kakao Map link. Use the REAL_QR_FIND civic blue and white design system, thin gray connectors, compact Korean labels, 8px or smaller corner radii, no gradients, and no real personal data.
+
+### Notes
+- Use when presenting why the privacy policy distinguishes protected account data from information deliberately exposed after an active QR scan.

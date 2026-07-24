@@ -6250,3 +6250,33 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Pricing analysis, database migration, administrator/user UI, server validation, checkout integration, testing, documentation, and deployment: about 45 minutes.
+
+## 2026-07-24 KST - User Privacy Policy Page
+
+### User Request
+- Use the existing `zezari.com` privacy policy as a reference and add an equivalent page to REAL_QR_FIND.
+- Add a `개인정보취급방침` link at the bottom of the user main page.
+
+### Reflected Work
+- Added the `/privacy` route with a current-implementation privacy policy rather than copying obsolete service behavior.
+- Documented membership, SNS login, phone verification, guardian and subject records, QR disclosure, products, subscriptions, payments, shipping, location sharing, push notifications, and advertising data.
+- Clarified that the public QR page does not expose guardian name, email, address, or raw phone number and uses the Bizcall 050 safe number.
+- Added processing-provider information for Vercel, Turso/libSQL, SNS providers, Toss Payments, Bizcall, SMS delivery, Meta Marketing API, and browser push.
+- Added a shared footer link below both anonymous onboarding/login and authenticated guardian dashboard views.
+- Added responsive table scrolling, compact mobile navigation, and project gov-style tokens.
+
+### Deliverables
+- `deliverables/PRIVACY_POLICY_PAGE.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+
+### Verification
+- `npm run build` succeeded and generated `/privacy` as a static route.
+- Local `/privacy` and `/` responses returned HTTP 200.
+- The privacy response contains the policy title, effective date, and privacy contact address.
+- The anonymous home response contains the `개인정보취급방침` label and `/privacy` link.
+- Desktop 1440×1200 and mobile 390×844 screenshots were visually checked.
+- `.env.local` secret values were not found in the policy page or its deliverable.
+- `git diff --check` succeeded.
+
+### Time Spent
+- Source-policy comparison, implementation-data review, page and footer implementation, responsive styling, documentation, testing, and deployment: about 25 minutes.
