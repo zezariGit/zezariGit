@@ -311,3 +311,11 @@ Create a clean Korean system-flow infographic for the "REAL_QR_FIND" service. Us
 
 ### Notes
 - Use for architecture reviews, privacy explanations, and Bizcall onboarding discussions.
+
+## 2026-07-24 - Administrator Login Verification Bypass
+
+### Purpose
+- Presentation flow explaining why an existing administrator does not enter the guardian phone-verification signup process.
+
+### Prompt
+Create a compact Korean authentication decision-flow diagram for "REAL_QR_FIND". Start with "SNS 로그인 완료", then a decision diamond "관리자 권한인가?" using both "ADMIN_EMAILS" and "guardians.is_admin = 1". The yes path goes directly to "로그인 완료 / 관리자 기능 사용" without phone verification. The no path checks "보호자 가입정보 완료?" and sends incomplete guardians to "휴대폰 인증 및 가입정보 입력". Add a small security note that administrator bypass does not mark a phone as verified and inactive accounts remain blocked. Use a white background, thin gray connectors, restrained blue and purple accents, compact Korean labels, no gradients, and no personal email addresses.

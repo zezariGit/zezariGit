@@ -6165,3 +6165,25 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Specification analysis, privacy design, implementation, UI/admin workflow, build verification, and documentation: about 45 minutes.
+
+## 2026-07-24 KST - Administrator Phone Verification Bypass
+
+### User Report
+- An already registered administrator was sent to the phone verification signup screen.
+- Administrators should be able to sign in without phone verification.
+
+### Root Cause
+- The account existed and had `guardians.is_admin = 1`.
+- Its optional guardian login ID, password hash, and phone fields were empty.
+- `GuardianDashboard` evaluated guardian profile completeness before treating administrator authority as a completed-login exception.
+
+### Reflected Work
+- Administrator authority is now evaluated first.
+- Accounts recognized by `ADMIN_EMAILS` or `guardians.is_admin = 1` are treated as complete for the post-login screen gate.
+- Administrators bypass `SocialSignupCompletion` and its phone verification screen.
+- Normal guardians still require all existing signup fields and phone verification.
+- Inactive administrator accounts remain blocked by the existing activation check.
+- Updated `deliverables/AUTH_PHONE_VERIFICATION.md` and the cumulative image prompt archive.
+
+### Time Spent
+- Account-state diagnosis, gate correction, verification, documentation, and deployment: about 15 minutes.

@@ -40,11 +40,11 @@ export default async function GuardianDashboard({
   const selectedAdSubject = subjectsWithQr.find((subject) => subject.id === adSubjectId) || null;
   const emptySlots = Array.from({ length: Math.max(0, 4 - subjectsWithQr.length) });
   const registeredSubject = subjectsWithQr.find((subject) => subject.id === registeredSubjectId) || null;
-  const guardianComplete = Boolean(
+  const admin = isAdminSession(session) || Number(guardian.is_admin || 0) === 1;
+  const guardianComplete = admin || Boolean(
     guardian.name && guardian.login_id && guardian.password_hash && guardian.phone
   );
   const guardianActive = guardian.is_active !== 0;
-  const admin = isAdminSession(session) || Number(guardian.is_admin || 0) === 1;
   const isDashboard = activeTab === "dashboard";
   const isGuardianTab = activeTab === "guardian";
   const isSubjectsTab = activeTab === "subjects";

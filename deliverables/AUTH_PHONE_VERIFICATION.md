@@ -16,6 +16,13 @@ Project: REAL_QR_FIND
 - On success, the server returns a 15-minute `phoneVerificationToken`.
 - Signup completion APIs consume that token once and save `guardians.phone_verified_at`.
 
+## Administrator Exception
+- A signed-in account recognized by `ADMIN_EMAILS` or `guardians.is_admin = 1` bypasses the guardian signup-completion screen.
+- Administrators are not required to enter a phone verification code merely to sign in.
+- This exception changes only the post-login screen gate. It does not create a verification token or mark an unverified phone as verified.
+- Administrators can enter or update optional guardian profile information later from the authenticated information screen.
+- Inactive administrator records remain blocked by the existing account activation rule.
+
 ## API
 - `POST /api/signup/phone/send`
   - Input: `phone`, optional `purpose`.
