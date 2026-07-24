@@ -6318,3 +6318,48 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Payment-flow analysis, server authorization, completion integration, revenue isolation, UI, testing, documentation, and deployment: about 40 minutes.
+
+## 2026-07-24 KST - Meta Advertisement End-to-End Publishing
+
+### User Request
+- Verify the uncommented Meta credentials in `.env.local` and apply valid values to Vercel.
+- Publish the missing-person advertisement with the guardian-selected period, location radius, and generated preview image through the Meta Marketing API.
+- Test the integration.
+
+### Reflected Work
+- Verified secrets without printing their values.
+- Confirmed that the token is valid, matches the configured app, includes `ads_management`, and can access the active KRW/Asia-Seoul ad account.
+- Updated the four populated Meta secrets in Vercel Production.
+- Added browser-side 1080px JPEG capture of the final missing-person poster before advertisement checkout.
+- Added `subject_ad_creatives` so large creative images are stored separately from advertisement grid rows.
+- Expanded Meta persistence with campaign, ad set, creative, ad, image hash, publication error, and publication timestamp fields.
+- Implemented Meta image upload, paused campaign creation, ad set creation with lifetime budget/schedule/custom-location targeting, Page-backed creative creation, ad creation, and final activation.
+- Propagated pause/resume/end commands to the campaign, ad set, and ad.
+- Added administrator creative preview and Meta object diagnostics.
+- Added a hard preflight requirement for `META_PAGE_ID` before any production campaign is created.
+
+### Environment Finding
+- `META_APP_ID`, `META_APP_SECRET`, `META_ACCESS_TOKEN`, and `META_AD_ACCOUNT_ID` are populated and valid.
+- `META_PAGE_ID` is empty.
+- The configured ad account returns zero `promote_pages`, and the token returns zero accessible Pages.
+- A Facebook Page must be connected to the ad account and its numeric ID added before creative/ad publication can complete.
+- The authenticated in-app browser surface was not exposed to this coding session, so console values were verified through the Graph API rather than copied from the visible browser.
+
+### Verification
+- `npm run build` succeeded.
+- Turso schema version `23` and six new Meta ID/error columns were applied.
+- A disposable image upload succeeded.
+- A disposable paused campaign and paused ad set with 3km custom-location targeting, schedule, and lifetime budget succeeded.
+- The test campaign was deleted and the test image was removed; no active delivery or spend occurred.
+- Local home returned HTTP 200.
+- Unauthenticated creative-image access returned HTTP 403.
+- Full creative/ad creation was correctly not attempted because the required Page is not connected.
+
+### Deliverables
+- `deliverables/META_AD_PUBLISHING.md`
+- `deliverables/ADVERTISING_SETUP.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/image_prompts/IMAGE_PROMPTS.md`
+
+### Time Spent
+- Meta credential and permission validation, safe write testing, image capture, database migration, full publishing implementation, documentation, and deployment preparation: about 65 minutes.

@@ -27,6 +27,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `BIZCALL_SAFE_PHONE_INTEGRATION.md`: Bizcall 050 issuance/remapping flow, guardian sync states, privacy rules, and server-only environment variables.
 - `PRIVACY_POLICY_PAGE.md`: user-facing privacy policy route, footer-link placement, current data handling scope, and maintenance rules.
 - `ADVERTISING_SETUP.md`: dashboard subject advertisement modal, admin daily rate, advertisement progress foundation, and Meta API preparation.
+- `META_AD_PUBLISHING.md`: browser-captured ad creative, Meta image/campaign/ad-set/creative/ad publishing flow, readiness checks, and remaining Page requirement.
 - `AD_PRICING_MANAGEMENT.md`: administrator billing-day/radius price policy, guardian date/radius quote flow, server calculation, and Toss amount validation.
 - `ADMIN_DASHBOARD_OPERATIONS_REVAMP.md`: operations-style admin dashboard with overview cards, trend chart, recent tables, order/ad/subscription/sales panels.
 - `GUARDIAN_ADMIN_OPERATIONS_LAYOUT.md`: operations-style guardian management screen with status cards, extended filters, dense grid, detail panel, and CSV export additions.

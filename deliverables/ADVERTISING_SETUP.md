@@ -123,44 +123,58 @@ Project: REAL_QR_FIND / zezari
   - `META_APP_SECRET`
   - `META_ACCESS_TOKEN`
   - `META_AD_ACCOUNT_ID`
+  - `META_PAGE_ID` (required; Facebook Page connected to the ad account)
   - Optional: `META_API_VERSION`, defaults to `v23.0`
   - Optional: `META_CAMPAIGN_OBJECTIVE`, defaults to `OUTCOME_AWARENESS`
-- `subject_ads.meta_campaign_id` stores the Meta campaign ID returned from the Campaigns API.
+  - Optional: `META_OPTIMIZATION_GOAL`, defaults to `REACH`
+- Meta object identifiers are stored separately:
+  - `subject_ads.meta_campaign_id`
+  - `subject_ads.meta_adset_id`
+  - `subject_ads.meta_creative_id`
+  - `subject_ads.meta_ad_id`
+  - `subject_ads.meta_image_hash`
+- `subject_ads.meta_last_error` stores the latest sanitized API error and `meta_published_at` records first successful publication.
+- `subject_ad_creatives` stores the JPEG captured from the guardian's missing-person advertisement preview.
 - `subject_ads.meta_status` stores the latest local integration state:
-  - `campaign_active`
-  - `campaign_paused`
-  - `campaign_not_created`
-  - `campaign_ended_paused`
+  - `ad_active`
+  - `ad_paused`
+  - `ad_ended_paused`
+  - `meta_publish_preparing`
+  - `meta_publish_failed`
   - `meta_api_access_blocked`
   - `meta_api_pending`
 - Current integration scope:
-  - Campaign create
-  - Campaign active/pause status update
-  - Campaign ID and integration status persistence
-- Meta campaign creation explicitly sends `is_adset_budget_sharing_enabled=false` because the current first-stage integration does not create campaign-budget optimization/ad set budget sharing.
-- Map-selected ad locations can be converted to Meta targeting with `buildMetaCustomLocationTargeting()`:
+  - Browser preview capture to a 1080px JPEG before advertisement checkout
+  - Meta image upload
+  - Paused campaign creation
+  - Ad set creation with lifetime budget, period, and map radius
+  - Page-backed link ad creative creation
+  - Paused ad creation
+  - Campaign, ad set, and ad activation after all objects are ready
+  - Pause/resume propagation to all created Meta objects
+- Meta campaign creation sends `is_adset_budget_sharing_enabled=false`; the paid amount is assigned as the ad set lifetime budget.
+- `buildMetaCustomLocationTargeting()` maps the guardian selection to:
   - `geo_locations.custom_locations[].latitude`
   - `geo_locations.custom_locations[].longitude`
   - `geo_locations.custom_locations[].radius`
   - `geo_locations.custom_locations[].distance_unit = kilometer`
+  - `geo_locations.location_types = ["home", "recent"]`
 - Location search endpoint:
   - `GET /api/maps/search?query=...`
   - currently uses OpenStreetMap Nominatim with Korean result priority and no project API key
   - can be replaced later with Kakao/Naver/Google Places if higher production search throughput is required
+- Required operation before live publication:
+  - Create or select a Facebook Page.
+  - Assign the Page to the configured ad account/business with advertising permission.
+  - Add the numeric Page ID as `META_PAGE_ID` locally and in Vercel Production.
+  - The current checked account returned zero `promote_pages`, so publication intentionally stops before creating any campaign until this condition is met.
 - Next Meta integration scope:
-  - capture/store the missing-person advertisement creative image after payment success
-  - Ad set creation
-  - Ad creative creation from the missing-person ad content
-  - Page/Instagram actor configuration
-  - targeting, budget, and schedule mapping
   - webhook or polling sync for Meta delivery status, impressions, reach, spend, and click count
-  - structured storage for Meta error code/message if needed
 
 ## Verification
 - `npm run build` succeeded.
-- Vercel production/development environment variables were updated for populated Meta keys without printing secret values.
-- Safe Meta account access check succeeded against the configured ad account.
-- Meta campaign creation validation with `execution_options=["validate_only"]` succeeded after adding `is_adset_budget_sharing_enabled=false`.
-- `npm run build` succeeded after the map-based advertisement region selection change.
-- When Meta returns `API access blocked` with OAuth code `200`, admin approval/pause/resume now persists the local service state and records `meta_api_access_blocked` instead of blocking the administrator workflow.
-- Full campaign creation was not executed during verification to avoid creating an unwanted live Meta campaign object.
+- Vercel Production variables were updated for the four populated Meta keys without printing secret values.
+- The configured user token is valid, belongs to the configured app, and has `ads_management`.
+- The configured KRW/Asia-Seoul ad account is active and accessible.
+- A disposable test image, paused campaign, and paused ad set with 3km custom-location targeting were created successfully and then deleted; no live delivery or spend occurred.
+- Creative/ad creation was not attempted because `META_PAGE_ID` is empty and the ad account has no connected Page. The application now reports this condition before any production campaign object is created.

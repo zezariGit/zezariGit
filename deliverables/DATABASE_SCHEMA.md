@@ -4,7 +4,7 @@ Project: REAL_QR_FIND / zezari
 
 ## Status
 - Implemented in Turso.
-- Current schema version: `22`.
+- Current schema version: `23`.
 
 ## Tables
 
@@ -235,7 +235,10 @@ Stores advertisement requests and status by managed subject.
 | `id` | TEXT | Primary key |
 | `guardian_id` | TEXT | Guardian who owns the subject |
 | `subject_id` | TEXT | Managed subject being advertised |
-| `region` | TEXT | User-entered advertising region |
+| `region` | TEXT | Map-selected advertising region label |
+| `region_latitude` | REAL | Map center latitude |
+| `region_longitude` | REAL | Map center longitude |
+| `region_radius_km` | INTEGER | Meta custom-location radius |
 | `start_date` | TEXT | Advertising start date |
 | `end_date` | TEXT | Advertising end date |
 | `days` | INTEGER | Inclusive advertising day count |
@@ -257,11 +260,29 @@ Stores advertisement requests and status by managed subject.
 | `is_test_payment` | INTEGER | `1` for an admin payment-pass test transaction; excluded from real revenue totals |
 | `paid_at` | TEXT | Advertisement payment completion timestamp |
 | `status` | TEXT | `ready`, `active`, `paused`, `ended` |
-| `meta_campaign_id` | TEXT | Reserved Meta API campaign identifier |
-| `meta_status` | TEXT | Reserved Meta API status, currently `meta_api_pending` |
+| `meta_campaign_id` | TEXT | Meta campaign identifier |
+| `meta_adset_id` | TEXT | Meta ad set identifier |
+| `meta_creative_id` | TEXT | Meta creative identifier |
+| `meta_ad_id` | TEXT | Meta ad identifier |
+| `meta_image_hash` | TEXT | Meta uploaded-image hash |
+| `meta_status` | TEXT | Current local Meta publication state |
+| `meta_last_error` | TEXT | Latest sanitized Meta publication error |
+| `meta_published_at` | TEXT | First successful Meta publication timestamp |
 | `click_count` | INTEGER | Meta/reporting click count placeholder, defaults to `0` |
 | `paused_at` | TEXT | Last pause timestamp |
 | `ended_at` | TEXT | End timestamp |
+| `created_at` | TEXT | Created timestamp |
+| `updated_at` | TEXT | Updated timestamp |
+
+### subject_ad_creatives
+
+Stores the browser-rendered advertisement poster separately so advertisement list queries do not load large image payloads.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `ad_id` | TEXT | Primary key and foreign key to `subject_ads.id` |
+| `image_data_url` | TEXT | JPEG/PNG preview capture, maximum 1.8MB encoded |
+| `mime_type` | TEXT | Captured image MIME type |
 | `created_at` | TEXT | Created timestamp |
 | `updated_at` | TEXT | Updated timestamp |
 

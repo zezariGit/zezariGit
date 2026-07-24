@@ -61,7 +61,7 @@ export default async function AccountAdsPage({ searchParams }) {
 
         <ul className="ad-dashboard-notes">
           <li>광고는 관리대상별로 신청되며, 기간과 지역 정보 기준으로 운영됩니다.</li>
-          <li>Meta 광고 API 직접 송출은 운영 설정이 필요한 항목입니다.</li>
+          <li>결제와 관리자 승인이 완료되면 저장된 광고 소재가 Meta 광고로 발행됩니다.</li>
           <li>광고 상태 변경은 대시보드의 관리대상 카드에서 진행할 수 있습니다.</li>
         </ul>
       </section>
@@ -88,6 +88,10 @@ function formatAdLocation(ad) {
 }
 
 function formatMetaStatus(status) {
+  if (status === "ad_active") return "광고 활성";
+  if (status === "ad_paused") return "광고 일시정지";
+  if (status === "ad_ended_paused") return "광고 종료";
+  if (status === "meta_publish_failed") return "Meta 발행 확인 필요";
   if (status === "campaign_active") return "캠페인 활성";
   if (status === "campaign_paused") return "캠페인 일시정지";
   if (status === "meta_api_access_blocked") return "Meta 권한 승인 필요";

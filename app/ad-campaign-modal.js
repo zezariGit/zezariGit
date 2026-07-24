@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { toJpeg } from "html-to-image";
 import FormSubmitButton from "./form-submit-button";
 import ModalScrollLock from "./modal-scroll-lock";
 import { formatDateOnly } from "../lib/date-format";
@@ -52,9 +53,48 @@ export default function AdCampaignModal({
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const circleRef = useRef(null);
+  const creativeRef = useRef(null);
+  const creativeInputRef = useRef(null);
+  const capturedSubmitRef = useRef(false);
+  const [capturePending, setCapturePending] = useState(false);
   const quote = calculateQuote(startDate, endDate, radiusKm, pricingSettings);
   const activeAd = ["active", "paused", "ready"].includes(subject?.ad_status || "");
   const canPreview = Boolean(location.selected && quote.valid);
+
+  async function prepareCreativeImage(event) {
+    if (capturedSubmitRef.current) {
+      capturedSubmitRef.current = false;
+      return;
+    }
+
+    event.preventDefault();
+    const form = event.currentTarget;
+    const submitter = event.nativeEvent.submitter;
+    if (!creativeRef.current || !creativeInputRef.current) return;
+
+    setCapturePending(true);
+    try {
+      const node = creativeRef.current;
+      const ratio = node.offsetWidth > 0 ? node.offsetHeight / node.offsetWidth : 1.25;
+      const dataUrl = await toJpeg(node, {
+        backgroundColor: "#ffffff",
+        cacheBust: true,
+        quality: 0.9,
+        canvasWidth: 1080,
+        canvasHeight: Math.max(1080, Math.round(1080 * ratio)),
+      });
+      if (dataUrl.length > 1.8 * 1024 * 1024) {
+        throw new Error("광고 이미지 용량이 너무 큽니다.");
+      }
+      creativeInputRef.current.value = dataUrl;
+      capturedSubmitRef.current = true;
+      form.requestSubmit(submitter || undefined);
+    } catch (error) {
+      window.alert(error?.message || "광고 미리보기 이미지를 생성하지 못했습니다. 다시 시도해 주세요.");
+    } finally {
+      setCapturePending(false);
+    }
+  }
 
   useEffect(() => {
     setLocation(initialLocation);
@@ -390,7 +430,7 @@ export default function AdCampaignModal({
                 </button>
               </div>
             ) : (
-              <form action={createAction} className="ad-request-form ad-preview-form">
+              <form action={createAction} className="ad-request-form ad-preview-form" onSubmit={prepareCreativeImage}>
                 <input type="hidden" name="subjectId" value={subject.id} />
                 <input type="hidden" name="region" value={regionLabel} />
                 <input type="hidden" name="regionLatitude" value={location.selected ? location.lat : ""} />
@@ -398,7 +438,9 @@ export default function AdCampaignModal({
                 <input type="hidden" name="regionRadiusKm" value={radiusKm} />
                 <input type="hidden" name="startDate" value={startDate} />
                 <input type="hidden" name="endDate" value={endDate} />
+                <input ref={creativeInputRef} type="hidden" name="creativeImageDataUrl" />
                 <MissingAdPreview
+                  creativeRef={creativeRef}
                   subject={subject}
                   quote={quote}
                   startDate={startDate}
@@ -410,8 +452,8 @@ export default function AdCampaignModal({
                   <button type="button" className="plain-button" onClick={() => setStep("setup")}>
                     다시 선택
                   </button>
-                  <FormSubmitButton className="action" pendingText="결제 준비중" disabled={!canPreview}>
-                    결제하기
+                  <FormSubmitButton className="action" pendingText="결제 준비중" disabled={!canPreview || capturePending}>
+                    {capturePending ? "이미지 생성중" : "결제하기"}
                   </FormSubmitButton>
                 </div>
               </form>
@@ -428,7 +470,7 @@ export default function AdCampaignModal({
   );
 }
 
-function MissingAdPreview({ subject, quote, startDate, endDate, regionLabel, radiusKm }) {
+function MissingAdPreview({ creativeRef, subject, quote, startDate, endDate, regionLabel, radiusKm }) {
   const photoSrc = subjectPhotoSrc(subject);
   const age = calculateAge(subject?.birth_date);
   const gender = formatGender(subject?.gender);
@@ -447,6 +489,7 @@ function MissingAdPreview({ subject, quote, startDate, endDate, regionLabel, rad
       </div>
 
       <article
+        ref={creativeRef}
         className="missing-ad-poster"
         data-ad-creative="missing-person-preview"
         data-subject-id={subject.id}

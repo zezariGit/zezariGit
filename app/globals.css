@@ -2545,6 +2545,20 @@ a {
   font-weight: 800;
 }
 
+.ad-creative-preview.captured {
+  padding: 0;
+  overflow: hidden;
+  background: var(--c-surface);
+}
+
+.ad-creative-preview.captured img {
+  display: block;
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  object-position: top center;
+}
+
 .ad-memo-form {
   display: grid;
   justify-items: end;

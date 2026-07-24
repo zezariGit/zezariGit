@@ -1973,7 +1973,13 @@ function AdManagementSection({ adsData }) {
                       <div><dt>광고기간</dt><dd>{formatDate(selectedAd.start_date)} ~ {formatDate(selectedAd.end_date)}</dd></div>
                       <div><dt>활성화 일시</dt><dd>{formatRecentDateTime(selectedAd.updated_at)}</dd></div>
                       <div><dt>캠페인 ID</dt><dd className="inline-scroll-value">{selectedAd.meta_campaign_id || "미연동"}</dd></div>
+                      <div><dt>광고세트 ID</dt><dd className="inline-scroll-value">{selectedAd.meta_adset_id || "미연동"}</dd></div>
+                      <div><dt>소재 ID</dt><dd className="inline-scroll-value">{selectedAd.meta_creative_id || "미연동"}</dd></div>
+                      <div><dt>광고 ID</dt><dd className="inline-scroll-value">{selectedAd.meta_ad_id || "미연동"}</dd></div>
                       <div><dt>Meta 상태</dt><dd>{formatAdMetaStatus(selectedAd.meta_status)}</dd></div>
+                      {selectedAd.meta_last_error ? (
+                        <div><dt>최근 오류</dt><dd className="inline-scroll-value">{selectedAd.meta_last_error}</dd></div>
+                      ) : null}
                     </dl>
                     <div className="ad-creative-row">
                       <strong>광고 소재</strong>
@@ -2049,6 +2055,22 @@ function AdAvatar({ ad }) {
 }
 
 function AdCreativePreview({ ad }) {
+  if (Number(ad?.has_creative_image || 0) === 1) {
+    return (
+      <a
+        className="ad-creative-preview captured"
+        href={`/api/admin/ads/${encodeURIComponent(ad.id)}/creative`}
+        target="_blank"
+        rel="noreferrer"
+        aria-label={`${ad.subject_name || "관리대상"} 광고 소재 원본 열기`}
+      >
+        <img
+          src={`/api/admin/ads/${encodeURIComponent(ad.id)}/creative?v=${encodeURIComponent(ad.updated_at || "")}`}
+          alt={`${ad.subject_name || "관리대상"} Meta 광고 소재`}
+        />
+      </a>
+    );
+  }
   return (
     <div className="ad-creative-preview">
       <strong>실종자 발견제보</strong>
@@ -4552,6 +4574,11 @@ function formatAdTargetLocation(ad) {
 }
 
 function formatAdMetaStatus(status) {
+  if (status === "ad_active") return "광고 활성";
+  if (status === "ad_paused") return "광고 일시정지";
+  if (status === "ad_ended_paused") return "광고 종료 처리";
+  if (status === "meta_publish_preparing") return "Meta 발행 준비";
+  if (status === "meta_publish_failed") return "Meta 발행 실패";
   if (status === "campaign_active") return "캠페인 활성";
   if (status === "campaign_paused") return "캠페인 일시정지";
   if (status === "campaign_not_created") return "캠페인 미생성";

@@ -363,3 +363,14 @@ Create a Korean mobile checkout and server-security flow diagram for "REAL_QR_FI
 
 ### Notes
 - Use when explaining that the bypass is a server-authorized test feature rather than a client-only page redirect.
+
+## 2026-07-24 - Meta Missing-Person Advertisement Publishing
+
+### Purpose
+- Presentation architecture for converting the guardian preview into a Meta advertisement while keeping administrator approval and spend controls.
+
+### Prompt
+Create a Korean civic-tech system flow diagram for "REAL_QR_FIND" Meta missing-person advertisement publishing. On the left, show a guardian mobile screen selecting a map center, radius, and end date, followed by a polished missing-person poster preview with a subject photo, name, age, guardian message, QR code, and safe contact wording. Show the browser converting the exact poster to a 1080px JPEG and saving it separately in Turso. In the center, show an administrator advertising grid with a selected row and the "광고승인" button, then a server security and configuration gate checking payment, administrator permission, META_ACCESS_TOKEN, META_AD_ACCOUNT_ID, and META_PAGE_ID. On the right, show the Meta Marketing API object chain: image upload, paused campaign, ad set with lifetime budget plus start/end time plus latitude/longitude/radius, Page-backed creative, paused ad, then final activation. Add a red stopped path labeled "Facebook 페이지 미연결: 캠페인 생성 전 차단" and a green test path labeled "PAUSED 생성 후 즉시 삭제 / 과금 없음". Use the REAL_QR_FIND white, civic blue, restrained purple, and warning red palette, thin gray connectors, compact Korean labels, 8px or smaller corner radii, no gradients, and no real credentials or personal data.
+
+### Notes
+- Use when presenting the difference between verified Meta account access and the remaining Facebook Page identity requirement.
