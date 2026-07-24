@@ -32,47 +32,29 @@ Project: REAL_QR_FIND / zezari
 Never expose these values in client code, logs, screenshots, Git, or documentation.
 
 ## Current Readiness Result
-- Token validity: passed.
-- Token/app match: passed.
-- `ads_management`: granted.
-- Configured KRW ad account: active and accessible.
+- Business portfolio: `제자리zezari` (`594205283097084`).
+- Facebook Page: `제자리` (`480121825189746`), assigned to the system user for ads and insights.
+- Ad account: `ZEZARI` (`604475922197751`), active, KRW, Asia/Seoul, and funding-source data present.
+- Meta app: `qr-find-ads` (`1005400915800540`), connected to the same business and ad account.
+- System user: `Conversions API System User` (`61571172351536`).
+- System-user token permissions: `ads_management`, `ads_read`, and `business_management`.
+- Token and real ad-account access: passed.
 - Image upload: passed.
-- Paused campaign create: passed.
-- Paused ad set create with a 3km custom location: passed.
-- Test campaign and image cleanup: passed.
-- Page-backed creative/ad create: blocked by configuration.
+- Paused campaign creation: passed.
+- Paused ad-set creation with a 3km custom location, schedule, and lifetime budget: passed.
+- Page-backed creative creation: passed.
+- Paused ad creation: blocked only by the Meta anti-discrimination policy operator acknowledgement.
+- Disposable campaign, ad set, creative, and image cleanup: passed. No delivery or spend occurred.
+- `META_ACCESS_TOKEN`, `META_AD_ACCOUNT_ID`, and `META_PAGE_ID` were updated locally and in Vercel Production without exposing secret values.
+- Facebook Login was added to the app so the Page permissions are available with standard access.
+- The deprecated `standard_enhancements` creative field was removed after Meta returned subcode `3858504`.
 
-The checked ad account currently returns zero connected Facebook Pages and `.env.local` has an empty `META_PAGE_ID`. This is not a source-code failure. Meta requires a Page identity in `object_story_spec.page_id`.
-
-### 2026-07-24 Business Connection Audit
-- Ad account: active (`account_status = 1`), KRW, Asia/Seoul, no disable reason.
-- Ad-account user access: one user is readable.
-- Facebook Page connected for promotion: zero.
-- Pages readable from the current user token: zero.
-- Instagram account connected to the ad account: zero.
-- Funding source/payment method: not configured according to the ad-account API.
-- Existing campaign: one active campaign.
-- Existing ad sets and ads: zero; account insights contain no spend, impressions, or clicks.
-- `META_PAGE_ID`: not configured locally.
-- Missing token permissions for setup inspection: `pages_show_list` and `business_management`.
-- The in-app browser tab was not exposed to the coding browser connection, so this audit used authenticated Graph API responses.
-
-### Screenshot Follow-up
-- The supplied Business Settings screenshot shows `계정 > 앱 > qr-find-ads > 연결된 자산`.
-- The single connected asset is the `ZEZARI` ad account.
-- This confirms the Meta app-to-ad-account connection, but it does not connect a Facebook Page.
-- A fresh Graph API check still returned zero `promote_pages`, zero user Pages, zero Instagram accounts, and an empty `META_PAGE_ID`.
-- The next console location is `계정 > 페이지`, not `계정 > 앱`.
+The Page object cannot be read directly with the system-user token because that token does not expose `pages_read_engagement`. This does not block Page-backed ad creative creation: the real paused creative write succeeded with the assigned Page ID.
 
 ## One Remaining Meta Console Task
-1. Create or select the official zezari Facebook Page.
-2. Assign that Page to the same Business Portfolio and ad account with advertising permission.
-3. Assign a funding source/payment method to the ad account.
-4. Generate/confirm a token with `ads_management`, `pages_manage_ads`, `pages_show_list`, and `business_management`.
-5. Put the numeric Page ID in local `META_PAGE_ID`.
-6. Add the same variable to Vercel Production and redeploy.
+The business operator must personally review and accept Meta's anti-discrimination policy in Business Settings. Meta rejects the final ad create call with subcode `2859024` until this legal acknowledgement is completed.
 
-The application now stops with a Korean setup error before campaign creation when this requirement is missing, preventing orphaned campaign objects.
+After the operator accepts it, rerun the PAUSED end-to-end test. The API configuration, Page identity, real ad account, funding source, image upload, campaign, ad set, and creative are already verified.
 
 ## Safety Rules
 - Automated verification creates only `PAUSED` resources.

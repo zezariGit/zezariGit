@@ -6410,3 +6410,34 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Screenshot interpretation, Graph API recheck, and documentation: about 5 minutes.
+
+## 2026-07-24 KST - Meta Real Ad Account and Page Publishing Setup
+
+### User Request
+- Use the connected Meta Business and Developer Center browser tabs to complete the settings required for advertisements requested by the production site.
+
+### Reflected Work
+- Confirmed the Business Portfolio `제자리zezari`, Facebook Page `제자리`, real ad account `ZEZARI`, and app `qr-find-ads`.
+- Assigned the Page, real ad account, and app to the existing `Conversions API System User`.
+- Added Facebook Login to the Meta app, enabling standard Page permission definitions.
+- Generated a non-expiring system-user token with `ads_management`, `ads_read`, and `business_management`.
+- Replaced the sandbox ad account with the real ad account and populated `META_PAGE_ID`.
+- Updated `META_ACCESS_TOKEN`, `META_AD_ACCOUNT_ID`, and `META_PAGE_ID` in local `.env.local` and Vercel Production without logging secret values.
+- Removed the deprecated Meta creative field `standard_enhancements`.
+
+### Verification
+- Real ad-account read passed; the account is active, KRW, Asia/Seoul, and has funding-source data.
+- Disposable image upload, PAUSED campaign, PAUSED ad set, and Page-backed creative creation all passed.
+- Final PAUSED ad creation reached Meta and was blocked only by anti-discrimination policy acknowledgement subcode `2859024`.
+- All disposable campaign, ad set, creative, and image resources were deleted immediately. No delivery or spend occurred.
+- `npm run build` succeeded.
+
+### Remaining Operator Action
+- A business operator must personally review and accept Meta's anti-discrimination policy. This is a legal acknowledgement and was not accepted by the development agent.
+- After acceptance, rerun the PAUSED ad creation test and deploy the verified source.
+
+### Deliverable
+- Updated `deliverables/META_AD_PUBLISHING.md`.
+
+### Time Spent
+- Meta browser configuration, system-user credential rotation, real-account API verification, compatibility fix, safe write test, cleanup, and documentation: about 45 minutes.
