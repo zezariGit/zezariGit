@@ -6187,3 +6187,32 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Account-state diagnosis, gate correction, verification, documentation, and deployment: about 15 minutes.
+
+## 2026-07-24 KST - Privacy-Minimized Public Subject Page
+
+### User Request
+- Remove the public `보호자에게 알리기` button.
+- Remove guardian name, email, and address from the managed-subject page, leaving only the safe number.
+- Remove finder phone and location-description inputs, leaving only `위치공유`.
+- Change the subject photo from a small circle to an approximately 1.7-times larger rounded rectangle.
+
+### Reflected Work
+- Removed guardian name, email, and address from both the public QR query and rendered page.
+- Kept the active Bizcall 050 safe number as the only guardian contact information, including click-to-call.
+- Removed the standalone guardian-notification button from the public page.
+- Simplified location sharing to send browser latitude, longitude, and accuracy after device permission.
+- Prevented new location notifications from showing the obsolete `연락처 미입력` text.
+- Enlarged the subject photo from 112px to 190px and changed it to a responsive 4:5 rounded portrait frame.
+- Updated QR, location-share, user-manual, and image-prompt deliverables.
+
+### Verification
+- `npm run build` completed successfully.
+- `git diff --check` reported no whitespace errors.
+- A data-backed active QR page returned HTTP 200.
+- The rendered HTML contained `안심번호`, `위치공유`, and the portrait class.
+- The rendered HTML did not contain the selected guardian's name, email, address, `보호자에게 알리기`, `발견자 연락처`, or `위치 설명`.
+- A missing-key location request still returned the expected HTTP 400 QR validation response.
+- No in-app browser session was available for screenshot automation, so responsive layout was verified from generated HTML and CSS constraints.
+
+### Time Spent
+- Privacy review, public-page implementation, responsive styling, verification, documentation, and deployment: about 25 minutes.

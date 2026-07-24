@@ -4,8 +4,6 @@ import { useState } from "react";
 
 export default function LocationShareButton({ qrKey }) {
   const [loading, setLoading] = useState(false);
-  const [finderContact, setFinderContact] = useState("");
-  const [addressLabel, setAddressLabel] = useState("");
   const [message, setMessage] = useState("");
   const [mapUrl, setMapUrl] = useState("");
 
@@ -28,8 +26,6 @@ export default function LocationShareButton({ qrKey }) {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy,
-          finderContact,
-          addressLabel,
         }),
       });
       const data = await response.json().catch(() => ({}));
@@ -47,27 +43,6 @@ export default function LocationShareButton({ qrKey }) {
 
   return (
     <div className="find-location-share">
-      <div className="find-location-fields">
-        <label>
-          발견자 연락처 <span>(선택)</span>
-          <input
-            value={finderContact}
-            onChange={(event) => setFinderContact(event.target.value)}
-            placeholder="010-0000-0000"
-            inputMode="tel"
-            maxLength={40}
-          />
-        </label>
-        <label>
-          위치 설명 <span>(선택)</span>
-          <input
-            value={addressLabel}
-            onChange={(event) => setAddressLabel(event.target.value)}
-            placeholder="예: 서울 송파구 올림픽공원 북문 근처"
-            maxLength={200}
-          />
-        </label>
-      </div>
       <button className="primary-button" type="button" onClick={shareLocation} disabled={loading}>
         {loading ? "위치 확인중" : "위치공유"}
       </button>

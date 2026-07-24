@@ -5,7 +5,6 @@ import { authOptions } from "../../../lib/auth";
 import { getGuardianKey } from "../../../lib/db";
 import { getFindPageDataByKey } from "../../../lib/db";
 import { formatDateOnly } from "../../../lib/date-format";
-import GuardianNotifyButton from "./notify-button";
 import LocationShareButton from "./location-share-button";
 import GuardianVoicePlayer from "./guardian-voice-player";
 
@@ -156,29 +155,15 @@ export default async function FindPage({ params, searchParams }) {
           </div>
         </div>
 
-        <div className="find-contact-grid">
-          <div className="find-key-box">
-            <span>보호자</span>
-            <strong>{data.guardian_name || "이름 미입력"}</strong>
-          </div>
-          <div className="find-key-box">
-            <span>안심번호</span>
-            {data.safe_phone ? (
-              <a className="find-safe-phone-link" href={`tel:${String(data.safe_phone).replace(/\D/g, "")}`}>
-                {data.safe_phone}
-              </a>
-            ) : (
-              <strong>안심번호 준비중</strong>
-            )}
-          </div>
-          <div className="find-key-box">
-            <span>이메일</span>
-            <strong>{data.email || "이메일 미입력"}</strong>
-          </div>
-          <div className="find-key-box">
-            <span>주소</span>
-            <strong>{formatFullAddress(data.address, data.address_detail)}</strong>
-          </div>
+        <div className="find-key-box find-safe-phone-card">
+          <span>안심번호</span>
+          {data.safe_phone ? (
+            <a className="find-safe-phone-link" href={`tel:${String(data.safe_phone).replace(/\D/g, "")}`}>
+              {data.safe_phone}
+            </a>
+          ) : (
+            <strong>안심번호 준비중</strong>
+          )}
         </div>
 
         <div className="find-guardian-message">
@@ -191,7 +176,6 @@ export default async function FindPage({ params, searchParams }) {
         </div>
 
         <div className="find-action-stack">
-          <GuardianNotifyButton qrKey={data.public_key} />
           <LocationShareButton qrKey={data.public_key} />
         </div>
       </section>
@@ -209,10 +193,6 @@ function hasActiveAccess(status, periodEnd) {
 
 function formatDate(value) {
   return formatDateOnly(value);
-}
-
-function formatFullAddress(address, detailAddress) {
-  return [address, detailAddress].filter(Boolean).join(" ") || "주소 미입력";
 }
 
 function statusLabel(status) {

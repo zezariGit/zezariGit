@@ -16,18 +16,15 @@ Date: 2026-06-25
    - QR is enabled.
    - QR has been activated by the owning guardian.
    - The linked guardian has an active paid service period.
-3. Finder optionally enters:
-   - finder contact phone
-   - short location description/address memo
-4. Finder presses `위치공유`.
-5. Browser asks for location permission through the standard Geolocation API.
-6. Server validates the QR/service state again, stores the location history, and sends a guardian push notification when push is configured.
+3. Finder presses the single `위치공유` button without entering a phone number or location memo.
+4. Browser asks for location permission through the standard Geolocation API.
+5. Server validates the QR/service state again, stores the coordinates and accuracy, and sends a guardian push notification when push is configured.
 
 ## Guardian Notification
 - Notification title: `{관리대상 이름} 발견 위치가 공유되었습니다`
-- Notification body displays the finder contact first and the location next:
-  - `연락처: 010-0000-0000 · 위치: 서울 송파구 ...`
-  - if the finder contact is empty, `연락처 미입력` is displayed.
+- New public-page notifications display the map-based location only:
+  - `위치: 지도에서 위치 확인`
+- The push helper still accepts an optional finder contact for backward compatibility, but the public QR page no longer collects or sends it.
 - The primary notification click URL is the Kakao map link when generated, with the Naver map link as fallback.
 - The in-app bell notification list renders URL text as clickable links and also shows a `지도 열기` action button.
 - The service worker opens external map URLs in a new browser window when the system push notification is clicked.
@@ -70,8 +67,8 @@ Date: 2026-06-25
 | `subject_name` | Subject name snapshot |
 | `guardian_name` | Guardian name snapshot |
 | `guardian_safe_phone` | Safe phone snapshot, not raw private phone |
-| `finder_contact` | Optional finder contact entered on the public page |
-| `address_label` | Optional finder-entered location description |
+| `finder_contact` | Legacy optional finder contact; new public shares store an empty value |
+| `address_label` | Location label; new public shares use the map-link guidance default |
 | `latitude` | Browser-provided latitude |
 | `longitude` | Browser-provided longitude |
 | `accuracy` | Browser-provided accuracy in meters |
@@ -101,9 +98,9 @@ Indexes:
 - Raw guardian private phone numbers are not stored in `location_shares`.
 - The table stores the guardian safe/relay phone snapshot only.
 - Public QR pages must hide personal information when the QR is inactive, not activated, paused, expired, or unpaid.
-- Location is sensitive information. Before full-scale production use, add service terms text explaining that location, approximate accuracy, finder contact, user-agent, and request IP may be stored for guardian response and administrator audit.
-- Real address reverse geocoding is not connected yet. The current address field is a finder-entered memo plus map links.
-- Finder contact is included in the guardian notification because the finder entered it for direct response. The public page should make this purpose clear before launch.
+- Location is sensitive information. Before full-scale production use, add service terms text explaining that coordinates, approximate accuracy, user-agent, and request IP may be stored for guardian response and administrator audit.
+- Real address reverse geocoding is not connected yet. New public shares use coordinates and generated map links without collecting a finder-written address memo.
+- The public page exposes only the guardian safe number. Guardian name, email, address, and raw phone number are not selected for the public response.
 
 ## Verification
 - `npm run build` succeeded.
@@ -125,4 +122,4 @@ Indexes:
 - QR public button, geolocation API route, DB schema, push notification, admin grid/detail screen, styling, documentation, and build verification: about 40 minutes.
 
 ## Image Generation Prompt
-Create a clean Korean civic-tech admin and public QR workflow diagram for "REAL_QR_FIND" location sharing. Show a finder scanning `/find/{QR key}`, pressing "위치공유", granting mobile location permission, and sending a guardian push notification with Kakao and Naver map links. Show the administrator left sidebar with "위치공유 관리" selected, a date/search filter, a dense grid with columns "공유일시, 대상자, 보호자, 발견자 연락처, 주소, 위도, 경도", and a right detail panel with a map preview and coordinates. Include Turso table `location_shares`, Web Push, and privacy notes that raw guardian phone numbers are not exposed. Use white work surfaces, civic blue accents, purple location pins, green successful share states, compact Korean labels, and no real personal data.
+Create a clean Korean civic-tech admin and public QR workflow diagram for "REAL_QR_FIND" location sharing. Show a finder scanning `/find/{QR key}`, seeing a large rounded-rectangle subject portrait, the subject information, guardian message/audio, and only the guardian 050 safe number. Show a single "위치공유" button with no finder phone or memo fields, followed by mobile location permission and a guardian push notification with Kakao and Naver map links. Show the administrator left sidebar with "위치공유 관리" selected, a dense history grid, and a right detail panel with a map preview and coordinates. Include Turso table `location_shares`, Web Push, and privacy notes that guardian name, email, address, and raw phone number are not exposed. Use white work surfaces, civic blue accents, purple location pins, green successful share states, compact Korean labels, and no real personal data.

@@ -312,6 +312,17 @@ Create a clean Korean system-flow infographic for the "REAL_QR_FIND" service. Us
 ### Notes
 - Use for architecture reviews, privacy explanations, and Bizcall onboarding discussions.
 
+## 2026-07-24 - Privacy-Minimized Public Subject Page
+
+### Purpose
+- Presentation visual for the simplified QR destination page after reducing guardian and finder personal-data entry.
+
+### Prompt
+Create a polished mobile Korean public QR destination screen for "REAL_QR_FIND". Show a managed subject with a large portrait photo inside a rounded rectangular frame, about 1.7 times larger than a typical avatar. Display only the subject's birth date, gender, current status, a guardian message, a "보호자 음성 재생(심신안정용)" control, and one 050 "안심번호" call link. Do not show guardian name, email, address, or raw phone number. At the bottom show one full-width blue "위치공유" button with no finder phone field and no location-description field. Use the project's civic blue and white visual system, thin borders, 8px or smaller corner radii, compact readable Korean text, no gradients, and no real personal data.
+
+### Notes
+- Use when explaining the privacy-minimized public QR experience and the reduced finder workflow.
+
 ## 2026-07-24 - Administrator Login Verification Bypass
 
 ### Purpose

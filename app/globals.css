@@ -7726,7 +7726,7 @@ button:disabled:hover {
 
 .find-profile {
   display: grid;
-  grid-template-columns: 112px minmax(0, 1fr);
+  grid-template-columns: 190px minmax(0, 1fr);
   gap: var(--space-md);
   align-items: center;
   padding: var(--space-md);
@@ -7736,13 +7736,14 @@ button:disabled:hover {
 }
 
 .find-profile-photo {
-  width: 112px;
-  aspect-ratio: 1;
+  width: 190px;
+  max-width: 100%;
+  aspect-ratio: 4 / 5;
   display: grid;
   place-items: center;
   overflow: hidden;
   border: 0.5px solid var(--c-primary-border);
-  border-radius: 50%;
+  border-radius: var(--radius-md);
   background: var(--c-info-bg);
 }
 
@@ -7774,10 +7775,13 @@ button:disabled:hover {
   overflow-wrap: anywhere;
 }
 
-.find-contact-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-sm);
+.find-safe-phone-card {
+  align-items: start;
+}
+
+.find-safe-phone-card .find-safe-phone-link,
+.find-safe-phone-card strong {
+  font-size: 1.05rem;
 }
 
 .find-action-stack {
@@ -7799,33 +7803,7 @@ button:disabled:hover {
 .find-location-share {
   display: grid;
   gap: var(--space-xs);
-  padding: var(--space-md);
-  border: 0.5px solid var(--c-border);
-  border-radius: var(--radius-md);
-  background: var(--c-bg);
-}
-
-.find-location-fields {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-xs);
-}
-
-.find-location-fields label {
-  display: grid;
-  gap: 5px;
-  color: var(--c-text);
-  font-size: 0.82rem;
-  font-weight: 800;
-}
-
-.find-location-fields label span {
-  color: var(--c-text-muted);
-  font-weight: 700;
-}
-
-.find-location-fields input {
-  min-width: 0;
+  padding: 0;
 }
 
 .find-map-link {
@@ -11260,10 +11238,13 @@ button:disabled:hover {
   .ad-location-search,
   .ad-location-summary,
   .ad-rate-form,
-  .find-location-fields,
-  .find-profile,
-  .find-contact-grid {
+  .find-profile {
     grid-template-columns: 1fr;
+  }
+
+  .find-profile-photo {
+    width: min(190px, 100%);
+    justify-self: center;
   }
 
   .admin-ad-toolbar {

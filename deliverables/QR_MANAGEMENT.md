@@ -89,9 +89,11 @@ Project: REAL_QR_FIND / zezari
 - Unknown key: shows an unregistered QR message.
 - Inactive key: shows a disabled QR message.
 - Active but unassigned key: shows a not-yet-connected QR message.
-- Active assigned key: shows the managed subject information, configured guardian response fields, guardian message/audio when present, and a `보호자에게 알리기` button.
-- The public QR page does not show the guardian's raw phone number. It shows `guardians.safe_phone` as `안심번호`, or `안심번호 준비중` if no safe number has been issued yet.
-- The notify button sends a Web Push message to the logged-in guardian's registered browser/app devices.
+- Active assigned key: shows the managed subject information, guardian message/audio when present, the safe-number contact action, and a single `위치공유` action.
+- The public QR page does not query or render the guardian's name, email, address, or raw phone number. It shows only `guardians.safe_phone` as `안심번호`, or `안심번호 준비중` if no safe number has been issued yet.
+- The former `보호자에게 알리기` button and finder contact/location-description fields have been removed.
+- `위치공유` requests the device location permission and sends only latitude, longitude, and accuracy from the browser.
+- The subject photo uses a rounded portrait frame that is approximately 1.7 times larger than the previous circular image.
 
 ## Admin Controls
 - Initial seed: 30 active QR records.
