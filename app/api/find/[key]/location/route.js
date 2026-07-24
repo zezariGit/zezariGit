@@ -37,6 +37,7 @@ export async function POST(request, { params }) {
     kakaoMapUrl: share.kakaoMapUrl,
     naverMapUrl: share.naverMapUrl,
     addressLabel: share.addressLabel,
+    finderContact: share.finderContact,
   });
 
   return NextResponse.json({

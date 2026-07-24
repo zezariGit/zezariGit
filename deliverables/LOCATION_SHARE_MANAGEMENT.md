@@ -25,7 +25,9 @@ Date: 2026-06-25
 
 ## Guardian Notification
 - Notification title: `{관리대상 이름} 발견 위치가 공유되었습니다`
-- Notification body tells the guardian to open the map.
+- Notification body displays the finder contact first and the location next:
+  - `연락처: 010-0000-0000 · 위치: 서울 송파구 ...`
+  - if the finder contact is empty, `연락처 미입력` is displayed.
 - The primary notification click URL is the Kakao map link when generated, with the Naver map link as fallback.
 - The in-app bell notification list renders URL text as clickable links and also shows a `지도 열기` action button.
 - The service worker opens external map URLs in a new browser window when the system push notification is clicked.
@@ -101,6 +103,7 @@ Indexes:
 - Public QR pages must hide personal information when the QR is inactive, not activated, paused, expired, or unpaid.
 - Location is sensitive information. Before full-scale production use, add service terms text explaining that location, approximate accuracy, finder contact, user-agent, and request IP may be stored for guardian response and administrator audit.
 - Real address reverse geocoding is not connected yet. The current address field is a finder-entered memo plus map links.
+- Finder contact is included in the guardian notification because the finder entered it for direct response. The public page should make this purpose clear before launch.
 
 ## Verification
 - `npm run build` succeeded.
