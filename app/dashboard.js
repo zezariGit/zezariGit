@@ -29,7 +29,7 @@ export default async function GuardianDashboard({
   subjects,
   subscription,
   subscriptionPlans = [],
-  adDailyRate = 0,
+  adPricing = {},
   session,
   activeTab = "dashboard",
   showMyPage = false,
@@ -147,7 +147,7 @@ export default async function GuardianDashboard({
             subjects={subjectsWithQr}
             subscription={subscription}
             subscriptionPlans={subscriptionPlans}
-            adDailyRate={adDailyRate}
+            adPricing={adPricing}
             selectedAdSubject={selectedAdSubject}
           />
         ) : isGuardianTab ? (
@@ -174,7 +174,7 @@ function DashboardTab({
   subjects,
   subscription,
   subscriptionPlans,
-  adDailyRate,
+  adPricing,
   selectedAdSubject,
 }) {
   if (!guardianComplete) {
@@ -198,7 +198,7 @@ function DashboardTab({
       {selectedAdSubject && (
         <AdCampaignModal
           subject={selectedAdSubject}
-          dailyRate={adDailyRate}
+          pricing={adPricing}
           createAction={createSubjectAdAction}
           pauseAction={pauseSubjectAdAction}
           resumeAction={resumeSubjectAdAction}

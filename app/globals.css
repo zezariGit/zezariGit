@@ -1491,7 +1491,7 @@ a {
 
 .ad-quote {
   display: grid;
-  gap: 4px;
+  gap: var(--space-sm);
   padding: var(--space-md);
   border: 0.5px solid var(--c-primary-border);
   border-radius: var(--radius-md);
@@ -1506,6 +1506,72 @@ a {
 .ad-quote span {
   color: var(--c-text-muted);
   font-size: 0.9rem;
+}
+
+.ad-quote-policy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px var(--space-sm);
+}
+
+.ad-quote-policy span {
+  padding-right: var(--space-sm);
+  border-right: 1px solid var(--c-primary-border);
+}
+
+.ad-quote-policy span:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.ad-quote dl {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+}
+
+.ad-quote dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.ad-quote dt,
+.ad-quote dd {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 0.88rem;
+}
+
+.ad-request-form > label small {
+  color: var(--c-text-muted);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.ad-fixed-date {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-muted);
+}
+
+.ad-fixed-date span {
+  color: var(--c-text);
+  font-weight: 800;
+}
+
+.ad-fixed-date strong {
+  color: var(--c-primary-dark);
+  font-size: 1rem;
+}
+
+.ad-fixed-date small {
+  color: var(--c-text-muted);
+  font-size: 0.76rem;
 }
 
 .ad-preview-form {
@@ -2059,6 +2125,137 @@ a {
 .ad-admin-page {
   display: grid;
   gap: var(--space-lg);
+}
+
+.ad-pricing-admin-page {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.ad-pricing-heading h2,
+.ad-pricing-group h2 {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 1.1rem;
+}
+
+.ad-pricing-heading p,
+.ad-pricing-group p {
+  margin: 6px 0 0;
+  color: var(--c-text-muted);
+  line-height: 1.55;
+}
+
+.ad-pricing-form {
+  display: grid;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+}
+
+.ad-pricing-group {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.8fr) minmax(420px, 1.4fr);
+  gap: var(--space-lg);
+  align-items: end;
+}
+
+.ad-pricing-inline-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.ad-pricing-inline-fields.three-columns {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ad-pricing-inline-fields label {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+  color: var(--c-text);
+  font-weight: 800;
+}
+
+.input-with-unit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  overflow: hidden;
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+}
+
+.input-with-unit input {
+  min-width: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.input-with-unit > span {
+  padding: 0 12px;
+  color: var(--c-text-muted);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.ad-pricing-example {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(300px, 0.8fr);
+  gap: var(--space-lg);
+  padding: var(--space-md) 0;
+  border-top: 1px solid var(--c-border);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.ad-pricing-example > div {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+
+.ad-pricing-example > div span {
+  color: var(--c-primary-dark);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.ad-pricing-example > div strong {
+  color: var(--c-text);
+  line-height: 1.5;
+}
+
+.ad-pricing-example dl {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.ad-pricing-example dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.ad-pricing-example dt,
+.ad-pricing-example dd {
+  margin: 0;
+  color: var(--c-text);
+}
+
+.ad-pricing-example .total {
+  padding-top: 8px;
+  border-top: 1px solid var(--c-border);
+  font-weight: 900;
+}
+
+.ad-pricing-save {
+  width: min(100%, 320px);
+  justify-self: end;
 }
 
 .ad-admin-status {
@@ -11237,7 +11434,10 @@ button:disabled:hover {
   .ad-request-form,
   .ad-location-search,
   .ad-location-summary,
-  .ad-rate-form,
+  .ad-pricing-group,
+  .ad-pricing-inline-fields,
+  .ad-pricing-inline-fields.three-columns,
+  .ad-pricing-example,
   .find-profile {
     grid-template-columns: 1fr;
   }
@@ -11263,11 +11463,18 @@ button:disabled:hover {
   .subscription-search-form,
   .subscription-date-filter,
   .ad-stat-grid,
-  .ad-rate-panel,
   .ad-search-form,
   .ad-date-filter,
   .account-shipping-info {
     grid-template-columns: 1fr;
+  }
+
+  .ad-pricing-form {
+    padding: var(--space-md);
+  }
+
+  .ad-pricing-save {
+    width: 100%;
   }
 
   .order-date-filter em,

@@ -17,6 +17,7 @@ const MENU_ITEMS = [
   { id: "coupons", label: "쿠폰 관리", href: "/admin?section=coupons", icon: "coupon" },
   { id: "products", label: "상품 관리", href: "/admin?section=products", icon: "box" },
   { id: "ads", label: "광고 관리", href: "/admin?section=ads", icon: "megaphone" },
+  { id: "ad-pricing", label: "광고결제 관리", href: "/admin?section=ad-pricing", icon: "payment" },
   { id: "missing", label: "실종신고 관리", href: "/admin?section=missing", icon: "alert" },
   { id: "locations", label: "위치공유 관리", href: "/admin?section=locations", icon: "pin" },
   { id: "notifications", label: "알림 관리", href: "/admin?section=notifications", icon: "alert" },

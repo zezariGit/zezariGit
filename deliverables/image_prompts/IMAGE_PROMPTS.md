@@ -323,6 +323,17 @@ Create a polished mobile Korean public QR destination screen for "REAL_QR_FIND".
 ### Notes
 - Use when explaining the privacy-minimized public QR experience and the reduced finder workflow.
 
+## 2026-07-24 - Advertisement Billing and Radius Pricing
+
+### Purpose
+- Presentation diagram for the administrator advertisement-payment policy and guardian price calculation.
+
+### Prompt
+Create a Korean civic-tech administrator and guardian workflow diagram for "REAL_QR_FIND" advertisement pricing. On the left, show a dark navy admin sidebar with "광고결제 관리" selected and a white pricing form containing "과금 일수 1일", "기본 금액 10,000원", "기본 광고 범위 5km", and "초과 2km당 10,000원". In the center, show the formula "과금 묶음 수 × (기본 금액 + 초과 범위 단위 수 × 추가 금액)". On the right, show a guardian mobile advertisement form with today's start date fixed, an end-date picker, map location, a 7km radius selector, and a breakdown for 2 days: period 20,000원, range 20,000원, total 40,000원. Use the existing REAL_QR_FIND style with white work surfaces, thin gray lines, civic blue and restrained purple actions, compact Korean labels, no gradients, and no real personal data.
+
+### Notes
+- Use when explaining why duration and radius produce the same amount in the application modal, database snapshot, and Toss checkout.
+
 ## 2026-07-24 - Administrator Login Verification Bypass
 
 ### Purpose

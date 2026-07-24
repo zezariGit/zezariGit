@@ -4,6 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import FormSubmitButton from "./form-submit-button";
 import ModalScrollLock from "./modal-scroll-lock";
 import { formatDateOnly } from "../lib/date-format";
+import {
+  buildAdRadiusOptions,
+  calculateAdPrice,
+  normalizeAdPricingSettings,
+} from "../lib/ad-pricing";
 
 const LEAFLET_CSS_URL = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS_URL = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
@@ -12,8 +17,6 @@ const DEFAULT_LOCATION = {
   lng: 126.978,
   label: "서울 중구 일대",
 };
-const RADIUS_OPTIONS = [1, 3, 5, 10, 20];
-
 const statusLabels = {
   active: "광고중",
   paused: "일시정지",
@@ -23,18 +26,21 @@ const statusLabels = {
 
 export default function AdCampaignModal({
   subject,
-  dailyRate,
+  pricing,
   createAction,
   pauseAction,
   resumeAction,
   endAction,
 }) {
-  const today = useMemo(() => getDateInputValue(new Date()), []);
+  const today = useMemo(() => getKstDateInputValue(), []);
+  const maximumEndDate = useMemo(() => addDaysToDateInput(today, 364), [today]);
+  const pricingSettings = useMemo(() => normalizeAdPricingSettings(pricing), [pricing]);
+  const radiusOptions = useMemo(() => buildAdRadiusOptions(pricingSettings), [pricingSettings]);
   const initialLocation = useMemo(() => getInitialLocation(subject), [subject]);
-  const [startDate, setStartDate] = useState(today);
+  const startDate = today;
   const [endDate, setEndDate] = useState(today);
   const [location, setLocation] = useState(initialLocation);
-  const [radiusKm, setRadiusKm] = useState(Number(subject?.ad_region_radius_km || 3));
+  const [radiusKm, setRadiusKm] = useState(pricingSettings.defaultRadiusKm);
   const [mapReady, setMapReady] = useState(false);
   const [mapMessage, setMapMessage] = useState("지도를 불러오고 있습니다.");
   const [step, setStep] = useState("setup");
@@ -46,18 +52,19 @@ export default function AdCampaignModal({
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const circleRef = useRef(null);
-  const quote = calculateQuote(startDate, endDate, dailyRate);
+  const quote = calculateQuote(startDate, endDate, radiusKm, pricingSettings);
   const activeAd = ["active", "paused", "ready"].includes(subject?.ad_status || "");
   const canPreview = Boolean(location.selected && quote.valid);
 
   useEffect(() => {
     setLocation(initialLocation);
-    setRadiusKm(Number(subject?.ad_region_radius_km || 3));
+    setRadiusKm(pricingSettings.defaultRadiusKm);
+    setEndDate(today);
     setStep("setup");
     setSearchQuery("");
     setSearchResults([]);
     setSearchStatus("");
-  }, [initialLocation, subject?.ad_region_radius_km]);
+  }, [initialLocation, pricingSettings.defaultRadiusKm, subject?.id, today]);
 
   useEffect(() => {
     if (!subject || activeAd || step !== "setup" || !mapContainerRef.current) return undefined;
@@ -341,35 +348,42 @@ export default function AdCampaignModal({
                     <label>
                       반경
                       <select value={radiusKm} onChange={(event) => setRadiusKm(Number(event.target.value))}>
-                        {RADIUS_OPTIONS.map((option) => (
+                        {radiusOptions.map((option) => (
                           <option value={option} key={option}>{option}km</option>
                         ))}
                       </select>
                     </label>
                   </div>
                 </section>
-                <label>
-                  시작일
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={(event) => setStartDate(event.target.value)}
-                    required
-                  />
-                </label>
+                <div className="ad-fixed-date">
+                  <span>시작일</span>
+                  <strong>{formatDate(startDate)}</strong>
+                  <small>광고는 신청 당일부터 시작합니다.</small>
+                </div>
                 <label>
                   종료일
                   <input
                     type="date"
                     value={endDate}
                     onChange={(event) => setEndDate(event.target.value)}
+                    min={today}
+                    max={maximumEndDate}
                     required
                   />
                 </label>
                 <div className="ad-quote full-field">
-                  <span>일 단가 {formatCurrency(dailyRate)}</span>
-                  <strong>{quote.valid ? formatCurrency(quote.amount) : "기간을 확인해 주세요"}</strong>
-                  <span>{quote.valid ? `${quote.days}일 기준` : "종료일은 시작일 이후여야 합니다."}</span>
+                  <div className="ad-quote-policy">
+                    <span>{pricingSettings.billingUnitDays}일당 {formatCurrency(pricingSettings.basePrice)}</span>
+                    <span>기본 반경 {pricingSettings.defaultRadiusKm}km</span>
+                    <span>초과 {pricingSettings.extraRadiusUnitKm}km당 {formatCurrency(pricingSettings.extraRadiusPrice)}</span>
+                  </div>
+                  <dl>
+                    <div><dt>광고기간</dt><dd>{quote.valid ? `${quote.days}일` : "-"}</dd></div>
+                    <div><dt>기간 기본금액</dt><dd>{formatCurrency(quote.periodAmount)}</dd></div>
+                    <div><dt>범위 추가금액</dt><dd>{formatCurrency(quote.rangeAmount)}</dd></div>
+                  </dl>
+                  <strong>{quote.valid ? `결제 예정금액 ${formatCurrency(quote.amount)}` : "기간을 확인해 주세요"}</strong>
+                  <span>{quote.valid ? `반경 ${radiusKm}km 기준` : "종료일은 오늘 이후여야 합니다."}</span>
                 </div>
                 <button type="button" className="action full-field" disabled={!canPreview} onClick={showPreview}>
                   확인
@@ -550,19 +564,17 @@ function getInitialLocation(subject) {
   };
 }
 
-function calculateQuote(startDate, endDate, dailyRate) {
+function calculateQuote(startDate, endDate, radiusKm, pricing) {
   const start = parseDate(startDate);
   const end = parseDate(endDate);
-  const rate = Number(dailyRate || 0);
   if (!start || !end || end < start) {
-    return { valid: false, days: 0, amount: 0 };
+    return { valid: false, days: 0, periodAmount: 0, rangeAmount: 0, amount: 0 };
   }
 
   const days = Math.floor((end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000)) + 1;
   return {
     valid: true,
-    days,
-    amount: days * Math.max(0, Math.floor(rate)),
+    ...calculateAdPrice({ days, radiusKm, settings: pricing }),
   };
 }
 
@@ -572,11 +584,15 @@ function parseDate(value) {
   return new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
 }
 
-function getDateInputValue(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+function getKstDateInputValue() {
+  return new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+function addDaysToDateInput(value, days) {
+  const date = parseDate(value);
+  if (!date) return value;
+  date.setUTCDate(date.getUTCDate() + Number(days || 0));
+  return date.toISOString().slice(0, 10);
 }
 
 function formatCurrency(value) {

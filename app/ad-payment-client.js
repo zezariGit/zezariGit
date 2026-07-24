@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatDateTime as formatStandardDateTime } from "../lib/date-format";
+import { calculateAdPrice } from "../lib/ad-pricing";
 
 const TOSS_SDK_URL = "https://js.tosspayments.com/v2/standard";
 
@@ -143,11 +144,11 @@ export default function AdPaymentClient({ ad, guardian }) {
         <p>선택한 기간과 범위에 따라 비용이 부과됩니다.</p>
         <dl className="ad-payment-cost-list">
           <div>
-            <dt>기간 ({Number(ad.days || 0)}일)</dt>
+            <dt>기간 ({Number(ad.days || 0)}일 / {estimate.billingUnitDays}일 단위)</dt>
             <dd>{formatCurrency(estimate.periodAmount)}</dd>
           </div>
           <div>
-            <dt>범위 (반경 {Number(ad.region_radius_km || 0)}km)</dt>
+            <dt>범위 (기본 {estimate.defaultRadiusKm}km / 선택 {Number(ad.region_radius_km || 0)}km)</dt>
             <dd>{formatCurrency(estimate.rangeAmount)}</dd>
           </div>
           <div className="total">
@@ -207,10 +208,30 @@ function buildAdEstimate(ad) {
   const amount = Math.max(0, Number(ad?.amount || 0));
   const days = Math.max(1, Number(ad?.days || 1));
   const radius = Math.max(1, Number(ad?.region_radius_km || 1));
-  const periodAmount = Math.min(amount, Math.round((amount * 0.54) / 100) * 100);
-  const rangeAmount = Math.max(0, amount - periodAmount);
+  const calculated = calculateAdPrice({
+    days,
+    radiusKm: radius,
+    settings: {
+      billing_unit_days: ad?.billing_unit_days,
+      daily_rate: ad?.daily_rate,
+      default_radius_km: ad?.default_radius_km,
+      extra_radius_unit_km: ad?.extra_radius_unit_km,
+      extra_radius_price: ad?.extra_radius_price,
+    },
+  });
+  const storedPeriodAmount = Math.max(0, Number(ad?.period_amount || 0));
+  const storedRangeAmount = Math.max(0, Number(ad?.range_amount || 0));
+  const hasStoredBreakdown = storedPeriodAmount + storedRangeAmount === amount;
+  const periodAmount = hasStoredBreakdown ? storedPeriodAmount : calculated.periodAmount;
+  const rangeAmount = hasStoredBreakdown ? storedRangeAmount : Math.max(0, amount - periodAmount);
   const reach = Math.max(1000, Math.round(days * radius * 1600 / 100) * 100);
-  return { periodAmount, rangeAmount, reach };
+  return {
+    periodAmount,
+    rangeAmount,
+    reach,
+    billingUnitDays: calculated.billingUnitDays,
+    defaultRadiusKm: calculated.defaultRadiusKm,
+  };
 }
 
 function clearAdTossWidgetContainers() {

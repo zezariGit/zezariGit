@@ -7,6 +7,7 @@ import ModalScrollLock from "../modal-scroll-lock";
 import StatusToast from "../status-toast";
 import AdminWorkspace from "./admin-workspace";
 import AdminExportButton from "./export-button";
+import AdPricingForm from "./ad-pricing-form";
 import ProductAdminCatalogForm from "./product-admin-catalog-form";
 import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
 import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
@@ -32,6 +33,7 @@ import {
   getAdminSubscriptionPlansData,
   getAdminSubjectsData,
   getAdminUsersData,
+  getAdPricingSettings,
   getQrAdminData,
   isDbAdminSession,
 } from "../../lib/db";
@@ -41,7 +43,7 @@ import {
   setGuardianAdminMemoAction,
   setGuardianAdminAction,
   syncGuardianSafePhoneAction,
-  setAdDailyRateAction,
+  setAdPricingAction,
   setProductOrderFulfillmentAction,
   setQrAdminMemoAction,
   setQrActiveAction,
@@ -92,7 +94,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "orders", "subscriptions", "ads", "missing", "locations", "notifications", "message-templates", "inquiries"].includes(resolvedSearchParams?.section)
+  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "orders", "subscriptions", "ads", "ad-pricing", "missing", "locations", "notifications", "message-templates", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -210,6 +212,7 @@ export default async function AdminPage({ searchParams }) {
   const ordersData = activeSection === "orders" ? await getAdminOrdersData(orderFilters, selectedOrderId) : null;
   const subscriptionsData = activeSection === "subscriptions" ? await getAdminSubscriptionsData(subscriptionFilters, selectedSubscriptionId) : null;
   const adsData = activeSection === "ads" ? await getAdminAdsData(adFilters, selectedAdId) : null;
+  const adPricingData = activeSection === "ad-pricing" ? await getAdPricingSettings() : null;
   const missingReportsData = activeSection === "missing" ? await getAdminMissingReportsData(missingFilters) : null;
   const locationSharesData = activeSection === "locations" ? await getAdminLocationSharesData(locationFilters, selectedLocationShareId) : null;
   const messagesData = activeSection === "notifications" ? await getAdminMessagesData(messageFilters, composeMessage ? "new" : selectedMessageId) : null;
@@ -247,6 +250,8 @@ export default async function AdminPage({ searchParams }) {
                 ? "구독 관리"
             : activeSection === "ads"
               ? "광고 관리"
+              : activeSection === "ad-pricing"
+                ? "광고결제 관리"
               : activeSection === "missing"
                 ? "실종신고 관리"
                 : activeSection === "locations"
@@ -278,7 +283,9 @@ export default async function AdminPage({ searchParams }) {
               : activeSection === "subscriptions"
                 ? "이용권 구독 상태, 기간, 결제내역과 운영 메모를 관리합니다."
             : activeSection === "ads"
-              ? "광고 일 단가를 설정하고 사용자별 광고 진행사항을 조회합니다."
+              ? "사용자별 광고 진행사항과 심사, 집행 상태를 조회합니다."
+              : activeSection === "ad-pricing"
+                ? "광고 기간과 범위에 적용할 결제 단가를 설정합니다."
               : activeSection === "missing"
                 ? "실종신고 접수 현황과 광고 상태, 발견 여부를 조회합니다."
                 : activeSection === "locations"
@@ -323,6 +330,8 @@ export default async function AdminPage({ searchParams }) {
             <SubscriptionManagementSection subscriptionsData={subscriptionsData} />
           ) : activeSection === "ads" ? (
             <AdManagementSection adsData={adsData} />
+          ) : activeSection === "ad-pricing" ? (
+            <AdPricingManagementSection setting={adPricingData} />
           ) : activeSection === "missing" ? (
             <MissingReportManagementSection missingReportsData={missingReportsData} />
           ) : activeSection === "locations" ? (
@@ -1738,8 +1747,26 @@ function OrderManagementSection({ ordersData }) {
   );
 }
 
+function AdPricingManagementSection({ setting }) {
+  return (
+    <div className="ad-pricing-admin-page">
+      <section className="admin-panel ad-pricing-heading">
+        <div>
+          <p className="intro-kicker">광고 과금 정책</p>
+          <h2>기간과 광고 범위별 가격 설정</h2>
+          <p>
+            저장한 정책은 이후 새로 신청되는 광고부터 적용됩니다. 결제금액은 서버에서 다시 계산해
+            사용자 화면의 안내 금액과 일치하는지 검증합니다.
+          </p>
+        </div>
+      </section>
+      <AdPricingForm setting={setting} action={setAdPricingAction} />
+    </div>
+  );
+}
+
 function AdManagementSection({ adsData }) {
-  const { setting, summary, regions, ads, selectedAd, selectedSpendHistory, filters } = adsData;
+  const { summary, regions, ads, selectedAd, selectedSpendHistory, filters } = adsData;
   const selectedAdReturnTo = buildAdListUrl(filters, selectedAd?.id);
   const selectedTabName = selectedAd ? `ad-detail-tab-${selectedAd.id}` : "ad-detail-tab-empty";
   const monthlyDelta = Number(summary.monthlyAmount || 0) - Number(summary.previousMonthlyAmount || 0);
@@ -1769,21 +1796,6 @@ function AdManagementSection({ adsData }) {
             </article>
           ))}
         </div>
-      </section>
-
-      <section className="admin-panel ad-rate-panel">
-        <div>
-          <h3>광고 일 단가</h3>
-          <p>{formatCurrency(setting.daily_rate)} 기준으로 사용자가 선택한 광고기간 예상 금액을 산정합니다.</p>
-        </div>
-        <form className="ad-rate-form" action={setAdDailyRateAction}>
-          <input type="hidden" name="returnTo" value={selectedAdReturnTo} />
-          <label>
-            일 단가
-            <input name="dailyRate" type="number" min="0" step="100" defaultValue={setting.daily_rate} />
-          </label>
-          <FormSubmitButton pendingText="저장중">저장</FormSubmitButton>
-        </form>
       </section>
 
       <section className="admin-panel ad-search-panel">

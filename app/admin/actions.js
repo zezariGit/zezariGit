@@ -17,7 +17,7 @@ import {
   saveAdminMessageTemplate,
   setAdminSubjectAdMemo,
   setAdminSubjectAdStatus,
-  setAdDailyRate,
+  setAdPricingSettings,
   setGuardianActive,
   setGuardianAdminMemo,
   setGuardianAdmin,
@@ -322,18 +322,18 @@ export async function setProductOrderFulfillmentAction(formData) {
   redirect(withNotice(getReturnTo(formData, "/admin?section=orders"), "배송 정보가 저장되었습니다."));
 }
 
-export async function setAdDailyRateAction(formData) {
+export async function setAdPricingAction(formData) {
   const session = await getServerSession(authOptions);
   if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
 
   try {
-    await setAdDailyRate(formData);
+    await setAdPricingSettings(formData);
     revalidatePath("/admin");
     revalidatePath("/");
   } catch (error) {
-    redirect(withNotice(getReturnTo(formData, "/admin?section=ads"), error.message || "광고 단가 저장에 실패했습니다.", "error"));
+    redirect(withNotice(getReturnTo(formData, "/admin?section=ad-pricing"), error.message || "광고 결제 설정 저장에 실패했습니다.", "error"));
   }
-  redirect(withNotice(getReturnTo(formData, "/admin?section=ads"), "광고 일 단가가 저장되었습니다."));
+  redirect(withNotice(getReturnTo(formData, "/admin?section=ad-pricing"), "광고 결제 설정이 저장되었습니다."));
 }
 
 export async function setAdminSubjectAdStatusAction(formData) {

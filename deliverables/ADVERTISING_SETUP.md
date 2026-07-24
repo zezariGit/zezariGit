@@ -19,12 +19,13 @@ Project: REAL_QR_FIND / zezari
    - selected location from the search result list, when used
    - advertising center location by clicking the map or using current device location
    - advertising radius in kilometers
-   - start date
-   - end date
+   - fixed current-date start
+   - selected end date
 5. The modal calculates:
    - inclusive advertising days
-   - daily rate from admin settings
-   - estimated total amount
+   - billing-day blocks from admin settings
+   - included default radius and extra-radius units
+   - period amount, range amount, and total amount
 6. The guardian selects `확인`.
 7. The modal changes to a missing-person advertisement preview:
    - managed subject photo
@@ -49,8 +50,8 @@ Project: REAL_QR_FIND / zezari
    - `광고끝내기`
 
 ## Admin Flow
-1. Admin opens `/admin?section=ads`.
-2. Admin can update the advertising daily unit price.
+1. Admin opens `/admin?section=ad-pricing` to configure billing-day and radius pricing.
+2. Admin opens `/admin?section=ads` to manage advertisement progress and Meta operations.
 3. Admin can search and filter advertisement progress:
    - search by advertisement ID, managed subject, guardian, phone, or email
    - filter by all, approval waiting, advertising, paused, or expired
@@ -77,6 +78,10 @@ Project: REAL_QR_FIND / zezari
 - Current row:
   - `id = default`
   - `daily_rate`
+  - `billing_unit_days`
+  - `default_radius_km`
+  - `extra_radius_unit_km`
+  - `extra_radius_price`
   - `currency = KRW`
 
 ### `subject_ads`
@@ -97,6 +102,11 @@ Project: REAL_QR_FIND / zezari
   - `toss_order_id`: Toss order ID used for advertisement payment
   - `payment_key`: Toss payment key after successful confirmation
   - `paid_at`: advertisement payment completion timestamp
+- Pricing snapshot fields preserve the amount shown when the advertisement was created:
+  - billing unit and base price
+  - default radius and extra-radius unit/price
+  - period and range amount breakdown
+  - pricing version
 
 ## Toss Payments Advertisement Checkout
 - Client component: `app/ad-payment-client.js`

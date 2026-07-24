@@ -6216,3 +6216,37 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Privacy review, public-page implementation, responsive styling, verification, documentation, and deployment: about 25 minutes.
+
+## 2026-07-24 KST - Advertisement Payment Pricing Management
+
+### User Request
+- Add an administrator `광고결제 관리` menu.
+- Configure a price per selected billing-day unit.
+- Configure a default advertising radius and an extra price per radius unit above the default.
+- Fix guardian advertisement start date to today and let the guardian select only the end date.
+- Recalculate and explain the price after location and radius selection.
+
+### Reflected Work
+- Added a dedicated admin pricing screen with billing-day, base-price, default-radius, extra-radius unit, and extra-radius price fields.
+- Added a shared pure pricing module used by the guardian modal, server advertisement creation, and Toss checkout breakdown.
+- Implemented `billing blocks × (base price + extra radius units × extra price)`.
+- Fixed start date to current KST on the server and limited the advertising period to 365 days.
+- Generated guardian radius select options from the administrator's default radius and extra unit.
+- Added period/range breakdowns to the application modal and checkout page.
+- Added pricing snapshots and payment-preparation amount verification for new advertisements.
+- Migrated Turso to schema version `21`.
+
+### Verification
+- `npm run build` succeeded.
+- Formula test: 2 days, 7km, 1-day/10,000 KRW, 5km default, 2km/10,000 KRW returned 40,000 KRW.
+- Turso schema version and all new `ad_settings`/`subject_ads` pricing columns were verified.
+- Default stored policy is 1 day, 10,000 KRW, 5km default, and 10,000 KRW per extra 2km.
+
+### Deliverables
+- `deliverables/AD_PRICING_MANAGEMENT.md`
+- `deliverables/ADVERTISING_SETUP.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- Advertisement pricing image-generation prompt accumulated.
+
+### Time Spent
+- Pricing analysis, database migration, administrator/user UI, server validation, checkout integration, testing, documentation, and deployment: about 45 minutes.
