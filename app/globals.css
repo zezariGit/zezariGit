@@ -8324,16 +8324,19 @@ button:disabled:hover {
 }
 
 .bracelet-preview-card {
-  min-height: 150px;
   place-items: center;
+  align-content: start;
   text-align: center;
-  background: var(--c-primary-light);
+  background: var(--c-surface);
 }
 
 .bracelet-preview-card img {
-  width: min(100%, 260px);
-  height: 96px;
-  object-fit: contain;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  display: block;
+  object-fit: initial;
+  border-radius: var(--radius-sm);
 }
 
 .bracelet-preview-card > span:first-child {
@@ -8767,13 +8770,24 @@ button:disabled:hover {
 }
 
 .product-design-admin-thumb.detail {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: auto;
+  min-height: 120px;
+  height: auto;
+  overflow: visible;
+  align-content: start;
 }
 
 .product-design-admin-thumb img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.product-design-admin-thumb.detail img {
+  height: auto;
+  max-height: none;
+  display: block;
+  object-fit: initial;
 }
 
 .product-design-admin-thumb > span {

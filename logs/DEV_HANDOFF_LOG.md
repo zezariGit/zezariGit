@@ -6056,3 +6056,23 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Production data diagnosis, visibility improvement, verification, and deployment: about 15 minutes.
+
+## 2026-07-24 KST - Product Design Detail Image Natural Ratio
+
+### User Request
+- Product design detail-page images are often very tall.
+- Stop shrinking them into a fixed preview frame and display them according to the uploaded image ratio.
+
+### Root Cause
+- The guardian product preview forced detail images into `height: 96px`.
+- The administrator detail-image preview forced a `4 / 3` aspect-ratio frame and stretched the image to the frame height.
+
+### Reflected Work
+- Kept product and design selection thumbnails in their existing fixed-size frames.
+- Changed only detail-page images to fill the available width and use automatic height.
+- Removed the short fixed-height user preview and the administrator `4 / 3` detail frame.
+- Long vertical detail images now expand the page/card vertically without cropping or compressing their aspect ratio.
+- Updated `deliverables/PRODUCT_DESIGN_CATALOG.md`.
+
+### Time Spent
+- Source analysis, CSS separation, responsive verification, documentation, and deployment: about 20 minutes.

@@ -39,6 +39,8 @@
 ## Admin Layout Notes
 - Product cards are aligned to the top of the product-management grid.
 - A product with many design rows can grow vertically without stretching the internal layout of the other product cards in the same row.
+- Product and design selection images keep their compact fixed thumbnail frames.
+- Detail-page image previews do not use a fixed aspect-ratio frame. They follow the available card width and expand vertically using the uploaded image's original aspect ratio.
 
 ## User Flow
 1. Guardian opens `/shop`.
@@ -48,6 +50,11 @@
 5. Preview step shows the selected design detail image if uploaded.
 6. Checkout stores the selected `design_id`.
 7. Admin orders and guardian billing history show the selected design name.
+
+## Detail Image Display
+- A long vertical detail-page image is displayed at the available page width with automatic height.
+- The full detail image remains visible without cropping or being compressed into a short preview frame.
+- Responsive width prevents the original image from overflowing narrow mobile screens while preserving its aspect ratio.
 
 ## Image Generation Prompt
 Create a Korean mobile commerce UI mockup for a QR safety product shop. Show four product categories and, inside one category, a row of animal-shaped design thumbnails, each with a unique design image and a detailed product preview page. Use a restrained public-service style with white cards, civic blue accents, compact Korean labels, and clear checkout progression from product selection to design preview to payment.
