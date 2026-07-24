@@ -11,6 +11,7 @@ Date: 2026-07-24
 - Fix the guardian advertisement start date to the current Korean date.
 - Let the guardian choose only the end date, map location, and advertising radius.
 - Display the same price breakdown on the application modal and Toss checkout page.
+- Configure Meta execution budget independently from the guardian payment amount.
 
 ## Admin Screen
 - URL: `/admin?section=ad-pricing`
@@ -20,6 +21,9 @@ Date: 2026-07-24
   - `기본 광고 범위`: numeric radius from 1km to 80km
   - `초과 범위 단위`: select box, 1km to 20km
   - `단위별 추가 금액`: numeric KRW input
+  - `Meta 일 기본예산`: numeric KRW input
+  - `Meta 초과 반경 단위별 일 추가예산`: numeric KRW input
+  - `수도권/광역시·세종/일반지역 가중치`: percentage inputs
 - The form shows a live example and the calculation formula before saving.
 - Saved settings apply only to advertisements created afterward. Existing advertisement amounts remain unchanged.
 
@@ -64,7 +68,7 @@ Example:
 - Toss payment preparation recalculates pricing-version 2 advertisements and rejects a mismatched stored amount.
 
 ## Database
-- Schema version: `21`
+- Schema version: `24`
 - `ad_settings` adds:
   - `billing_unit_days`
   - `default_radius_km`
@@ -80,11 +84,16 @@ Example:
   - `period_amount`
   - `range_amount`
   - `pricing_version`
+  - `meta_daily_budget`
+  - `meta_budget_amount`
+  - `meta_region_tier`
+  - `meta_region_multiplier_percent`
+  - `meta_budget_version`
 
 ## Verification
 - Next.js production build succeeded.
 - Formula test returned 40,000 KRW for 2 days and 7km under the example policy.
-- Turso schema version `21` and all pricing columns were verified.
+- Turso schema version `24` and all payment/Meta budget columns were verified.
 - Default persisted policy was verified as 1 day / 10,000 KRW / 5km / 2km / 10,000 KRW.
 
 ## Image Generation Prompt

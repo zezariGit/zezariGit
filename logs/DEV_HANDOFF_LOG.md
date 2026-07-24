@@ -6507,3 +6507,44 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Service DB lookup, Meta Graph status comparison, Ads Manager verification, and documentation: about 10 minutes.
+
+## 2026-07-24 KST - City Labels, Separate Meta Budget, and Automatic Publication
+
+### User Request
+- Replace raw GPS coordinate labels with an approximate city/district name.
+- Publish a paid guardian advertisement without waiting for administrator approval.
+- Keep the guardian payment as service revenue and calculate the Meta budget separately from location, radius, and duration.
+
+### Implementation
+- Extended `/api/maps/search` with reverse geocoding for map clicks and current-location selection.
+- New advertisement region labels store Korean city/district text without appended coordinates.
+- Added `lib/meta-ad-budget.js` with configurable region-tier, radius, and duration calculation.
+- Added separate guardian payment and Meta budget fields to `ad_settings` and `subject_ads`.
+- Updated Meta ad-set creation to use only `meta_budget_amount` as `lifetime_budget`.
+- Added payment-complete automatic publication with a five-minute claim guard.
+- Payment remains completed when Meta fails; the advertisement becomes `meta_publish_failed`.
+- Renamed the administrator action to `광고발행 재시도` and retained it as recovery tooling.
+- Updated guardian checkout and administrator grids to distinguish payment revenue from Meta budget.
+
+### Database
+- Increased schema version from `23` to `24`.
+- Migrated the production Turso schema.
+- Preserved existing advertisement budgets as `legacy` snapshots without changing Meta IDs or delivery status.
+- Reverse-geocoded six existing coordinate-style advertisement labels to Korean city/district text without changing their targeting coordinates.
+
+### Verification
+- `npm run build` passed.
+- Nominatim forward and reverse Korean city labels passed.
+- Meta budget formula cases for Seoul, Busan, and Chuncheon passed.
+- Production Turso schema and defaults were verified.
+- Existing production advertisement region labels no longer expose coordinate text.
+- No real payment or new Meta delivery was created during this change.
+
+### Deliverables
+- Added `deliverables/META_AD_AUTOMATION.md`.
+- Updated `deliverables/META_AD_PUBLISHING.md`.
+- Updated `deliverables/AD_PRICING_MANAGEMENT.md`.
+- Updated `deliverables/DATABASE_SCHEMA.md`.
+
+### Time Spent
+- Analysis, implementation, migration, formula/API checks, and documentation: about 35 minutes.

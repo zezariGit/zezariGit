@@ -1,6 +1,10 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../../lib/auth";
-import { getGuardianAdCheckoutData, markSubjectAdPaid } from "../../../../../lib/db";
+import {
+  getGuardianAdCheckoutData,
+  markSubjectAdPaid,
+  publishPaidSubjectAd,
+} from "../../../../../lib/db";
 import { confirmWidgetPayment } from "../../../../../lib/toss-payments";
 
 export const dynamic = "force-dynamic";
@@ -24,12 +28,14 @@ export default async function TossAdSuccessPage({ searchParams }) {
   try {
     const { ad } = await getGuardianAdCheckoutData(session, adId);
     if (ad.paid_at && ad.toss_order_id === orderId) {
+      const publication = await publishPaidSubjectAd(adId);
       return (
         <AdPaymentResult
           title="광고 결제가 완료되었습니다"
-          message={adminPass
-            ? "관리자 결제패스로 테스트 광고 결제가 저장되었습니다. 관리자 승인 후 Meta 광고 등록을 진행할 수 있습니다."
-            : "이미 결제가 완료된 광고입니다. 관리자 승인 후 Meta 광고 등록을 진행합니다."}
+          message={publicationMessage(publication, {
+            alreadyPaid: true,
+            adminPass,
+          })}
           sourceLabel={adminPass ? "관리자 테스트 결제" : "Toss Payments"}
         />
       );
@@ -49,16 +55,30 @@ export default async function TossAdSuccessPage({ searchParams }) {
       tossOrderId: orderId,
       paymentMethod: payment.method || "결제위젯",
     });
+    const publication = await publishPaidSubjectAd(adId);
 
     return (
       <AdPaymentResult
         title="광고 결제가 완료되었습니다"
-        message="광고 소재와 결제 정보가 저장되었습니다. 관리자 승인 후 Meta 광고 등록을 진행합니다."
+        message={publicationMessage(publication)}
       />
     );
   } catch (error) {
     return <AdPaymentResult title="광고 결제 처리에 실패했습니다" message={error.message || "잠시 후 다시 시도해 주세요."} />;
   }
+}
+
+function publicationMessage(publication, { alreadyPaid = false, adminPass = false } = {}) {
+  if (publication?.published) {
+    return adminPass
+      ? "관리자 결제패스가 완료되었고 Meta 광고가 자동 발행되었습니다."
+      : "결제와 동시에 Meta 광고가 자동 발행되었습니다. Meta 심사와 노출 현황은 광고내역에서 확인할 수 있습니다.";
+  }
+  if (publication?.status === "preparing") {
+    return "결제는 완료되었으며 Meta 광고를 자동 발행하고 있습니다. 잠시 후 광고내역에서 상태를 확인해 주세요.";
+  }
+  const prefix = alreadyPaid ? "결제 완료 내역을 확인했습니다." : "결제는 정상적으로 완료되었습니다.";
+  return `${prefix} Meta 자동 발행은 완료되지 않아 관리자가 발행 재시도를 진행할 수 있습니다.`;
 }
 
 function AdPaymentResult({ title, message, sourceLabel = "Toss Payments" }) {

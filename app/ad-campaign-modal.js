@@ -10,6 +10,11 @@ import {
   calculateAdPrice,
   normalizeAdPricingSettings,
 } from "../lib/ad-pricing";
+import {
+  calculateMetaAdBudget,
+  metaRegionTierLabel,
+  normalizeMetaAdBudgetSettings,
+} from "../lib/meta-ad-budget";
 
 const LEAFLET_CSS_URL = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS_URL = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
@@ -36,6 +41,7 @@ export default function AdCampaignModal({
   const today = useMemo(() => getKstDateInputValue(), []);
   const maximumEndDate = useMemo(() => addDaysToDateInput(today, 364), [today]);
   const pricingSettings = useMemo(() => normalizeAdPricingSettings(pricing), [pricing]);
+  const metaBudgetSettings = useMemo(() => normalizeMetaAdBudgetSettings(pricing), [pricing]);
   const radiusOptions = useMemo(() => buildAdRadiusOptions(pricingSettings), [pricingSettings]);
   const initialLocation = useMemo(() => getInitialLocation(subject), [subject]);
   const startDate = today;
@@ -49,6 +55,7 @@ export default function AdCampaignModal({
   const [searchResults, setSearchResults] = useState([]);
   const [searchStatus, setSearchStatus] = useState("");
   const [searching, setSearching] = useState(false);
+  const [resolvingLocation, setResolvingLocation] = useState(false);
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markerRef = useRef(null);
@@ -56,10 +63,20 @@ export default function AdCampaignModal({
   const creativeRef = useRef(null);
   const creativeInputRef = useRef(null);
   const capturedSubmitRef = useRef(false);
+  const locationRequestRef = useRef(0);
   const [capturePending, setCapturePending] = useState(false);
   const quote = calculateQuote(startDate, endDate, radiusKm, pricingSettings);
+  const regionLabel = location.selected ? cleanRegionLabel(location.label) : "";
+  const metaBudget = calculateMetaAdBudget({
+    days: quote.days || 1,
+    radiusKm,
+    region: regionLabel,
+    defaultRadiusKm: pricingSettings.defaultRadiusKm,
+    extraRadiusUnitKm: pricingSettings.extraRadiusUnitKm,
+    settings: metaBudgetSettings,
+  });
   const activeAd = ["active", "paused", "ready"].includes(subject?.ad_status || "");
-  const canPreview = Boolean(location.selected && quote.valid);
+  const canPreview = Boolean(location.selected && regionLabel && quote.valid && !resolvingLocation);
 
   async function prepareCreativeImage(event) {
     if (capturedSubmitRef.current) {
@@ -104,6 +121,7 @@ export default function AdCampaignModal({
     setSearchQuery("");
     setSearchResults([]);
     setSearchStatus("");
+    setResolvingLocation(false);
   }, [initialLocation, pricingSettings.defaultRadiusKm, subject?.id, today]);
 
   useEffect(() => {
@@ -127,7 +145,7 @@ export default function AdCampaignModal({
           .addTo(map);
 
         map.on("click", (event) => {
-          updateLocationFromMap(event.latlng.lat, event.latlng.lng, "지도 선택 위치");
+          updateLocationFromMap(event.latlng.lat, event.latlng.lng);
         });
 
         mapRef.current = map;
@@ -190,17 +208,48 @@ export default function AdCampaignModal({
 
   if (!subject) return null;
 
-  function updateLocationFromMap(lat, lng, label) {
+  async function updateLocationFromMap(lat, lng, label = "") {
     const nextLat = Number(lat);
     const nextLng = Number(lng);
     if (!Number.isFinite(nextLat) || !Number.isFinite(nextLng)) return;
+    const requestId = locationRequestRef.current + 1;
+    locationRequestRef.current = requestId;
 
     setLocation({
       selected: true,
       lat: Number(nextLat.toFixed(6)),
       lng: Number(nextLng.toFixed(6)),
-      label,
+      label: cleanRegionLabel(label) || "지역 확인 중",
     });
+
+    if (label) {
+      setResolvingLocation(false);
+      return;
+    }
+
+    setResolvingLocation(true);
+    setMapMessage("선택한 위치의 도시를 확인하고 있습니다.");
+    try {
+      const response = await fetch(`/api/maps/search?lat=${encodeURIComponent(nextLat)}&lng=${encodeURIComponent(nextLng)}`, {
+        cache: "no-store",
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data?.message || "도시 정보를 확인하지 못했습니다.");
+      if (locationRequestRef.current !== requestId) return;
+      const nextLabel = cleanRegionLabel(data?.result?.label || data?.result?.address);
+      if (!nextLabel) throw new Error("도시 정보를 확인하지 못했습니다.");
+      setLocation((current) => ({
+        ...current,
+        label: nextLabel,
+      }));
+      setMapMessage(`${nextLabel}이 광고 중심 지역으로 설정되었습니다.`);
+    } catch (error) {
+      if (locationRequestRef.current !== requestId) return;
+      setLocation((current) => ({ ...current, label: "" }));
+      setMapMessage(`${error.message || "도시 정보를 확인하지 못했습니다."} 지역 검색으로 다시 선택해 주세요.`);
+    } finally {
+      if (locationRequestRef.current === requestId) setResolvingLocation(false);
+    }
   }
 
   async function searchMapLocation(event) {
@@ -258,8 +307,7 @@ export default function AdCampaignModal({
     setMapMessage("현재 위치를 확인하고 있습니다.");
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        updateLocationFromMap(position.coords.latitude, position.coords.longitude, "현재 위치 기준");
-        setMapMessage("현재 위치가 광고 중심으로 설정되었습니다.");
+        updateLocationFromMap(position.coords.latitude, position.coords.longitude);
       },
       () => {
         setMapMessage("위치 권한을 허용하지 않았거나 현재 위치를 확인할 수 없습니다.");
@@ -271,10 +319,6 @@ export default function AdCampaignModal({
       },
     );
   }
-
-  const regionLabel = location.selected
-    ? `${location.label} (${location.lat.toFixed(5)}, ${location.lng.toFixed(5)})`
-    : "";
 
   function showPreview() {
     if (!location.selected) {
@@ -384,7 +428,11 @@ export default function AdCampaignModal({
                     {!mapReady && <span className="ad-location-map-placeholder">{mapMessage}</span>}
                   </div>
                   <div className="ad-location-summary">
-                    <span>{location.selected ? regionLabel : "선택된 위치가 없습니다."}</span>
+                    <span>
+                      {resolvingLocation
+                        ? "도시 정보를 확인하고 있습니다."
+                        : regionLabel || "지역 검색 또는 지도를 이용해 위치를 선택해 주세요."}
+                    </span>
                     <label>
                       반경
                       <select value={radiusKm} onChange={(event) => setRadiusKm(Number(event.target.value))}>
@@ -421,9 +469,14 @@ export default function AdCampaignModal({
                     <div><dt>광고기간</dt><dd>{quote.valid ? `${quote.days}일` : "-"}</dd></div>
                     <div><dt>기간 기본금액</dt><dd>{formatCurrency(quote.periodAmount)}</dd></div>
                     <div><dt>범위 추가금액</dt><dd>{formatCurrency(quote.rangeAmount)}</dd></div>
+                    <div><dt>Meta 집행예산</dt><dd>{quote.valid ? formatCurrency(metaBudget.amount) : "-"}</dd></div>
                   </dl>
                   <strong>{quote.valid ? `결제 예정금액 ${formatCurrency(quote.amount)}` : "기간을 확인해 주세요"}</strong>
-                  <span>{quote.valid ? `반경 ${radiusKm}km 기준` : "종료일은 오늘 이후여야 합니다."}</span>
+                  <span>
+                    {quote.valid
+                      ? `반경 ${radiusKm}km · ${metaRegionTierLabel(metaBudget.regionTier)} 기준, Meta 예산은 결제금액과 별도로 자동 책정`
+                      : "종료일은 오늘 이후여야 합니다."}
+                  </span>
                 </div>
                 <button type="button" className="action full-field" disabled={!canPreview} onClick={showPreview}>
                   확인
@@ -447,6 +500,7 @@ export default function AdCampaignModal({
                   endDate={endDate}
                   regionLabel={regionLabel}
                   radiusKm={radiusKm}
+                  metaBudget={metaBudget}
                 />
                 <div className="ad-preview-actions full-field">
                   <button type="button" className="plain-button" onClick={() => setStep("setup")}>
@@ -470,7 +524,7 @@ export default function AdCampaignModal({
   );
 }
 
-function MissingAdPreview({ creativeRef, subject, quote, startDate, endDate, regionLabel, radiusKm }) {
+function MissingAdPreview({ creativeRef, subject, quote, startDate, endDate, regionLabel, radiusKm, metaBudget }) {
   const photoSrc = subjectPhotoSrc(subject);
   const age = calculateAge(subject?.birth_date);
   const gender = formatGender(subject?.gender);
@@ -546,6 +600,7 @@ function MissingAdPreview({ creativeRef, subject, quote, startDate, endDate, reg
       <div className="ad-preview-meta">
         <span>기간: {formatDate(startDate)} ~ {formatDate(endDate)} / {quote.days}일</span>
         <span>지역: {regionLabel} / 반경 {radiusKm}km</span>
+        <span>Meta 예상 집행예산: {formatCurrency(metaBudget.amount)} / 보호자 결제금액과 별도</span>
         {qrTargetUrl ? (
           <a href={qrTargetUrl} target="_blank" rel="noreferrer">
             관리대상정보 페이지 열기
@@ -597,7 +652,7 @@ function getInitialLocation(subject) {
       selected: true,
       lat,
       lng,
-      label: subject?.ad_region || "저장된 광고 위치",
+      label: cleanRegionLabel(subject?.ad_region) || "저장된 광고 위치",
     };
   }
 
@@ -605,6 +660,12 @@ function getInitialLocation(subject) {
     selected: false,
     ...DEFAULT_LOCATION,
   };
+}
+
+function cleanRegionLabel(value) {
+  return String(value || "")
+    .replace(/\s*\(-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?\)\s*$/, "")
+    .trim();
 }
 
 function calculateQuote(startDate, endDate, radiusKm, pricing) {
@@ -655,6 +716,11 @@ function formatAdLocation(subject) {
 function formatMetaStatus(status) {
   if (status === "campaign_active") return "캠페인 활성";
   if (status === "campaign_paused") return "캠페인 일시정지";
+  if (status === "ad_active") return "광고 활성";
+  if (status === "ad_paused") return "광고 일시정지";
+  if (status === "meta_publish_queued") return "자동 발행 대기";
+  if (status === "meta_publish_preparing") return "자동 발행 중";
+  if (status === "meta_publish_failed") return "발행 재시도 필요";
   if (status === "meta_api_access_blocked") return "Meta 권한 승인 필요";
   if (status === "meta_api_pending") return "연동 대기";
   return status || "연동 대기";

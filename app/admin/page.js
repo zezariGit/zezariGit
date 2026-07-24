@@ -1756,7 +1756,8 @@ function AdPricingManagementSection({ setting }) {
           <h2>기간과 광고 범위별 가격 설정</h2>
           <p>
             저장한 정책은 이후 새로 신청되는 광고부터 적용됩니다. 결제금액은 서버에서 다시 계산해
-            사용자 화면의 안내 금액과 일치하는지 검증합니다.
+            사용자 화면의 안내 금액과 일치하는지 검증합니다. Meta 집행예산은 보호자 결제금액과
+            분리해 지역, 반경과 기간 기준으로 별도 계산합니다.
           </p>
         </div>
       </section>
@@ -1776,8 +1777,8 @@ function AdManagementSection({ adsData }) {
     { label: "심사반려", value: `${formatMetricValue(summary.reviewRejected)}건`, icon: "blocked", note: "확인 필요" },
     { label: "중단", value: `${formatMetricValue(summary.paused)}건`, icon: "blocked", note: "일시정지" },
     { label: "만료", value: `${formatMetricValue(summary.ended)}건`, icon: "check", note: "종료됨" },
-    { label: "월 광고비", value: formatCurrency(summary.monthlyAmount), icon: "money", note: `전월 대비 ${monthlyDelta >= 0 ? "+" : ""}${formatCurrency(monthlyDelta)}` },
-    { label: "년 광고비", value: formatCurrency(summary.yearlyAmount), icon: "money", note: "올해 누적" },
+    { label: "월 광고매출", value: formatCurrency(summary.monthlyAmount), icon: "money", note: `전월 대비 ${monthlyDelta >= 0 ? "+" : ""}${formatCurrency(monthlyDelta)}` },
+    { label: "년 광고매출", value: formatCurrency(summary.yearlyAmount), icon: "money", note: "올해 누적" },
   ];
 
   return (
@@ -1865,7 +1866,7 @@ function AdManagementSection({ adsData }) {
               returnTo={selectedAdReturnTo}
               disabled={!selectedAd || !["ready", "active", "paused"].includes(selectedAd.status)}
             >
-              광고승인
+              광고발행 재시도
             </AdStatusActionButton>
             <AdStatusActionButton
               ad={selectedAd}
@@ -1902,8 +1903,8 @@ function AdManagementSection({ adsData }) {
                 <span role="columnheader">심사상태</span>
                 <span role="columnheader">광고지역</span>
                 <span role="columnheader">광고기간</span>
-                <span role="columnheader">일예산</span>
-                <span role="columnheader">총예산</span>
+                <span role="columnheader">Meta 일예산</span>
+                <span role="columnheader">Meta 총예산</span>
                 <span role="columnheader">광고비(%)</span>
                 <span role="columnheader">활성화 일시</span>
                 <span role="columnheader">관리</span>
@@ -1922,8 +1923,8 @@ function AdManagementSection({ adsData }) {
                   <em role="cell" className={`ad-review-pill ${adReviewClass(ad.review_status)}`}>{adReviewStatusLabel(ad.review_status)}</em>
                   <span role="cell">{ad.region || "지역 미입력"}</span>
                   <time role="cell">{formatDate(ad.start_date)} ~ {formatDate(ad.end_date)}</time>
-                  <span role="cell">{formatCurrency(ad.daily_rate)}</span>
-                  <span role="cell">{formatCurrency(ad.amount)}</span>
+                  <span role="cell">{formatCurrency(ad.meta_daily_budget)}</span>
+                  <span role="cell">{formatCurrency(ad.meta_budget_amount)}</span>
                   <span role="cell">{adBudgetProgressPercent(ad)}%</span>
                   <time role="cell">{formatRecentDateTime(ad.updated_at)}</time>
                   <span className="admin-row-detail" role="cell">상세보기</span>
@@ -1959,15 +1960,17 @@ function AdManagementSection({ adsData }) {
                 <div className="guardian-detail-tabs">
                   <label htmlFor={`${selectedTabName}-base`}>기본 정보</label>
                   <label htmlFor={`${selectedTabName}-performance`}>광고 성과</label>
-                  <label htmlFor={`${selectedTabName}-spend`}>지출 내역</label>
+                  <label htmlFor={`${selectedTabName}-spend`}>비용 내역</label>
                 </div>
                 <div className="guardian-tab-panels">
                   <section className="guardian-tab-panel">
                     <dl className="guardian-detail-list">
                       <div><dt>광고상태</dt><dd>{adStatusLabel(selectedAd.status)}</dd></div>
                       <div><dt>심사상태</dt><dd>{adReviewStatusLabel(selectedAd.review_status)}</dd></div>
-                      <div><dt>일예산</dt><dd>{formatCurrency(selectedAd.daily_rate)}</dd></div>
-                      <div><dt>총예산(%)</dt><dd>{formatCurrency(selectedAd.amount)} ({adBudgetProgressPercent(selectedAd)}% 소진)</dd></div>
+                      <div><dt>보호자 결제금액</dt><dd>{formatCurrency(selectedAd.amount)}</dd></div>
+                      <div><dt>Meta 일예산</dt><dd>{formatCurrency(selectedAd.meta_daily_budget)}</dd></div>
+                      <div><dt>Meta 총예산(%)</dt><dd>{formatCurrency(selectedAd.meta_budget_amount)} ({adBudgetProgressPercent(selectedAd)}% 소진)</dd></div>
+                      <div><dt>Meta 지역 가중치</dt><dd>{metaRegionTierAdminLabel(selectedAd.meta_region_tier)} {Number(selectedAd.meta_region_multiplier_percent || 100)}%</dd></div>
                       <div><dt>광고지역</dt><dd>{selectedAd.region || "-"}</dd></div>
                       <div><dt>지도 반경</dt><dd className="inline-scroll-value">{formatAdTargetLocation(selectedAd)}</dd></div>
                       <div><dt>광고기간</dt><dd>{formatDate(selectedAd.start_date)} ~ {formatDate(selectedAd.end_date)}</dd></div>
@@ -2013,7 +2016,8 @@ function AdManagementSection({ adsData }) {
                           <span role="columnheader">지출일시</span>
                           <span role="columnheader">광고기간</span>
                           <span role="columnheader">광고지역</span>
-                          <span role="columnheader">광고금액</span>
+                          <span role="columnheader">보호자 결제</span>
+                          <span role="columnheader">Meta 예산</span>
                           <span role="columnheader">결제수단</span>
                           <span role="columnheader">영수증</span>
                         </div>
@@ -2023,6 +2027,7 @@ function AdManagementSection({ adsData }) {
                             <span role="cell">{formatDate(item.start_date)} ~ {formatDate(item.end_date)}</span>
                             <span role="cell">{item.region || "-"}</span>
                             <span role="cell">{formatCurrency(item.amount)}</span>
+                            <span role="cell">{formatCurrency(item.meta_budget_amount)}</span>
                             <span role="cell">광고 결제 준비</span>
                             <Link role="cell" href={`/admin?section=payments&paymentLedgerQuery=${encodeURIComponent(formatAdNumber(item))}`}>다음</Link>
                           </div>
@@ -3284,7 +3289,8 @@ function GuardianManagementSection({ adminData }) {
                           <div className="guardian-detail-row"><strong>광고상태</strong><span>{adStatusLabel(ad.status)}</span></div>
                           <div className="guardian-detail-row"><strong>광고기간</strong><span>{formatDate(ad.start_date)} ~ {formatDate(ad.end_date)}</span></div>
                           <div className="guardian-detail-row"><strong>광고지역</strong><span>{ad.region || "-"}</span></div>
-                          <div className="guardian-detail-row"><strong>일 예산</strong><span>{formatCurrency(ad.daily_rate)}</span></div>
+                          <div className="guardian-detail-row"><strong>Meta 일 예산</strong><span>{formatCurrency(ad.meta_daily_budget)}</span></div>
+                          <div className="guardian-detail-row"><strong>보호자 결제금액</strong><span>{formatCurrency(ad.amount)}</span></div>
                           <div className="guardian-detail-row"><strong>총 예산</strong><span>{formatCurrency(ad.amount)}</span></div>
                           <div className="guardian-detail-row"><strong>클릭수</strong><span>{formatMetricValue(ad.click_count)}</span></div>
                         </article>
@@ -3614,7 +3620,8 @@ function SubjectManagementSection({ adminSubjectsData, selectedSubjectQrImage })
                           <div className="guardian-detail-row"><strong>광고상태</strong><span>{adStatusLabel(ad.status)}</span></div>
                           <div className="guardian-detail-row"><strong>광고기간</strong><span>{formatDate(ad.start_date)} ~ {formatDate(ad.end_date)}</span></div>
                           <div className="guardian-detail-row"><strong>광고지역</strong><span>{ad.region || "-"}</span></div>
-                          <div className="guardian-detail-row"><strong>일 예산</strong><span>{formatCurrency(ad.daily_rate)}</span></div>
+                          <div className="guardian-detail-row"><strong>Meta 일 예산</strong><span>{formatCurrency(ad.meta_daily_budget)}</span></div>
+                          <div className="guardian-detail-row"><strong>보호자 결제금액</strong><span>{formatCurrency(ad.amount)}</span></div>
                           <div className="guardian-detail-row"><strong>총 예산</strong><span>{formatCurrency(ad.amount)}</span></div>
                           <div className="guardian-detail-row"><strong>도달수</strong><span>{formatMetricValue(ad.click_count)}</span></div>
                         </article>
@@ -4183,8 +4190,10 @@ function adExportRows(ads = []) {
     심사상태: adReviewStatusLabel(ad.review_status),
     광고지역: ad.region || "지역 미입력",
     광고기간: `${formatDate(ad.start_date)} ~ ${formatDate(ad.end_date)}`,
-    일예산: formatCurrency(ad.daily_rate),
-    총예산: formatCurrency(ad.amount),
+    보호자결제금액: formatCurrency(ad.amount),
+    Meta일예산: formatCurrency(ad.meta_daily_budget),
+    Meta총예산: formatCurrency(ad.meta_budget_amount),
+    Meta지역가중치: `${metaRegionTierAdminLabel(ad.meta_region_tier)} ${Number(ad.meta_region_multiplier_percent || 100)}%`,
     광고비소진율: `${adBudgetProgressPercent(ad)}%`,
     클릭수: formatMetricValue(ad.click_count),
     활성화일시: formatRecentDateTime(ad.updated_at),
@@ -4565,12 +4574,9 @@ function formatAdNumber(ad) {
 }
 
 function formatAdTargetLocation(ad) {
-  const lat = Number(ad?.region_latitude);
-  const lng = Number(ad?.region_longitude);
   const radius = Number(ad?.region_radius_km || 0);
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return "지도 위치 미설정";
   const radiusLabel = radius > 0 ? `반경 ${radius}km` : "반경 미설정";
-  return `${radiusLabel} / ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  return ad?.region ? `${ad.region} / ${radiusLabel}` : radiusLabel;
 }
 
 function formatAdMetaStatus(status) {
@@ -4578,6 +4584,7 @@ function formatAdMetaStatus(status) {
   if (status === "ad_paused") return "광고 일시정지";
   if (status === "ad_ended_paused") return "광고 종료 처리";
   if (status === "meta_publish_preparing") return "Meta 발행 준비";
+  if (status === "meta_publish_queued") return "Meta 자동 발행 대기";
   if (status === "meta_publish_failed") return "Meta 발행 실패";
   if (status === "campaign_active") return "캠페인 활성";
   if (status === "campaign_paused") return "캠페인 일시정지";
@@ -4586,6 +4593,13 @@ function formatAdMetaStatus(status) {
   if (status === "meta_api_access_blocked") return "Meta 권한 승인 필요";
   if (status === "meta_api_pending") return "연동 대기";
   return status || "연동 대기";
+}
+
+function metaRegionTierAdminLabel(tier) {
+  if (tier === "capital") return "수도권";
+  if (tier === "metro") return "광역시·세종";
+  if (tier === "local") return "일반지역";
+  return "기존 정책";
 }
 
 function formatPaymentNumber(payment) {
@@ -4895,11 +4909,11 @@ function adReviewClass(status) {
 
 function displayAdSpentAmount(ad) {
   const spent = Number(ad?.display_spent_amount || ad?.spent_amount || 0);
-  return spent > 0 ? spent : Number(ad?.amount || 0);
+  return spent > 0 ? spent : Number(ad?.meta_budget_amount || 0);
 }
 
 function adBudgetProgressPercent(ad) {
-  const amount = Number(ad?.amount || 0);
+  const amount = Number(ad?.meta_budget_amount || 0);
   if (amount <= 0) return 0;
   const spent = Number(ad?.display_spent_amount || ad?.spent_amount || 0);
   if (spent > 0) return Math.max(0, Math.min(100, Math.round((spent / amount) * 100)));

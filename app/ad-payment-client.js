@@ -166,7 +166,7 @@ export default function AdPaymentClient({ ad, guardian, adminPaymentPassEnabled 
     <>
       <section className="ad-payment-card">
         <h2>비용 안내</h2>
-        <p>선택한 기간과 범위에 따라 비용이 부과됩니다.</p>
+        <p>선택한 기간과 범위에 따라 보호자 결제금액이 부과됩니다.</p>
         <dl className="ad-payment-cost-list">
           <div>
             <dt>기간 ({Number(ad.days || 0)}일 / {estimate.billingUnitDays}일 단위)</dt>
@@ -177,10 +177,17 @@ export default function AdPaymentClient({ ad, guardian, adminPaymentPassEnabled 
             <dd>{formatCurrency(estimate.rangeAmount)}</dd>
           </div>
           <div className="total">
-            <dt>총 광고금액</dt>
+            <dt>보호자 결제금액</dt>
             <dd>{formatCurrency(amount)}</dd>
           </div>
+          <div>
+            <dt>Meta 집행예산</dt>
+            <dd>{formatCurrency(ad.meta_budget_amount)}</dd>
+          </div>
         </dl>
+        <p className="ad-payment-budget-note">
+          Meta 집행예산은 지역, 반경과 기간에 따라 별도로 책정되며 보호자 결제금액과 직접 연동되지 않습니다.
+        </p>
       </section>
 
       <section className="ad-payment-reach">
@@ -193,8 +200,8 @@ export default function AdPaymentClient({ ad, guardian, adminPaymentPassEnabled 
         <h2>안내사항</h2>
         <ul>
           <li>선택한 광고 기간과 지역 내 노출을 목표로 진행되며, 광고 노출은 Meta 심사 및 운영 상황에 따라 달라질 수 있습니다.</li>
-          <li>광고 결제 후에는 관리자 승인과 Meta 광고 등록 준비를 거쳐 노출됩니다.</li>
-          <li>모든 광고는 보호자 및 관리대상 정보 확인 후 승인됩니다.</li>
+          <li>결제가 완료되면 관리자 승인 대기 없이 Meta 광고 발행을 자동으로 시작합니다.</li>
+          <li>Meta 권한 또는 심사 오류로 자동 발행이 실패하면 관리자 화면에서 발행을 재시도합니다.</li>
         </ul>
       </section>
 

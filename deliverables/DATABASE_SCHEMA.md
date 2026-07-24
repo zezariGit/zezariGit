@@ -253,6 +253,11 @@ Stores advertisement requests and status by managed subject.
 | `range_amount` | INTEGER | Additional radius portion of the charge |
 | `pricing_version` | INTEGER | Pricing calculation version; new policy uses `2` |
 | `amount` | INTEGER | `period_amount + range_amount` |
+| `meta_daily_budget` | INTEGER | Independently calculated Meta daily budget |
+| `meta_budget_amount` | INTEGER | Meta lifetime budget; never copied from a new guardian payment |
+| `meta_region_tier` | TEXT | `capital`, `metro`, `local`, or legacy compatibility value |
+| `meta_region_multiplier_percent` | INTEGER | Region multiplier snapshot |
+| `meta_budget_version` | INTEGER | Meta budget calculation version |
 | `currency` | TEXT | Currency, currently `KRW` |
 | `payment_method` | TEXT | Toss payment method after advertisement checkout |
 | `toss_order_id` | TEXT | Toss order ID used for advertisement checkout |
@@ -332,7 +337,9 @@ Stores the browser-rendered advertisement poster separately so advertisement lis
 - Logged-in guardians can pause, resume, or end only their own subject advertisements.
 - Admin users can edit advertisement billing and radius pricing from `광고결제 관리`.
 - Admin users can list advertisement progress by guardian and managed subject.
-- Meta API fields are reserved but external Meta calls are not connected yet.
+- Paid advertisements are automatically submitted through the Meta Marketing API.
+- Meta publication uses `meta_budget_amount`, while `amount` remains guardian payment revenue.
+- Failed automatic publication preserves the payment and can be retried from the administrator advertisement screen.
 - Admin users can list QR location-share history by subject, guardian, finder contact, address memo, and share date range.
 
 ## Upload Rules

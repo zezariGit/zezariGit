@@ -374,3 +374,14 @@ Create a Korean civic-tech system flow diagram for "REAL_QR_FIND" Meta missing-p
 
 ### Notes
 - Use when presenting the difference between verified Meta account access and the remaining Facebook Page identity requirement.
+
+## 2026-07-24 - Automatic Meta Publication and Budget Separation
+
+### Purpose
+- Explain how guardian revenue, Meta execution budget, city targeting, and automatic publication are separated.
+
+### Prompt
+Create a Korean civic-tech system flow diagram for "REAL_QR_FIND" advertisement automation. On the left, show a guardian selecting "서울특별시 강남구 논현1동", a 7km radius, and a 2-day period, then paying a clearly labeled "보호자 결제금액". In the center, show the server storing that payment as service revenue and separately calculating "Meta 집행예산" with the formula "(일 기본예산 + 초과 반경 예산) × 기간 × 지역 가중치", producing 14,400원 for the example. Show latitude and longitude stored in a small protected database field only for targeting, while the visible region remains a Korean city label. On the right, show automatic Meta object creation immediately after payment: image upload, campaign, ad set, creative, ad, and activation. Add a recovery path where a failed API call preserves the completed payment, records "meta_publish_failed", and enables an administrator button labeled "광고발행 재시도". Use white work surfaces, civic blue, restrained purple, thin gray connectors, compact Korean labels, 8px or smaller corner radii, no gradients, and no real personal or credential data.
+
+### Notes
+- Use when presenting why customer revenue and platform media spend are different accounting values.
