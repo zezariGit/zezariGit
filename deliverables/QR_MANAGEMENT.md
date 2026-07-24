@@ -22,6 +22,9 @@ Project: REAL_QR_FIND / zezari
    - all/matched/unmatched
    - all/active/inactive
 5. Admin can activate or deactivate each QR.
+   - An assigned QR with an active subscription starts a QR-specific hold timer when deactivated.
+   - Reactivation within 24 hours does not change the subscription period.
+   - Reactivation after 24 hours extends the subscription end by completed inactive days.
 6. Admin can manually assign, change, or clear a QR-to-subject match.
    - Instead of a full select box, unmatched QR cards show one `매칭대상 조회` button.
    - The button opens one modal popup for guardian/subject search.
@@ -69,6 +72,11 @@ Project: REAL_QR_FIND / zezari
   - `lifecycle_status`: `in_use`, `unused`, `discarded`
   - `discarded_at`
   - `admin_memo`
+  - `subscription_hold_started_at`
+  - `subscription_hold_subscription_id`
+  - `subscription_hold_total_days`
+  - `subscription_hold_last_days`
+  - `subscription_hold_last_ended_at`
 
 ## URL Rule
 - Production base URL:

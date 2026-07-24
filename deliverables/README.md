@@ -18,6 +18,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `ADMIN_SETUP.md`: admin page access, guardian activation, and subject lookup behavior.
 - `UI_STYLE_GUIDE.md`: gov-style design base and future page styling rules.
 - `QR_MANAGEMENT.md`: QR generation, unique URL strings, admin activation, and public find URL behavior.
+- `QR_SUBSCRIPTION_HOLD.md`: subject-level QR activation controls, 24-hour grace rule, and subscription end-date credit logic.
 - `TOSS_PAYMENTS_SETUP.md`: Toss Payments subscription payment foundation and callback flow.
 - `PREPAID_PASS_PAYMENT.md`: one-time Toss payment, QR-based pass activation, renewal, pause/resume, expiry, and privacy rules.
 - `PUSH_NOTIFICATION_SETUP.md`: guardian browser push registration and QR find-page notification flow.

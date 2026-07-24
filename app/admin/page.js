@@ -3531,9 +3531,34 @@ function SubjectManagementSection({ adminSubjectsData, selectedSubjectQrImage })
                         <div className="guardian-detail-row"><strong>QR 상태</strong><span>{qrAdminStateLabel(selectedSubject)}</span></div>
                         <div className="guardian-detail-row"><strong>발급일</strong><span>{formatRecentDateTime(selectedSubject.qr_updated_at)}</span></div>
                         <div className="guardian-detail-row"><strong>활성화 시점</strong><span>{formatRecentDateTime(selectedSubject.qr_activated_at)}</span></div>
+                        <div className="guardian-detail-row"><strong>기간 보정 시작</strong><span>{formatRecentDateTime(selectedSubject.qr_subscription_hold_started_at)}</span></div>
+                        <div className="guardian-detail-row"><strong>누적 보정일</strong><span>{formatMetricValue(selectedSubject.qr_subscription_hold_total_days)}일</span></div>
                         <div className="guardian-detail-row"><strong>최근 수정일</strong><span>{formatRecentDateTime(selectedSubject.qr_updated_at)}</span></div>
                       </div>
                     </article>
+                    {selectedSubject.qr_id && (
+                      <div className="subject-qr-toggle-control">
+                        <div>
+                          <strong>QR 서비스 상태 변경</strong>
+                          <p>
+                            {subscription?.status === "active"
+                              ? "비활성화 후 24시간을 초과하면 재활성화 시 완료 일수만큼 구독 종료일이 연장됩니다."
+                              : "현재 활성 구독이 없어 QR 상태만 변경됩니다."}
+                          </p>
+                        </div>
+                        <form action={setQrActiveAction}>
+                          <input type="hidden" name="qrId" value={selectedSubject.qr_id} />
+                          <input type="hidden" name="active" value={Number(selectedSubject.qr_is_active || 0) === 1 ? "0" : "1"} />
+                          <input type="hidden" name="returnTo" value={buildSubjectAdminUrl(filters, selectedSubject.id)} />
+                          <FormSubmitButton
+                            className={Number(selectedSubject.qr_is_active || 0) === 1 ? "plain-button" : "activate-button"}
+                            pendingText={Number(selectedSubject.qr_is_active || 0) === 1 ? "비활성화중" : "활성화중"}
+                          >
+                            {Number(selectedSubject.qr_is_active || 0) === 1 ? "QR 비활성화" : "QR 활성화"}
+                          </FormSubmitButton>
+                        </form>
+                      </div>
+                    )}
                   </section>
 
                   <section className="guardian-tab-panel subject-ads-panel">
@@ -3793,6 +3818,8 @@ function QrManagementSection({ qrData, qrItems }) {
                       <div><dt>생성일</dt><dd>{formatRecentDateTime(selectedQr.created_at)}</dd></div>
                       <div><dt>활성화일</dt><dd>{formatRecentDateTime(selectedQr.activated_at)}</dd></div>
                       <div><dt>만료일</dt><dd>{formatRecentDateTime(selectedQr.subscription_ends_at)}</dd></div>
+                      <div><dt>기간 보정 시작</dt><dd>{formatRecentDateTime(selectedQr.subscription_hold_started_at)}</dd></div>
+                      <div><dt>누적 보정일</dt><dd>{formatMetricValue(selectedQr.subscription_hold_total_days)}일</dd></div>
                       <div><dt>QR 번호</dt><dd><span className="inline-scroll-value">{selectedQr.code || "-"}</span></dd></div>
                       <div><dt>고유키</dt><dd><span className="inline-scroll-value">{selectedQr.public_key || "-"}</span></dd></div>
                       <div><dt>대상자정보페이지</dt><dd><a className="inline-scroll-value" href={selectedQr.target_url} target="_blank" rel="noreferrer">{selectedQr.target_url}</a></dd></div>

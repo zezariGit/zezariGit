@@ -5593,6 +5593,35 @@ textarea:focus {
   align-items: center;
 }
 
+.subject-qr-toggle-control {
+  display: grid;
+  gap: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 0.5px solid var(--c-border);
+}
+
+.subject-qr-toggle-control > div {
+  display: grid;
+  gap: 4px;
+}
+
+.subject-qr-toggle-control strong {
+  color: var(--c-text);
+  font-size: 0.86rem;
+}
+
+.subject-qr-toggle-control p {
+  margin: 0;
+  color: var(--c-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.subject-qr-toggle-control form,
+.subject-qr-toggle-control button {
+  width: 100%;
+}
+
 .subject-qr-preview {
   display: grid;
   place-items: center;

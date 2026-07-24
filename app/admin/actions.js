@@ -76,13 +76,25 @@ export async function setQrActiveAction(formData) {
   const session = await getServerSession(authOptions);
   if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
 
+  let result;
   try {
-    await setQrActive(formData);
+    result = await setQrActive(formData);
     revalidatePath("/admin");
   } catch (error) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), error.message || "QR 상태 변경에 실패했습니다.", "error"));
   }
-  redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), "QR 상태가 수정되었습니다."));
+  const message = !result?.changed
+    ? "QR 상태가 이미 요청한 상태입니다."
+    : !result.active && result.holdStarted
+      ? "QR이 비활성화되었습니다. 24시간 초과 시 구독기간 보정을 시작합니다."
+      : !result.active
+        ? "QR이 비활성화되었습니다."
+        : Number(result.creditedDays || 0) > 0
+          ? `QR이 활성화되었습니다. 비활성화 ${result.creditedDays}일이 구독기간에 반영되었습니다.`
+          : Number(result.holdElapsedMs || 0) > 0
+            ? "QR이 활성화되었습니다. 24시간 이내 비활성화는 구독기간에 포함하지 않았습니다."
+            : "QR이 활성화되었습니다.";
+  redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), message));
 }
 
 export async function setQrLifecycleAction(formData) {

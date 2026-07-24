@@ -6076,3 +6076,40 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Source analysis, CSS separation, responsive verification, documentation, and deployment: about 20 minutes.
+
+## 2026-07-24 KST - QR Deactivation Subscription Period Credit
+
+### User Request
+- Let administrators activate or deactivate each subject QR from subject management.
+- When an active subscription QR is inactive, preserve the inactive days by extending the subscription period.
+- Ignore temporary inactive periods of one day or less.
+
+### Architecture Decision
+- `subscriptions` is guardian-level and one guardian can have multiple subjects.
+- Changing the whole subscription status to `paused` would block every subject QR owned by that guardian.
+- The implementation therefore records a QR-specific hold timer while leaving the guardian subscription active.
+
+### Reflected Work
+- Increased DB schema version to `19`.
+- Added five QR hold fields for start, owning subscription, accumulated days, last credited days, and last completion time.
+- Added deterministic hold-day calculation and end-date extension helpers.
+- Deactivation starts timing only for an assigned QR with an active unexpired subscription.
+- Reactivation credits `0` days through exactly 24 hours, then credits completed 24-hour days.
+- Added idempotency conditions so repeated activation cannot extend the same hold twice.
+- Added QR activation controls and hold status to the subject-management QR tab.
+- Added the hold status to QR-management details and subject activity history.
+- QR discard, subject deletion, unmatching, and reassignment clear hold ownership data.
+- Created `deliverables/QR_SUBSCRIPTION_HOLD.md` and updated related deliverables.
+
+### Verification
+- Boundary calculation tests passed:
+  - 23:59 = 0 days
+  - 24:00 = 0 days
+  - 24:00:01 = 1 day
+  - 47:00 = 1 day
+  - 48:00 = 2 days
+- `npm run build` succeeded.
+- `git diff --check` succeeded.
+
+### Time Spent
+- Data-model analysis, implementation, concurrency guard, UI, tests, documentation, and deployment: about 55 minutes.
