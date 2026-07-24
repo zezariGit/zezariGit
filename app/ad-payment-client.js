@@ -6,7 +6,7 @@ import { calculateAdPrice } from "../lib/ad-pricing";
 
 const TOSS_SDK_URL = "https://js.tosspayments.com/v2/standard";
 
-export default function AdPaymentClient({ ad, guardian }) {
+export default function AdPaymentClient({ ad, guardian, adminPaymentPassEnabled = false }) {
   const [sdkReady, setSdkReady] = useState(false);
   const [widgetStatus, setWidgetStatus] = useState("idle");
   const [loading, setLoading] = useState(false);
@@ -137,6 +137,31 @@ export default function AdPaymentClient({ ad, guardian }) {
     }
   }
 
+  async function passPayment() {
+    if (!adminPaymentPassEnabled || paid) return;
+    if (!window.confirm("실제 결제 없이 관리자 테스트 광고를 결제완료 처리할까요?")) return;
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/payments/toss/ad/prepare", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ adId: ad.id, adminPass: true }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.message || "광고 결제패스 처리에 실패했습니다.");
+      if (!data.adminPass || !data.redirectUrl) throw new Error("결제패스 완료 주소를 확인할 수 없습니다.");
+      window.location.href = data.redirectUrl;
+    } catch (error) {
+      setMessage(error.message || "광고 결제패스 처리에 실패했습니다.");
+      setLoading(false);
+    }
+  }
+
   return (
     <>
       <section className="ad-payment-card">
@@ -190,14 +215,30 @@ export default function AdPaymentClient({ ad, guardian }) {
         )}
       </section>
 
-      <button
-        className="ad-payment-button"
-        type="button"
-        onClick={pay}
-        disabled={paid || loading || widgetStatus !== "ready"}
-      >
-        {paid ? "결제완료" : loading ? "결제 준비중" : widgetStatus !== "ready" ? "결제수단 준비중" : `${formatCurrency(amount)} 결제하기`}
-      </button>
+      <div className="payment-action-stack">
+        <button
+          className="ad-payment-button"
+          type="button"
+          onClick={pay}
+          disabled={paid || loading || widgetStatus !== "ready"}
+        >
+          {paid ? "결제완료" : loading ? "결제 준비중" : widgetStatus !== "ready" ? "결제수단 준비중" : `${formatCurrency(amount)} 결제하기`}
+        </button>
+        {adminPaymentPassEnabled && !paid && (
+          <button
+            className="admin-payment-pass-button"
+            type="button"
+            onClick={passPayment}
+            disabled={loading}
+          >
+            {loading ? "처리중" : "결제패스"}
+          </button>
+        )}
+      </div>
+
+      {adminPaymentPassEnabled && !paid && (
+        <p className="admin-payment-pass-note">관리자 테스트 전용 · 실제 Toss 결제는 발생하지 않습니다.</p>
+      )}
 
       {message && <p className="shop-message" role="status">{message}</p>}
     </>

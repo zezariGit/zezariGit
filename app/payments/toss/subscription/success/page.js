@@ -16,6 +16,7 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
   const orderId = String(params?.orderId || "").trim();
   const amount = Number(params?.amount || 0);
   const freeOrder = String(params?.free || "") === "1";
+  const adminPass = String(params?.adminPass || "") === "1";
 
   if (!session) {
     return <PaymentResult title="로그인이 필요합니다" message="이용권 결제 완료 처리를 위해 다시 로그인해 주세요." />;
@@ -33,7 +34,9 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
     return (
       <ShopComplete
         title="주문이 완료되었습니다!"
-        message="이미 결제가 완료된 주문입니다. 상품 수령 후 QR 코드를 활성화해 주세요."
+        message={adminPass
+          ? "관리자 결제패스로 테스트 구독 주문이 완료되었습니다. 상품 수령 후 QR 코드를 활성화해 주세요."
+          : "이미 결제가 완료된 주문입니다. 상품 수령 후 QR 코드를 활성화해 주세요."}
         order={productOrder}
       />
     );

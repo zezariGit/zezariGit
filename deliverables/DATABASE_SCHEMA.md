@@ -4,6 +4,7 @@ Project: REAL_QR_FIND / zezari
 
 ## Status
 - Implemented in Turso.
+- Current schema version: `22`.
 
 ## Tables
 
@@ -201,6 +202,7 @@ Stores product selections and standalone purchase requests.
 | `payment_method` | TEXT | Selected Toss payment method, currently `CARD` |
 | `toss_order_id` | TEXT | Toss order ID used for payment request |
 | `payment_key` | TEXT | Toss payment key after successful payment |
+| `is_test_payment` | INTEGER | `1` for an admin payment-pass test transaction; excluded from real revenue totals |
 | `amount` | INTEGER | Expected payment amount |
 | `status` | TEXT | `payment_pending`, `paid`, `paid_waiting_activation`, or `activated` |
 | `paid_at` | TEXT | Payment completion timestamp |
@@ -252,6 +254,7 @@ Stores advertisement requests and status by managed subject.
 | `payment_method` | TEXT | Toss payment method after advertisement checkout |
 | `toss_order_id` | TEXT | Toss order ID used for advertisement checkout |
 | `payment_key` | TEXT | Toss payment key after successful confirmation |
+| `is_test_payment` | INTEGER | `1` for an admin payment-pass test transaction; excluded from real revenue totals |
 | `paid_at` | TEXT | Advertisement payment completion timestamp |
 | `status` | TEXT | `ready`, `active`, `paused`, `ended` |
 | `meta_campaign_id` | TEXT | Reserved Meta API campaign identifier |
@@ -300,6 +303,8 @@ Stores advertisement requests and status by managed subject.
 - Subscription is marked active only after server-side Toss billing API succeeds.
 - Logged-in guardians can pause/resume their own subscription service state.
 - Admin users can edit 1/3/6-month subscription option prices.
+- Admin users can bypass Toss approval from product, subscription, and advertisement checkout screens for functional testing.
+- Admin payment-pass requests are authorized again on the server, complete the normal downstream state transition, and are excluded from real revenue totals.
 - Logged-in guardians can open an advertisement modal per managed subject.
 - Advertisement request amount is calculated from administrator billing-day, base-radius, and extra-radius settings.
 - Advertisement start date is fixed to the current KST date; guardians choose the end date.

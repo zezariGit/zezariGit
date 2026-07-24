@@ -13,6 +13,7 @@ export default async function TossProductSuccessPage({ searchParams }) {
   const orderId = String(params?.orderId || "").trim();
   const amount = Number(params?.amount || 0);
   const freeOrder = String(params?.free || "") === "1";
+  const adminPass = String(params?.adminPass || "") === "1";
 
   if (!session) {
     return <ShopComplete title="로그인이 필요합니다" message="상품 결제 완료 처리를 위해 다시 로그인해 주세요." />;
@@ -27,7 +28,15 @@ export default async function TossProductSuccessPage({ searchParams }) {
     return <ShopComplete title="주문 정보를 찾을 수 없습니다" message="다시 상품 선택 화면에서 결제를 시작해 주세요." />;
   }
   if (["paid", "paid_waiting_activation", "activated"].includes(order.status)) {
-    return <ShopComplete title="주문이 완료되었습니다!" message="이미 결제가 완료된 주문입니다." order={order} />;
+    return (
+      <ShopComplete
+        title="주문이 완료되었습니다!"
+        message={adminPass
+          ? "관리자 결제패스로 테스트 주문과 결제 완료 상태가 저장되었습니다."
+          : "이미 결제가 완료된 주문입니다."}
+        order={order}
+      />
+    );
   }
   if (order.order_type !== "standalone" || order.toss_order_id !== orderId || Number(order.amount) !== amount) {
     return <ShopComplete title="결제 정보가 일치하지 않습니다" message="주문번호와 결제금액을 다시 확인해 주세요." />;

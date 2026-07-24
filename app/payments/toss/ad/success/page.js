@@ -12,6 +12,7 @@ export default async function TossAdSuccessPage({ searchParams }) {
   const paymentKey = String(params?.paymentKey || "").trim();
   const orderId = String(params?.orderId || "").trim();
   const amount = Number(params?.amount || 0);
+  const adminPass = String(params?.adminPass || "") === "1";
 
   if (!session) {
     return <AdPaymentResult title="로그인이 필요합니다" message="광고 결제 완료 처리를 위해 다시 로그인해 주세요." />;
@@ -23,7 +24,15 @@ export default async function TossAdSuccessPage({ searchParams }) {
   try {
     const { ad } = await getGuardianAdCheckoutData(session, adId);
     if (ad.paid_at && ad.toss_order_id === orderId) {
-      return <AdPaymentResult title="광고 결제가 완료되었습니다" message="이미 결제가 완료된 광고입니다. 관리자 승인 후 Meta 광고 등록을 진행합니다." />;
+      return (
+        <AdPaymentResult
+          title="광고 결제가 완료되었습니다"
+          message={adminPass
+            ? "관리자 결제패스로 테스트 광고 결제가 저장되었습니다. 관리자 승인 후 Meta 광고 등록을 진행할 수 있습니다."
+            : "이미 결제가 완료된 광고입니다. 관리자 승인 후 Meta 광고 등록을 진행합니다."}
+          sourceLabel={adminPass ? "관리자 테스트 결제" : "Toss Payments"}
+        />
+      );
     }
     if (ad.toss_order_id !== orderId || Number(ad.amount) !== amount) {
       throw new Error("광고 결제 정보가 일치하지 않습니다.");
@@ -52,12 +61,12 @@ export default async function TossAdSuccessPage({ searchParams }) {
   }
 }
 
-function AdPaymentResult({ title, message }) {
+function AdPaymentResult({ title, message, sourceLabel = "Toss Payments" }) {
   return (
     <main className="payment-result-page">
       <section className="payment-result-panel">
         <div className="complete-mark" aria-hidden="true">✓</div>
-        <p className="intro-kicker">Toss Payments</p>
+        <p className="intro-kicker">{sourceLabel}</p>
         <h1>{title}</h1>
         <p>{message}</p>
         <a className="primary-button" href="/account/ads">

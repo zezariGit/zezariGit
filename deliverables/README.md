@@ -20,6 +20,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `QR_MANAGEMENT.md`: QR generation, unique URL strings, admin activation, and public find URL behavior.
 - `QR_SUBSCRIPTION_HOLD.md`: subject-level QR activation controls, 24-hour grace rule, and subscription end-date credit logic.
 - `TOSS_PAYMENTS_SETUP.md`: Toss Payments subscription payment foundation and callback flow.
+- `ADMIN_PAYMENT_PASS.md`: admin-only product, subscription, and advertisement payment bypass with server authorization and test-revenue isolation.
 - `PREPAID_PASS_PAYMENT.md`: one-time Toss payment, QR-based pass activation, renewal, pause/resume, expiry, and privacy rules.
 - `PUSH_NOTIFICATION_SETUP.md`: guardian browser push registration and QR find-page notification flow.
 - `PUBLIC_GUARDIAN_VOICE_PLAYBACK.md`: public QR page guardian voice playback button, states, access conditions, and privacy notes.

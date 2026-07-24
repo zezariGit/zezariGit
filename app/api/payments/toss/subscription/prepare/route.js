@@ -1,7 +1,12 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "../../../../../../lib/auth";
-import { saveProductOrderDraft } from "../../../../../../lib/db";
+import { isAdminSession } from "../../../../../../lib/admin";
+import {
+  completePrepaidSubscriptionPurchase,
+  isDbAdminSession,
+  saveProductOrderDraft,
+} from "../../../../../../lib/db";
 import {
   createTossCustomerKey,
   getTossCallbackUrls,
@@ -17,6 +22,11 @@ export async function POST(request) {
 
   const body = await request.json().catch(() => ({}));
   const planMonths = Number(body?.planMonths || 1);
+  const adminPass = body.adminPass === true;
+  if (adminPass && !(isAdminSession(session) || (await isDbAdminSession(session)))) {
+    return NextResponse.json({ message: "관리자만 결제패스를 사용할 수 있습니다." }, { status: 403 });
+  }
+
   try {
     if (!body?.productId) throw new Error("이용권과 함께 구매할 상품을 선택해 주세요.");
     const productOrder = await saveProductOrderDraft(session, {
@@ -35,6 +45,31 @@ export async function POST(request) {
     const configured = isTossWidgetConfigured();
     const { successUrl, failUrl } = getTossCallbackUrls(productOrder.id);
     const freeSuccessUrl = `${successUrl}${successUrl.includes("?") ? "&" : "?"}free=1&orderId=${encodeURIComponent(productOrder.tossOrderId)}&amount=0`;
+    if (adminPass) {
+      const paymentKey = `admin-pass-subscription-${productOrder.id}`;
+      await completePrepaidSubscriptionPurchase({
+        guardianId: productOrder.guardian.id,
+        productOrderId: productOrder.id,
+        payment: {
+          orderId: productOrder.tossOrderId,
+          paymentKey,
+          method: "관리자 결제패스",
+          status: "DONE",
+          isTestPayment: true,
+        },
+      });
+      return NextResponse.json({
+        adminPass: true,
+        productOrderId: productOrder.id,
+        orderId: productOrder.tossOrderId,
+        amount: productOrder.amount,
+        redirectUrl: buildAdminPassSuccessUrl(successUrl, {
+          paymentKey,
+          orderId: productOrder.tossOrderId,
+          amount: productOrder.amount,
+        }),
+      });
+    }
 
     return NextResponse.json({
       configured,
@@ -57,4 +92,17 @@ export async function POST(request) {
   } catch (error) {
     return NextResponse.json({ message: error.message || "이용권 결제 준비에 실패했습니다." }, { status: 400 });
   }
+}
+
+function buildAdminPassSuccessUrl(successUrl, { paymentKey, orderId, amount }) {
+  const url = new URL(successUrl);
+  url.searchParams.set("adminPass", "1");
+  url.searchParams.set("orderId", orderId);
+  url.searchParams.set("amount", String(Number(amount || 0)));
+  if (Number(amount || 0) === 0) {
+    url.searchParams.set("free", "1");
+  } else {
+    url.searchParams.set("paymentKey", paymentKey);
+  }
+  return url.toString();
 }

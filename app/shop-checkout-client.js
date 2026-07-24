@@ -6,7 +6,15 @@ import { formatDateOnly } from "../lib/date-format";
 
 const TOSS_SDK_URL = "https://js.tosspayments.com/v2/standard";
 
-export default function ShopCheckoutClient({ product, subjects = [], plans = [], subscription = null, guardian = null, coupons = [] }) {
+export default function ShopCheckoutClient({
+  product,
+  subjects = [],
+  plans = [],
+  subscription = null,
+  guardian = null,
+  coupons = [],
+  adminPaymentPassEnabled = false,
+}) {
   const [step, setStep] = useState("configure");
   const [quantity, setQuantity] = useState(1);
   const [subjectId, setSubjectId] = useState(subjects[0]?.id || "");
@@ -213,7 +221,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
     setStep("order");
   };
 
-  const startSubscription = async () => {
+  const startSubscription = async (adminPass = false) => {
     const response = await fetch("/api/payments/toss/subscription/prepare", {
       method: "POST",
       headers: {
@@ -230,12 +238,17 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
         shippingAddress,
         shippingAddressDetail,
         paymentMethod: "WIDGET",
+        adminPass,
       }),
     });
     const data = await response.json();
 
     if (!response.ok) {
       throw new Error(data?.message || "이용권 결제 준비에 실패했습니다.");
+    }
+    if (data.adminPass) {
+      window.location.href = data.redirectUrl;
+      return;
     }
     if (data.freeOrder) {
       window.location.href = data.redirectUrl || "/?tab=dashboard";
@@ -260,7 +273,7 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
     });
   };
 
-  const startStandalonePayment = async () => {
+  const startStandalonePayment = async (adminPass = false) => {
     const response = await fetch("/api/payments/toss/product/prepare", {
       method: "POST",
       headers: {
@@ -276,12 +289,17 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
         shippingAddress,
         shippingAddressDetail,
         paymentMethod: "WIDGET",
+        adminPass,
       }),
     });
     const data = await response.json();
 
     if (!response.ok) {
       throw new Error(data?.message || "상품 결제 준비에 실패했습니다.");
+    }
+    if (data.adminPass) {
+      window.location.href = data.redirectUrl;
+      return;
     }
     if (data.freeOrder) {
       window.location.href = data.redirectUrl || "/?tab=dashboard";
@@ -329,6 +347,25 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
       await startSubscription();
     } catch (error) {
       setMessage(error.message || "결제를 시작하지 못했습니다.");
+      setLoading(false);
+    }
+  };
+
+  const passPayment = async () => {
+    if (!adminPaymentPassEnabled || !validateSelection()) return;
+    if (!window.confirm("실제 결제 없이 관리자 테스트 거래를 결제완료 처리할까요?")) return;
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      if (mode === "standalone") {
+        await startStandalonePayment(true);
+        return;
+      }
+      await startSubscription(true);
+    } catch (error) {
+      setMessage(error.message || "결제패스 처리에 실패했습니다.");
       setLoading(false);
     }
   };
@@ -409,14 +446,29 @@ export default function ShopCheckoutClient({ product, subjects = [], plans = [],
             discountAmount={discountAmount}
             amount={paymentAmount}
           />
-          <button
-            className="shop-next-button"
-            type="button"
-            onClick={pay}
-            disabled={loading || widgetStatus !== "ready"}
-          >
-            {loading ? "결제 준비중" : freePayment ? "쿠폰으로 주문완료" : widgetStatus !== "ready" ? "결제수단 준비중" : "결제하기"}
-          </button>
+          <div className="payment-action-stack">
+            <button
+              className="shop-next-button"
+              type="button"
+              onClick={pay}
+              disabled={loading || widgetStatus !== "ready"}
+            >
+              {loading ? "결제 준비중" : freePayment ? "쿠폰으로 주문완료" : widgetStatus !== "ready" ? "결제수단 준비중" : "결제하기"}
+            </button>
+            {adminPaymentPassEnabled && (
+              <button
+                className="admin-payment-pass-button"
+                type="button"
+                onClick={passPayment}
+                disabled={loading}
+              >
+                {loading ? "처리중" : "결제패스"}
+              </button>
+            )}
+          </div>
+          {adminPaymentPassEnabled && (
+            <p className="admin-payment-pass-note">관리자 테스트 전용 · 실제 Toss 결제는 발생하지 않습니다.</p>
+          )}
         </>
       )}
 

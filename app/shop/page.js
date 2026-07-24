@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import StatusToast from "../status-toast";
 import ShopCheckoutClient from "../shop-checkout-client";
+import { isAdminSession } from "../../lib/admin";
 import { authOptions } from "../../lib/auth";
 import { getDashboardData, getGuardianCoupons, getProducts } from "../../lib/db";
 
@@ -26,6 +27,7 @@ export default async function ShopPage({ searchParams }) {
   ]);
   const availableCoupons = couponData.coupons.filter((coupon) => coupon.status === "available");
   const selectedProduct = products.find((product) => product.id === selectedProductId || product.slug === selectedProductId) || null;
+  const adminPaymentPassEnabled = isAdminSession(session) || Number(guardian?.is_admin || 0) === 1;
 
   return (
     <main className="shop-page">
@@ -58,6 +60,7 @@ export default async function ShopPage({ searchParams }) {
           subscription={subscription}
           guardian={guardian}
           coupons={availableCoupons}
+          adminPaymentPassEnabled={adminPaymentPassEnabled}
         />
       )}
       <StatusToast message={notice} type={noticeType} />

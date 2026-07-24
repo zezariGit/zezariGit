@@ -6283,3 +6283,38 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Source-policy comparison, implementation-data review, page and footer implementation, responsive styling, documentation, testing, and deployment: about 25 minutes.
+
+## 2026-07-24 KST - Administrator Payment Pass
+
+### User Request
+- Show a `결제패스` button to administrators on every checkout page.
+- Allow product, subscription, and advertisement flows to proceed to their completed state without a real payment during testing.
+
+### Reflected Work
+- Added the administrator-only button to standalone product, subscription-product, and advertisement checkout screens.
+- Kept subject, shipping address, coupon, subscription, and advertisement validation active during bypass processing.
+- Added server-side administrator authorization to all three payment preparation APIs.
+- Reused the existing product-order, prepaid-subscription, and advertisement payment completion functions.
+- Stored the payment method as `관리자 결제패스` with synthetic `admin-pass-*` payment keys.
+- Added `is_test_payment` to product orders and advertisements and increased the DB schema version to `22`.
+- Excluded test transactions from admin revenue totals, monthly comparisons, and revenue trend data while retaining them in operational grids.
+- Added tailored completion-page messages for bypassed transactions.
+
+### Deliverables
+- `deliverables/ADMIN_PAYMENT_PASS.md`
+- `deliverables/DATABASE_SCHEMA.md`
+- `deliverables/USER_MANUAL.md`
+- Administrator payment-pass image prompt accumulated.
+
+### Verification
+- `npm run build` succeeded with all product, subscription, advertisement, and success routes.
+- Anonymous `adminPass: true` requests to all three preparation APIs returned HTTP 401.
+- Each preparation API contains a second server-side administrator role check that returns HTTP 403 for authenticated non-admin users.
+- Turso schema version `22` and both `is_test_payment` columns were applied and verified.
+- Existing rows were verified to have valid `0` or `1` test-payment flags.
+- Real-revenue aggregate queries using `is_test_payment = 0` executed successfully.
+- `git diff --check` succeeded.
+- GitHub main push and Vercel production deployment are completed as part of this task.
+
+### Time Spent
+- Payment-flow analysis, server authorization, completion integration, revenue isolation, UI, testing, documentation, and deployment: about 40 minutes.

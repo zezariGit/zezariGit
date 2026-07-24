@@ -33,6 +33,7 @@ The manual explains the current implemented service from both user and admin per
 - Product selection flow: admin-managed product image cards, design/quantity/managed subject/subscription period selection, product preview, order information entry, shipping address, payment method, and Toss checkout.
 - Product standalone purchase details are shown only after the subscribed guardian selects the standalone purchase tab.
 - Product standalone purchase uses Toss product payment and is available only to already-subscribed guardians.
+- Administrators see a `결제패스` test button on product, subscription, and advertisement checkout screens; it completes the downstream test state without a Toss charge and does not add to real revenue totals.
 - Product subscription payment from the shop remains pending/ready until the guardian receives the physical product and activates the QR code.
 - Subscription payment options, active state, pause, and resume.
 - Subject-level advertisement request and progress state foundation.

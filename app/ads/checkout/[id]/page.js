@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import AdPaymentClient from "../../../ad-payment-client";
 import StatusToast from "../../../status-toast";
+import { isAdminSession } from "../../../../lib/admin";
 import { authOptions } from "../../../../lib/auth";
 import { getGuardianAdCheckoutData } from "../../../../lib/db";
 
@@ -28,7 +29,11 @@ export default async function AdCheckoutPage({ params, searchParams }) {
             <h1>온라인 광고</h1>
             <span aria-hidden="true" />
           </header>
-          <AdPaymentClient ad={data.ad} guardian={data.guardian} />
+          <AdPaymentClient
+            ad={data.ad}
+            guardian={data.guardian}
+            adminPaymentPassEnabled={isAdminSession(session) || Number(data.guardian?.is_admin || 0) === 1}
+          />
         </section>
       </main>
       <StatusToast message={resolvedSearchParams?.notice || ""} type={resolvedSearchParams?.noticeType || "success"} />

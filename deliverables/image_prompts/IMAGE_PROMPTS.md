@@ -352,3 +352,14 @@ Create a clean Korean privacy data-flow infographic for "REAL_QR_FIND". Place th
 
 ### Notes
 - Use when presenting why the privacy policy distinguishes protected account data from information deliberately exposed after an active QR scan.
+
+## 2026-07-24 - Administrator Payment Pass
+
+### Purpose
+- Presentation visual for testing product, subscription, and advertisement completion flows without a real Toss charge.
+
+### Prompt
+Create a Korean mobile checkout and server-security flow diagram for "REAL_QR_FIND". On the left, show three checkout types: 상품 단독구매, 구독 상품, and 온라인 광고. Each screen has the normal blue "결제하기" button and, only for an administrator, an amber outlined "결제패스" button with a small "관리자 테스트 전용" note. In the center, show a server authorization gate checking "ADMIN_EMAILS 또는 DB 관리자 권한"; unauthorized requests lead to HTTP 403. The authorized path skips the external Toss approval call but still runs the existing order, subscription, or advertisement completion handler. On the right, show the payment-complete page and database rows marked "관리자 결제패스 / is_test_payment = 1". Add a final reporting rule: "기능 상태에는 반영, 실제 매출 합계에서는 제외". Use the REAL_QR_FIND civic blue, white, and restrained amber warning colors, thin gray lines, 8px or smaller corner radii, no gradients, and no real personal or payment data.
+
+### Notes
+- Use when explaining that the bypass is a server-authorized test feature rather than a client-only page redirect.
