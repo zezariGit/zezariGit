@@ -80,4 +80,4 @@ The current privacy policy is available at `https://zezari.vercel.app/privacy`. 
 
 ## Current Signup Note
 
-Direct signup currently uses a test-mode phone verification code displayed on the page. Replace this with a real SMS provider before production identity verification is considered complete.
+Direct and first-time SNS signup use a server-issued SMS verification code and one-time verification token. Production delivery requires the configured SMS provider credentials; the development bypass code is restricted to local development.

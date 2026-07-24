@@ -4359,6 +4359,8 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 로그인 전 메인 HTML에서 링크 문구와 `/privacy` 주소 확인.
 - 데스크톱 1440×1200, 모바일 390×844 화면 확인.
 - 정책 페이지와 산출물에 `.env.local` 비밀값이 포함되지 않은 것 확인.
+- GitHub `main`에 `4a699dc` 커밋 반영.
+- Vercel 프로덕션 배포 `READY` 및 `https://zezari.vercel.app/privacy` HTTP 200 확인.
 
 ### 반영시간
 - 기존 정책 대조, 현재 구현 분석, 화면·링크·반응형 스타일, 문서화, 테스트 및 배포: 약 25분.
