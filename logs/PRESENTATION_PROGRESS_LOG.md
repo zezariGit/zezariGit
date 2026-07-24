@@ -4463,3 +4463,14 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 브라우저 연결 재확인, API 자산·권한·결제·캠페인 점검 및 문서화: 약 15분.
+
+## 2026-07-24 - Meta 앱 연결 캡처 재확인
+
+### 확인내용
+- 캡처에 표시된 연결은 `qr-find-ads 앱 → ZEZARI 광고계정` 연결이다.
+- 광고 발행에 필요한 Facebook 페이지 연결 화면은 아니다.
+- API 재확인에서도 광고용 페이지, 사용자 페이지, Instagram 계정이 모두 0개이며 `META_PAGE_ID`도 비어 있다.
+- 다음 설정 위치는 `계정 > 앱`이 아니라 `계정 > 페이지`다.
+
+### 반영시간
+- 화면 판독, API 재확인 및 기록: 약 5분.

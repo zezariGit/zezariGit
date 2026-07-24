@@ -6396,3 +6396,17 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Browser connection retry, Graph API asset/permission/payment/campaign audit, and documentation: about 15 minutes.
+
+## 2026-07-24 KST - Meta App Asset Screenshot Check
+
+### User Request
+- Confirm whether the Facebook Page was connected based on the supplied Meta Business Settings screenshot.
+
+### Result
+- The screenshot shows the `qr-find-ads` Meta app connected to the `ZEZARI` ad account.
+- It does not show a Facebook Page connected to the ad account.
+- A fresh Graph API check still returned zero promotable Pages, zero user Pages, zero Instagram accounts, and no `META_PAGE_ID`.
+- The required next menu is `계정 > 페이지`; add/select the Page there and connect the `ZEZARI` ad account as an asset.
+
+### Time Spent
+- Screenshot interpretation, Graph API recheck, and documentation: about 5 minutes.

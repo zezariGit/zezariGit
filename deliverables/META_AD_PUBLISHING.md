@@ -57,6 +57,13 @@ The checked ad account currently returns zero connected Facebook Pages and `.env
 - Missing token permissions for setup inspection: `pages_show_list` and `business_management`.
 - The in-app browser tab was not exposed to the coding browser connection, so this audit used authenticated Graph API responses.
 
+### Screenshot Follow-up
+- The supplied Business Settings screenshot shows `계정 > 앱 > qr-find-ads > 연결된 자산`.
+- The single connected asset is the `ZEZARI` ad account.
+- This confirms the Meta app-to-ad-account connection, but it does not connect a Facebook Page.
+- A fresh Graph API check still returned zero `promote_pages`, zero user Pages, zero Instagram accounts, and an empty `META_PAGE_ID`.
+- The next console location is `계정 > 페이지`, not `계정 > 앱`.
+
 ## One Remaining Meta Console Task
 1. Create or select the official zezari Facebook Page.
 2. Assign that Page to the same Business Portfolio and ad account with advertising permission.
