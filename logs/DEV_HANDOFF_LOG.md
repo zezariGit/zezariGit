@@ -6615,3 +6615,8 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Source review, implementation, build verification, and documentation: about 10 minutes.
+
+### Deployment
+- GitHub `main` commit: `076a658`.
+- Vercel production deployment: `dpl_CQQj6jK9k4pEAW1b8aNCMGDBPzt7`.
+- `https://zezari.vercel.app` and `/?tab=dashboard` returned HTTP 200 after alias assignment.
