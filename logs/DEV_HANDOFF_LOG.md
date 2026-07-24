@@ -6476,3 +6476,34 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Policy confirmation, active advertisement creation, review polling, Ads Manager verification, safe pause, and documentation: about 15 minutes.
+
+## 2026-07-24 KST - Site Advertisement AD-50934FB359 Publication Check
+
+### User Request
+- Confirm how to determine whether the advertisement requested and approved through the service was published to Meta.
+
+### Database Result
+- Advertisement ID: `50934fb3-5958-41f1-add9-9f6cd2d80986`.
+- Service status: `active`.
+- Meta status: `ad_active`.
+- Meta last error: empty.
+- Meta campaign, ad-set, creative, and ad IDs are all stored.
+
+### Meta Result
+- Campaign `120255992127740550`: `ACTIVE`.
+- Ad set `120255992128520550`: `ACTIVE`.
+- Ad `120255992129580550`: `ACTIVE`.
+- No API issue or review rejection was returned.
+- Scheduled start: 2026-07-24 22:41:50 KST.
+- Scheduled end: 2026-07-24 23:59:59 KST.
+- Lifetime budget: KRW 10,000.
+- Ads Manager displayed `예약됨` because the check occurred before the scheduled start.
+- Insights were empty before the start time, which is expected.
+
+### Operational Check
+- Before start: confirm the ad switch is on and delivery is `예약됨`.
+- After start: confirm delivery changes to `활동 중`.
+- Final delivery evidence is non-zero impressions/reach/spend in Ads Manager or Graph insights.
+
+### Time Spent
+- Service DB lookup, Meta Graph status comparison, Ads Manager verification, and documentation: about 10 minutes.

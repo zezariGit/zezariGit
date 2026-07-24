@@ -70,6 +70,23 @@ The Page object cannot be read directly with the system-user token because that 
 
 There are no remaining Meta asset, token, Page, funding-source, policy, or API compatibility blockers for administrator-approved advertisements.
 
+## 2026-07-24 Site Approval Flow Verification
+- Service advertisement: `AD-50934FB359`.
+- Service record ID: `50934fb3-5958-41f1-add9-9f6cd2d80986`.
+- Service status: `active`.
+- Stored Meta status: `ad_active`.
+- Campaign ID: `120255992127740550`.
+- Ad-set ID: `120255992128520550`.
+- Creative ID: `1043259211453331`.
+- Ad ID: `120255992129580550`.
+- Meta campaign, ad set, and ad all returned configured and effective status `ACTIVE`.
+- Ads Manager displayed the advertisement as `예약됨` before its scheduled start.
+- Scheduled delivery: 2026-07-24 22:41:50 KST through 23:59:59 KST.
+- Lifetime budget: KRW 10,000.
+- Targeting: 5km around latitude `37.506757`, longitude `127.128897`.
+- No Meta issue or publication error was returned.
+- Insights were empty before the scheduled start, which is expected. After delivery starts, verify the Ads Manager delivery column changes to `활동 중` and confirm impressions, reach, and spend.
+
 ## Safety Rules
 - Automated verification creates only `PAUSED` resources unless the operator explicitly authorizes an active delivery test.
 - Explicit active tests use a small capped lifetime budget and are paused immediately after delivery-state verification.
