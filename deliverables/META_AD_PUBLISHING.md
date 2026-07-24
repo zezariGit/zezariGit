@@ -44,12 +44,26 @@ Never expose these values in client code, logs, screenshots, Git, or documentati
 
 The checked ad account currently returns zero connected Facebook Pages and `.env.local` has an empty `META_PAGE_ID`. This is not a source-code failure. Meta requires a Page identity in `object_story_spec.page_id`.
 
+### 2026-07-24 Business Connection Audit
+- Ad account: active (`account_status = 1`), KRW, Asia/Seoul, no disable reason.
+- Ad-account user access: one user is readable.
+- Facebook Page connected for promotion: zero.
+- Pages readable from the current user token: zero.
+- Instagram account connected to the ad account: zero.
+- Funding source/payment method: not configured according to the ad-account API.
+- Existing campaign: one active campaign.
+- Existing ad sets and ads: zero; account insights contain no spend, impressions, or clicks.
+- `META_PAGE_ID`: not configured locally.
+- Missing token permissions for setup inspection: `pages_show_list` and `business_management`.
+- The in-app browser tab was not exposed to the coding browser connection, so this audit used authenticated Graph API responses.
+
 ## One Remaining Meta Console Task
 1. Create or select the official zezari Facebook Page.
 2. Assign that Page to the same Business Portfolio and ad account with advertising permission.
-3. Generate/confirm a token that can manage that Page and the ad account.
-4. Put the numeric Page ID in local `META_PAGE_ID`.
-5. Add the same variable to Vercel Production and redeploy.
+3. Assign a funding source/payment method to the ad account.
+4. Generate/confirm a token with `ads_management`, `pages_manage_ads`, `pages_show_list`, and `business_management`.
+5. Put the numeric Page ID in local `META_PAGE_ID`.
+6. Add the same variable to Vercel Production and redeploy.
 
 The application now stops with a Korean setup error before campaign creation when this requirement is missing, preventing orphaned campaign objects.
 

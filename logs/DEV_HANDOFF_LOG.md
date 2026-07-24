@@ -6366,3 +6366,33 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Meta credential and permission validation, safe write testing, image capture, database migration, full publishing implementation, documentation, and deployment preparation: about 65 minutes.
+
+## 2026-07-24 KST - Meta Business Connection Audit
+
+### User Request
+- Inspect the Meta Business Settings opened in the in-app browser and confirm the overall connection state.
+
+### Audit Result
+- The coding browser connection still exposed zero in-app tabs, so the visible Business Settings page could not be clicked directly.
+- The configured Graph API identity and ad account are readable.
+- The ad account is active, uses KRW and Asia/Seoul, and has no disable reason.
+- One ad-account user is connected.
+- No Facebook Page is connected as a promotable Page.
+- No user Page or Instagram account is visible to the current token.
+- `META_PAGE_ID` remains empty.
+- The current token has `ads_management` and `pages_manage_ads`, but not `pages_show_list` or `business_management`.
+- The ad account API reports no funding source/payment method.
+- One active campaign exists, but it has zero ad sets and zero ads; no spend, impressions, or clicks were returned.
+
+### Required Follow-up
+- Connect or create the official Facebook Page in the Business Portfolio.
+- Assign the Page and ad account to the operating user/system user with advertising permission.
+- Add an ad-account payment method.
+- Reissue the token with Page-list and business-management permissions.
+- Set `META_PAGE_ID` locally and in Vercel, then run a paused creative/ad publication test.
+
+### Deliverable
+- Updated `deliverables/META_AD_PUBLISHING.md`.
+
+### Time Spent
+- Browser connection retry, Graph API asset/permission/payment/campaign audit, and documentation: about 15 minutes.
