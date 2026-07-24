@@ -7544,7 +7544,66 @@ button:disabled:hover {
 }
 
 .find-audio-box audio {
+  display: none;
+}
+
+.guardian-voice-play-button {
   width: 100%;
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: var(--space-sm);
+  align-items: center;
+  padding: 10px var(--space-md);
+  border: 1px solid var(--c-primary);
+  border-radius: var(--radius-sm);
+  background: var(--c-primary);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-align: left;
+}
+
+.guardian-voice-play-button:hover,
+.guardian-voice-play-button:focus-visible {
+  background: var(--c-primary-dark);
+}
+
+.guardian-voice-play-button.playing {
+  border-color: var(--c-text);
+  background: var(--c-text);
+}
+
+.guardian-voice-play-button > span:last-child {
+  min-width: 0;
+  color: inherit;
+  font-size: inherit;
+  overflow-wrap: anywhere;
+}
+
+.guardian-voice-button-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--c-primary-dark) !important;
+  font-size: 0.8rem !important;
+  line-height: 1;
+}
+
+.find-audio-box em {
+  color: var(--c-primary-dark);
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.find-audio-error {
+  margin: 0;
+  color: var(--c-danger) !important;
+  font-size: 0.78rem !important;
 }
 
 .find-page {

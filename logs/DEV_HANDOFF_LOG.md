@@ -6008,3 +6008,32 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Flow analysis, implementation, build verification, and documentation: about 10 minutes.
+
+## 2026-07-24 KST - Public Guardian Voice Playback Button
+
+### User Request
+- Add a button to the managed subject public QR page that plays the guardian-recorded voice for emotional stabilization.
+
+### Existing State
+- `getFindPageDataByKey()` already returned `subjects.voice_data_url` and `voice_name`.
+- The public page used a small browser-default `<audio controls>` element.
+
+### Reflected Work
+- Added client component `app/find/[key]/guardian-voice-player.js`.
+- Replaced the native audio controls with a project-styled mobile playback button.
+- Button states:
+  - `보호자 음성 재생(심신안정용)`
+  - `보호자 음성 일시정지`
+- Added playing and error status messages.
+- The button is rendered only when a guardian voice recording exists.
+- Preserved the existing active QR, QR activation, and active subscription privacy gates.
+- Created `deliverables/PUBLIC_GUARDIAN_VOICE_PLAYBACK.md`.
+
+### Verification
+- `npm run build` succeeded.
+- Read-only Turso lookup found an eligible active QR with saved guardian voice.
+- Local public page returned HTTP 200 and contained the requested playback button.
+- No QR public key or personal data was printed during verification.
+
+### Time Spent
+- Source analysis, implementation, data-backed page verification, and documentation: about 20 minutes.

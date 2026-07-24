@@ -7,6 +7,7 @@ import { getFindPageDataByKey } from "../../../lib/db";
 import { formatDateOnly } from "../../../lib/date-format";
 import GuardianNotifyButton from "./notify-button";
 import LocationShareButton from "./location-share-button";
+import GuardianVoicePlayer from "./guardian-voice-player";
 
 export const dynamic = "force-dynamic";
 
@@ -179,10 +180,10 @@ export default async function FindPage({ params, searchParams }) {
             <h2>보호자 안내</h2>
             {data.guardian_message && <p>{data.guardian_message}</p>}
             {data.voice_data_url && (
-              <div className="find-audio-box">
-                <span>{data.voice_name || "보호자 음성 메시지"}</span>
-                <audio controls src={data.voice_data_url} />
-              </div>
+              <GuardianVoicePlayer
+                src={data.voice_data_url}
+                name={data.voice_name || "보호자 음성 메시지"}
+              />
             )}
           </div>
         )}
