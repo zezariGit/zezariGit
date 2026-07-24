@@ -4,6 +4,7 @@ import StatusToast from "../../status-toast";
 import { authOptions } from "../../../lib/auth";
 import { getGuardianKey } from "../../../lib/db";
 import { getFindPageDataByKey } from "../../../lib/db";
+import { formatDateOnly } from "../../../lib/date-format";
 import GuardianNotifyButton from "./notify-button";
 import LocationShareButton from "./location-share-button";
 
@@ -204,8 +205,7 @@ function hasActiveAccess(status, periodEnd) {
 }
 
 function formatDate(value) {
-  if (!value) return "-";
-  return String(value).replaceAll("-", ".");
+  return formatDateOnly(value);
 }
 
 function formatFullAddress(address, detailAddress) {

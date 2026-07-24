@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { formatDateOnly } from "../../lib/date-format";
 
 export default function MissingReportSelector({ subjects = [] }) {
   const [selectedId, setSelectedId] = useState("");
@@ -133,6 +134,5 @@ function statusClass(status) {
 }
 
 function formatDate(value) {
-  if (!value) return "-";
-  return String(value).replaceAll("-", ".");
+  return formatDateOnly(value);
 }

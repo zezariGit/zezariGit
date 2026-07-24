@@ -5819,3 +5819,67 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Production HTTP/API, OAuth, database, configuration, log, and build verification plus reporting: about 45 minutes.
+
+## 2026-07-24 KST - Unified Date Display and Admin Test Subscription Control
+
+### User Request
+- Simplify the subscription period in admin subscription management to year-month-day.
+- Standardize date display across other pages.
+- Let administrators assign a subscription plan, status, and period without payment for feature testing.
+
+### Reflected Work
+- Added `lib/date-format.js` as the shared Korea-time date formatting module.
+  - Date: `YYYY-MM-DD`
+  - Date and time: `YYYY-MM-DD HH:mm`
+  - SQLite UTC timestamps are converted to `Asia/Seoul`.
+  - Date-only values such as birth dates are preserved without timezone shifts.
+- Replaced page-specific dotted and locale date formatting in:
+  - admin management
+  - guardian dashboard
+  - account billing/coupons/ads
+  - advertisement application and payment
+  - missing report selection
+  - public QR find page
+  - product checkout
+  - notification list
+- Added `setSubscriptionAdminTest()` and `setSubscriptionAdminTestAction()`.
+  - Admin authorization is checked on the server.
+  - Supports 1, 3, and 6 month plans.
+  - Supports active, ready, paused, expired, and cancelled statuses.
+  - Active, paused, and expired statuses require both start and end dates.
+  - Rejects incomplete, invalid, or reversed periods.
+  - Stores the selected end date as the end of that day in Korea time.
+  - Updates the subscription plan price but does not create a payment or order.
+- Added the `테스트 구독 설정` form to the selected subscription detail card.
+- Updated `deliverables/ADMIN_SUBSCRIPTION_MANAGEMENT.md`.
+
+### Files Changed
+- `lib/date-format.js`
+- `lib/db.js`
+- `app/admin/actions.js`
+- `app/admin/page.js`
+- `app/globals.css`
+- `app/account/account-ui.js`
+- `app/dashboard.js`
+- `app/ad-campaign-modal.js`
+- `app/ad-payment-client.js`
+- `app/missing-report/missing-report-selector.js`
+- `app/find/[key]/page.js`
+- `app/shop-checkout-client.js`
+- `app/notification-bell.js`
+- `deliverables/ADMIN_SUBSCRIPTION_MANAGEMENT.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- `npm run build` succeeded.
+- `git diff --check` succeeded with line-ending warnings only.
+- Date formatter checks:
+  - ISO timestamp to `YYYY-MM-DD`
+  - SQLite UTC timestamp to Korean `YYYY-MM-DD HH:mm`
+  - Korean end-of-day input to UTC ISO storage
+- Local `/admin?section=subscriptions` returned HTTP 200 and rendered the authorization screen.
+- Authenticated visual verification could not be automated because no controllable in-app browser was connected.
+
+### Time Spent
+- Analysis, implementation, verification, documentation, and deployment preparation: about 35 minutes.

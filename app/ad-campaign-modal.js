@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import FormSubmitButton from "./form-submit-button";
 import ModalScrollLock from "./modal-scroll-lock";
+import { formatDateOnly } from "../lib/date-format";
 
 const LEAFLET_CSS_URL = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS_URL = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
@@ -583,8 +584,7 @@ function formatCurrency(value) {
 }
 
 function formatDate(value) {
-  if (!value) return "-";
-  return String(value).replaceAll("-", ".");
+  return formatDateOnly(value);
 }
 
 function formatAdLocation(subject) {

@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { formatDateTime } from "../lib/date-format";
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
@@ -316,13 +317,5 @@ function BellIcon() {
 }
 
 function formatNotificationTime(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return new Intl.DateTimeFormat("ko-KR", {
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
+  return formatDateTime(value, "");
 }

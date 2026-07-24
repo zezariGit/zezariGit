@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import KakaoPostcodeAddress from "./kakao-postcode-address";
+import { formatDateOnly } from "../lib/date-format";
 
 const TOSS_SDK_URL = "https://js.tosspayments.com/v2/standard";
 
@@ -766,6 +767,5 @@ function formatCurrency(value) {
 }
 
 function formatDate(value) {
-  if (!value) return "생년월일 미입력";
-  return String(value).replaceAll("-", ".");
+  return formatDateOnly(value, "생년월일 미입력");
 }

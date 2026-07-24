@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatDateOnly } from "../../lib/date-format";
 
 export function AccountTopbar({ title, backHref = "/?panel=my", action = null }) {
   return (
@@ -15,14 +16,7 @@ export function formatCurrency(value) {
 }
 
 export function formatDate(value) {
-  if (!value) return "-";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return String(value);
-  return date.toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
+  return formatDateOnly(value);
 }
 
 export function subscriptionStatusLabel(status) {

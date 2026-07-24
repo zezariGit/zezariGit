@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { formatDateTime as formatStandardDateTime } from "../lib/date-format";
 
 const TOSS_SDK_URL = "https://js.tosspayments.com/v2/standard";
 
@@ -223,6 +224,5 @@ function formatCurrency(value) {
 }
 
 function formatDateTime(value) {
-  if (!value) return "-";
-  return String(value).replace("T", " ").slice(0, 16).replaceAll("-", ".");
+  return formatStandardDateTime(value);
 }

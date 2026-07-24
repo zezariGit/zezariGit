@@ -28,6 +28,7 @@ import {
   setQrLifecycle,
   setQrSubject,
   setSubscriptionAdminMemo,
+  setSubscriptionAdminTest,
   setSubscriptionPlanPrice,
 } from "../../lib/db";
 import { notifyGuardiansFromAdmin } from "../../lib/push";
@@ -239,6 +240,21 @@ export async function setSubscriptionAdminMemoAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=subscriptions"), error.message || "구독 메모 저장에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin?section=subscriptions"), "구독 메모가 저장되었습니다."));
+}
+
+export async function setSubscriptionAdminTestAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  try {
+    await setSubscriptionAdminTest(formData);
+    revalidatePath("/admin");
+    revalidatePath("/");
+    revalidatePath("/account/billing");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=subscriptions"), error.message || "테스트 구독 설정에 실패했습니다.", "error"));
+  }
+  redirect(withNotice(getReturnTo(formData, "/admin?section=subscriptions"), "테스트 구독 상태와 기간이 저장되었습니다."));
 }
 
 export async function setProductCatalogItemAction(formData) {

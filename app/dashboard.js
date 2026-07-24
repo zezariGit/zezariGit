@@ -19,6 +19,7 @@ import Link from "next/link";
 import SocialSignupCompletion from "./social-signup-completion";
 import SubjectVoiceRecorder from "./subject-voice-recorder";
 import { isAdminSession } from "../lib/admin";
+import { formatDateOnly } from "../lib/date-format";
 
 const genders = ["남성", "여성", "기타"];
 const statuses = ["상품구매필요", "QR활성화필요", "안전", "찾는중"];
@@ -648,8 +649,7 @@ function SubjectRegistrationComplete({ subject }) {
 }
 
 function formatDate(value) {
-  if (!value) return "-";
-  return String(value).replaceAll("-", ".");
+  return formatDateOnly(value);
 }
 
 function formatFullAddress(address, detailAddress) {

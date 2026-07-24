@@ -11,6 +11,11 @@ import ProductAdminCatalogForm from "./product-admin-catalog-form";
 import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
 import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
 import {
+  formatDateOnly as formatStandardDate,
+  formatDateTime as formatStandardDateTime,
+  toDateInputValue,
+} from "../../lib/date-format";
+import {
   getAdminAdsData,
   getAdminCouponsData,
   getAdminDashboardData,
@@ -48,6 +53,7 @@ import {
   saveAdminMessageAction,
   saveAdminMessageTemplateAction,
   setSubscriptionAdminMemoAction,
+  setSubscriptionAdminTestAction,
   setSubscriptionPlanPriceAction,
 } from "./actions";
 
@@ -2764,6 +2770,56 @@ function SubscriptionManagementSection({ subscriptionsData }) {
                         <FormSubmitButton className="plain-button compact" pendingText="저장중">메모저장</FormSubmitButton>
                       </form>
                     </section>
+                    <section className="guardian-detail-section subscription-test-section">
+                      <div className="subscription-section-heading">
+                        <h3 className="guardian-tab-section-title">테스트 구독 설정</h3>
+                        <span>결제 없이 적용</span>
+                      </div>
+                      <p>테스트를 위해 구독 상태와 이용 기간을 직접 지정합니다.</p>
+                      <form className="subscription-test-form" action={setSubscriptionAdminTestAction}>
+                        <input type="hidden" name="subscriptionId" value={selectedSubscription.subscription_id} />
+                        <input type="hidden" name="returnTo" value={returnTo} />
+                        <label>
+                          구독 상품
+                          <select name="planMonths" defaultValue={String(selectedSubscription.plan_months || 1)}>
+                            {plans.map((plan) => (
+                              <option value={String(plan.months)} key={plan.months}>
+                                {plan.name || `${plan.months}개월 이용권`}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label>
+                          구독 상태
+                          <select name="status" defaultValue={selectedSubscription.status || "ready"}>
+                            <option value="active">이용중</option>
+                            <option value="ready">QR 활성화 대기</option>
+                            <option value="paused">일시정지</option>
+                            <option value="expired">기간 만료</option>
+                            <option value="cancelled">해지</option>
+                          </select>
+                        </label>
+                        <label>
+                          시작일
+                          <input
+                            type="date"
+                            name="currentPeriodStart"
+                            defaultValue={toDateInputValue(selectedSubscription.current_period_start)}
+                          />
+                        </label>
+                        <label>
+                          종료일
+                          <input
+                            type="date"
+                            name="currentPeriodEnd"
+                            defaultValue={toDateInputValue(selectedSubscription.current_period_end)}
+                          />
+                        </label>
+                        <FormSubmitButton className="primary-button compact" pendingText="적용중">
+                          테스트 구독 저장
+                        </FormSubmitButton>
+                      </form>
+                    </section>
                   </div>
                   <div className="guardian-tab-panel">
                     <section className="guardian-detail-section">
@@ -4238,35 +4294,15 @@ function calculateAge(birthDate) {
 }
 
 function formatDate(value) {
-  if (!value) return "-";
-  return String(value).replaceAll("-", ".");
+  return formatStandardDate(value);
 }
 
 function formatRecentDateTime(value) {
-  const date = parseDatabaseDate(value);
-  if (!date) return "-";
-  const parts = getKoreanDateParts(date, {
-    timeZone: "Asia/Seoul",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-  });
-  return `${parts.year}.${parts.month}.${parts.day} ${parts.hour}:${parts.minute}`;
+  return formatStandardDateTime(value);
 }
 
 function formatRecentDate(value) {
-  const date = parseDatabaseDate(value);
-  if (!date) return "-";
-  const parts = getKoreanDateParts(date, {
-    timeZone: "Asia/Seoul",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-  return `${parts.year}.${parts.month}.${parts.day}`;
+  return formatStandardDate(value);
 }
 
 function truncateText(value, maxLength = 10) {
@@ -4274,34 +4310,8 @@ function truncateText(value, maxLength = 10) {
   return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 }
 
-function getKoreanDateParts(date, options) {
-  return Object.fromEntries(
-    new Intl.DateTimeFormat("en-CA", options)
-      .formatToParts(date)
-      .filter((part) => part.type !== "literal")
-      .map((part) => [part.type, part.value]),
-  );
-}
-
-function parseDatabaseDate(value) {
-  if (!value) return null;
-  const raw = String(value).trim();
-  const normalized = /(?:Z|[+-]\d{2}:?\d{2})$/.test(raw) ? raw : `${raw.replace(" ", "T")}Z`;
-  const date = new Date(normalized);
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
 function formatDateTime(value) {
-  if (!value) return "-";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return formatDate(value);
-  return date.toLocaleString("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return formatStandardDateTime(value);
 }
 
 function formatMetricValue(value) {
