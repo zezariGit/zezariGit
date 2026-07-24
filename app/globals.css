@@ -1948,9 +1948,16 @@ a {
 }
 
 .ad-state-actions .activate-button,
-.ad-state-actions .danger-button {
+.ad-state-actions .danger-button,
+.ad-state-actions .primary-button {
   width: auto;
   margin-top: 0;
+}
+
+.ad-state-actions .ad-feed-link {
+  min-height: 38px;
+  padding: 0 14px;
+  text-decoration: none;
 }
 
 .ad-status-pill {

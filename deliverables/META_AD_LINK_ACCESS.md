@@ -15,6 +15,7 @@ Project: REAL_QR_FIND / zezari
 6. The guardian advertisement dashboard shows:
    - `관리대상 페이지`: opens the public managed-subject page.
    - `광고 피드 보기`: opens Meta's shareable advertisement preview.
+7. The main guardian dashboard's managed-subject advertisement modal also shows `광고 피드 보기` beside pause/resume/end controls when the latest advertisement has a stored Meta preview URL.
 
 ## Existing Advertisements
 - Production schema version `25` adds both Meta link fields.
@@ -30,6 +31,7 @@ Project: REAL_QR_FIND / zezari
 - Meta credentials remain server-only and are never included in the URL shown to guardians.
 - The public destination contains only the QR public key.
 - The preview URL is shown only inside the authenticated guardian advertisement dashboard.
+- Both guardian entry points open the Meta preview in a new browser tab and do not expose Meta credentials.
 
 ## Operational Meaning
 - `광고 피드 보기` is Meta's shareable advertisement preview link.

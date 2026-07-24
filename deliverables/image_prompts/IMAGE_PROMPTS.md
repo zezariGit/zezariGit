@@ -396,3 +396,14 @@ Create a Korean civic-tech flow diagram for "REAL_QR_FIND" Meta advertisement li
 
 ### Notes
 - Use when presenting mobile discoverability and post-publication guardian verification.
+
+## 2026-07-25 - Managed-Subject Advertisement Control With Feed Link
+
+### Purpose
+- Show the guardian's quickest path from a managed-subject dashboard card to the currently published Meta advertisement.
+
+### Prompt
+Create a compact Korean mobile modal for "REAL_QR_FIND" showing an active managed-subject advertisement. The summary contains status "광고중", amount, period, Korean city and radius, and Meta state. Directly below, arrange three compact controls in one wrapping row: a blue "광고 피드 보기" link button, a green "일시정지" button, and a restrained red "광고끝내기" button. Add a small interaction arrow showing that "광고 피드 보기" opens Meta's shareable advertisement preview in a new tab. Use the existing civic blue and white project style, thin borders, 6px button corners, compact Korean labels, no gradients, and no real personal data.
+
+### Notes
+- Use when explaining that feed verification is available from both the advertisement dashboard and the managed-subject advertisement modal.

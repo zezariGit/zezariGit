@@ -353,6 +353,16 @@ export default function AdCampaignModal({
               <span>Meta API: {formatMetaStatus(subject.ad_meta_status)}</span>
             </div>
             <div className="ad-state-actions">
+              {subject.ad_meta_preview_url ? (
+                <a
+                  className="primary-button compact ad-feed-link"
+                  href={subject.ad_meta_preview_url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  광고 피드 보기
+                </a>
+              ) : null}
               {subject.ad_status === "active" && (
                 <form action={pauseAction}>
                   <input type="hidden" name="adId" value={subject.ad_id} />

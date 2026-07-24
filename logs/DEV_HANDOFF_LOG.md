@@ -6592,3 +6592,26 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Production alias: `https://zezari.vercel.app`.
 - Home and `/account/ads` returned HTTP 200 after alias assignment.
 - A fresh unauthenticated browser correctly returned to onboarding; authenticated button rendering remains protected by the guardian session.
+
+## 2026-07-25 KST - Advertisement Feed Link In Managed-Subject Modal
+
+### User Request
+- Show `광고 피드 보기` beside pause and end controls when a guardian opens an already-running advertisement from a managed-subject dashboard card.
+
+### Implementation
+- Added the latest advertisement's `meta_preview_url` to the guardian dashboard subject query as `ad_meta_preview_url`.
+- Added a new-tab `광고 피드 보기` link to the active advertisement control row.
+- The button is rendered only when Meta has returned and stored a shareable preview URL.
+- Matched the existing project button sizing and responsive wrapping behavior.
+
+### Verification
+- `npm run build` passed.
+- `git diff --check` passed.
+- Existing production advertisement records already contain Meta preview URLs, so no DB migration is required.
+
+### Deliverables
+- Updated `deliverables/META_AD_LINK_ACCESS.md`.
+- Added the cumulative presentation image prompt.
+
+### Time Spent
+- Source review, implementation, build verification, and documentation: about 10 minutes.

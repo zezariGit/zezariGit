@@ -4624,3 +4624,24 @@ This file is the cumulative presentation-ready project log. It is written so the
 - GitHub `main` 커밋 `3ea5728` 푸시
 - Vercel 운영 배포 `dpl_GYbMdYEbe3JZdBPVwBTSHenPzZ6a` READY
 - `https://zezari.vercel.app` 운영 별칭 연결 및 홈·광고 대시보드 경로 HTTP 200 확인
+
+## 2026-07-25 - 관리대상 광고 팝업의 광고 피드 확인
+
+### 요구내용
+- 사용자 대시보드에서 관리대상의 진행 중 광고를 열었을 때 일시정지·종료 버튼 옆에 광고 피드 확인 버튼을 제공한다.
+
+### 반영내용
+- 최신 광고의 Meta 공유 링크를 관리대상 데이터에 포함했다.
+- 공유 링크가 저장된 광고에만 `광고 피드 보기` 버튼을 표시한다.
+- 버튼은 새 창에서 Meta 공유 광고 미리보기를 열며, 기존 광고 상태 버튼과 같은 행에서 반응형으로 정렬된다.
+
+### 검증결과
+- Next.js 운영 빌드 성공
+- 공백 오류 검사 성공
+- 기존 운영 광고의 Meta 공유 링크 저장 상태 확인
+
+### 공식 산출물
+- `deliverables/META_AD_LINK_ACCESS.md` 및 이미지 프롬프트 갱신
+
+### 반영시간
+- 분석, 구현, 검증 및 문서화: 약 10분.
