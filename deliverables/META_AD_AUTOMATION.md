@@ -81,4 +81,7 @@ The claim expires after five minutes so a stalled serverless request can be retr
   - Chuncheon, 1 day, 9km: Meta budget `7,000 KRW`
 - Turso schema version `24` and all new budget columns were verified.
 - Six existing production advertisement labels were converted from coordinate text to Korean city/district labels.
+- Production deployment `dpl_hbiQeiAkWHhjohBNnGKtUr13ML5S` reached `READY`.
+- `https://zezari.vercel.app` and its reverse-geocoding API returned HTTP 200.
+- Production database verification found seven budgeted advertisements and zero coordinate-style region labels.
 - No Toss payment or new live Meta advertisement was created during verification.

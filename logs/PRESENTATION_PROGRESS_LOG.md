@@ -4583,6 +4583,9 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 서울 좌표 역조회 결과: `서울특별시 중구 명동`
 - 서울 2일·7km Meta 예산 14,400원 계산 확인
 - 운영 Turso 스키마 버전 24 및 신규 컬럼 확인
+- 운영 DB 광고 7건 모두 Meta 예산 보유, 좌표형 표시 문구 0건 확인
+- GitHub `main` 커밋 `e8780f3` 푸시 완료
+- Vercel 배포 `dpl_hbiQeiAkWHhjohBNnGKtUr13ML5S` READY 및 `https://zezari.vercel.app` 200 확인
 
 ### 공식 산출물
 - `deliverables/META_AD_AUTOMATION.md` 생성

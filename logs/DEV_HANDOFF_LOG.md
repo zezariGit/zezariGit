@@ -6538,6 +6538,10 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Meta budget formula cases for Seoul, Busan, and Chuncheon passed.
 - Production Turso schema and defaults were verified.
 - Existing production advertisement region labels no longer expose coordinate text.
+- GitHub commit `e8780f3` was pushed to `main`.
+- Vercel production deployment `dpl_hbiQeiAkWHhjohBNnGKtUr13ML5S` reached `READY`.
+- `https://zezari.vercel.app` and the production reverse-geocoding API returned HTTP 200.
+- Vercel error-log scan returned no runtime errors for the new deployment.
 - No real payment or new Meta delivery was created during this change.
 
 ### Deliverables
