@@ -4619,3 +4619,8 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 분석, 구현, 운영 DB 반영, 기존 광고 링크 보강, 검증 및 문서화: 약 25분.
+
+### 배포결과
+- GitHub `main` 커밋 `3ea5728` 푸시
+- Vercel 운영 배포 `dpl_GYbMdYEbe3JZdBPVwBTSHenPzZ6a` READY
+- `https://zezari.vercel.app` 운영 별칭 연결 및 홈·광고 대시보드 경로 HTTP 200 확인

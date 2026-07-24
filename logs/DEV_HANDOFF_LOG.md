@@ -6585,3 +6585,10 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Source analysis, implementation, production migration, backfill, build verification, and documentation: about 25 minutes.
+
+### Deployment
+- GitHub `main` commit: `3ea5728`.
+- Vercel production deployment: `dpl_GYbMdYEbe3JZdBPVwBTSHenPzZ6a`.
+- Production alias: `https://zezari.vercel.app`.
+- Home and `/account/ads` returned HTTP 200 after alias assignment.
+- A fresh unauthenticated browser correctly returned to onboarding; authenticated button rendering remains protected by the guardian session.
