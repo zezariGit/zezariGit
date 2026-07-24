@@ -594,6 +594,9 @@ function MissingAdPreview({ creativeRef, subject, quote, startDate, endDate, reg
           <div className="missing-ad-qr">
             {subject?.qr_image ? <img src={subject.qr_image} alt={`${subject.name} QR 코드`} /> : <span>QR</span>}
           </div>
+          {qrTargetUrl ? (
+            <span className="missing-ad-direct-url">관리대상 페이지: {qrTargetUrl}</span>
+          ) : null}
         </footer>
       </article>
 

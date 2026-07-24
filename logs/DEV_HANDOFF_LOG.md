@@ -6552,3 +6552,36 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Analysis, implementation, migration, formula/API checks, and documentation: about 35 minutes.
+
+## 2026-07-24 KST - Mobile Meta Destination And Guardian Advertisement Link
+
+### User Request
+- Add a direct managed-subject page link to Meta advertisements because a mobile viewer cannot scan a QR shown on the same phone.
+- Let the guardian open the published advertisement from the advertisement dashboard.
+
+### Implementation
+- Added the managed-subject URL to the Meta primary text while retaining the existing `LEARN_MORE` CTA destination.
+- Added the same URL as visible text to the browser-captured missing-person poster.
+- Added a Meta Graph lookup for `preview_shareable_link` and `creative.effective_object_story_id`.
+- Added `meta_preview_url` and `meta_story_id` to `subject_ads`.
+- Added `관리대상 페이지` and `광고 피드 보기` links to the authenticated guardian advertisement dashboard.
+- Updated the dashboard guidance to reflect automatic publication immediately after payment.
+- Preview-link retrieval failure is non-blocking and does not interrupt advertisement delivery.
+
+### Database
+- Increased schema version from `24` to `25`.
+- Migrated production Turso with the two new Meta-link columns.
+- Backfilled both existing advertisements that had Meta ad IDs; no new advertisement or spend was created.
+
+### Verification
+- `npm run build` passed.
+- `git diff --check` passed before documentation updates.
+- Meta Graph returned shareable preview links for both backfill candidates.
+- Production Turso reports schema version `25` and two stored preview links.
+
+### Deliverables
+- Added `deliverables/META_AD_LINK_ACCESS.md`.
+- Updated Meta publishing, database schema, deliverable index, and image-prompt archive.
+
+### Time Spent
+- Source analysis, implementation, production migration, backfill, build verification, and documentation: about 25 minutes.

@@ -385,3 +385,14 @@ Create a Korean civic-tech system flow diagram for "REAL_QR_FIND" advertisement 
 
 ### Notes
 - Use when presenting why customer revenue and platform media spend are different accounting values.
+
+## 2026-07-24 - Mobile Advertisement Direct Link And Guardian Feed Access
+
+### Purpose
+- Explain why a Meta advertisement needs both a QR code and a clickable destination link, and how the guardian later opens the published advertisement.
+
+### Prompt
+Create a Korean civic-tech flow diagram for "REAL_QR_FIND" Meta advertisement link access. On the left, show a smartphone displaying a missing-person advertisement that contains a portrait, QR code, and a visible text URL labeled "관리대상 페이지 바로가기". Emphasize that a person viewing the advertisement on the same phone cannot scan its QR, so the Meta "자세히 보기" CTA opens `/find/{public_key}` directly. In the center, show the server creating the Meta ad and retrieving `preview_shareable_link` plus `effective_object_story_id`, then storing them in Turso without exposing credentials. On the right, show the authenticated guardian "광고 대시보드" with two compact buttons: "관리대상 페이지" and "광고 피드 보기". Add a small note that the feed button is a Meta shareable advertisement preview, while the managed-subject URL is the durable service destination. Use white work surfaces, civic blue, restrained purple, thin gray connectors, compact Korean labels, 8px or smaller corner radii, no gradients, and no real personal data or tokens.
+
+### Notes
+- Use when presenting mobile discoverability and post-publication guardian verification.

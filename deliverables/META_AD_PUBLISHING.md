@@ -19,6 +19,14 @@ Project: REAL_QR_FIND / zezari
 9. Only after all four objects exist are campaign, ad set, and ad changed to `ACTIVE`.
 10. A failed publication preserves payment and can be retried with `광고발행 재시도`.
 11. Pause/resume actions update all existing Meta objects.
+12. The creative primary text, CTA, and captured poster contain the managed-subject page URL so mobile viewers can open it without scanning the QR displayed on the same screen.
+13. After ad creation, the server retrieves Meta's `preview_shareable_link` and stores it for the guardian advertisement dashboard.
+
+## Guardian Link Access
+- `관리대상 페이지` opens the same `/find/{public_key}` destination used by the QR and Meta CTA.
+- `광고 피드 보기` opens Meta's shareable advertisement preview URL in a new tab.
+- The Meta preview URL is an operational preview/share link, not a guaranteed organic Page-post permalink.
+- Existing published advertisements are backfilled when their Meta ad IDs can be read with the configured access token.
 
 ## Required Server Variables
 - `META_APP_ID`
@@ -96,6 +104,7 @@ There are no remaining Meta asset, token, Page, funding-source, policy, or API c
 - The guardian payment amount is stored as revenue and is never reused as the Meta lifetime budget.
 - Meta budget is calculated separately from region tier, radius, and duration.
 - Partial Meta identifiers and a sanitized error are retained when a downstream API step fails.
+- Failure to retrieve a Meta preview link does not stop advertisement delivery; the link can be backfilled later.
 - Existing advertisements created before this version do not contain a captured poster; they must be re-created through the updated application flow before full publication.
 
 ## Future Work

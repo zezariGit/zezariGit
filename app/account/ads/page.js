@@ -51,6 +51,18 @@ export default async function AccountAdsPage({ searchParams }) {
                   <dt>Meta 상태</dt>
                   <dd>{formatMetaStatus(ad.meta_status)}</dd>
                 </dl>
+                <div className="ad-dashboard-actions">
+                  {ad.qr_target_url ? (
+                    <a href={ad.qr_target_url} target="_blank" rel="noreferrer">
+                      관리대상 페이지
+                    </a>
+                  ) : null}
+                  {ad.meta_preview_url ? (
+                    <a className="primary" href={ad.meta_preview_url} target="_blank" rel="noreferrer">
+                      광고 피드 보기
+                    </a>
+                  ) : null}
+                </div>
               </div>
             </article>
           ))}
@@ -61,7 +73,8 @@ export default async function AccountAdsPage({ searchParams }) {
 
         <ul className="ad-dashboard-notes">
           <li>광고는 관리대상별로 신청되며, 기간과 지역 정보 기준으로 운영됩니다.</li>
-          <li>결제와 관리자 승인이 완료되면 저장된 광고 소재가 Meta 광고로 발행됩니다.</li>
+          <li>결제가 완료되면 저장된 광고 소재가 Meta 광고로 자동 발행됩니다.</li>
+          <li>광고 피드 보기는 Meta가 제공하는 공유 가능한 광고 미리보기로 연결됩니다.</li>
           <li>광고 상태 변경은 대시보드의 관리대상 카드에서 진행할 수 있습니다.</li>
         </ul>
       </section>

@@ -4,7 +4,7 @@ Project: REAL_QR_FIND / zezari
 
 ## Status
 - Implemented in Turso.
-- Current schema version: `23`.
+- Current schema version: `25`.
 
 ## Tables
 
@@ -270,6 +270,8 @@ Stores advertisement requests and status by managed subject.
 | `meta_creative_id` | TEXT | Meta creative identifier |
 | `meta_ad_id` | TEXT | Meta ad identifier |
 | `meta_image_hash` | TEXT | Meta uploaded-image hash |
+| `meta_preview_url` | TEXT | Meta shareable advertisement preview URL shown to the guardian |
+| `meta_story_id` | TEXT | Effective Meta object story ID when the API returns it |
 | `meta_status` | TEXT | Current local Meta publication state |
 | `meta_last_error` | TEXT | Latest sanitized Meta publication error |
 | `meta_published_at` | TEXT | First successful Meta publication timestamp |
