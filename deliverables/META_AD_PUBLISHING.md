@@ -43,7 +43,9 @@ Never expose these values in client code, logs, screenshots, Git, or documentati
 - Paused campaign creation: passed.
 - Paused ad-set creation with a 3km custom location, schedule, and lifetime budget: passed.
 - Page-backed creative creation: passed.
-- Paused ad creation: blocked only by the Meta anti-discrimination policy operator acknowledgement.
+- Paused ad creation: passed after the business operator accepted Meta's anti-discrimination policy.
+- Active ad submission and review: passed.
+- Ads Manager delivery display: passed (`활동 중`).
 - Disposable campaign, ad set, creative, and image cleanup: passed. No delivery or spend occurred.
 - `META_ACCESS_TOKEN`, `META_AD_ACCOUNT_ID`, and `META_PAGE_ID` were updated locally and in Vercel Production without exposing secret values.
 - Facebook Login was added to the app so the Page permissions are available with standard access.
@@ -51,13 +53,26 @@ Never expose these values in client code, logs, screenshots, Git, or documentati
 
 The Page object cannot be read directly with the system-user token because that token does not expose `pages_read_engagement`. This does not block Page-backed ad creative creation: the real paused creative write succeeded with the assigned Page ID.
 
-## One Remaining Meta Console Task
-The business operator must personally review and accept Meta's anti-discrimination policy in Business Settings. Meta rejects the final ad create call with subcode `2859024` until this legal acknowledgement is completed.
+## 2026-07-24 Active Test Result
+- The business operator accepted Meta's anti-discrimination policy.
+- A synthetic API connectivity advertisement was created against the real `ZEZARI` ad account.
+- Campaign ID: `120255991903620550`.
+- Ad-set ID: `120255991907990550`.
+- Creative ID: `1746203396451350`.
+- Ad ID: `120255991909750550`.
+- Targeting: Seoul center, 1km radius, age 18+.
+- Lifetime budget: KRW 2,000.
+- Campaign, ad set, and ad were submitted as `ACTIVE`.
+- Meta review progressed from `IN_PROCESS` to `PENDING_REVIEW` and then `ACTIVE`.
+- Ads Manager displayed the selected advertisement as `활동 중`.
+- The test was paused immediately after delivery verification. Campaign and ad set are retained in Meta for audit, with `PAUSED` configured status.
+- No impressions or spend had been reported when the test was paused.
 
-After the operator accepts it, rerun the PAUSED end-to-end test. The API configuration, Page identity, real ad account, funding source, image upload, campaign, ad set, and creative are already verified.
+There are no remaining Meta asset, token, Page, funding-source, policy, or API compatibility blockers for administrator-approved advertisements.
 
 ## Safety Rules
-- Automated verification creates only `PAUSED` resources.
+- Automated verification creates only `PAUSED` resources unless the operator explicitly authorizes an active delivery test.
+- Explicit active tests use a small capped lifetime budget and are paused immediately after delivery-state verification.
 - Test resources are deleted immediately.
 - A real guardian advertisement becomes active only through the administrator approval command.
 - Partial Meta identifiers and a sanitized error are retained when a downstream API step fails.

@@ -6441,3 +6441,38 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Meta browser configuration, system-user credential rotation, real-account API verification, compatibility fix, safe write test, cleanup, and documentation: about 45 minutes.
+
+## 2026-07-24 KST - Meta Active Advertisement Delivery Verification
+
+### User Request
+- After accepting Meta's anti-discrimination policy, publish a test advertisement and confirm that it is actually listed as delivering.
+
+### Test Configuration
+- Real ad account: `ZEZARI`.
+- Facebook Page: `제자리`.
+- Synthetic connectivity creative using the application icon and production-site destination.
+- Seoul center, 1km radius, age 18+.
+- Lifetime budget capped at KRW 2,000.
+
+### Verification
+- Image, campaign, ad set, Page-backed creative, and ad creation all succeeded.
+- Campaign ID: `120255991903620550`.
+- Ad-set ID: `120255991907990550`.
+- Creative ID: `1746203396451350`.
+- Ad ID: `120255991909750550`.
+- Campaign, ad set, and ad activation calls all returned success.
+- The ad progressed from `IN_PROCESS` to `PENDING_REVIEW` and then `ACTIVE`.
+- Meta Ads Manager displayed the selected test ad as `활동 중`.
+- No API issue, policy warning, or review rejection was returned.
+- The test was paused immediately after live-state confirmation; campaign and ad set are retained for audit.
+- No impressions or spend were reported before the pause.
+
+### Result
+- Meta Marketing API production publication is fully operational for administrator-approved advertisements.
+- No remaining Page, ad-account, funding-source, system-user, policy, or creative-schema blocker remains.
+
+### Deliverable
+- Updated `deliverables/META_AD_PUBLISHING.md`.
+
+### Time Spent
+- Policy confirmation, active advertisement creation, review polling, Ads Manager verification, safe pause, and documentation: about 15 minutes.
