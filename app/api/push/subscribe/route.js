@@ -14,6 +14,20 @@ export async function POST(request) {
     return NextResponse.json({ message: "푸시 구독 정보가 올바르지 않습니다." }, { status: 400 });
   }
 
-  await savePushSubscription(session, subscription);
-  return NextResponse.json({ ok: true });
+  try {
+    const saved = await savePushSubscription(session, subscription);
+    console.info("[push/subscribe] device subscription saved", {
+      guardianId: saved.guardianId,
+      endpointHost: saved.endpointHost,
+    });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("[push/subscribe] failed", {
+      message: error.message || String(error),
+    });
+    return NextResponse.json(
+      { message: "기기 푸시 연결 정보를 저장하지 못했습니다." },
+      { status: 500 }
+    );
+  }
 }

@@ -203,6 +203,12 @@ export async function saveAdminMessageAction(formData) {
         url: message.url || "/",
       });
       await markAdminMessageSent(messageId, result);
+      if (message.channel === "push" && result.successCount === 0) {
+        if (result.subscriptionTargetCount === 0) {
+          throw new Error("푸시 알림을 받을 수 있는 등록 기기가 없습니다. 보호자가 기기에서 푸시 알림을 다시 연결해야 합니다.");
+        }
+        throw new Error("등록 기기로 푸시를 전송하지 못했습니다. 서버 발송 로그를 확인해 주세요.");
+      }
     }
     revalidatePath("/admin");
     revalidatePath("/");

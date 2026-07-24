@@ -19,6 +19,20 @@ Project: REAL_QR_FIND / zezari
 9. Server sends Web Push to the guardian's registered browser/app devices.
 10. The guardian can open the top-left bell icon in the dashboard to view received notification messages.
 
+## Device Registration And Self-Recovery
+- Notification permission alone is not treated as a completed Push connection.
+- On app load, a guardian with granted permission goes through all required checks:
+  1. register or update `/sw.js`
+  2. load the production VAPID public key
+  3. inspect the browser `PushSubscription`
+  4. replace a subscription created with a different VAPID key
+  5. upsert the current endpoint into `push_subscriptions`
+- The UI becomes connected only after the server confirms the endpoint save.
+- `푸시 알림 연결하기` requests permission, completes device registration, and immediately sends a real test Push.
+- Once connected, the same button becomes `테스트 알림 보내기`.
+- Test endpoint: authenticated `POST /api/push/test`.
+- A failed test returns a specific error for no registered device or provider delivery failure.
+
 ## Installed App Notification Behavior
 - Android installed PWA:
   - Web Push appears in the Android notification center.
@@ -54,6 +68,7 @@ Project: REAL_QR_FIND / zezari
 - `app/api/notifications/route.js`
 - `app/api/push/public-key/route.js`
 - `app/api/push/subscribe/route.js`
+- `app/api/push/test/route.js`
 - `app/api/find/[key]/notify/route.js`
 - `app/find/[key]/notify-button.js`
 - `lib/push.js`
@@ -82,3 +97,20 @@ Project: REAL_QR_FIND / zezari
 - Public QR pages show subject/contact information by design. Add explicit consent and field-level visibility controls before real personal data rollout.
 - Final sound, vibration, notification-center placement, and icon-badge visibility are controlled by each device's notification settings and launcher.
 - Complete verification requires one real Android installed PWA and one iOS 16.4+ Home Screen web app.
+
+## 2026-07-24 Android Delivery Incident
+- Symptom: the installed Android PWA received no sound or notification-center entry.
+- Production evidence:
+  - `push_subscriptions`: 0 rows
+  - guardians with a registered Push endpoint: 0
+  - latest admin Push batch: 9 recipients, 0 successes, 9 failures
+- Root cause:
+  - the old UI marked Push as enabled when `Notification.permission` was `granted`
+  - it did not verify that a browser Push subscription existed and was saved in Turso
+  - the enabled button was disabled, so the user could not repair the missing endpoint
+- Fix:
+  - validate and upsert the device endpoint on every granted-permission app load
+  - keep the button available for reconnect/test
+  - expose real test delivery
+  - log server-side subscription saves and provider failures
+  - mark an administrator batch with zero successes as failed instead of showing a false completion message

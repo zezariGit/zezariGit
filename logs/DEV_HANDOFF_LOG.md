@@ -5930,3 +5930,57 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Platform research, implementation, verification, and documentation: about 35 minutes.
+
+## 2026-07-24 KST - Android Push Delivery Incident And Device Reconnection
+
+### User Report
+- The installed Android app did not play a notification sound and no notification appeared in the notification center after sending from the web administrator screen.
+
+### Production Evidence
+- Vercel Production contains all three VAPID variables.
+- Turso read-only diagnostics:
+  - `push_subscriptions`: 0
+  - distinct guardians with a registered endpoint: 0
+  - latest admin Push batch: 9 recipients, 0 successes, 9 failures
+  - recent stored guardian notifications had no matching device subscription
+
+### Root Cause
+- `PushNotificationButton` set the enabled state from `Notification.permission === "granted"` only.
+- It did not verify that `PushManager.getSubscription()` returned a subscription or that the endpoint was saved in `push_subscriptions`.
+- Once permission was granted, the disabled `푸시 알림 켜짐` button prevented the user from repairing the missing device registration.
+
+### Reflected Work
+- Rebuilt Push connection initialization.
+  - Registers/updates the service worker.
+  - Loads the current VAPID public key.
+  - Replaces a subscription when its application server key differs.
+  - Creates a missing browser subscription.
+  - Upserts the endpoint to Turso before showing the connected state.
+- Added automatic repair when the app opens with notification permission already granted.
+- Changed the control to:
+  - `푸시 알림 연결하기` before server-confirmed registration
+  - `테스트 알림 보내기` after registration
+- A manual connection immediately sends a real test Push.
+- Added authenticated `POST /api/push/test`.
+- Added structured server logs for subscription saves and Push provider delivery failures.
+- Changed zero-success admin Push batches to `failed` and shows an error instead of a false success notice.
+
+### Verification
+- `npm run build` succeeded with the new `/api/push/test` route.
+- Local VAPID public-key endpoint reported configured without exposing the key.
+- Unauthenticated test Push request returned HTTP 401.
+- Real Android delivery requires reopening the deployed app and completing one reconnect/test action.
+
+### Files Changed
+- `app/push-notification-button.js`
+- `app/api/push/subscribe/route.js`
+- `app/api/push/test/route.js`
+- `app/admin/actions.js`
+- `lib/db.js`
+- `lib/push.js`
+- `deliverables/PUSH_NOTIFICATION_SETUP.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Time Spent
+- Production diagnosis, implementation, verification, and documentation: about 35 minutes.
