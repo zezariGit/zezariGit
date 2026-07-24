@@ -6354,6 +6354,9 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Local home returned HTTP 200.
 - Unauthenticated creative-image access returned HTTP 403.
 - Full creative/ad creation was correctly not attempted because the required Page is not connected.
+- GitHub `main` received commit `02dd260` (`Implement Meta ad publishing pipeline`).
+- Vercel production deployment `dpl_8Zro5FbdhuCNC7Vv1nzVRevNsogR` reached `READY`.
+- `https://zezari.vercel.app/` and `/privacy` returned HTTP 200, while anonymous creative-image access returned HTTP 403.
 
 ### Deliverables
 - `deliverables/META_AD_PUBLISHING.md`

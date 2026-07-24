@@ -4425,6 +4425,9 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 3km 지도 타기팅, 기간, 전체예산이 포함된 일시정지 캠페인과 광고세트 생성 성공.
 - 테스트 객체와 이미지 즉시 삭제, 실제 광고 과금 없음.
 - 페이지 미연결 상태에서는 광고소재·광고 생성을 실행하지 않도록 확인.
+- GitHub `main` 커밋 `02dd260` 반영.
+- Vercel 프로덕션 배포 `dpl_8Zro5FbdhuCNC7Vv1nzVRevNsogR` `READY` 확인.
+- 운영 메인·개인정보처리방침 HTTP 200, 비로그인 광고소재 API HTTP 403 확인.
 
 ### 공식 산출물
 - `deliverables/META_AD_PUBLISHING.md`
