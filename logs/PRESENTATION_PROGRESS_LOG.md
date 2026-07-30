@@ -4769,3 +4769,10 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 도메인 확인, 설정, QR 이전, 소스 반영, 검증, 문서화: 약 25분.
+
+### 배포결과
+- GitHub `main` 커밋 `3b996c7` 푸시
+- Vercel 운영 배포 `dpl_PrQLdYZpbRUYdPWxUrEpyHraihpD` READY
+- `zezari.family`과 `zezari.vercel.app`이 동일 배포를 가리키는 상태 확인
+- 두 도메인의 홈·공개 QR HTTPS 200, 새 도메인의 개인정보처리방침·PWA manifest·service worker HTTPS 200 확인
+- 두 도메인에서 Google·Kakao·Naver·Facebook 인증 공급자와 도메인별 콜백 URL 생성 확인

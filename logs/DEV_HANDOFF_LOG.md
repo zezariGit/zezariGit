@@ -6766,3 +6766,10 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Domain inspection, configuration, QR migration, source update, verification, and documentation: about 25 minutes.
+
+### Deployment
+- GitHub `main` commit: `3b996c7`.
+- Vercel production deployment: `dpl_PrQLdYZpbRUYdPWxUrEpyHraihpD` (`READY`).
+- `https://zezari.family` and `https://zezari.vercel.app` resolve to the same deployment.
+- Both domains returned HTTPS 200 for home and public QR paths; the custom-domain privacy, manifest, and service-worker routes also returned HTTPS 200.
+- The authentication provider API returned all configured providers and host-matching callback URLs on both domains.

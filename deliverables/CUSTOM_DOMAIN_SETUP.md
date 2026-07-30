@@ -44,7 +44,7 @@ https://zezari.family/api/auth/callback/naver
 https://zezari.family/api/auth/callback/facebook
 ```
 
-Keep the matching `https://zezari.vercel.app/api/auth/callback/{provider}` entries while the compatibility domain remains available. With `NEXTAUTH_URL` set to the custom domain, login started from the Vercel URL can complete on the custom domain.
+Keep the matching `https://zezari.vercel.app/api/auth/callback/{provider}` entries while the compatibility domain remains available. The authentication API emits a callback URL for the host used to open the service, so both callback URL sets are required when both domains offer direct login.
 
 ## Payment And External Links
 
@@ -54,9 +54,10 @@ Keep the matching `https://zezari.vercel.app/api/auth/callback/{provider}` entri
 
 ## Verification Checklist
 
-- Both domains return HTTPS 200 for the home page.
-- Both domains return HTTPS 200 for `/privacy`, PWA manifest, and service worker.
-- A public `/find/{public_key}` path works on both domains.
-- Social login initiation uses the custom-domain callback URL.
-- New QR display/download URLs use `zezari.family`.
-- Existing Vercel-domain QR links continue to resolve.
+- PASS: Both domains return HTTPS 200 for the home page and point to the same production deployment.
+- PASS: The custom domain returns HTTPS 200 for `/privacy`, PWA manifest, and service worker.
+- PASS: A public `/find/{public_key}` path returns HTTPS 200 on both domains.
+- PASS: The authentication provider API exposes credentials, Google, Kakao, Naver, and Facebook on both domains and creates host-matching callback URLs.
+- PASS: All 40 stored QR target URLs use `zezari.family`, with 40 unique public keys and unchanged subject matching.
+- PASS: Existing Vercel-domain QR links continue to resolve.
+- EXTERNAL CHECK: Each OAuth provider console must contain both host callback URL sets before live social-login completion can be claimed for both domains.
