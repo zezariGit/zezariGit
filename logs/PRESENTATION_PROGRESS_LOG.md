@@ -4830,3 +4830,11 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 분석, DB·API·관리자·사용자 화면 구현, 빌드, DB 검증, 문서화: 약 30분.
+
+### 운영 검증 및 배포
+- GitHub `main` 커밋 `cf5928b` 푸시
+- Vercel 운영 배포 `dpl_APPQHV7Suscu1kNS5bK21mkJGtCv` READY
+- `zezari.family`과 `zezari.vercel.app` 홈 HTTP 200 확인
+- 로그인된 관리자 상품관리에서 새 상품 폼, 긴 상세이미지, 노출 설정, 기존 디자인 편집 화면 확인
+- 임시 활성 상품과 12간지 디자인을 생성해 사용자 상품 selectbox 노출, 12,300원 가격·설명 변경 반응 확인
+- 임시 데이터를 모두 삭제하고 기존 전체 7개·활성 7개 상품으로 복원

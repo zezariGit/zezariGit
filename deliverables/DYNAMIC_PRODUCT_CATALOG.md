@@ -40,3 +40,6 @@
 - Active products appear in the guardian product select box; hidden products do not.
 - A long product detail image renders at natural width and proportional height in the purchase preview.
 - A temporary inactive product image request returns HTTP 200 with its original image MIME type, and the test product is removed afterward.
+- PASS: An authenticated production administrator opened the new-product form and existing product editors.
+- PASS: A temporary active product with 12 zodiac rows appeared in the guardian product select box; selecting it updated the price and description.
+- PASS: The temporary product and design rows were removed, restoring the original seven active products.

@@ -6830,3 +6830,11 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Source analysis, schema/API/admin/shop implementation, build, DB verification, and documentation: about 30 minutes.
+
+### Production Verification And Deployment
+- GitHub `main` commit: `cf5928b`.
+- Vercel production deployment: `dpl_APPQHV7Suscu1kNS5bK21mkJGtCv` (`READY`).
+- Assigned `https://zezari.vercel.app` to the same deployment as `https://zezari.family`; both home routes returned HTTP 200.
+- Authenticated admin product management displayed the new-product form, product-level long detail upload, visibility control, and unchanged design editors.
+- Inserted a temporary active product with 12 zodiac designs, confirmed it appeared in the guardian product select box, and confirmed selection updated its 12,300 KRW price and description.
+- Removed all temporary product/design rows and confirmed the catalog returned to seven total and seven active products.
