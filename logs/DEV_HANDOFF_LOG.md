@@ -6652,3 +6652,9 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Analysis, implementation, production catalog migration, build verification, and documentation: about 30 minutes.
+
+### Deployment
+- GitHub `main` commit: `87c43a7`.
+- Vercel production deployment: `dpl_GumWVzpyDT6dXpverJ1Lgihznztj` (`READY`).
+- Assigned `https://zezari.vercel.app` to the deployment and verified HTTP 200 for the home and `/shop` routes.
+- The automated in-app browser had no zezari login session, so direct `/shop` access correctly returned to the onboarding screen. Authenticated shop UI behavior is covered by the production build and catalog/API contract verification above.

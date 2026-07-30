@@ -49,3 +49,5 @@ The three combination choices are stored as normal catalog products. This preser
 - Each required product has twelve active zodiac design names.
 - Next.js production build passes.
 - Existing Toss preparation APIs receive the newly selected product and design IDs without a request-contract change.
+- GitHub `main` commit `87c43a7` was deployed through Vercel deployment `dpl_GumWVzpyDT6dXpverJ1Lgihznztj`.
+- `https://zezari.vercel.app` and `https://zezari.vercel.app/shop` returned HTTP 200 after the production alias was assigned.

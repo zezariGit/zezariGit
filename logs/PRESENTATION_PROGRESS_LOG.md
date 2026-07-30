@@ -4677,3 +4677,9 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 분석, 구현, 운영 DB 반영, 검증 및 문서화: 약 30분.
+
+### 배포결과
+- GitHub `main` 커밋 `87c43a7` 푸시
+- Vercel 운영 배포 `dpl_GumWVzpyDT6dXpverJ1Lgihznztj` READY
+- `https://zezari.vercel.app` 홈 및 `/shop` HTTP 200 확인
+- 비로그인 브라우저에서 `/shop` 접근 시 온보딩으로 이동하는 접근 제어 확인
