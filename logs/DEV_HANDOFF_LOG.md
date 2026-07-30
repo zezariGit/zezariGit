@@ -6730,3 +6730,8 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Authenticated browser exploration, source comparison, risk classification, and documentation: about 70 minutes.
+
+### Deployment
+- GitHub `main` commit: `727b526`.
+- Vercel production deployment: `dpl_BbPaYAGxaiPi1Beb9dx31bxPX8K2` (`READY`).
+- Assigned `https://zezari.vercel.app` to the deployment and verified HTTP 200 for the home and privacy-policy routes.
