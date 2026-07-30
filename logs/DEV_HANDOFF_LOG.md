@@ -6700,3 +6700,33 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Assigned `https://zezari.vercel.app` to the deployment.
 - Production home, `/shop`, and a public `/find/{key}` route returned HTTP 200.
 - Removed standalone order and payment preparation APIs both returned HTTP 410 in production.
+
+## 2026-07-30 KST - Authenticated Production Browser Test
+
+### User Request
+- Use the administrator account already signed in to the Codex in-app browser and carefully test the production service from guardian pages through every administrator page.
+
+### Test Coverage
+- Tested 12 guardian/public areas: dashboard, notification bell, guardian information, subject information, My Page, billing, coupons, payment methods, advertisement dashboard, shop and checkout preparation, missing-report advertisement preparation, public QR, and privacy policy.
+- Tested all 17 administrator menus and the collapsible sidebar: dashboard, guardians, subjects, QR, orders, subscriptions, payments, coupons, products, advertisements, advertisement pricing, missing reports, location shares, notifications, message templates, inquiries, and administrators.
+- Verified PWA manifest and service worker HTTP 200 responses.
+- Kept the production test read-only. No payment, refund, advertisement publication, message send, save, delete, activation, role change, or device-permission request was executed.
+
+### Main Findings
+- Payment-management revenue cards and the dashboard monthly revenue use different source/eligibility rules and displayed inconsistent totals.
+- Recent bulk push records showed 1 success and 9 failures out of 10 recipients.
+- The admin dashboard divides all inactive QR inventory by registered subjects, producing an inactive-QR percentage above 100%.
+- The customer-inquiry admin list exists, but there is no user inquiry submission flow yet.
+- Duplicate-looking guardian email records, browser password autofill in the password-change field, legacy Meta/order wording, and product-admin rendering weight require follow-up review.
+
+### Verification
+- No server-error page, blank page, or critical authenticated UI failure appeared during the browser pass.
+- Guardian shop product/design selection, coupon recalculation, Toss widget rendering, Kakao address search, map region search, public QR privacy layout, administrator grids, detail tabs, and sidebar collapse all worked.
+- Production `/manifest.webmanifest` and `/sw.js` returned HTTP 200.
+
+### Deliverables
+- Added `deliverables/PRODUCTION_AUTHENTICATED_BROWSER_TEST_2026-07-30.md`.
+- Updated `deliverables/README.md`.
+
+### Time Spent
+- Authenticated browser exploration, source comparison, risk classification, and documentation: about 70 minutes.
