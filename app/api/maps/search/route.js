@@ -29,7 +29,7 @@ export async function GET(request) {
       headers: {
         "Accept": "application/json",
         "Accept-Language": "ko,en;q=0.8",
-        "User-Agent": "REAL_QR_FIND/1.0 (https://zezari.vercel.app)",
+        "User-Agent": "REAL_QR_FIND/1.0 (https://zezari.family)",
       },
       cache: "no-store",
     });
@@ -68,7 +68,7 @@ async function reverseGeocode(lat, lng) {
       headers: {
         "Accept": "application/json",
         "Accept-Language": "ko,en;q=0.8",
-        "User-Agent": "REAL_QR_FIND/1.0 (https://zezari.vercel.app)",
+        "User-Agent": "REAL_QR_FIND/1.0 (https://zezari.family)",
       },
       cache: "no-store",
     });

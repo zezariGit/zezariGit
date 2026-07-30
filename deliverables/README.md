@@ -42,6 +42,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `SHOP_PRODUCT_SELECTION.md`: guardian-first product purchase flow with seven product combinations and twelve zodiac design options.
 - `PRODUCT_INCLUDED_QR_SERVICE.md`: product-price checkout with automatic continuing QR service access and legacy period-subscription compatibility.
 - `PRODUCTION_AUTHENTICATED_BROWSER_TEST_2026-07-30.md`: authenticated production browser test across guardian, public QR, purchase, advertising, and all administrator screens.
+- `CUSTOM_DOMAIN_SETUP.md`: `zezari.family` production-domain setup, dual-domain compatibility, QR migration, and OAuth callback checklist.
 - `ADMIN_COUPON_MANAGEMENT.md`: admin coupon ledger, discount conditions, issue limits, status management, and user coupon registration validation.
 - `ADMIN_NOTIFICATION_MANAGEMENT.md`: admin notification/message grid, right-side compose panel, push delivery action, and delivery result tracking.
 - `ADMIN_MESSAGE_TEMPLATE_MANAGEMENT.md`: admin message template grid, locked automatic templates, push/KakaoTalk channel settings, and template seed data.

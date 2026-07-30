@@ -2,6 +2,7 @@ import "../css/gov-style.css";
 import "./globals.css";
 
 export const metadata = {
+  metadataBase: new URL("https://zezari.family"),
   title: "zezari",
   description: "QR people-finding service",
   manifest: "/manifest.webmanifest",

@@ -429,3 +429,14 @@ Create a clean Korean civic-tech service flow for "REAL_QR_FIND". Show four comp
 
 ### Notes
 - Use when presenting the shift from separate pass/standalone modes to product-included QR service.
+
+## 2026-07-30 - Custom Domain And Legacy QR Compatibility
+
+### Purpose
+- Explain how the new `zezari.family` domain becomes the primary service URL without breaking previously printed Vercel-domain QR codes.
+
+### Prompt
+Create a clean Korean civic-tech infrastructure diagram for "REAL_QR_FIND". In the center, show one Vercel production deployment labeled "zezari project". Connect two HTTPS entry domains to it: a bold primary domain `zezari.family` and a smaller compatibility domain `zezari.vercel.app`. From the primary domain, show new QR downloads, public `/find/{public_key}` pages, Toss return paths, and Meta advertisement links. From the compatibility domain, show previously printed QR codes continuing to open the same `/find/{public_key}` page. Add a protected configuration box containing only variable names `NEXTAUTH_URL` and `PUBLIC_APP_URL`, with no secret values. Add four small OAuth callback labels for Google, Kakao, Naver, and Facebook under the custom domain. Use white work surfaces, civic blue, restrained purple, thin gray connectors, compact Korean labels, 8px or smaller corner radii, no gradients, and no personal or credential data.
+
+### Notes
+- Use when presenting the custom-domain migration and the reason existing physical QR products do not need replacement.

@@ -4744,3 +4744,28 @@ This file is the cumulative presentation-ready project log. It is written so the
 - GitHub `main` 커밋 `727b526` 푸시
 - Vercel 운영 배포 `dpl_BbPaYAGxaiPi1Beb9dx31bxPX8K2` READY
 - `https://zezari.vercel.app` 별칭 연결 및 홈·개인정보취급방침 HTTP 200 확인
+
+## 2026-07-30 - `zezari.family` 운영 도메인 연결
+
+### 요구내용
+- Vercel에서 구매한 `zezari.family`을 프로젝트 운영 URL로 사용한다.
+- 기존 `https://zezari.vercel.app` 주소와 이미 제작된 QR도 계속 사용할 수 있게 한다.
+
+### 반영내용
+- 도메인 소유권, Vercel 네임서버, CDN, 자동 갱신 SSL 인증서를 확인했다.
+- `zezari.family`을 기존 `zezari` 프로젝트에 연결하고 Vercel 도메인 별칭은 유지했다.
+- 운영 `NEXTAUTH_URL`, `PUBLIC_APP_URL`과 QR·Meta 광고·지도 API의 기본 URL을 새 도메인으로 변경했다.
+- DB의 QR 40개 URL을 `zezari.family/find/{키}`로 변경하되 QR 키와 대상자 매칭은 그대로 보존했다.
+- 기존 인쇄 QR은 `zezari.vercel.app` 별칭을 통해 계속 접근할 수 있게 했다.
+
+### 검증결과
+- Next.js 운영 빌드 성공
+- QR URL 40개 새 도메인 반영, 구 도메인 DB URL 0개 확인
+- 두 도메인 병행 구조와 SNS 로그인 콜백 추가 목록 문서화
+
+### 공식 산출물
+- `deliverables/CUSTOM_DOMAIN_SETUP.md` 생성
+- 산출물 목록 및 이미지 프롬프트 갱신
+
+### 반영시간
+- 도메인 확인, 설정, QR 이전, 소스 반영, 검증, 문서화: 약 25분.

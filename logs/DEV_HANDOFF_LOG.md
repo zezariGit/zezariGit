@@ -6735,3 +6735,34 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - GitHub `main` commit: `727b526`.
 - Vercel production deployment: `dpl_BbPaYAGxaiPi1Beb9dx31bxPX8K2` (`READY`).
 - Assigned `https://zezari.vercel.app` to the deployment and verified HTTP 200 for the home and privacy-policy routes.
+
+## 2026-07-30 KST - Custom Production Domain `zezari.family`
+
+### User Request
+- Connect the newly purchased Vercel domain `zezari.family` to the REAL_QR_FIND project.
+- Keep `https://zezari.vercel.app` accessible and verify whether both URLs can coexist.
+
+### Implementation
+- Verified Vercel registration, Vercel nameservers, active CDN, and automatically renewed wildcard/root SSL certificate.
+- Connected `zezari.family` to the existing `zezari` Vercel project without removing `zezari.vercel.app`.
+- Updated production `NEXTAUTH_URL` and `PUBLIC_APP_URL` to `https://zezari.family`.
+- Updated source fallbacks, Meta destination URL, map API user agent, metadata base, and environment example.
+- Migrated all 40 `qr_codes.target_url` rows to `https://zezari.family/find/{public_key}` without changing QR codes, public keys, or subject assignments.
+- Retained the Vercel domain so previously printed QR codes remain usable.
+
+### External Provider Follow-up
+- Google, Kakao, Naver, and Facebook consoles must allow the new `https://zezari.family/api/auth/callback/{provider}` callback URLs.
+- The old Vercel callback URLs should remain registered while both domains are supported.
+
+### Verification
+- `npm run build` passed.
+- `git diff --check` passed.
+- Verified the domain in the Vercel dashboard and CLI.
+- Verified 40 custom-domain QR target rows and zero old-domain rows after migration.
+
+### Deliverables
+- Added `deliverables/CUSTOM_DOMAIN_SETUP.md`.
+- Updated the deliverable index and cumulative image prompt archive.
+
+### Time Spent
+- Domain inspection, configuration, QR migration, source update, verification, and documentation: about 25 minutes.
