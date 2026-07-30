@@ -4709,3 +4709,9 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 분석, 구현, DB 반영, 호환성 검증 및 문서화: 약 25분.
+
+### 배포결과
+- GitHub `main` 커밋 `10514ab` 푸시
+- Vercel 운영 배포 `dpl_8R2gi56J4EdM2xLVMsBfsn5NxkCW` READY
+- 운영 홈, 상품구매, 공개 QR 페이지 HTTP 200 확인
+- 제거된 구형 단독주문 API 2곳 HTTP 410 확인

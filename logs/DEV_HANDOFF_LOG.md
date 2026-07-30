@@ -6693,3 +6693,10 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Analysis, implementation, DB migration, compatibility checks, build verification, and documentation: about 25 minutes.
+
+### Deployment
+- GitHub `main` commit: `10514ab`.
+- Vercel production deployment: `dpl_8R2gi56J4EdM2xLVMsBfsn5NxkCW` (`READY`).
+- Assigned `https://zezari.vercel.app` to the deployment.
+- Production home, `/shop`, and a public `/find/{key}` route returned HTTP 200.
+- Removed standalone order and payment preparation APIs both returned HTTP 410 in production.

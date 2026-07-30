@@ -39,3 +39,5 @@ Project: REAL_QR_FIND / zezari
 - `subscriptions.access_type` exists with default `periodic`.
 - Existing subscription rows remain `periodic` after migration.
 - A public QR page request succeeded after the migration.
+- GitHub `main` commit `10514ab` was deployed through Vercel deployment `dpl_8R2gi56J4EdM2xLVMsBfsn5NxkCW`.
+- Production home, shop, and public find routes returned HTTP 200; removed standalone APIs returned HTTP 410.
