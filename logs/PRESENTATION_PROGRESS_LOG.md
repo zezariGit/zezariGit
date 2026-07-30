@@ -4776,3 +4776,26 @@ This file is the cumulative presentation-ready project log. It is written so the
 - `zezari.family`과 `zezari.vercel.app`이 동일 배포를 가리키는 상태 확인
 - 두 도메인의 홈·공개 QR HTTPS 200, 새 도메인의 개인정보처리방침·PWA manifest·service worker HTTPS 200 확인
 - 두 도메인에서 Google·Kakao·Naver·Facebook 인증 공급자와 도메인별 콜백 URL 생성 확인
+
+## 2026-07-31 - Google·Naver 새 도메인 로그인 콜백 설정
+
+### 요구내용
+- Google Cloud와 Naver Developers에 `zezari.family` 로그인 콜백을 직접 등록한다.
+- 기존 `zezari.vercel.app` 로그인 호환성을 유지한다.
+
+### 반영내용
+- Google OAuth 웹 클라이언트에 새 도메인 원본과 콜백을 추가하고 기존 Vercel·로컬 개발 설정을 보존했다.
+- Naver 서비스 URL을 `zezari.family`으로 변경하고 새 도메인과 기존 Vercel 도메인 콜백을 함께 등록했다.
+- 민감한 클라이언트 비밀값과 토큰은 산출물 및 로그에 기록하지 않았다.
+
+### 검증결과
+- Google 계정 선택 화면이 새 도메인 콜백으로 정상 열리고 리디렉션 불일치 오류가 없었다.
+- Naver `zezari` 동의 화면이 새 도메인 콜백으로 정상 열리고 콜백 오류가 없었다.
+- Naver 앱은 현재 개발 중이므로 등록 멤버는 테스트 가능하며 전체 사용자는 검수 승인 후 이용 가능하다.
+
+### 공식 산출물
+- `deliverables/OAUTH_CALLBACK_SETUP.md` 생성
+- 커스텀 도메인 산출물, 산출물 목록, 이미지 프롬프트 누적 갱신
+
+### 반영시간
+- 콘솔 확인, 설정 저장, 운영 OAuth 진입 테스트, 문서화: 약 15분.

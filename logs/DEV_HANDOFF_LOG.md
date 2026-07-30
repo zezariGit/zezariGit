@@ -6773,3 +6773,28 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `https://zezari.family` and `https://zezari.vercel.app` resolve to the same deployment.
 - Both domains returned HTTPS 200 for home and public QR paths; the custom-domain privacy, manifest, and service-worker routes also returned HTTPS 200.
 - The authentication provider API returned all configured providers and host-matching callback URLs on both domains.
+
+## 2026-07-31 KST - Google And Naver Custom-Domain OAuth Callbacks
+
+### User Request
+- Configure Google and Naver login callback URLs directly in the signed-in provider consoles for the new `zezari.family` domain.
+
+### Implementation
+- Updated the active Google OAuth web client with the `https://zezari.family` JavaScript origin and Google callback.
+- Preserved the existing `zezari.vercel.app` and localhost Google entries.
+- Changed the Naver application's primary service URL to `https://zezari.family`.
+- Added the custom-domain Naver callback while preserving the Vercel-domain callback.
+- Did not expose or copy provider secrets into source control or documentation.
+
+### Verification
+- Google opened the account chooser with `redirect_uri=https://zezari.family/api/auth/callback/google` and no redirect mismatch.
+- Naver opened the `zezari` consent screen with `redirect_uri=https://zezari.family/api/auth/callback/naver` and no callback error.
+- Reopened both provider settings and confirmed the saved custom-domain and compatibility-domain entries.
+- Naver remains in development mode, so public login requires Naver review approval; registered app members can test now.
+
+### Deliverables
+- Added `deliverables/OAUTH_CALLBACK_SETUP.md`.
+- Updated `deliverables/CUSTOM_DOMAIN_SETUP.md`, the deliverable index, and the cumulative image prompt archive.
+
+### Time Spent
+- Provider-console inspection, callback registration, live OAuth entry verification, and documentation: about 15 minutes.

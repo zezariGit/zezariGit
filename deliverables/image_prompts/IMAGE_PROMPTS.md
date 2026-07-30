@@ -440,3 +440,14 @@ Create a clean Korean civic-tech infrastructure diagram for "REAL_QR_FIND". In t
 
 ### Notes
 - Use when presenting the custom-domain migration and the reason existing physical QR products do not need replacement.
+
+## 2026-07-31 - Dual-Domain Google And Naver Login
+
+### Purpose
+- Explain how the primary custom domain and compatibility domain share one application while each OAuth provider validates explicit callback URLs.
+
+### Prompt
+Create a compact Korean OAuth architecture diagram for "REAL_QR_FIND". On the left, show two HTTPS entry domains, `zezari.family` as primary and `zezari.vercel.app` as compatibility. In the center, show one Next.js authentication gateway that selects a host-matching callback. On the right, show separate Google and Naver provider boxes, each containing two approved callback labels for the custom and Vercel domains. Add a green verification path from Google to an account chooser and from Naver to a consent screen. Add a restrained amber note under Naver reading "개발 중: 등록 멤버만 로그인 가능, 검수 승인 후 전체 공개". Use white work surfaces, civic blue, restrained purple, thin gray connectors, compact Korean labels, 8px or smaller corner radii, no gradients, and no client IDs, secrets, tokens, or personal account data.
+
+### Notes
+- Use when explaining why both callback sets must remain while the compatibility URL is supported.

@@ -46,6 +46,13 @@ https://zezari.family/api/auth/callback/facebook
 
 Keep the matching `https://zezari.vercel.app/api/auth/callback/{provider}` entries while the compatibility domain remains available. The authentication API emits a callback URL for the host used to open the service, so both callback URL sets are required when both domains offer direct login.
 
+### Provider Console Status
+
+- Google: custom-domain origin and callback registered; existing Vercel-domain and localhost entries retained.
+- Naver: primary service URL changed to `https://zezari.family`; custom-domain and Vercel-domain callbacks registered.
+- Naver operational note: the application is still in the `개발 중` state, so only registered application members can complete login until review approval.
+- Kakao and Facebook callbacks remain separate provider-console follow-up items.
+
 ## Payment And External Links
 
 - Toss success/failure paths are relative application routes and use the active custom-domain origin after deployment.
@@ -60,4 +67,6 @@ Keep the matching `https://zezari.vercel.app/api/auth/callback/{provider}` entri
 - PASS: The authentication provider API exposes credentials, Google, Kakao, Naver, and Facebook on both domains and creates host-matching callback URLs.
 - PASS: All 40 stored QR target URLs use `zezari.family`, with 40 unique public keys and unchanged subject matching.
 - PASS: Existing Vercel-domain QR links continue to resolve.
-- EXTERNAL CHECK: Each OAuth provider console must contain both host callback URL sets before live social-login completion can be claimed for both domains.
+- PASS: Google opened its account chooser with the `zezari.family` callback and no redirect mismatch.
+- PASS: Naver opened its consent screen with the `zezari.family` callback and no callback URL error.
+- FOLLOW-UP: Register and verify the custom-domain callback in the Kakao and Facebook consoles.
