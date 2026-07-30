@@ -24,9 +24,11 @@ export default async function ShopPage({ searchParams }) {
   const notice = params?.notice || "";
   const noticeType = params?.noticeType || "success";
   const requestedProductId = params?.product || "";
-  const [{ guardian, subjects, subscription, subscriptionPlans }, productRows, couponData] = await Promise.all([
+  const [{ guardian, subjects }, productRows, couponData] = await Promise.all([
     getDashboardData(session, {
       includeSubjectDetails: false,
+      includeSubscription: false,
+      includeSubscriptionPlans: false,
       includeAdDailyRate: false,
     }),
     getProducts(),
@@ -46,8 +48,6 @@ export default async function ShopPage({ searchParams }) {
           products={products}
           initialProductId={initialProduct.id}
           subjects={subjects}
-          plans={subscriptionPlans}
-          subscription={subscription}
           guardian={guardian}
           coupons={availableCoupons}
           adminPaymentPassEnabled={adminPaymentPassEnabled}

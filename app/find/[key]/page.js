@@ -70,7 +70,11 @@ export default async function FindPage({ params, searchParams }) {
 
   const owner = Boolean(session && getGuardianKey(session) === data.guardian_google_id);
   const subscriptionReady = data.subscription_status === "ready";
-  const subscriptionActive = hasActiveAccess(data.subscription_status, data.subscription_period_end);
+  const subscriptionActive = hasActiveAccess(
+    data.subscription_status,
+    data.subscription_period_end,
+    data.subscription_access_type
+  );
 
   if (!subscriptionActive && !subscriptionReady) {
     const paused = data.subscription_status === "paused";
@@ -78,12 +82,12 @@ export default async function FindPage({ params, searchParams }) {
     return (
       <main className="find-page">
         <section className="find-shell">
-          <p className="intro-kicker">이용권 확인 필요</p>
-          <h1>{paused ? "현재 서비스가 일시정지되어 있습니다" : expired ? "이용기간이 만료되었습니다" : "사용 가능한 이용권이 없습니다"}</h1>
-          <p>이용권이 활성화되기 전에는 대상자와 보호자의 개인정보가 표시되지 않습니다.</p>
+          <p className="intro-kicker">서비스 확인 필요</p>
+          <h1>{paused ? "현재 서비스가 일시정지되어 있습니다" : expired ? "기존 이용기간이 만료되었습니다" : "사용 가능한 QR 안심 서비스가 없습니다"}</h1>
+          <p>상품 구매와 QR 활성화가 완료되기 전에는 대상자 정보가 표시되지 않습니다.</p>
           {owner ? (
             <a className="primary-button" href={paused ? "/account/billing" : "/shop"}>
-              {paused ? "이용권 재개하기" : "이용권 구매하기"}
+              {paused ? "서비스 재개하기" : "상품 구매하기"}
             </a>
           ) : (
             <div className="find-key-box">
@@ -121,7 +125,7 @@ export default async function FindPage({ params, searchParams }) {
                   QR 코드 활성화하기
                 </button>
               </form>
-              <p className="find-notify-message">활성화가 완료되면 오늘부터 이용기간이 시작되고, 이 QR에서 대상자 정보가 조회됩니다.</p>
+              <p className="find-notify-message">활성화가 완료되면 이 QR에서 대상자 정보를 계속 조회할 수 있습니다.</p>
             </>
           ) : (
             <>
@@ -184,8 +188,9 @@ export default async function FindPage({ params, searchParams }) {
   );
 }
 
-function hasActiveAccess(status, periodEnd) {
+function hasActiveAccess(status, periodEnd, accessType = "periodic") {
   if (status !== "active") return false;
+  if (accessType === "product_lifetime") return true;
   if (!periodEnd) return false;
   const end = new Date(periodEnd);
   return !Number.isNaN(end.getTime()) && end.getTime() > Date.now();

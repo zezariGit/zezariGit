@@ -4,7 +4,7 @@ Project: REAL_QR_FIND / zezari
 
 ## Status
 - Implemented in Turso.
-- Current schema version: `26`.
+- Current schema version: `27`.
 
 ## Tables
 
@@ -128,7 +128,7 @@ Stores public QR location-share history when a finder grants browser location pe
 
 ### subscriptions
 
-Stores Toss Payments subscription/billing state for a guardian.
+Stores guardian QR service access. Existing period access and new product-included continuing access share this table.
 
 | Column | Type | Notes |
 | --- | --- | --- |
@@ -137,9 +137,10 @@ Stores Toss Payments subscription/billing state for a guardian.
 | `customer_key` | TEXT | Toss billing customer key mapped to the guardian |
 | `billing_key` | TEXT | Toss billing key, server-side only |
 | `status` | TEXT | `ready`, `active`, `failed`, etc. |
+| `access_type` | TEXT | `periodic` for legacy period access or `product_lifetime` for continuing product-included access |
 | `plan_name` | TEXT | Subscription plan identifier |
-| `plan_months` | INTEGER | Selected plan duration: `1`, `3`, or `6` |
-| `amount` | INTEGER | Subscription amount in KRW |
+| `plan_months` | INTEGER | Legacy plan duration or `0` for product-included continuing access |
+| `amount` | INTEGER | Last related payment amount in KRW |
 | `currency` | TEXT | Currency, currently `KRW` |
 | `current_period_start` | TEXT | Current subscription period start |
 | `current_period_end` | TEXT | Current subscription period end |
@@ -186,7 +187,7 @@ Stores administrator-managed products shown on the user product selection page.
 
 ### product_orders
 
-Stores product selections and standalone purchase requests.
+Stores product selections, payment state, delivery state, and QR service activation state.
 
 | Column | Type | Notes |
 | --- | --- | --- |
@@ -195,8 +196,8 @@ Stores product selections and standalone purchase requests.
 | `subject_id` | TEXT | Managed subject linked to the product |
 | `product_id` | TEXT | Selected product |
 | `quantity` | INTEGER | Selected quantity |
-| `order_type` | TEXT | `subscription` or `standalone` |
-| `plan_months` | INTEGER | Subscription period when `order_type = subscription` |
+| `order_type` | TEXT | `subscription` for current QR-service product orders; `standalone` remains only for legacy records |
+| `plan_months` | INTEGER | `0` for current product-included continuing access; legacy period value otherwise |
 | `design_index` | INTEGER | Selected design index on the product detail screen |
 | `shipping_address` | TEXT | Delivery address entered during order information step |
 | `payment_method` | TEXT | Selected Toss payment method, currently `CARD` |
@@ -319,18 +320,18 @@ Stores the browser-rendered advertisement poster separately so advertisement lis
 - Logged-in guardians can register a browser push subscription from the dashboard.
 - Public find pages can call the notification API to send a push message to the assigned guardian.
 - The push notification message is also stored in `guardian_notifications` so the guardian can review messages from the top-left bell notification panel.
-- Public find pages can call the location-share API only when the QR is enabled, activated by the guardian, linked to a subject, and covered by an active paid service period.
+- Public find pages can call the location-share API only when the QR is enabled, activated by the guardian, linked to a subject, and covered by active period or product-included service access.
 - Location-share history is stored in `location_shares`; guardian push notifications use generated map links and do not store the raw private guardian phone number.
 - Privacy note: public QR pages intentionally expose configured subject/contact fields. Raw guardian phone numbers are private; before production launch, connect a real safe-number provider and add explicit guardian consent and a field-level exposure policy.
 - Dashboard no longer starts new subscription billing directly; the dashboard product purchase button now opens `/shop`.
-- Logged-in guardians select a product, target subject, quantity, and subscription period from `/shop`.
-- A subscription checkout from `/shop` stores the product selection as a `product_orders` row with `payment_pending`.
-- Subscription payment completion from `/shop` stores the order as `paid_waiting_activation`; the subscription remains `ready` until QR activation.
-- Product standalone purchase is only accepted for guardians with `subscriptions.status = active` and uses Toss product payment confirmation.
+- Logged-in guardians select a target subject, product, zodiac design, and quantity from `/shop`.
+- Product checkout charges the selected product/design price and stores `plan_months = 0`.
+- Payment completion stores the order as `paid_waiting_activation`; QR service remains `ready` until activation.
+- QR activation changes product-included service to `active` with `access_type = product_lifetime` and no expiry date.
+- The removed standalone order/payment preparation APIs return HTTP 410 to cached clients.
 - Admin users can manage product images, prices, activation state, and display order from the admin product management section.
-- Subscription is marked active only after server-side Toss billing API succeeds.
-- Logged-in guardians can pause/resume their own subscription service state.
-- Admin users can edit 1/3/6-month subscription option prices.
+- Existing period subscriptions remain compatible and retain their stored dates and pause/resume behavior.
+- Product-included continuing access is excluded from period expiry and pause/resume behavior.
 - Admin users can bypass Toss approval from product, subscription, and advertisement checkout screens for functional testing.
 - Admin payment-pass requests are authorized again on the server, complete the normal downstream state transition, and are excluded from real revenue totals.
 - Logged-in guardians can open an advertisement modal per managed subject.

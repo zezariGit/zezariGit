@@ -414,7 +414,18 @@ Create a compact Korean mobile modal for "REAL_QR_FIND" showing an active manage
 - Present the redesigned product purchase sequence and the catalog relationship between managed subjects, combination products, and zodiac designs.
 
 ### Prompt
-Create a Korean mobile commerce workflow for "REAL_QR_FIND" using its white and civic-blue design system. Show one compact phone screen titled "상품 구매" with three vertically aligned select boxes labeled "나의 관리대상", "상품", and "디자인". The product menu contains 팔찌, 목걸이, 키링, 팔찌&목걸이, 목걸이&키링, 팔찌&목걸이&키링, and 스티커. The design menu contains all twelve zodiac animals: 쥐, 소, 호랑이, 토끼, 용, 뱀, 말, 양, 원숭이, 닭, 개, 돼지. Below the fields, show a compact selected-item summary, quantity stepper, purchase type tabs, price, and a blue "다음" button. On the right, include a small catalog diagram showing one selected subject linked to one product row and one product-specific zodiac design row, then continuing to the existing preview and Toss checkout. Use thin gray borders, 6px corners, compact Korean labels, no gradients, and no real personal or payment data.
+Create a Korean mobile commerce workflow for "REAL_QR_FIND" using its white and civic-blue design system. Show one compact phone screen titled "상품 구매" with three vertically aligned select boxes labeled "나의 관리대상", "상품", and "디자인". The product menu contains 팔찌, 목걸이, 키링, 팔찌&목걸이, 목걸이&키링, 팔찌&목걸이&키링, and 스티커. The design menu contains all twelve zodiac animals: 쥐, 소, 호랑이, 토끼, 용, 뱀, 말, 양, 원숭이, 닭, 개, 돼지. Below the fields, show a compact selected-item summary, quantity stepper, product price, a short note that QR service is included continuously, and a blue "다음" button. Do not show subscription-period or standalone-purchase tabs. On the right, include a small catalog diagram showing one selected subject linked to one product row and one product-specific zodiac design row, then continuing to the existing preview and Toss checkout. Use thin gray borders, 6px corners, compact Korean labels, no gradients, and no real personal or payment data.
 
 ### Notes
 - Use when explaining why combination products remain compatible with the existing one-product-per-order database contract.
+
+## 2026-07-30 - Product Purchase Includes Continuing QR Service
+
+### Purpose
+- Explain the simplified commercial policy in which buying the physical QR product unlocks continuing managed-subject service without a separate period purchase.
+
+### Prompt
+Create a clean Korean civic-tech service flow for "REAL_QR_FIND". Show four compact stages connected left to right: 1) a guardian selects a managed subject, physical product, zodiac design, and quantity; 2) the guardian pays only the product price through Toss Payments; 3) after delivery, the guardian scans and activates the product QR; 4) the managed-subject public page remains available with a clear "계속 이용" service badge and no expiry date. Include a small legacy branch labeled "기존 기간제 데이터 유지" to show backward compatibility. Use the project's white and civic-blue interface, thin gray lines, 6px corners, restrained status colors, no gradients, and no personal, payment, QR-key, or API credential data.
+
+### Notes
+- Use when presenting the shift from separate pass/standalone modes to product-included QR service.

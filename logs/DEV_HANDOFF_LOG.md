@@ -6658,3 +6658,38 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Vercel production deployment: `dpl_GumWVzpyDT6dXpverJ1Lgihznztj` (`READY`).
 - Assigned `https://zezari.vercel.app` to the deployment and verified HTTP 200 for the home and `/shop` routes.
 - The automated in-app browser had no zezari login session, so direct `/shop` access correctly returned to the onboarding screen. Authenticated shop UI behavior is covered by the production build and catalog/API contract verification above.
+
+## 2026-07-30 KST - Product Purchase Includes Continuing QR Service
+
+### User Request
+- Remove the period-pass and standalone-product purchase choices from the shop.
+- Buying a product should allow continued use of the managed-subject QR page without a separate pass purchase.
+
+### Implementation
+- Removed purchase-mode tabs and 1/3/6-month choices from the guardian shop.
+- Checkout now charges the selected product/design unit price multiplied by quantity.
+- Kept preview, shipping address, coupon, Toss widget, administrator payment pass, delivery, and QR activation flows.
+- New completed orders create `product_lifetime` QR service access. Before product QR activation the service is `ready`; after activation it is `active` without an expiry date.
+- Public QR page and location-sharing access checks now recognize active `product_lifetime` access.
+- Updated guardian billing pages to show `계속 이용`; product-based access cannot enter period pause/resume behavior.
+- Disabled the removed standalone order/payment preparation APIs with HTTP 410 for cached clients.
+- Updated administrator order labels and revenue aggregation so new service-included orders remain product sales.
+
+### Database
+- Increased schema version from `26` to `27`.
+- Added `subscriptions.access_type`, defaulting to `periodic` for backward compatibility.
+- Existing subscription rows were retained as `periodic`; no product, design, order, or payment data was deleted.
+
+### Verification
+- `npm run build` passed.
+- `git diff --check` passed before documentation finalization.
+- Local Next.js runtime migrated production Turso to schema version `27`.
+- Verified the `access_type` column and confirmed the existing subscription row remained `periodic`.
+- A public `/find/{key}` request returned HTTP 200 after migration.
+
+### Deliverables
+- Added `deliverables/PRODUCT_INCLUDED_QR_SERVICE.md`.
+- Updated shop selection, database schema, deliverable index, and image-prompt archive.
+
+### Time Spent
+- Analysis, implementation, DB migration, compatibility checks, build verification, and documentation: about 25 minutes.

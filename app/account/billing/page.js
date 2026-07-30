@@ -16,22 +16,27 @@ export default async function BillingPage({ searchParams }) {
   const noticeType = params?.noticeType || "success";
   const { subjects, subscription, productOrders } = await getGuardianBillingData(session);
   const statusLabel = subscriptionStatusLabel(subscription?.status);
-  const expiryDate = subscription?.current_period_end ? formatDate(subscription.current_period_end) : "-";
+  const lifetimeAccess = subscription?.access_type === "product_lifetime";
+  const expiryDate = lifetimeAccess
+    ? "계속 이용"
+    : subscription?.current_period_end
+      ? formatDate(subscription.current_period_end)
+      : "-";
 
   return (
     <main className="account-page">
       <section className="account-panel">
-        <AccountTopbar title="결제 및 이용권 현황" />
+        <AccountTopbar title="결제 및 서비스 현황" />
 
         <section className="account-section">
-          <h2>이용권 현황</h2>
+          <h2>QR 안심 서비스 현황</h2>
           <div className="account-subscription-summary">
             <div>
               <strong>{statusLabel}</strong>
-              <span>이용 만료일: {expiryDate}</span>
-              <span>자동 갱신되지 않으며, 필요한 기간만큼 직접 추가 구매합니다.</span>
+              <span>서비스 이용: {expiryDate}</span>
+              <span>{lifetimeAccess ? "구매한 상품의 QR을 활성화하면 추가 기간 결제 없이 계속 이용할 수 있습니다." : "기존 기간제 서비스 정보입니다."}</span>
             </div>
-            <SubscriptionControls status={subscription?.status || "none"} />
+            <SubscriptionControls status={subscription?.status || "none"} accessType={subscription?.access_type || "periodic"} />
           </div>
           <div className="account-subject-list">
             {subjects.map((subject) => (
@@ -39,8 +44,8 @@ export default async function BillingPage({ searchParams }) {
                 <SubjectAvatar subject={subject} />
                 <div>
                   <strong>{subject.name}</strong>
-                  <span>이용권 상태: {statusLabel}</span>
-                  <span>이용 만료일: {expiryDate}</span>
+                  <span>서비스 상태: {statusLabel}</span>
+                  <span>서비스 이용: {expiryDate}</span>
                 </div>
                 <a href="#payment-history">결제 내역 &gt;</a>
               </article>
@@ -52,7 +57,7 @@ export default async function BillingPage({ searchParams }) {
         </section>
 
         <nav className="account-menu-list" aria-label="결제 관련 메뉴">
-          <Link href="/shop">이용권 추가 구매</Link>
+          <Link href="/shop">상품 구매</Link>
           <Link href="/account/coupons">쿠폰함</Link>
           <Link href="/account/payment-methods">결제수단</Link>
           <Link href="/account/ads">광고 대시보드</Link>
@@ -65,7 +70,7 @@ export default async function BillingPage({ searchParams }) {
               <article className="account-history-card" key={order.id}>
                 <div>
                   <strong>{formatOrderProductName(order)}</strong>
-                  <span>{order.subject_name || "대상자 미선택"} · {order.order_type === "standalone" ? "상품 단독 구매" : "이용권 포함 상품"}</span>
+                  <span>{order.subject_name || "대상자 미선택"} · {Number(order.plan_months || 0) <= 0 ? "QR 서비스 포함 상품" : "기존 기간제 상품"}</span>
                   <span>{formatDate(order.created_at)}</span>
                 </div>
                 <div>

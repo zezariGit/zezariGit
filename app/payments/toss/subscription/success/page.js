@@ -19,7 +19,7 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
   const adminPass = String(params?.adminPass || "") === "1";
 
   if (!session) {
-    return <PaymentResult title="로그인이 필요합니다" message="이용권 결제 완료 처리를 위해 다시 로그인해 주세요." />;
+    return <PaymentResult title="로그인이 필요합니다" message="상품 결제 완료 처리를 위해 다시 로그인해 주세요." />;
   }
 
   if (!productOrderId || !orderId || (!freeOrder && (!paymentKey || !amount))) {
@@ -46,13 +46,13 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
     || productOrder.toss_order_id !== orderId
     || Number(productOrder.amount) !== amount
   ) {
-    return <PaymentResult title="결제 정보가 일치하지 않습니다" message="이용권 주문번호와 결제금액을 다시 확인해 주세요." />;
+    return <PaymentResult title="결제 정보가 일치하지 않습니다" message="상품 주문번호와 결제금액을 다시 확인해 주세요." />;
   }
 
   try {
     if (freeOrder) {
       if (Number(productOrder.amount || 0) !== 0) {
-        throw new Error("전액 할인 이용권 주문 정보가 일치하지 않습니다.");
+        throw new Error("전액 할인 상품 주문 정보가 일치하지 않습니다.");
       }
       const result = await completePrepaidSubscriptionPurchase({
         guardianId: productOrder.guardian_id,
@@ -71,8 +71,8 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
         <ShopComplete
           title="주문이 완료되었습니다!"
           message={waitingForActivation
-            ? "쿠폰 전액 할인으로 결제가 완료되었습니다. 상품을 수령한 뒤 QR을 활성화하면 이용기간이 시작됩니다."
-            : "쿠폰 전액 할인으로 결제가 완료되었고, 이용기간이 추가되었습니다."}
+            ? "쿠폰 전액 할인으로 결제가 완료되었습니다. 상품을 수령한 뒤 QR을 활성화하면 서비스를 계속 이용할 수 있습니다."
+            : "쿠폰 전액 할인으로 결제가 완료되었고, QR 안심 서비스가 연결되었습니다."}
           order={order}
         />
       );
@@ -80,7 +80,7 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
 
     const payment = await confirmWidgetPayment({ paymentKey, orderId, amount });
     if (payment.orderId !== orderId || Number(payment.totalAmount || 0) !== Number(productOrder.amount) || payment.status !== "DONE") {
-      throw new Error("토스페이먼츠 승인 결과가 이용권 주문과 일치하지 않습니다.");
+      throw new Error("토스페이먼츠 승인 결과가 상품 주문과 일치하지 않습니다.");
     }
 
     const result = await completePrepaidSubscriptionPurchase({
@@ -95,15 +95,15 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
       <ShopComplete
         title="주문이 완료되었습니다!"
         message={waitingForActivation
-          ? "상품을 수령한 뒤 QR을 활성화하면 이용기간이 시작됩니다."
-          : "기존 이용기간 뒤에 구매한 이용기간이 추가되었습니다."}
+          ? "상품을 수령한 뒤 QR을 활성화하면 QR 안심 서비스를 계속 이용할 수 있습니다."
+          : "상품 결제가 완료되었고 QR 안심 서비스가 연결되었습니다."}
         order={order}
       />
     );
   } catch (error) {
     return (
       <PaymentResult
-        title="이용권 결제 처리에 실패했습니다"
+        title="상품 결제 처리에 실패했습니다"
         message={error.message || "잠시 후 다시 시도해 주세요."}
         actionLabel="상품 선택으로 이동"
         actionHref="/shop"

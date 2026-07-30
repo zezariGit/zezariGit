@@ -11,8 +11,6 @@ export default function ShopCheckoutClient({
   products = [],
   initialProductId = "",
   subjects = [],
-  plans = [],
-  subscription = null,
   guardian = null,
   coupons = [],
   adminPaymentPassEnabled = false,
@@ -23,8 +21,6 @@ export default function ShopCheckoutClient({
   const [productId, setProductId] = useState(initialProduct?.id || "");
   const [quantity, setQuantity] = useState(1);
   const [subjectId, setSubjectId] = useState(subjects[0]?.id || "");
-  const [planMonths, setPlanMonths] = useState(String(plans[0]?.months || 1));
-  const [mode, setMode] = useState("subscription");
   const [designIndex, setDesignIndex] = useState(0);
   const [designId, setDesignId] = useState(initialDesigns[0]?.id || "");
   const [couponId, setCouponId] = useState("");
@@ -38,7 +34,6 @@ export default function ShopCheckoutClient({
   const latestPaymentAmountRef = useRef(0);
   const widgetAmountRef = useRef(null);
 
-  const subscribed = subscription?.status === "active";
   const product = useMemo(
     () => products.find((item) => item.id === productId) || products[0] || null,
     [productId, products]
@@ -48,16 +43,12 @@ export default function ShopCheckoutClient({
   const selectedDesign = useMemo(() => {
     return designs.find((design) => design.id === designId) || designs[designIndex] || designs[0] || null;
   }, [designId, designIndex, designs]);
-  const selectedPlan = useMemo(
-    () => plans.find((plan) => String(plan.months) === String(planMonths)) || plans[0] || null,
-    [plans, planMonths]
-  );
   const productUnitPrice = getDesignUnitPrice(product, selectedDesign);
   const productAmount = productUnitPrice * quantity;
-  const subtotalAmount = mode === "subscription" ? Number(selectedPlan?.amount || 0) : productAmount;
+  const subtotalAmount = productAmount;
   const applicableCoupons = useMemo(
-    () => coupons.filter((coupon) => isCouponApplicableToOrder(coupon, mode, product?.slug, subtotalAmount)),
-    [coupons, mode, product?.slug, subtotalAmount]
+    () => coupons.filter((coupon) => isCouponApplicableToOrder(coupon, "product", product?.slug, subtotalAmount)),
+    [coupons, product?.slug, subtotalAmount]
   );
   const selectedCoupon = applicableCoupons.find((coupon) => coupon.id === couponId) || null;
   const discountAmount = selectedCoupon ? calculateCouponDiscount(selectedCoupon, subtotalAmount) : 0;
@@ -192,15 +183,6 @@ export default function ShopCheckoutClient({
     setQuantity(Math.max(1, Math.min(99, Number(next) || 1)));
   };
 
-  const chooseMode = (nextMode) => {
-    if (nextMode === "standalone" && !subscribed) {
-      setMessage("상품 단독 구매는 이용권 사용중인 고객만 선택할 수 있습니다.");
-      return;
-    }
-    setMode(nextMode);
-    setMessage("");
-  };
-
   const validateSelection = () => {
     if (!subjectId) {
       setMessage("상품을 연결할 대상자를 선택해 주세요.");
@@ -208,14 +190,6 @@ export default function ShopCheckoutClient({
     }
     if (designs.length > 0 && !selectedDesign) {
       setMessage("상품 디자인을 선택해 주세요.");
-      return false;
-    }
-    if (mode === "standalone" && !subscribed) {
-      setMessage("상품 단독 구매는 이용권 사용중인 고객만 선택할 수 있습니다.");
-      return false;
-    }
-    if (mode === "subscription" && subscription?.status === "ready") {
-      setMessage("QR 활성화를 기다리는 이용권이 있습니다. QR 활성화 후 추가 구매해 주세요.");
       return false;
     }
     if (step === "order" && !shippingAddress.trim()) {
@@ -236,60 +210,8 @@ export default function ShopCheckoutClient({
     setStep("order");
   };
 
-  const startSubscription = async (adminPass = false) => {
+  const startProductServicePurchase = async (adminPass = false) => {
     const response = await fetch("/api/payments/toss/subscription/prepare", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        planMonths: Number(planMonths),
-        productId: product.id,
-        subjectId,
-        quantity,
-        designIndex,
-        designId: selectedDesign?.id || "",
-        couponId,
-        shippingAddress,
-        shippingAddressDetail,
-        paymentMethod: "WIDGET",
-        adminPass,
-      }),
-    });
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data?.message || "이용권 결제 준비에 실패했습니다.");
-    }
-    if (data.adminPass) {
-      window.location.href = data.redirectUrl;
-      return;
-    }
-    if (data.freeOrder) {
-      window.location.href = data.redirectUrl || "/?tab=dashboard";
-      return;
-    }
-    if (!data.configured) {
-      throw new Error("Toss Payments 키 설정이 필요합니다.");
-    }
-    if (!widgetRef.current || widgetStatus !== "ready") {
-      throw new Error("결제수단을 준비 중입니다. 잠시 후 다시 시도해 주세요.");
-    }
-    if (Number(data.amount || 0) !== paymentAmount) {
-      await widgetRef.current.setAmount({ currency: "KRW", value: Number(data.amount || 0) });
-    }
-    await widgetRef.current.requestPayment({
-      orderId: data.orderId,
-      orderName: data.orderName,
-      successUrl: data.successUrl,
-      failUrl: data.failUrl,
-      customerEmail: data.customerEmail || guardian?.email || guardian?.google_email || "",
-      customerName: data.customerName || guardian?.name || "",
-    });
-  };
-
-  const startStandalonePayment = async (adminPass = false) => {
-    const response = await fetch("/api/payments/toss/product/prepare", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -329,15 +251,14 @@ export default function ShopCheckoutClient({
     if (Number(data.amount || 0) !== paymentAmount) {
       await widgetRef.current.setAmount({ currency: "KRW", value: Number(data.amount || 0) });
     }
-    const request = {
+    await widgetRef.current.requestPayment({
       orderId: data.orderId,
       orderName: data.orderName,
       successUrl: data.successUrl,
       failUrl: data.failUrl,
-      customerEmail: guardian?.email || guardian?.google_email || "",
-      customerName: guardian?.name || "",
-    };
-    await widgetRef.current.requestPayment(request);
+      customerEmail: data.customerEmail || guardian?.email || guardian?.google_email || "",
+      customerName: data.customerName || guardian?.name || "",
+    });
   };
 
   const pay = async () => {
@@ -355,11 +276,7 @@ export default function ShopCheckoutClient({
     setMessage("");
 
     try {
-      if (mode === "standalone") {
-        await startStandalonePayment();
-        return;
-      }
-      await startSubscription();
+      await startProductServicePurchase();
     } catch (error) {
       setMessage(error.message || "결제를 시작하지 못했습니다.");
       setLoading(false);
@@ -374,11 +291,7 @@ export default function ShopCheckoutClient({
     setMessage("");
 
     try {
-      if (mode === "standalone") {
-        await startStandalonePayment(true);
-        return;
-      }
-      await startSubscription(true);
+      await startProductServicePurchase(true);
     } catch (error) {
       setMessage(error.message || "결제패스 처리에 실패했습니다.");
       setLoading(false);
@@ -421,12 +334,6 @@ export default function ShopCheckoutClient({
             designId={designId}
             setDesignId={setDesignId}
             selectedDesign={selectedDesign}
-            mode={mode}
-            chooseMode={chooseMode}
-            subscribed={subscribed}
-            plans={plans}
-            planMonths={planMonths}
-            setPlanMonths={setPlanMonths}
             productUnitPrice={productUnitPrice}
             productAmount={productAmount}
           />
@@ -512,12 +419,6 @@ function ProductConfiguration({
   designId,
   setDesignId,
   selectedDesign,
-  mode,
-  chooseMode,
-  subscribed,
-  plans,
-  planMonths,
-  setPlanMonths,
   productUnitPrice,
   productAmount,
 }) {
@@ -579,7 +480,7 @@ function ProductConfiguration({
         <ProductVisual product={product} design={selectedDesign} />
         <div>
           <strong>{formatProductDesignName(product, selectedDesign)}</strong>
-          <span>{mode === "standalone" ? `${formatCurrency(productUnitPrice)} / 개` : "이용권과 함께 주문"}</span>
+          <span>{formatCurrency(productUnitPrice)} / 개</span>
         </div>
       </div>
 
@@ -592,51 +493,17 @@ function ProductConfiguration({
         </div>
       </div>
 
-      <div className="purchase-mode-tabs" role="tablist" aria-label="구매 방식">
-        <button className={mode === "subscription" ? "active" : ""} type="button" onClick={() => chooseMode("subscription")}>
-          이용기간
-        </button>
-        <button
-          className={mode === "standalone" ? "active" : ""}
-          type="button"
-          onClick={() => chooseMode("standalone")}
-          disabled={!subscribed}
-          title={subscribed ? "상품 단독 구매" : "이용권 사용중인 고객만 선택 가능합니다"}
-        >
-          상품 단독 구매
-        </button>
-      </div>
-
-      {mode === "subscription" ? (
-        <>
-          <div className="plan-choice-list">
-            {plans.map((plan) => (
-              <button
-                className={String(plan.months) === String(planMonths) ? "active" : ""}
-                type="button"
-                key={plan.months}
-                onClick={() => setPlanMonths(String(plan.months))}
-              >
-                <span>{planLabel(plan.months)}</span>
-                <strong>{formatCurrency(plan.amount)}</strong>
-              </button>
-            ))}
-          </div>
-          <p className="shop-note">선택한 기간을 한 번 결제하며 자동 갱신되지 않습니다.</p>
-        </>
-      ) : (
-        <div className="standalone-info-panel">
-          <div className="shop-summary-list">
-            <span>상품 금액</span>
-            <strong>{formatCurrency(productUnitPrice)} / 개</strong>
-            <span>상품 수량</span>
-            <strong>{quantity}개</strong>
-            <span>결제예정금액</span>
-            <strong>{formatCurrency(productAmount)}</strong>
-          </div>
-          <p className="shop-warning">상품 단독 구매는 이용권 사용중인 고객에게만 표시됩니다.</p>
+      <div className="standalone-info-panel">
+        <div className="shop-summary-list">
+          <span>상품 금액</span>
+          <strong>{formatCurrency(productUnitPrice)} / 개</strong>
+          <span>상품 수량</span>
+          <strong>{quantity}개</strong>
+          <span>결제예정금액</span>
+          <strong>{formatCurrency(productAmount)}</strong>
         </div>
-      )}
+        <p className="shop-note">상품을 구매하고 QR을 활성화하면 관리대상 QR 안심 서비스를 계속 이용할 수 있습니다.</p>
+      </div>
     </>
   );
 }
@@ -659,7 +526,7 @@ function ProductPreview({ product, design, subject, quantity }) {
       </div>
       <div className="preview-note-card">
         <strong>QR 안심 서비스 연결</strong>
-        <span>상품 수령 후 QR을 스캔하고 활성화하면 대상자 정보가 공개됩니다.</span>
+        <span>상품 수령 후 QR을 활성화하면 대상자 정보가 공개되며 추가 기간 결제 없이 계속 이용할 수 있습니다.</span>
       </div>
     </div>
   );
@@ -856,10 +723,6 @@ function productFallbackIcon(slug) {
   if (slug === "keyring") return "●";
   if (["bracelet-necklace", "necklace-keyring", "bracelet-necklace-keyring"].includes(slug)) return "세트";
   return "상품";
-}
-
-function planLabel(months) {
-  return `${months}개월`;
 }
 
 function formatCurrency(value) {

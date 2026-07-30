@@ -1595,7 +1595,7 @@ function OrderManagementSection({ ordersData }) {
                       <small>{order.guardian_name || "보호자 미입력"}</small>
                     </span>
                     <span role="cell">{order.display_recipient_phone || order.guardian_phone || "-"}</span>
-                    <span role="cell">{formatOrderProductName(order)} ({order.order_type === "standalone" ? "단독" : `${order.plan_months || "-"}개월`})</span>
+                    <span role="cell">{formatOrderProductName(order)} ({orderPurchaseTypeLabel(order)})</span>
                     <span role="cell">{order.quantity || 1}개</span>
                     <span role="cell">{formatCurrency(order.amount)}</span>
                     <span role="cell">{formatCurrency(order.amount)}</span>
@@ -1664,7 +1664,7 @@ function OrderManagementSection({ ordersData }) {
                   </div>
                   <dl className="admin-detail-list">
                     <div><dt>상품명</dt><dd>{formatOrderProductName(selectedOrder)}</dd></div>
-                    <div><dt>옵션</dt><dd>{selectedOrder.order_type === "standalone" ? "상품 단독 구매" : `${selectedOrder.plan_months || "-"}개월 이용권`}</dd></div>
+                    <div><dt>옵션</dt><dd>{orderPurchaseTypeLabel(selectedOrder)}</dd></div>
                     <div><dt>수량</dt><dd>{selectedOrder.quantity || 1}개</dd></div>
                     <div><dt>결제금액</dt><dd>{formatCurrency(selectedOrder.amount)}</dd></div>
                   </dl>
@@ -3259,13 +3259,13 @@ function GuardianManagementSection({ adminData }) {
                       {payments.length === 0 && <p className="empty-text">주문 내역이 없습니다.</p>}
                     </div>
 
-                    <div className="guardian-tab-section-title">구독 내역</div>
+                    <div className="guardian-tab-section-title">서비스 내역</div>
                     <article className="guardian-detail-mini-card">
-                      <div className="guardian-detail-row"><strong>구독상태</strong><span>{subscriptionStatusLabel(subscription?.status)}</span></div>
-                      <div className="guardian-detail-row"><strong>구독상품</strong><span>{subscription?.plan_name || "이용권 정보 없음"}</span></div>
-                      <div className="guardian-detail-row"><strong>구독기간</strong><span>{subscription ? `${Number(subscription.plan_months || 1)}개월` : "-"}</span></div>
-                      <div className="guardian-detail-row"><strong>다음 결제일</strong><span>{formatDateOnlyValue(subscription?.current_period_end)}</span></div>
-                      <div className="guardian-detail-row"><strong>구독금액</strong><span>{subscription ? formatCurrency(subscription.amount) : "-"}</span></div>
+                      <div className="guardian-detail-row"><strong>서비스 상태</strong><span>{subscriptionStatusLabel(subscription?.status)}</span></div>
+                      <div className="guardian-detail-row"><strong>서비스 상품</strong><span>{subscriptionPlanLabel(subscription)}</span></div>
+                      <div className="guardian-detail-row"><strong>이용 기간</strong><span>{subscriptionServicePeriodLabel(subscription)}</span></div>
+                      <div className="guardian-detail-row"><strong>다음 결제일</strong><span>{subscription?.access_type === "product_lifetime" ? "없음" : formatDateOnlyValue(subscription?.current_period_end)}</span></div>
+                      <div className="guardian-detail-row"><strong>최근 결제금액</strong><span>{subscription ? formatCurrency(subscription.amount) : "-"}</span></div>
                     </article>
 
                     <div className="guardian-tab-section-title">결제 내역</div>
@@ -3645,14 +3645,14 @@ function SubjectManagementSection({ adminSubjectsData, selectedSubjectQrImage })
                       {orders.length === 0 && <p className="empty-text">주문 내역이 없습니다.</p>}
                     </div>
 
-                    <div className="guardian-tab-section-title">구독 내역</div>
+                    <div className="guardian-tab-section-title">서비스 내역</div>
                     <article className="guardian-detail-mini-card">
-                      <div className="guardian-detail-row"><strong>구독번호</strong><span>{subscription?.id || "-"}</span></div>
-                      <div className="guardian-detail-row"><strong>구독상품</strong><span>{subscription?.plan_name || "이용권 정보 없음"}</span></div>
-                      <div className="guardian-detail-row"><strong>구독상태</strong><span>{subscriptionStatusLabel(subscription?.status)}</span></div>
-                      <div className="guardian-detail-row"><strong>구독 시작일시</strong><span>{formatRecentDateTime(subscription?.current_period_start)}</span></div>
-                      <div className="guardian-detail-row"><strong>다음 결제일</strong><span>{formatDateOnlyValue(subscription?.current_period_end)}</span></div>
-                      <div className="guardian-detail-row"><strong>구독 금액</strong><span>{subscription ? formatCurrency(subscription.amount) : "-"}</span></div>
+                      <div className="guardian-detail-row"><strong>서비스 번호</strong><span>{subscription?.id || "-"}</span></div>
+                      <div className="guardian-detail-row"><strong>서비스 상품</strong><span>{subscriptionPlanLabel(subscription)}</span></div>
+                      <div className="guardian-detail-row"><strong>서비스 상태</strong><span>{subscriptionStatusLabel(subscription?.status)}</span></div>
+                      <div className="guardian-detail-row"><strong>서비스 시작일시</strong><span>{formatRecentDateTime(subscription?.current_period_start)}</span></div>
+                      <div className="guardian-detail-row"><strong>이용 기간</strong><span>{subscriptionServicePeriodLabel(subscription)}</span></div>
+                      <div className="guardian-detail-row"><strong>최근 결제금액</strong><span>{subscription ? formatCurrency(subscription.amount) : "-"}</span></div>
                     </article>
 
                     <div className="guardian-tab-section-title">결제 내역</div>
@@ -4168,7 +4168,7 @@ function orderExportRows(orders = []) {
     보호자: order.guardian_name || "이름 미입력",
     대상자: order.subject_name || "대상자 미선택",
     상품: formatOrderProductName(order),
-    구매유형: order.order_type === "standalone" ? "상품 단독 구매" : `${order.plan_months || "-"}개월 이용권`,
+    구매유형: orderPurchaseTypeLabel(order),
     결제금액: formatCurrency(order.amount),
     결제상태: paymentStatusLabel(order.status),
     배송상태: fulfillmentStatusLabel(order.fulfillment_status || (isPaidOrder(order.status) ? "preparing" : "pending")),
@@ -4480,16 +4480,22 @@ function subscriptionStatusLabel(status) {
   if (status === "ready") return "활성화 대기";
   if (status === "cancelled") return "해지";
   if (status === "expired") return "기간 만료";
-  return "이용권 정보 없음";
+  return "서비스 정보 없음";
 }
 
 function orderTypeLabel(type) {
-  return type === "subscription" ? "이용권 주문" : "상품 주문";
+  return type === "subscription" ? "QR 서비스 포함 상품 주문" : "상품 주문";
 }
 
 function formatOrderProductName(order) {
   const productName = order?.product_name || "상품 미확인";
   return order?.design_name ? `${productName} - ${order.design_name}` : productName;
+}
+
+function orderPurchaseTypeLabel(order) {
+  if (order?.order_type === "standalone") return "기존 상품 단독 구매";
+  if (Number(order?.plan_months || 0) <= 0) return "QR 서비스 포함 상품";
+  return `${order.plan_months}개월 이용권`;
 }
 
 function qrAdminStateLabel(subject) {
@@ -4547,13 +4553,25 @@ function formatSubscriptionNumber(subscription) {
 
 function subscriptionPlanLabel(subscription) {
   if (!subscription) return "-";
+  if (subscription.access_type === "product_lifetime") return "상품 구매 QR 서비스";
   if (subscription.plan_name) return subscription.plan_name;
   if (subscription.plan_months) return `${subscription.plan_months}개월 이용권`;
   return "이용권";
 }
 
+function subscriptionServicePeriodLabel(subscription) {
+  if (!subscription) return "-";
+  if (subscription.access_type === "product_lifetime") {
+    return subscription.status === "ready" ? "QR 활성화 후 계속 이용" : "계속 이용";
+  }
+  return formatSubscriptionPeriod(subscription);
+}
+
 function formatSubscriptionPeriod(subscription) {
   const start = formatDate(subscription?.current_period_start);
+  if (subscription?.access_type === "product_lifetime") {
+    return start === "-" ? "QR 활성화 대기" : `${start}부터 계속 이용`;
+  }
   const end = formatDate(subscription?.current_period_end);
   if (start === "-" && end === "-") return "-";
   return `${start} ~ ${end}`;

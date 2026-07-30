@@ -12,9 +12,8 @@ Project: REAL_QR_FIND / zezari
 2. `상품`
 3. `디자인`
 4. Quantity
-5. Subscription period or standalone purchase
-6. Product preview
-7. Shipping, coupon, and payment
+5. Product preview
+6. Shipping, coupon, and payment
 
 ## Product Options
 - 팔찌
@@ -33,16 +32,16 @@ The three combination choices are stored as normal catalog products. This preser
 - The shop displays only active designs whose names match the twelve zodiac options.
 
 ## Pricing
-- Standalone purchase uses the selected design's price when configured; otherwise it uses the product price.
+- Purchase uses the selected design's price when configured; otherwise it uses the product price.
 - Default combination prices are the sum of their included base products.
-- Subscription purchase continues to use the selected subscription plan amount.
+- Product purchase includes continuing QR service without a separate period or standalone-purchase choice.
 - Coupon eligibility and discount validation remain server-calculated.
 
 ## Data Compatibility
 - Existing products, designs, and orders are retained.
 - New combination products and missing zodiac designs are inserted only when absent.
 - `product_orders.product_id` and `product_orders.design_id` continue to identify the exact purchased option.
-- Production Turso schema version is `26`.
+- Production Turso schema version is `27`.
 
 ## Verification
 - Seven required product slugs exist in production.

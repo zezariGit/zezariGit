@@ -21,14 +21,13 @@ export async function POST(request) {
   }
 
   const body = await request.json().catch(() => ({}));
-  const planMonths = Number(body?.planMonths || 1);
   const adminPass = body.adminPass === true;
   if (adminPass && !(isAdminSession(session) || (await isDbAdminSession(session)))) {
     return NextResponse.json({ message: "관리자만 결제패스를 사용할 수 있습니다." }, { status: 403 });
   }
 
   try {
-    if (!body?.productId) throw new Error("이용권과 함께 구매할 상품을 선택해 주세요.");
+    if (!body?.productId) throw new Error("구매할 상품을 선택해 주세요.");
     const productOrder = await saveProductOrderDraft(session, {
       productId: body.productId,
       subjectId: body.subjectId,
@@ -40,7 +39,7 @@ export async function POST(request) {
       shippingAddressDetail: body.shippingAddressDetail,
       paymentMethod: "WIDGET",
       orderType: "subscription",
-      planMonths,
+      planMonths: 0,
     });
     const configured = isTossWidgetConfigured();
     const { successUrl, failUrl } = getTossCallbackUrls(productOrder.id);
@@ -78,11 +77,11 @@ export async function POST(request) {
       customerKey: createTossCustomerKey(session.user?.id || session.user?.email),
       productOrderId: productOrder.id,
       orderId: productOrder.tossOrderId,
-      planMonths: productOrder.plan.months,
+      serviceIncluded: true,
       subtotalAmount: productOrder.subtotalAmount,
       discountAmount: productOrder.discountAmount,
       amount: productOrder.amount,
-      orderName: `${productOrder.product.name}${productOrder.product.selected_design?.name ? ` - ${productOrder.product.selected_design.name}` : ""} + ${productOrder.plan.name}`,
+      orderName: `${productOrder.product.name}${productOrder.product.selected_design?.name ? ` - ${productOrder.product.selected_design.name}` : ""} + QR 안심 서비스`,
       successUrl,
       failUrl,
       redirectUrl: Number(productOrder.amount || 0) === 0 ? freeSuccessUrl : "",
@@ -90,7 +89,7 @@ export async function POST(request) {
       customerEmail: productOrder.guardian.email || session.user?.email || "",
     });
   } catch (error) {
-    return NextResponse.json({ message: error.message || "이용권 결제 준비에 실패했습니다." }, { status: 400 });
+    return NextResponse.json({ message: error.message || "상품 결제 준비에 실패했습니다." }, { status: 400 });
   }
 }
 
