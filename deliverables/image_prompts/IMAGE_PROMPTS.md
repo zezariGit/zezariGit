@@ -451,3 +451,14 @@ Create a compact Korean OAuth architecture diagram for "REAL_QR_FIND". On the le
 
 ### Notes
 - Use when explaining why both callback sets must remain while the compatibility URL is supported.
+
+## 2026-07-31 - Administrator-Managed Product Select Catalog
+
+### Purpose
+- Show how administrator-created products become guardian purchase select options while zodiac designs remain a separate reusable layer.
+
+### Prompt
+Create a Korean commerce administration flow diagram for "REAL_QR_FIND". On the left, show an administrator product management form with fields for product name, price, display order, visibility, representative image, and a long vertical detail-page image, plus a separate unchanged section for zodiac designs. In the center, show Turso tables `products` and `product_designs`, with the product detail image served on demand through `/api/products/{id}/detail` rather than embedded in the full catalog response. On the right, show a guardian mobile purchase screen with select boxes for managed subject, administrator-managed product, and zodiac design. Below it, show a natural-ratio long product detail page followed by an optional design-detail image. Use white work surfaces, civic blue, restrained purple, thin gray connectors, compact Korean labels, 8px or smaller corner radii, no gradients, and no real product image, personal data, or payment credentials.
+
+### Notes
+- Use when explaining the separation between product catalog management and reusable design management.

@@ -6,16 +6,6 @@ import { isAdminSession } from "../../lib/admin";
 import { authOptions } from "../../lib/auth";
 import { getDashboardData, getGuardianCoupons, getProducts } from "../../lib/db";
 
-const SHOP_PRODUCT_ORDER = [
-  "bracelet",
-  "necklace",
-  "keyring",
-  "bracelet-necklace",
-  "necklace-keyring",
-  "bracelet-necklace-keyring",
-  "sticker",
-];
-
 export default async function ShopPage({ searchParams }) {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/");
@@ -64,10 +54,8 @@ export default async function ShopPage({ searchParams }) {
 }
 
 function sortShopProducts(products) {
-  const order = new Map(SHOP_PRODUCT_ORDER.map((slug, index) => [slug, index]));
-  return products.filter((product) => order.has(product.slug)).sort((a, b) => {
-    const left = order.has(a.slug) ? order.get(a.slug) : SHOP_PRODUCT_ORDER.length;
-    const right = order.has(b.slug) ? order.get(b.slug) : SHOP_PRODUCT_ORDER.length;
-    return left - right || Number(a.sort_order || 0) - Number(b.sort_order || 0);
+  return [...products].sort((a, b) => {
+    return Number(a.sort_order || 0) - Number(b.sort_order || 0)
+      || String(a.name || "").localeCompare(String(b.name || ""), "ko");
   });
 }

@@ -481,6 +481,7 @@ function ProductConfiguration({
         <div>
           <strong>{formatProductDesignName(product, selectedDesign)}</strong>
           <span>{formatCurrency(productUnitPrice)} / 개</span>
+          {product?.description && <small>{product.description}</small>}
         </div>
       </div>
 
@@ -509,6 +510,9 @@ function ProductConfiguration({
 }
 
 function ProductPreview({ product, design, subject, quantity }) {
+  const hasProductDetail = Number(product?.has_detail_image || 0) === 1;
+  const hasDesignDetail = Boolean(design?.detail_image_data_url);
+
   return (
     <div className="product-preview-stack">
       <p className="intro-kicker">주문할 상품 미리보기</p>
@@ -520,10 +524,25 @@ function ProductPreview({ product, design, subject, quantity }) {
         </div>
       </div>
       <div className="bracelet-preview-card">
-        <ProductDetailVisual product={product} design={design} />
-        <span>{formatProductDesignName(product, design)} 상세 미리보기</span>
-        {design?.description && <small>{design.description}</small>}
+        {hasProductDetail ? (
+          <ProductDetailVisual product={product} />
+        ) : hasDesignDetail ? (
+          <DesignDetailVisual design={design} product={product} />
+        ) : (
+          <ProductDetailVisual product={product} />
+        )}
+        <span>{hasProductDetail ? `${product.name} 상세페이지` : hasDesignDetail ? `${design.name} 디자인 상세` : `${product.name} 상품 안내`}</span>
+        {(hasProductDetail ? product?.description : design?.description || product?.description) && (
+          <small>{hasProductDetail ? product.description : design?.description || product.description}</small>
+        )}
       </div>
+      {hasProductDetail && hasDesignDetail && (
+        <div className="bracelet-preview-card design-detail-preview-card">
+          <DesignDetailVisual design={design} product={product} />
+          <span>{design.name} 디자인 상세</span>
+          {design?.description && <small>{design.description}</small>}
+        </div>
+      )}
       <div className="preview-note-card">
         <strong>QR 안심 서비스 연결</strong>
         <span>상품 수령 후 QR을 활성화하면 대상자 정보가 공개되며 추가 기간 결제 없이 계속 이용할 수 있습니다.</span>
@@ -648,12 +667,22 @@ function ProductVisual({ product, design = null }) {
   return <span>{productFallbackIcon(product.slug)}</span>;
 }
 
-function ProductDetailVisual({ product, design = null }) {
-  const image = design?.detail_image_data_url || design?.option_image_data_url || product.image_data_url;
+function ProductDetailVisual({ product }) {
+  const image = Number(product?.has_detail_image || 0) === 1
+    ? productDetailImageUrl(product)
+    : product?.image_data_url;
   if (image) {
     return <img src={image} alt="" />;
   }
   return <span>{productFallbackIcon(product.slug)}</span>;
+}
+
+function DesignDetailVisual({ product, design }) {
+  const image = design?.detail_image_data_url || design?.option_image_data_url || product?.image_data_url;
+  if (image) {
+    return <img src={image} alt="" />;
+  }
+  return <span>{productFallbackIcon(product?.slug)}</span>;
 }
 
 function getDesignUnitPrice(product, design = null) {
@@ -665,6 +694,11 @@ function getDesignUnitPrice(product, design = null) {
 
 function formatProductDesignName(product, design = null) {
   return design?.name ? `${product.name} - ${design.name}` : product.name;
+}
+
+function productDetailImageUrl(product) {
+  const version = encodeURIComponent(String(product?.updated_at || ""));
+  return `/api/products/${encodeURIComponent(product.id)}/detail?v=${version}`;
 }
 
 function isCouponApplicableToOrder(coupon, mode, productSlug, subtotalAmount) {

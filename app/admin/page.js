@@ -8,7 +8,7 @@ import StatusToast from "../status-toast";
 import AdminWorkspace from "./admin-workspace";
 import AdminExportButton from "./export-button";
 import AdPricingForm from "./ad-pricing-form";
-import ProductAdminCatalogForm from "./product-admin-catalog-form";
+import ProductAdminCatalogForm, { ProductAdminCreateForm } from "./product-admin-catalog-form";
 import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
 import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
 import {
@@ -2911,18 +2911,20 @@ function SubscriptionAvatar({ subscription }) {
 
 function ProductManagementSection({ productsData }) {
   const { products } = productsData;
+  const nextSortOrder = products.reduce((max, product) => Math.max(max, Number(product.sort_order || 0)), 0) + 1;
 
   return (
     <div className="qr-admin-stack">
       <section className="admin-panel">
         <div className="panel-heading">
-          <h2>상품 이미지 및 가격</h2>
+          <h2>구매 상품 관리</h2>
           <div className="admin-heading-actions">
             <span>{products.length}개</span>
             <AdminExportButton filename="zezari-products.csv" rows={productExportRows(products)} />
           </div>
         </div>
-        <p className="empty-text">업로드한 상품 이미지는 사용자 상품 선택 화면에 노출됩니다. 이미지는 1MB 이하만 저장됩니다.</p>
+        <p className="empty-text">활성 상품은 관리자 정렬 순서대로 사용자 상품 selectbox에 표시됩니다. 디자인 자료는 각 상품 안에서 그대로 관리합니다.</p>
+        <ProductAdminCreateForm defaultSortOrder={nextSortOrder} />
         <div className="product-admin-grid">
           {products.map((product) => (
             <ProductAdminCatalogForm product={product} key={product.id} />
@@ -4272,10 +4274,11 @@ function productExportRows(products = []) {
     상품명: product.name || "-",
     구분: product.slug || "-",
     설명: product.description || "",
-    단독구매가격: formatCurrency(product.unit_price),
+    상품가격: formatCurrency(product.unit_price),
     노출상태: product.is_active !== 0 ? "노출" : "숨김",
     정렬순서: Number(product.sort_order || 0),
     이미지파일: product.image_name || "-",
+    상세페이지파일: product.detail_image_name || "-",
     디자인수: (product.designs || []).length,
   }));
 }

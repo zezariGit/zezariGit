@@ -6798,3 +6798,35 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Provider-console inspection, callback registration, live OAuth entry verification, and documentation: about 15 minutes.
+
+## 2026-07-31 KST - Dynamic Administrator Product Catalog
+
+### User Request
+- Record the remaining non-Google social login work for later.
+- Keep the existing design management, but let administrators manage the products shown in the guardian purchase select box, including name, price, and a long detail-page image.
+
+### Implementation
+- Added a cumulative social-login follow-up checklist; Google is complete, while Naver, Kakao, and Facebook remain deferred verification items.
+- Increased the DB schema version to 28 and added product-level detail image data/name columns.
+- Added an administrator new-product form with name, price, order, description, visibility, representative image, and long detail image.
+- New products receive the existing 12 zodiac design rows automatically so the design select remains consistent.
+- Extended existing product editors with product-level detail image upload, preview, removal, and corrected `상품 가격` wording.
+- Preserved all existing product-design rows and zodiac design selection behavior.
+- Removed the fixed seven-slug shop filter so every active administrator-managed product appears in the purchase select box.
+- Added an on-demand product detail image API to prevent all long images from being embedded in the initial product list.
+- Updated the guardian preview to preserve long-image aspect ratio and show an additional design-detail section when present.
+
+### Verification
+- `npm run build` passed with the new `/api/products/[id]/detail` route.
+- `git diff --check` passed.
+- Local detail endpoint returned the expected 404 for a product without a detail image and produced no server error.
+- A temporary inactive product with a 1px PNG verified the on-demand detail endpoint returned HTTP 200, `image/png`, and the exact 68-byte payload; the temporary row was removed immediately.
+- Turso schema inspection confirmed `detail_image_data_url` and `detail_image_name`; the existing seven products remained active.
+
+### Deliverables
+- Added `deliverables/DYNAMIC_PRODUCT_CATALOG.md`.
+- Added `deliverables/FOLLOW_UP_TASKS.md`.
+- Updated the deliverable index and cumulative image prompt archive.
+
+### Time Spent
+- Source analysis, schema/API/admin/shop implementation, build, DB verification, and documentation: about 30 minutes.

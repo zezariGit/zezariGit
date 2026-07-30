@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { isAdminSession } from "../../lib/admin";
 import { authOptions } from "../../lib/auth";
 import {
+  createProductCatalogItem,
   generateQrCodes,
   createAdminPaymentRefund,
   getAdminMessageById,
@@ -306,6 +307,20 @@ export async function setProductCatalogItemAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=products"), error.message || "상품 저장에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin?section=products"), "상품 정보가 저장되었습니다."));
+}
+
+export async function createProductCatalogItemAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  try {
+    await createProductCatalogItem(formData);
+    revalidatePath("/admin");
+    revalidatePath("/shop");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=products"), error.message || "상품 추가에 실패했습니다.", "error"));
+  }
+  redirect(withNotice(getReturnTo(formData, "/admin?section=products"), "새 상품이 추가되었습니다."));
 }
 
 export async function setProductOrderFulfillmentAction(formData) {

@@ -2,7 +2,53 @@
 
 import { useState } from "react";
 import FormSubmitButton from "../form-submit-button";
-import { setProductCatalogItemAction } from "./actions";
+import { createProductCatalogItemAction, setProductCatalogItemAction } from "./actions";
+
+export function ProductAdminCreateForm({ defaultSortOrder = 1 }) {
+  return (
+    <details className="product-admin-create">
+      <summary>새 상품 추가</summary>
+      <form action={createProductCatalogItemAction} className="product-admin-create-form">
+        <input type="hidden" name="returnTo" value="/admin?section=products" />
+        <div className="product-admin-create-fields">
+          <label>
+            상품명
+            <input name="name" placeholder="구매 화면에 표시할 상품명" required />
+          </label>
+          <label>
+            상품 가격
+            <input name="unitPrice" type="number" min="0" step="100" defaultValue="0" required />
+          </label>
+          <label>
+            정렬
+            <input name="sortOrder" type="number" step="1" defaultValue={defaultSortOrder} />
+          </label>
+        </div>
+        <label>
+          설명
+          <input name="description" placeholder="상품 선택과 주문 화면에 표시할 설명" />
+        </label>
+        <div className="product-admin-create-fields media">
+          <label>
+            상품 대표 이미지
+            <input name="image" type="file" accept="image/*" />
+            <small>선택 화면용 이미지, 1MB 이하</small>
+          </label>
+          <label>
+            긴 상세페이지 이미지
+            <input name="detailImage" type="file" accept="image/*" />
+            <small>세로형 원본 비율 유지, 4MB 이하</small>
+          </label>
+        </div>
+        <label className="product-admin-create-active">
+          <input name="isActive" type="checkbox" value="1" defaultChecked />
+          <span>추가 즉시 사용자 상품 selectbox에 노출</span>
+        </label>
+        <FormSubmitButton pendingText="추가중">상품 추가</FormSubmitButton>
+      </form>
+    </details>
+  );
+}
 
 export default function ProductAdminCatalogForm({ product }) {
   const [draftDesigns, setDraftDesigns] = useState([]);
@@ -51,7 +97,7 @@ export default function ProductAdminCatalogForm({ product }) {
           <input name="description" defaultValue={product.description || ""} placeholder="상품 설명" />
         </label>
         <label>
-          단독 구매 기본 가격
+          상품 가격
           <input name="unitPrice" type="number" min="0" step="100" defaultValue={product.unit_price || 0} />
         </label>
         <label>
@@ -61,6 +107,12 @@ export default function ProductAdminCatalogForm({ product }) {
         <label>
           상품 대표 이미지
           <input name="image" type="file" accept="image/*" />
+          <small>상품 선택 화면용, 1MB 이하</small>
+        </label>
+        <label>
+          긴 상세페이지 이미지
+          <input name="detailImage" type="file" accept="image/*" />
+          <small>세로형 이미지의 원본 비율을 유지하며 4MB 이하로 저장합니다.</small>
         </label>
         <div className="product-admin-options">
           <label>
@@ -71,6 +123,19 @@ export default function ProductAdminCatalogForm({ product }) {
             <input name="removeImage" type="checkbox" value="1" />
             <span>대표 이미지 삭제</span>
           </label>
+          <label>
+            <input name="removeDetailImage" type="checkbox" value="1" />
+            <span>상세페이지 이미지 삭제</span>
+          </label>
+        </div>
+
+        <div className="product-admin-detail-preview">
+          <strong>상품 상세페이지 미리보기</strong>
+          {Number(product.has_detail_image || 0) === 1 ? (
+            <img src={productDetailImageUrl(product)} alt={`${product.name} 상세페이지 이미지`} />
+          ) : (
+            <span>등록된 상품 상세페이지 이미지가 없습니다.</span>
+          )}
         </div>
 
         <fieldset className="product-design-admin-list">
@@ -175,4 +240,9 @@ function productFallbackIcon(slug) {
   if (slug === "necklace") return "◎";
   if (slug === "keyring") return "●";
   return "상품";
+}
+
+function productDetailImageUrl(product) {
+  const version = encodeURIComponent(String(product?.updated_at || ""));
+  return `/api/products/${encodeURIComponent(product.id)}/detail?v=${version}`;
 }

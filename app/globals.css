@@ -8423,6 +8423,15 @@ button:disabled:hover {
   font-size: 0.8rem;
 }
 
+.shop-selection-summary small {
+  display: block;
+  margin-top: 5px;
+  color: var(--c-text-muted);
+  font-size: 0.76rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
 .design-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -8940,6 +8949,65 @@ button:disabled:hover {
   gap: var(--space-md);
 }
 
+.product-admin-create {
+  margin-bottom: var(--space-md);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-primary-light);
+}
+
+.product-admin-create summary {
+  cursor: pointer;
+  padding: var(--space-sm) var(--space-md);
+  color: var(--c-primary-dark);
+  font-size: 0.92rem;
+  font-weight: 900;
+}
+
+.product-admin-create-form {
+  display: grid;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md) var(--space-md);
+}
+
+.product-admin-create-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(140px, 0.8fr) minmax(100px, 0.5fr);
+  gap: var(--space-sm);
+}
+
+.product-admin-create-fields.media {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.product-admin-create-form small,
+.product-admin-form label > small {
+  display: block;
+  margin-top: 5px;
+  color: var(--c-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.product-admin-create-active {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  width: fit-content;
+  color: var(--c-text-muted);
+  font-size: 0.84rem;
+}
+
+.product-admin-create-active input[type="checkbox"] {
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+  min-height: 16px;
+  margin: 0;
+  accent-color: var(--c-primary);
+}
+
 .product-admin-card {
   display: grid;
   align-self: start;
@@ -8965,6 +9033,37 @@ button:disabled:hover {
   display: grid;
   align-content: start;
   gap: var(--space-sm);
+}
+
+.product-admin-detail-preview {
+  display: grid;
+  gap: var(--space-xs);
+  align-content: start;
+  padding: var(--space-sm);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-primary-light);
+}
+
+.product-admin-detail-preview strong {
+  color: var(--c-primary-dark);
+  font-size: 0.84rem;
+}
+
+.product-admin-detail-preview img {
+  width: 100%;
+  height: auto;
+  max-height: none;
+  display: block;
+  object-fit: initial;
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+}
+
+.product-admin-detail-preview > span {
+  color: var(--c-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
 }
 
 .product-admin-options {
@@ -9136,6 +9235,20 @@ button:disabled:hover {
   color: var(--c-primary);
   font-size: 1.8rem;
   font-weight: 900;
+}
+
+@media (max-width: 720px) {
+  .product-admin-create-fields,
+  .product-admin-create-fields.media,
+  .product-design-admin-fields,
+  .product-design-admin-images {
+    grid-template-columns: 1fr;
+  }
+
+  .product-design-admin-title {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 .order-summary-panel,
