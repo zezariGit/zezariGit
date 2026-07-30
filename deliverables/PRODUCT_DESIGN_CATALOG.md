@@ -1,8 +1,9 @@
 # Product Design Catalog
 
 ## Summary
-- Product categories remain in `products` such as sticker, bracelet, necklace, and keyring.
+- The user shop exposes seven product choices: bracelet, necklace, keyring, bracelet-and-necklace, necklace-and-keyring, bracelet-and-necklace-and-keyring, and sticker.
 - Each product can now have multiple child designs in `product_designs`.
+- Every default product has the twelve Korean zodiac design names: 쥐, 소, 호랑이, 토끼, 용, 뱀, 말, 양, 원숭이, 닭, 개, 돼지.
 - A design can store its own selection image and detail-page image.
 - New orders store `product_orders.design_id` while keeping the legacy `design_index` for compatibility.
 
@@ -44,12 +45,19 @@
 
 ## User Flow
 1. Guardian opens `/shop`.
-2. Product category is selected.
-3. Design picker shows only the active designs configured by the administrator.
-4. If no design is configured yet, checkout continues with the product representative image instead of showing fake design options.
-5. Preview step shows the selected design detail image if uploaded.
-6. Checkout stores the selected `design_id`.
-7. Admin orders and guardian billing history show the selected design name.
+2. The first field selects one of the guardian's managed subjects.
+3. The second select box chooses one of the seven product or product-combination options.
+4. The third select box chooses one of the twelve active zodiac designs.
+5. Quantity and the current product/design summary are shown before choosing the purchase type.
+6. Preview step shows the selected design detail image if uploaded.
+7. Checkout stores the selected product ID and exact `design_id`.
+8. Admin orders and guardian billing history show the selected product and design name.
+
+## Default Standalone Prices
+- 팔찌, 목걸이, 키링, 스티커: 5,000원.
+- 팔찌&목걸이, 목걸이&키링: 10,000원.
+- 팔찌&목걸이&키링: 15,000원.
+- Administrators can change these values from product management.
 
 ## Detail Image Display
 - A long vertical detail-page image is displayed at the available page width with automatic height.

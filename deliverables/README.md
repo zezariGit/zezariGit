@@ -39,6 +39,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `ADMIN_SUBSCRIPTION_MANAGEMENT.md`: admin subscription grid, search filters, two-tab detail card, admin memo storage, and scroll behavior.
 - `ADMIN_PAYMENT_EXPORT_MANAGEMENT.md`: admin payment ledger grid, product/pass/ad payment data source, and Excel-compatible CSV exports for admin grids.
 - `PRODUCT_DESIGN_CATALOG.md`: product design-level image/detail-page management, order design linkage, and admin/user shop flow.
+- `SHOP_PRODUCT_SELECTION.md`: guardian-first product purchase flow with seven product combinations and twelve zodiac design options.
 - `ADMIN_COUPON_MANAGEMENT.md`: admin coupon ledger, discount conditions, issue limits, status management, and user coupon registration validation.
 - `ADMIN_NOTIFICATION_MANAGEMENT.md`: admin notification/message grid, right-side compose panel, push delivery action, and delivery result tracking.
 - `ADMIN_MESSAGE_TEMPLATE_MANAGEMENT.md`: admin message template grid, locked automatic templates, push/KakaoTalk channel settings, and template seed data.

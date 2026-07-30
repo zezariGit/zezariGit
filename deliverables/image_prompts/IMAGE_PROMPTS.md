@@ -407,3 +407,14 @@ Create a compact Korean mobile modal for "REAL_QR_FIND" showing an active manage
 
 ### Notes
 - Use when explaining that feed verification is available from both the advertisement dashboard and the managed-subject advertisement modal.
+
+## 2026-07-30 - Guardian-First Zodiac Product Selection
+
+### Purpose
+- Present the redesigned product purchase sequence and the catalog relationship between managed subjects, combination products, and zodiac designs.
+
+### Prompt
+Create a Korean mobile commerce workflow for "REAL_QR_FIND" using its white and civic-blue design system. Show one compact phone screen titled "상품 구매" with three vertically aligned select boxes labeled "나의 관리대상", "상품", and "디자인". The product menu contains 팔찌, 목걸이, 키링, 팔찌&목걸이, 목걸이&키링, 팔찌&목걸이&키링, and 스티커. The design menu contains all twelve zodiac animals: 쥐, 소, 호랑이, 토끼, 용, 뱀, 말, 양, 원숭이, 닭, 개, 돼지. Below the fields, show a compact selected-item summary, quantity stepper, purchase type tabs, price, and a blue "다음" button. On the right, include a small catalog diagram showing one selected subject linked to one product row and one product-specific zodiac design row, then continuing to the existing preview and Toss checkout. Use thin gray borders, 6px corners, compact Korean labels, no gradients, and no real personal or payment data.
+
+### Notes
+- Use when explaining why combination products remain compatible with the existing one-product-per-order database contract.

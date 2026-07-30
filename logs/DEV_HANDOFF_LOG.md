@@ -6620,3 +6620,35 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - GitHub `main` commit: `076a658`.
 - Vercel production deployment: `dpl_CQQj6jK9k4pEAW1b8aNCMGDBPzt7`.
 - `https://zezari.vercel.app` and `/?tab=dashboard` returned HTTP 200 after alias assignment.
+
+## 2026-07-30 KST - Guardian-First Product And Zodiac Design Selection
+
+### User Request
+- Replace the product-card-first purchase flow with subject, product, and design select boxes.
+- Provide seven exact product choices, including three product combinations.
+- Provide all twelve Korean zodiac animals as design choices.
+
+### Implementation
+- Replaced the `/shop` category grid with a single checkout client that begins with `나의 관리대상`, `상품`, and `디자인` selects.
+- Added bracelet-and-necklace, necklace-and-keyring, and bracelet-and-necklace-and-keyring as real catalog products.
+- Added product-specific zodiac design rows for all seven products while preserving existing product, design, and order data.
+- Added a compact selected product/design summary and retained quantity, subscription/standalone mode, preview, shipping, coupon, Toss payment, and administrator payment-pass flows.
+- The shop limits product choices to the seven requested slugs and design choices to active zodiac names.
+
+### Database
+- Increased schema version from `25` to `26`.
+- Migrated production Turso before deployment.
+- Verified seven required products and twelve active zodiac designs for every product.
+- Default standalone prices: 5,000원 for single products, 10,000원 for two-item combinations, and 15,000원 for the three-item combination.
+
+### Verification
+- `npm run build` passed after the core implementation.
+- Production catalog verification returned seven products with `zodiacCount: 12` each.
+- No existing order or uploaded image was deleted.
+
+### Deliverables
+- Added `deliverables/SHOP_PRODUCT_SELECTION.md`.
+- Updated product catalog, database schema, deliverable index, and image-prompt archive.
+
+### Time Spent
+- Analysis, implementation, production catalog migration, build verification, and documentation: about 30 minutes.

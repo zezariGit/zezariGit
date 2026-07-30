@@ -5,9 +5,11 @@ import KakaoPostcodeAddress from "./kakao-postcode-address";
 import { formatDateOnly } from "../lib/date-format";
 
 const TOSS_SDK_URL = "https://js.tosspayments.com/v2/standard";
+const ZODIAC_DESIGN_ORDER = ["쥐", "소", "호랑이", "토끼", "용", "뱀", "말", "양", "원숭이", "닭", "개", "돼지"];
 
 export default function ShopCheckoutClient({
-  product,
+  products = [],
+  initialProductId = "",
   subjects = [],
   plans = [],
   subscription = null,
@@ -15,13 +17,16 @@ export default function ShopCheckoutClient({
   coupons = [],
   adminPaymentPassEnabled = false,
 }) {
+  const initialProduct = products.find((item) => item.id === initialProductId) || products[0];
+  const initialDesigns = getShopDesigns(initialProduct);
   const [step, setStep] = useState("configure");
+  const [productId, setProductId] = useState(initialProduct?.id || "");
   const [quantity, setQuantity] = useState(1);
   const [subjectId, setSubjectId] = useState(subjects[0]?.id || "");
   const [planMonths, setPlanMonths] = useState(String(plans[0]?.months || 1));
   const [mode, setMode] = useState("subscription");
   const [designIndex, setDesignIndex] = useState(0);
-  const [designId, setDesignId] = useState(product.designs?.[0]?.id || "");
+  const [designId, setDesignId] = useState(initialDesigns[0]?.id || "");
   const [couponId, setCouponId] = useState("");
   const [shippingAddress, setShippingAddress] = useState(guardian?.address || "");
   const [shippingAddressDetail, setShippingAddressDetail] = useState(guardian?.address_detail || "");
@@ -34,11 +39,15 @@ export default function ShopCheckoutClient({
   const widgetAmountRef = useRef(null);
 
   const subscribed = subscription?.status === "active";
+  const product = useMemo(
+    () => products.find((item) => item.id === productId) || products[0] || null,
+    [productId, products]
+  );
+  const designs = useMemo(() => getShopDesigns(product), [product]);
   const selectedSubject = subjects.find((subject) => subject.id === subjectId) || null;
   const selectedDesign = useMemo(() => {
-    const designs = product.designs || [];
     return designs.find((design) => design.id === designId) || designs[designIndex] || designs[0] || null;
-  }, [designId, designIndex, product.designs]);
+  }, [designId, designIndex, designs]);
   const selectedPlan = useMemo(
     () => plans.find((plan) => String(plan.months) === String(planMonths)) || plans[0] || null,
     [plans, planMonths]
@@ -47,8 +56,8 @@ export default function ShopCheckoutClient({
   const productAmount = productUnitPrice * quantity;
   const subtotalAmount = mode === "subscription" ? Number(selectedPlan?.amount || 0) : productAmount;
   const applicableCoupons = useMemo(
-    () => coupons.filter((coupon) => isCouponApplicableToOrder(coupon, mode, product.slug, subtotalAmount)),
-    [coupons, mode, product.slug, subtotalAmount]
+    () => coupons.filter((coupon) => isCouponApplicableToOrder(coupon, mode, product?.slug, subtotalAmount)),
+    [coupons, mode, product?.slug, subtotalAmount]
   );
   const selectedCoupon = applicableCoupons.find((coupon) => coupon.id === couponId) || null;
   const discountAmount = selectedCoupon ? calculateCouponDiscount(selectedCoupon, subtotalAmount) : 0;
@@ -58,6 +67,12 @@ export default function ShopCheckoutClient({
   useEffect(() => {
     latestPaymentAmountRef.current = paymentAmount;
   }, [paymentAmount]);
+
+  useEffect(() => {
+    const nextDesigns = getShopDesigns(product);
+    setDesignIndex(0);
+    setDesignId(nextDesigns[0]?.id || "");
+  }, [product]);
 
   useEffect(() => {
     if (couponId && !applicableCoupons.some((coupon) => coupon.id === couponId)) {
@@ -191,7 +206,7 @@ export default function ShopCheckoutClient({
       setMessage("상품을 연결할 대상자를 선택해 주세요.");
       return false;
     }
-    if ((product.designs || []).length > 0 && !selectedDesign) {
+    if (designs.length > 0 && !selectedDesign) {
       setMessage("상품 디자인을 선택해 주세요.");
       return false;
     }
@@ -373,7 +388,7 @@ export default function ShopCheckoutClient({
   return (
     <section className="shop-phone-panel">
       <header className="shop-topbar">
-        <a className="shop-back-link" href={step === "configure" ? "/shop" : "#back"} onClick={(event) => {
+        <a className="shop-back-link" href={step === "configure" ? "/?tab=dashboard" : "#back"} onClick={(event) => {
           if (step === "preview") {
             event.preventDefault();
             setStep("configure");
@@ -383,7 +398,7 @@ export default function ShopCheckoutClient({
             setStep("preview");
           }
         }} aria-label="이전으로 돌아가기">‹</a>
-        <h1>{step === "order" ? "결제" : product.name}</h1>
+        <h1>{step === "configure" ? "상품 구매" : step === "order" ? "결제" : product.name}</h1>
         <span className="shop-help-mark" aria-hidden="true">?</span>
       </header>
 
@@ -391,6 +406,10 @@ export default function ShopCheckoutClient({
         <>
           <ProductConfiguration
             product={product}
+            products={products}
+            productId={productId}
+            setProductId={setProductId}
+            designs={designs}
             subjects={subjects}
             selectedSubject={selectedSubject}
             subjectId={subjectId}
@@ -479,6 +498,10 @@ export default function ShopCheckoutClient({
 
 function ProductConfiguration({
   product,
+  products,
+  productId,
+  setProductId,
+  designs,
   subjects,
   subjectId,
   setSubjectId,
@@ -498,58 +521,75 @@ function ProductConfiguration({
   productUnitPrice,
   productAmount,
 }) {
-  const designs = product.designs || [];
   return (
     <>
-      {designs.length > 0 ? (
+      <div className="shop-selection-fields">
         <div className="shop-field">
-          <strong>디자인 선택</strong>
-          <div className="design-grid" role="listbox" aria-label="디자인 선택">
-            {designs.map((design, index) => (
-              <button
-                className={(selectedDesign?.id || designId) === design.id ? "design-option active" : "design-option"}
-                type="button"
-                key={design.id}
-                onClick={() => {
-                  setDesignIndex(index);
-                  setDesignId(design.id);
-                }}
-                aria-label={design.name || `디자인 ${index + 1}`}
-                title={design.name || `디자인 ${index + 1}`}
-              >
-                <ProductVisual product={product} design={design} />
-              </button>
-            ))}
-          </div>
+          <label htmlFor="shop-subject-select">나의 관리대상</label>
+          {subjects.length > 0 ? (
+            <select id="shop-subject-select" className="subject-pick-select" value={subjectId} onChange={(event) => setSubjectId(event.target.value)}>
+              {subjects.map((subject) => (
+                <option value={subject.id} key={subject.id}>
+                  {subject.name} / {formatDate(subject.birth_date)}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <a className="empty-shop-link" href="/?tab=subjects#subjects-info">
+              대상자를 먼저 등록해 주세요
+            </a>
+          )}
         </div>
-      ) : (
-        <p className="shop-note">등록된 디자인이 없어 상품 대표 이미지로 주문이 진행됩니다.</p>
-      )}
 
-      <div className="shop-field">
-        <strong>수량</strong>
-        <div className="quantity-control">
-          <button type="button" onClick={() => changeQuantity(quantity - 1)} aria-label="수량 감소">−</button>
-          <input value={quantity} onChange={(event) => changeQuantity(event.target.value)} inputMode="numeric" />
-          <button type="button" onClick={() => changeQuantity(quantity + 1)} aria-label="수량 증가">+</button>
+        <div className="shop-field">
+          <label htmlFor="shop-product-select">상품</label>
+          <select id="shop-product-select" className="subject-pick-select" value={productId} onChange={(event) => setProductId(event.target.value)}>
+            {products.map((item) => (
+              <option value={item.id} key={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="shop-field">
+          <label htmlFor="shop-design-select">디자인</label>
+          {designs.length > 0 ? (
+            <select
+              id="shop-design-select"
+              className="subject-pick-select"
+              value={selectedDesign?.id || designId}
+              onChange={(event) => {
+                const index = designs.findIndex((design) => design.id === event.target.value);
+                setDesignIndex(Math.max(0, index));
+                setDesignId(event.target.value);
+              }}
+            >
+              {designs.map((design) => (
+                <option value={design.id} key={design.id}>{design.name}</option>
+              ))}
+            </select>
+          ) : (
+            <p className="shop-note">등록된 12간지 디자인이 없습니다.</p>
+          )}
+        </div>
+      </div>
+
+      <div className="shop-selection-summary">
+        <ProductVisual product={product} design={selectedDesign} />
+        <div>
+          <strong>{formatProductDesignName(product, selectedDesign)}</strong>
+          <span>{mode === "standalone" ? `${formatCurrency(productUnitPrice)} / 개` : "이용권과 함께 주문"}</span>
         </div>
       </div>
 
       <div className="shop-field">
-        <strong>대상자</strong>
-        {subjects.length > 0 ? (
-          <select className="subject-pick-select" value={subjectId} onChange={(event) => setSubjectId(event.target.value)}>
-            {subjects.map((subject) => (
-              <option value={subject.id} key={subject.id}>
-                {subject.name} / {formatDate(subject.birth_date)}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <a className="empty-shop-link" href="/?tab=subjects#subjects-info">
-            대상자를 먼저 등록해 주세요
-          </a>
-        )}
+        <label htmlFor="shop-quantity">수량</label>
+        <div className="quantity-control">
+          <button type="button" onClick={() => changeQuantity(quantity - 1)} aria-label="수량 감소">−</button>
+          <input id="shop-quantity" value={quantity} onChange={(event) => changeQuantity(event.target.value)} inputMode="numeric" />
+          <button type="button" onClick={() => changeQuantity(quantity + 1)} aria-label="수량 증가">+</button>
+        </div>
       </div>
 
       <div className="purchase-mode-tabs" role="tablist" aria-label="구매 방식">
@@ -802,11 +842,19 @@ function clearTossWidgetContainers() {
   document.getElementById("toss-payment-agreement")?.replaceChildren();
 }
 
+function getShopDesigns(product) {
+  const order = new Map(ZODIAC_DESIGN_ORDER.map((name, index) => [name, index]));
+  return [...(product?.designs || [])]
+    .filter((design) => order.has(String(design?.name || "").trim()))
+    .sort((a, b) => order.get(a.name) - order.get(b.name));
+}
+
 function productFallbackIcon(slug) {
   if (slug === "sticker") return "★";
   if (slug === "bracelet") return "○";
   if (slug === "necklace") return "◎";
   if (slug === "keyring") return "●";
+  if (["bracelet-necklace", "necklace-keyring", "bracelet-necklace-keyring"].includes(slug)) return "세트";
   return "상품";
 }
 

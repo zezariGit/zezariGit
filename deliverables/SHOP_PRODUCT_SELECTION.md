@@ -1,0 +1,51 @@
+# Guardian-First Product Selection
+
+Project: REAL_QR_FIND / zezari
+
+## Requirement
+- Replace the category-card-first shop flow with three select boxes.
+- Select a managed subject first, then a product, then a Korean zodiac design.
+- Keep the existing preview, shipping, coupon, Toss payment, administrator payment-pass, order, and QR activation flows.
+
+## Selection Order
+1. `나의 관리대상`
+2. `상품`
+3. `디자인`
+4. Quantity
+5. Subscription period or standalone purchase
+6. Product preview
+7. Shipping, coupon, and payment
+
+## Product Options
+- 팔찌
+- 목걸이
+- 키링
+- 팔찌&목걸이
+- 목걸이&키링
+- 팔찌&목걸이&키링
+- 스티커
+
+The three combination choices are stored as normal catalog products. This preserves the existing one-product-per-order contract and allows administrators to manage their representative image, detail images, price, active state, and designs without introducing a separate cart schema.
+
+## Zodiac Designs
+- 쥐, 소, 호랑이, 토끼, 용, 뱀, 말, 양, 원숭이, 닭, 개, 돼지.
+- Each product owns its own design rows, so administrators can upload different thumbnails and detail pages for the same zodiac animal on different products.
+- The shop displays only active designs whose names match the twelve zodiac options.
+
+## Pricing
+- Standalone purchase uses the selected design's price when configured; otherwise it uses the product price.
+- Default combination prices are the sum of their included base products.
+- Subscription purchase continues to use the selected subscription plan amount.
+- Coupon eligibility and discount validation remain server-calculated.
+
+## Data Compatibility
+- Existing products, designs, and orders are retained.
+- New combination products and missing zodiac designs are inserted only when absent.
+- `product_orders.product_id` and `product_orders.design_id` continue to identify the exact purchased option.
+- Production Turso schema version is `26`.
+
+## Verification
+- Seven required product slugs exist in production.
+- Each required product has twelve active zodiac design names.
+- Next.js production build passes.
+- Existing Toss preparation APIs receive the newly selected product and design IDs without a request-contract change.

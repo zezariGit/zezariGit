@@ -4,7 +4,7 @@ Project: REAL_QR_FIND / zezari
 
 ## Status
 - Implemented in Turso.
-- Current schema version: `25`.
+- Current schema version: `26`.
 
 ## Tables
 
