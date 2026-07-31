@@ -41,8 +41,14 @@ export default async function GuardianDashboard({
   const emptySlots = Array.from({ length: Math.max(0, 4 - subjectsWithQr.length) });
   const registeredSubject = subjectsWithQr.find((subject) => subject.id === registeredSubjectId) || null;
   const admin = isAdminSession(session) || Number(guardian.is_admin || 0) === 1;
+  const socialAccount = isSocialAccount(session);
   const guardianComplete = admin || Boolean(
-    guardian.name && guardian.login_id && guardian.password_hash && guardian.phone
+    guardian.name
+      && guardian.birth_date
+      && guardian.phone
+      && (socialAccount
+        ? guardian.phone_verified_at && guardian.terms_privacy_agreed_at && guardian.terms_service_agreed_at
+        : guardian.login_id && guardian.password_hash)
   );
   const guardianActive = guardian.is_active !== 0;
   const isDashboard = activeTab === "dashboard";
@@ -261,7 +267,10 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
           <Link href="/?tab=guardian">정보 수정 &gt;</Link>
         </div>
         <InfoRow label="이름" value={guardian.name || "이름 미입력"} />
-        <InfoRow label="비밀번호" value={guardian.password_hash ? "********" : "미설정"} />
+        <InfoRow
+          label={isSocialAccount(session) ? "로그인 방식" : "비밀번호"}
+          value={isSocialAccount(session) ? `${socialProviderLabel(session?.user?.provider)} 계정` : guardian.password_hash ? "********" : "미설정"}
+        />
         <InfoRow label="연락처" value={guardian.phone || "연락처 미입력"} />
         <InfoRow label="수령인" value={guardian.name || "이름 미입력"} actionLabel="주소록관리 >" href="/?tab=guardian" />
         <InfoRow label="주소" value={formatFullAddress(guardian.address, guardian.address_detail)} />
@@ -455,25 +464,39 @@ function StatusDashboard({ guardian, subjects }) {
 }
 
 function GuardianForm({ guardian, session }) {
+  const socialAccount = isSocialAccount(session);
+
   return (
     <form action={saveGuardianAction} className="form-grid">
               <label>
                 이름
                 <input name="guardianName" defaultValue={guardian.name || ""} required />
               </label>
-              <label>
-                아이디
-                <input name="loginId" defaultValue={guardian.login_id || ""} required />
-              </label>
-              <label>
-                비밀번호
-                <input
-                  name="password"
-                  type="password"
-                  placeholder={guardian.password_hash ? "변경할 때만 입력" : "비밀번호 입력"}
-                  required={!guardian.password_hash}
-                />
-              </label>
+              {socialAccount ? (
+                <>
+                  <input name="loginId" type="hidden" defaultValue={guardian.login_id || ""} />
+                  <label>
+                    로그인 방식
+                    <input value={`${socialProviderLabel(session?.user?.provider)} 계정 로그인`} readOnly />
+                  </label>
+                </>
+              ) : (
+                <>
+                  <label>
+                    아이디
+                    <input name="loginId" defaultValue={guardian.login_id || ""} required />
+                  </label>
+                  <label>
+                    비밀번호
+                    <input
+                      name="password"
+                      type="password"
+                      placeholder={guardian.password_hash ? "변경할 때만 입력" : "비밀번호 입력"}
+                      required={!guardian.password_hash}
+                    />
+                  </label>
+                </>
+              )}
               <label>
                 연락받을 전화번호
                 <input name="phone" defaultValue={guardian.phone || ""} required />
@@ -662,6 +685,20 @@ function formatDate(value) {
 
 function formatFullAddress(address, detailAddress) {
   return [address, detailAddress].filter(Boolean).join(" ") || "주소 미입력";
+}
+
+function isSocialAccount(session) {
+  return ["google", "kakao", "naver", "facebook"].includes(
+    String(session?.user?.provider || "").trim().toLowerCase()
+  );
+}
+
+function socialProviderLabel(provider) {
+  if (provider === "naver") return "네이버";
+  if (provider === "kakao") return "카카오";
+  if (provider === "google") return "Google";
+  if (provider === "facebook") return "Facebook";
+  return "SNS";
 }
 
 function safePhoneDisplayValue(guardian) {

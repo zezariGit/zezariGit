@@ -4,14 +4,13 @@ import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 export default function SocialSignupCompletion({ guardian, session }) {
+  const providerLabel = socialProviderLabel(session?.user?.provider);
   const [step, setStep] = useState("phone");
   const [form, setForm] = useState({
     phone: guardian?.phone || "",
     name: guardian?.name || session?.user?.name || "",
     birthDate: guardian?.birth_date || "",
     email: guardian?.email || guardian?.google_email || session?.user?.email || "",
-    loginId: guardian?.login_id || "",
-    password: "",
     privacyAgreed: false,
     serviceAgreed: false,
   });
@@ -176,7 +175,7 @@ export default function SocialSignupCompletion({ guardian, session }) {
             <h1 className="login-title">회원가입</h1>
             <div className="signup-copy">
               <strong>휴대폰 번호를 입력해주세요</strong>
-              <p>SNS 계정 확인이 완료되었습니다. 보호자 알림을 위해 휴대폰 인증을 진행해 주세요.</p>
+              <p>{providerLabel} 계정 확인이 완료되었습니다. 보호자 알림을 위해 휴대폰 인증을 진행해 주세요.</p>
             </div>
             <label className="signup-field">
               <span>휴대폰 번호</span>
@@ -227,7 +226,11 @@ export default function SocialSignupCompletion({ guardian, session }) {
             <h1 className="login-title">회원가입</h1>
             <div className="signup-copy">
               <strong>기본 정보를 입력해주세요</strong>
-              <p>SNS에서 확인된 정보는 미리 입력했습니다. 필요한 항목을 확인해 주세요.</p>
+              <p>{providerLabel}에서 확인된 정보는 미리 입력했습니다. 필요한 항목을 확인해 주세요.</p>
+            </div>
+            <div className="social-signup-account-note">
+              <strong>{providerLabel} 계정으로 가입</strong>
+              <span>별도 아이디와 비밀번호를 만들지 않고 {providerLabel} 계정으로 로그인합니다.</span>
             </div>
             <label className="signup-field">
               <span>이름</span>
@@ -245,28 +248,6 @@ export default function SocialSignupCompletion({ guardian, session }) {
             <label className="signup-field">
               <span>이메일</span>
               <input value={form.email} onChange={(event) => update("email", event.target.value)} type="email" />
-            </label>
-            <label className="signup-field">
-              <span>아이디</span>
-              <input
-                value={form.loginId}
-                onChange={(event) => update("loginId", event.target.value)}
-                placeholder="zezari_mom"
-                autoComplete="username"
-                required
-              />
-            </label>
-            <label className="signup-field">
-              <span>비밀번호</span>
-              <input
-                value={form.password}
-                onChange={(event) => update("password", event.target.value)}
-                type="password"
-                placeholder="8~16자 영문, 숫자, 특수문자"
-                autoComplete="new-password"
-                required
-              />
-              <small>8~16자, 영문, 숫자, 특수문자 포함</small>
             </label>
             <div className="terms-box">
               <strong>필수동의</strong>
@@ -320,4 +301,12 @@ function formatTimer(seconds) {
   const minutes = String(Math.floor(safeSeconds / 60)).padStart(2, "0");
   const rest = String(safeSeconds % 60).padStart(2, "0");
   return `${minutes}:${rest}`;
+}
+
+function socialProviderLabel(provider) {
+  if (provider === "naver") return "네이버";
+  if (provider === "kakao") return "카카오";
+  if (provider === "google") return "Google";
+  if (provider === "facebook") return "Facebook";
+  return "SNS";
 }

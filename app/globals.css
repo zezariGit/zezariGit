@@ -205,6 +205,27 @@ a {
   gap: 8px;
 }
 
+.social-signup-account-note {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border: 1px solid #9fd5b1;
+  border-radius: 6px;
+  background: #eff9f2;
+  color: #174c2a;
+}
+
+.social-signup-account-note strong {
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.social-signup-account-note span {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
 .phone-with-badge {
   position: relative;
 }
