@@ -313,14 +313,18 @@ export async function createProductCatalogItemAction(formData) {
   const session = await getServerSession(authOptions);
   if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
 
+  let productId = "";
   try {
-    await createProductCatalogItem(formData);
+    productId = await createProductCatalogItem(formData);
     revalidatePath("/admin");
     revalidatePath("/shop");
   } catch (error) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=products"), error.message || "상품 추가에 실패했습니다.", "error"));
   }
-  redirect(withNotice(getReturnTo(formData, "/admin?section=products"), "새 상품이 추가되었습니다."));
+  const returnTo = productId
+    ? `/admin?section=products&product=${encodeURIComponent(productId)}`
+    : getReturnTo(formData, "/admin?section=products");
+  redirect(withNotice(returnTo, "새 상품이 추가되었습니다."));
 }
 
 export async function setProductOrderFulfillmentAction(formData) {

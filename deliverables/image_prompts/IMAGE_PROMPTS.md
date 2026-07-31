@@ -462,3 +462,14 @@ Create a Korean commerce administration flow diagram for "REAL_QR_FIND". On the 
 
 ### Notes
 - Use when explaining the separation between product catalog management and reusable design management.
+
+## 2026-07-31 - Administrator Product Grid And Selected Detail Editor
+
+### Purpose
+- Present the scalable administrator workflow for managing the products shown in the guardian purchase select box.
+
+### Prompt
+Create a Korean operations-style administrator screen for "REAL_QR_FIND" product management. On the left, show a dense product grid with stable columns for selection, thumbnail, product name, price, visibility, display order, detail-page status, and a compact detail action. Highlight one selected row in civic blue. On the right, show one fixed-height selected-product editor with two tabs labeled "상품 정보" and "디자인 관리". The product tab contains editable product name, price, description, order, visibility, a square thumbnail uploader, and a natural-ratio long vertical detail-page preview inside its own scroll area. The design tab contains compact product-specific zodiac design editors without changing the left grid layout. Include a small "+ 새 상품" command that replaces the right panel with a creation form. Use the existing white and civic-blue project style, thin gray table lines, compact typography, 6px corners, no gradients, no nested decorative cards, and no real product or credential data.
+
+### Notes
+- Use when explaining why one product's designs or long detail image no longer affects the layout of other products.

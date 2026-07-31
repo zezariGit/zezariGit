@@ -8,7 +8,7 @@ import StatusToast from "../status-toast";
 import AdminWorkspace from "./admin-workspace";
 import AdminExportButton from "./export-button";
 import AdPricingForm from "./ad-pricing-form";
-import ProductAdminCatalogForm, { ProductAdminCreateForm } from "./product-admin-catalog-form";
+import ProductAdminWorkspace from "./product-admin-catalog-form";
 import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
 import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
 import {
@@ -323,7 +323,7 @@ export default async function AdminPage({ searchParams }) {
           ) : activeSection === "coupons" ? (
             <CouponManagementSection couponsData={couponsData} />
           ) : activeSection === "products" ? (
-            <ProductManagementSection productsData={productsData} />
+            <ProductManagementSection productsData={productsData} selectedProductId={resolvedSearchParams?.product || ""} />
           ) : activeSection === "orders" ? (
             <OrderManagementSection ordersData={ordersData} />
           ) : activeSection === "subscriptions" ? (
@@ -2909,9 +2909,8 @@ function SubscriptionAvatar({ subscription }) {
   );
 }
 
-function ProductManagementSection({ productsData }) {
+function ProductManagementSection({ productsData, selectedProductId = "" }) {
   const { products } = productsData;
-  const nextSortOrder = products.reduce((max, product) => Math.max(max, Number(product.sort_order || 0)), 0) + 1;
 
   return (
     <div className="qr-admin-stack">
@@ -2923,13 +2922,8 @@ function ProductManagementSection({ productsData }) {
             <AdminExportButton filename="zezari-products.csv" rows={productExportRows(products)} />
           </div>
         </div>
-        <p className="empty-text">활성 상품은 관리자 정렬 순서대로 사용자 상품 selectbox에 표시됩니다. 디자인 자료는 각 상품 안에서 그대로 관리합니다.</p>
-        <ProductAdminCreateForm defaultSortOrder={nextSortOrder} />
-        <div className="product-admin-grid">
-          {products.map((product) => (
-            <ProductAdminCatalogForm product={product} key={product.id} />
-          ))}
-        </div>
+        <p className="empty-text">활성 상품은 관리자 정렬 순서대로 사용자 상품 selectbox에 표시됩니다. 목록에서 상품을 선택하면 오른쪽 상세 패널에서 수정할 수 있습니다.</p>
+        <ProductAdminWorkspace products={products} initialProductId={selectedProductId} />
       </section>
     </div>
   );

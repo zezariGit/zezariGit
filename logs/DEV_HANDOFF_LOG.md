@@ -6838,3 +6838,30 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Authenticated admin product management displayed the new-product form, product-level long detail upload, visibility control, and unchanged design editors.
 - Inserted a temporary active product with 12 zodiac designs, confirmed it appeared in the guardian product select box, and confirmed selection updated its 12,300 KRW price and description.
 - Removed all temporary product/design rows and confirmed the catalog returned to seven total and seven active products.
+
+## 2026-07-31 KST - Administrator Product Grid And Detail Editor
+
+### User Request
+- Redesign administrator product management as a grid for the products shown in the guardian select box.
+- Allow administrators to edit product name and price and upload both a product thumbnail and a long detail-page image.
+
+### Implementation
+- Replaced the repeated large product-card layout with a dense product grid showing thumbnail, name, price, visibility, order, and detail-page status.
+- Added a fixed right-side editor that changes immediately when a grid row is selected.
+- Split the editor into `상품 정보` and `디자인 관리` tabs while preserving every existing product-specific design row and image field.
+- Added internal horizontal and vertical scrolling so large catalogs, many designs, and long detail images do not expand or shift neighboring products.
+- Moved new-product registration into the same detail panel and retained name, price, description, order, visibility, thumbnail, and long detail-page uploads.
+- Updated new-product creation to return the created product ID and reopen that exact product after saving.
+- Kept the guardian `/shop` catalog contract unchanged: active products appear by administrator sort order with their saved price and media.
+
+### Verification
+- `npm run build` passed with all 26 application routes generated.
+- `git diff --check` passed.
+- Browser verification and production deployment results are recorded below after release.
+
+### Deliverables
+- Updated `deliverables/DYNAMIC_PRODUCT_CATALOG.md`.
+- Updated the cumulative presentation prompt archive.
+
+### Time Spent
+- Existing-flow review, grid/detail editor implementation, responsive styling, build verification, and documentation: about 25 minutes.
