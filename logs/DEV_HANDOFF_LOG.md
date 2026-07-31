@@ -6876,3 +6876,41 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - The design tab displayed all twelve bracelet zodiac designs inside the fixed panel scroll area.
 - The new-product command displayed name, price, visibility, thumbnail upload, and long detail-page upload without writing production data.
 - The guardian shop retained all seven active product options and twelve zodiac designs; administrator and shop console error scans were clean.
+
+## 2026-07-31 KST - Naver Passwordless Signup And Review Resubmission
+
+### User Request
+- Re-implement Naver login based on the current rejected review.
+- Explain that the earlier application's member data is not migrated or shared.
+- Remove the separate password request from Naver first signup.
+- Capture the corrected flow and submit a Naver re-review request.
+
+### Implementation
+- Removed login ID and password inputs from all social first-signup forms.
+- Updated the server completion action so Google, Kakao, Naver, and Facebook accounts do not create or require a service password.
+- Preserved credential-signup password validation and existing password hashes.
+- Added provider-specific first-signup guidance stating that Naver users sign in without a separate ID or password.
+- Updated dashboard completion checks and guardian information editing for social accounts.
+- Preserved both production Naver callbacks and added a temporary localhost callback for isolated review verification.
+
+### Review Submission
+- Entered the required explanation that the old and new applications are independent member systems and that application changes have no user-identification issue.
+- Marked the submitted screenshot as covering email, name, and phone usage.
+- Selected `네이버 로그인을 통한 신규 회원 가입에 적용`.
+- Uploaded three sanitized screenshots covering the login button, phone verification, and passwordless information-entry screen.
+- Submitted the re-review request; Naver Developer status changed from `승인거부` to `검수요청` on 2026-07-31.
+
+### Verification
+- Actual Naver OAuth consent and registered localhost callback completed.
+- Isolated database flow reached Naver phone verification and the passwordless profile step.
+- The profile screen contained no login ID or password input.
+- `npm run build` passed.
+- `git diff --check` passed before the functional commit.
+
+### Deliverables
+- Added `deliverables/NAVER_LOGIN_REVIEW_RESUBMISSION.md`.
+- Added sanitized review screenshots under `deliverables/naver-review/`.
+- Updated the follow-up checklist, deliverable index, and cumulative image prompt archive.
+
+### Time Spent
+- Rejection analysis, source changes, OAuth verification, screenshot preparation, provider-console submission, and documentation: about 50 minutes.

@@ -45,6 +45,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `PRODUCTION_AUTHENTICATED_BROWSER_TEST_2026-07-30.md`: authenticated production browser test across guardian, public QR, purchase, advertising, and all administrator screens.
 - `CUSTOM_DOMAIN_SETUP.md`: `zezari.family` production-domain setup, dual-domain compatibility, QR migration, and OAuth callback checklist.
 - `OAUTH_CALLBACK_SETUP.md`: Google and Naver dual-domain callback registration, live provider-entry verification, and Naver review-state note.
+- `NAVER_LOGIN_REVIEW_RESUBMISSION.md`: Naver rejection fixes, passwordless first-signup flow, review screenshots, submitted explanation, and re-review status.
 - `FOLLOW_UP_TASKS.md`: cumulative deferred work checklist, including remaining Naver, Kakao, and Facebook production login verification.
 - `ADMIN_COUPON_MANAGEMENT.md`: admin coupon ledger, discount conditions, issue limits, status management, and user coupon registration validation.
 - `ADMIN_NOTIFICATION_MANAGEMENT.md`: admin notification/message grid, right-side compose panel, push delivery action, and delivery result tracking.

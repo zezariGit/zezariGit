@@ -473,3 +473,14 @@ Create a Korean operations-style administrator screen for "REAL_QR_FIND" product
 
 ### Notes
 - Use when explaining why one product's designs or long detail image no longer affects the layout of other products.
+
+## 2026-07-31 - Passwordless Naver First Signup And Review
+
+### Purpose
+- Explain the corrected Naver login review flow and the separation between the earlier and current member systems.
+
+### Prompt
+Create a compact Korean OAuth review flow for "REAL_QR_FIND". Show four mobile stages connected left to right: 1) the user selects the green Naver login button; 2) Naver consent provides the user identifier, name, email, and phone information; 3) the new `zezari.family` member system performs phone verification and required guardian information entry; 4) the user reaches the dashboard and returns later through the same Naver identity. On the information-entry stage, include a prominent green notice reading "별도 아이디와 비밀번호를 만들지 않습니다" and show no password field. Add a separate restrained box explaining that the earlier `zezari.com` member data is not migrated or shared. Use the project's white and civic-blue style with Naver green only for provider identity, thin gray connectors, compact Korean labels, 8px or smaller corners, no gradients, and no real account, phone, client ID, secret, or token data.
+
+### Notes
+- Use when presenting the two Naver review rejection fixes and the 2026-07-31 re-review request.
