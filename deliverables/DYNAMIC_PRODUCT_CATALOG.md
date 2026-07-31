@@ -49,3 +49,14 @@
 - PASS: An authenticated production administrator opened the new-product form and existing product editors.
 - PASS: A temporary active product with 12 zodiac rows appeared in the guardian product select box; selecting it updated the price and description.
 - PASS: The temporary product and design rows were removed, restoring the original seven active products.
+- PASS: The redesigned production administrator screen displayed seven products in a dense grid with a non-overlapping fixed detail panel at a 1440px viewport.
+- PASS: Selecting `팔찌` changed the editor name, price, selected radio, and URL immediately without a server navigation.
+- PASS: The `디자인 관리` tab displayed 12 rows inside a fixed-height internal scroll area, and the new-product panel exposed both thumbnail and long detail-page uploads.
+- PASS: The guardian product select retained the seven active products and the selected product retained all twelve zodiac design options.
+
+## 2026-07-31 Deployment
+
+- GitHub commit: `571a773`
+- Vercel production deployment: `dpl_7YtMvwc4KVPGNPtT4TWsAfoBHFEX` (`READY`)
+- Production aliases: `https://zezari.family`, `https://zezari.vercel.app`
+- Both aliases and their administrator product routes returned HTTP 200.

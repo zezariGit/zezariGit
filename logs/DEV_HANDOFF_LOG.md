@@ -6865,3 +6865,14 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Existing-flow review, grid/detail editor implementation, responsive styling, build verification, and documentation: about 25 minutes.
+
+### Production Verification And Deployment
+- GitHub `main` commit: `571a773`.
+- Vercel production deployment: `dpl_7YtMvwc4KVPGNPtT4TWsAfoBHFEX` (`READY`).
+- Assigned both `https://zezari.family` and compatibility alias `https://zezari.vercel.app`; home and administrator product routes returned HTTP 200.
+- Authenticated production administrator view displayed seven products in the new dense grid.
+- At a 1440px test viewport, the grid and the 360px detail editor were side by side with zero overlap; both provided independent scrolling.
+- Selecting `팔찌` updated the right editor to `팔찌`, 5,000 KRW, checked the correct row, and preserved `product=product-bracelet` in the URL without page navigation.
+- The design tab displayed all twelve bracelet zodiac designs inside the fixed panel scroll area.
+- The new-product command displayed name, price, visibility, thumbnail upload, and long detail-page upload without writing production data.
+- The guardian shop retained all seven active product options and twelve zodiac designs; administrator and shop console error scans were clean.

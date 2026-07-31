@@ -4864,3 +4864,15 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 구조 분석, 화면 구현, 반응형 스타일, 빌드, 문서화: 약 25분.
+
+### 운영 검증 및 배포
+- GitHub `main` 커밋 `571a773` 푸시
+- Vercel 운영 배포 `dpl_7YtMvwc4KVPGNPtT4TWsAfoBHFEX` READY
+- `zezari.family`, `zezari.vercel.app` 홈과 관리자 상품관리 HTTP 200 확인
+- 운영 관리자 화면에서 상품 7개 그리드 조회 확인
+- 1440px 화면에서 상품 그리드와 360px 상세 패널이 겹침 없이 나란히 배치되고 각각 독립 스크롤되는 것을 확인
+- `팔찌` 행 선택 시 상품명, 5,000원 가격, 선택 표시, URL 상품 ID가 즉시 함께 변경되는 것을 확인
+- 디자인 탭에서 팔찌 12간지 디자인 12개와 내부 세로 스크롤 확인
+- 새 상품 화면에서 상품명, 가격, 노출, 썸네일, 긴 상세페이지 업로드 항목 확인
+- 사용자 상품 구매 selectbox의 활성 상품 7개와 선택 상품의 12간지 디자인 유지 확인
+- 관리자 상품관리와 사용자 상품구매 화면 콘솔 오류 없음
