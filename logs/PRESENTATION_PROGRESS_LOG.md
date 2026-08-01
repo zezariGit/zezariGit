@@ -5001,3 +5001,12 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 분석, DB·관리자·사용자 화면 구현, 호환성 검증과 문서화: 약 45분
+
+### 운영 검증 및 배포
+- GitHub `main` 구현 커밋: `6db5e1c`, `b1f985f`, `a4a5b6e`
+- Vercel 운영 배포: `dpl_2vcUBe5XWsZMZATPkfgea6GpvteP` READY
+- 관리자 화면에서 거리 5개와 기간 5개, 추가·삭제·노출·금액·저장 기능 확인
+- 보호자 운영 화면에서 대상자 선택, 거리 선택, 기간 선택, 요약·결제 단계 확인
+- 전국 확산과 3일 선택 시 기간 30,000원 + 거리 100,000원 = 총 130,000원 계산 확인
+- 검증 중 브라우저 콘솔 오류 없음
+- 실제 결제와 Meta 광고 발행은 비용 발생 방지를 위해 수행하지 않음

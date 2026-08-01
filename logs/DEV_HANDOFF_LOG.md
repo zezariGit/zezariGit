@@ -7007,3 +7007,12 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Analysis, schema and compatibility design, administrator/user UI implementation, pricing validation, build, and documentation: about 45 minutes.
+
+### Production Verification And Deployment
+- GitHub `main` implementation commits: `6db5e1c`, `b1f985f`, `a4a5b6e`.
+- Vercel production deployment: `dpl_2vcUBe5XWsZMZATPkfgea6GpvteP` (`READY`).
+- Verified the signed-in administrator page displays five distance rows and five duration rows with add, delete, active-state, price, and save controls.
+- Verified the guardian flow on production: subject selection -> five distance choices -> five duration choices -> selection summary and payment amount.
+- Nationwide plus three days produced the expected snapshots and amount: duration 30,000 KRW + distance 100,000 KRW = 130,000 KRW.
+- Browser console error log was empty during the verified flow.
+- Live payment and Meta publication were not executed because they can incur real charges.
