@@ -7016,3 +7016,21 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Nationwide plus three days produced the expected snapshots and amount: duration 30,000 KRW + distance 100,000 KRW = 130,000 KRW.
 - Browser console error log was empty during the verified flow.
 - Live payment and Meta publication were not executed because they can incur real charges.
+
+## 2026-08-01 KST - Advertisement Option Save Area Layout Fix
+
+### User Request
+- Fix the administrator advertisement-payment page where the save button occupied the row and the guidance sentence wrapped one Korean character per line.
+
+### Root Cause And Implementation
+- The shared `.action` class applies `width: 100%`; inside the horizontal flex save bar this consumed the available width and collapsed the sibling paragraph to its minimum content width.
+- Replaced the save bar with an explicit `minmax(0, 1fr) + 220-320px` grid.
+- Added Korean word-preserving wrapping to the guidance text and retained a one-column mobile layout.
+
+### Verification
+- `npm run build`: passed.
+- `git diff --check`: passed.
+- Distance and duration grid markup and server save action were not changed.
+
+### Time Spent
+- Cause analysis, responsive CSS correction, build, and documentation: about 10 minutes.

@@ -2755,9 +2755,9 @@ a {
 }
 
 .ad-option-save-bar {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-md);
   padding: var(--space-md);
   border: 0.5px solid var(--c-primary-border);
@@ -2766,14 +2766,16 @@ a {
 }
 
 .ad-option-save-bar p {
+  min-width: 0;
   margin: 0;
   color: var(--c-text-muted);
   font-size: 0.84rem;
   line-height: 1.45;
+  word-break: keep-all;
 }
 
 .ad-option-save-bar .action {
-  flex: 0 0 auto;
+  width: 100%;
   min-width: 220px;
 }
 
@@ -13283,6 +13285,10 @@ button:disabled:hover {
   .ad-option-save-bar {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .ad-option-save-bar {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .ad-option-save-bar .action {
