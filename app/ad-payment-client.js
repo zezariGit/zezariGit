@@ -169,11 +169,11 @@ export default function AdPaymentClient({ ad, guardian, adminPaymentPassEnabled 
         <p>선택한 기간과 범위에 따라 보호자 결제금액이 부과됩니다.</p>
         <dl className="ad-payment-cost-list">
           <div>
-            <dt>기간 ({Number(ad.days || 0)}일 / {estimate.billingUnitDays}일 단위)</dt>
+            <dt>기간 ({ad.duration_label || `${Number(ad.days || 0)}일`})</dt>
             <dd>{formatCurrency(estimate.periodAmount)}</dd>
           </div>
           <div>
-            <dt>범위 (기본 {estimate.defaultRadiusKm}km / 선택 {Number(ad.region_radius_km || 0)}km)</dt>
+            <dt>거리 ({formatDistanceLabel(ad)})</dt>
             <dd>{formatCurrency(estimate.rangeAmount)}</dd>
           </div>
           <div className="total">
@@ -286,6 +286,12 @@ function clearAdTossWidgetContainers() {
   if (typeof document === "undefined") return;
   document.getElementById("ad-toss-payment-methods")?.replaceChildren();
   document.getElementById("ad-toss-payment-agreement")?.replaceChildren();
+}
+
+function formatDistanceLabel(ad) {
+  if (ad?.coverage_type === "country") return ad?.distance_label || "전국 확산";
+  if (ad?.distance_label) return `${ad.distance_label} / ${Number(ad.region_radius_km || 0)}km`;
+  return `반경 ${Number(ad?.region_radius_km || 0)}km`;
 }
 
 function formatCurrency(value) {

@@ -31,6 +31,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `META_AD_AUTOMATION.md`: Korean city-label targeting, guardian-revenue/Meta-budget separation, automatic post-payment publication, and retry behavior.
 - `META_AD_LINK_ACCESS.md`: mobile-friendly managed-subject destination links, Meta shareable preview storage, and guardian dashboard access.
 - `AD_PRICING_MANAGEMENT.md`: administrator billing-day/radius price policy, guardian date/radius quote flow, server calculation, and Toss amount validation.
+- `AD_DISTANCE_DURATION_OPTIONS.md`: administrator-managed distance/duration option grids and the guardian distance, duration, summary, and payment flow.
 - `ADMIN_DASHBOARD_OPERATIONS_REVAMP.md`: operations-style admin dashboard with overview cards, trend chart, recent tables, order/ad/subscription/sales panels.
 - `GUARDIAN_ADMIN_OPERATIONS_LAYOUT.md`: operations-style guardian management screen with status cards, extended filters, dense grid, detail panel, and CSV export additions.
 - `ADMIN_AD_GRID_MANAGEMENT.md`: admin advertisement grid, selected-row actions, detail panel, click-count schema placeholder, and Meta API readiness.

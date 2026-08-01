@@ -1752,12 +1752,11 @@ function AdPricingManagementSection({ setting }) {
     <div className="ad-pricing-admin-page">
       <section className="admin-panel ad-pricing-heading">
         <div>
-          <p className="intro-kicker">광고 과금 정책</p>
-          <h2>기간과 광고 범위별 가격 설정</h2>
+          <p className="intro-kicker">광고 옵션 관리</p>
+          <h2>광고 노출 거리와 기간 설정</h2>
           <p>
-            저장한 정책은 이후 새로 신청되는 광고부터 적용됩니다. 결제금액은 서버에서 다시 계산해
-            사용자 화면의 안내 금액과 일치하는지 검증합니다. Meta 집행예산은 보호자 결제금액과
-            분리해 지역, 반경과 기간 기준으로 별도 계산합니다.
+            거리와 기간 옵션을 그리드에서 자유롭게 추가·수정·삭제할 수 있습니다. 저장한 활성 옵션은
+            사용자 광고 설정 화면에 바로 반영되며, 결제금액은 선택한 기간 금액과 거리 추가금액의 합계로 검증합니다.
           </p>
         </div>
       </section>

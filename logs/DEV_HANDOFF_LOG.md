@@ -6978,3 +6978,32 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - GitHub `main` document commit: `d4d0f84`.
 - Vercel production deployment: `dpl_8HFijjJ1nW9XZ6bevdiC1mb47ygr` (`READY`).
 - The deployment URL, `https://zezari.family`, and `https://zezari.vercel.app` each returned HTTP 200.
+## 2026-08-01 - Advertisement Distance And Duration Option Catalog
+
+### Requirement
+- Replace guardian map/start/end-date advertisement setup with managed-subject, distance, and duration choices.
+- Show a final selection summary before payment.
+- Replace the old administrator ad-pricing form with independent distance and duration grids that support add, update, delete, and visibility settings.
+- Seed the exact distance and duration labels shown in the supplied references.
+
+### Implementation
+- Added `ad_distance_options` and `ad_duration_options` with active state, sort order, descriptions, and independently editable prices.
+- Seeded 10km, 20km, 40km, 80km, nationwide and 1, 3, 7, 14, 30-day choices.
+- Rebuilt the guardian modal into distance, duration, and summary/payment steps.
+- Radius choices request the device's current location only when the guardian continues; nationwide uses the Meta `KR` country target without requesting coordinates.
+- Added selected option snapshots and `coverage_type` to `subject_ads`; new requests use pricing version 3 while legacy versions remain valid.
+- Guardian amount is the duration price plus the distance surcharge. Meta budget remains separately calculated.
+- Rebuilt administrator ad-payment management as two scrollable editable grids.
+- Updated checkout and guardian ad history labels for the new option names.
+
+### Verification
+- `npm run build`: passed.
+- `git diff --check`: passed.
+- New advertisement INSERT placeholder count: 30, matching the 30 bound values.
+- Live Toss payment and live Meta publication were intentionally not executed during automated verification.
+
+### Deliverable
+- `deliverables/AD_DISTANCE_DURATION_OPTIONS.md`
+
+### Time Spent
+- Analysis, schema and compatibility design, administrator/user UI implementation, pricing validation, build, and documentation: about 45 minutes.

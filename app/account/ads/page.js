@@ -95,8 +95,9 @@ function AdThumb({ ad }) {
 }
 
 function formatAdLocation(ad) {
+  if (ad?.coverage_type === "country") return ad?.distance_label || "대한민국 전체";
   const radius = Number(ad?.region_radius_km || 0);
-  if (ad?.region && radius > 0) return `${ad.region} / 반경 ${radius}km`;
+  if (ad?.region && radius > 0) return `${ad.region} / ${ad?.distance_label || `반경 ${radius}km`}`;
   return ad?.region || "지역 미입력";
 }
 

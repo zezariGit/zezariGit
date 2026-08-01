@@ -484,3 +484,12 @@ Create a compact Korean OAuth review flow for "REAL_QR_FIND". Show four mobile s
 
 ### Notes
 - Use when presenting the two Naver review rejection fixes and the 2026-07-31 re-review request.
+# 2026-08-01 - 광고 거리·기간 선택형 설정
+
+## 보호자 광고 설정 3단계
+
+Create a Korean mobile civic-service interface for REAL_QR_FIND using the project's existing white, civic-blue, and restrained-purple visual system. Step 1 shows selectable vertical cards for `위치 주변 10km`, `인근 지역 20km`, `인접 도시 40km`, `광역권 80km`, and `전국 확산`. Step 2 shows `1일`, `3일`, `7일`, `14일`, and `30일`. Step 3 shows a compact summary with the managed subject photo and name, selected distance, duration, expected exposure area, start and end dates, duration price, distance surcharge, total payment amount, and one clear payment button. Use thin borders, card radii no larger than 8px, compact Korean typography, no gradients, and no real personal data.
+
+## 관리자 광고 옵션 그리드
+
+Create a desktop Korean admin screen for REAL_QR_FIND. Show two independent dense data grids titled `광고 노출 거리` and `광고 기간`. The distance grid has columns for order, option name, radius/country type, kilometers, user description, surcharge, visibility, and delete. The duration grid has columns for order, option name, days, user description, period price, visibility, and delete. Put a small add button above each grid and one save bar below. Match a quiet government-service admin style with white surfaces, civic blue, restrained purple actions, thin gray rules, compact controls, and horizontal scrolling for narrow screens.
