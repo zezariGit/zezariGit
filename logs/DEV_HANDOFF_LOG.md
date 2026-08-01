@@ -7089,3 +7089,11 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Specification review, legacy-flow replacement, concurrency design, DB/server/UI implementation, build, and documentation: about 55 minutes.
+
+### GitHub And Production Verification
+- GitHub `main` implementation commit: `4bdedec`.
+- Vercel source deployment: `dpl_AXUTHXVngivxsxT2MMMngVwzzpfa` (`READY`).
+- `https://zezari.family` and `https://zezari.vercel.app` were aligned to the new deployment and returned HTTP 200.
+- Authenticated production verification confirmed the new menu, zero-state pool grid, configuration warning, responsive layout, and no browser console errors.
+- An active public QR page showed `안심번호 준비중` while omitting guardian name, raw phone, email, and address.
+- No contracted 050 number was added and no Bizcall call was made because the required server API base URL and Interface ID are not configured.

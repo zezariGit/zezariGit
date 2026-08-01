@@ -5070,3 +5070,12 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 규격 검토, 구조 설계, DB·서버·관리자·공개 화면 구현, 빌드와 문서화: 약 55분
+
+### GitHub 및 운영 검증
+- GitHub `main` 구현 커밋: `4bdedec`
+- Vercel 소스 배포: `dpl_AXUTHXVngivxsxT2MMMngVwzzpfa` READY
+- `https://zezari.family`, `https://zezari.vercel.app` 모두 신규 배포 연결 및 HTTP 200 확인
+- 운영 관리자 화면에서 메뉴, 현황, 설정 경고, 추가 폼, 검색·필터, 그리드, 상세 빈 상태 확인
+- 활성 공개 QR에서 보호자 개인정보 없이 `안심번호 준비중`만 표시되는 것 확인
+- 브라우저 콘솔 오류 없음
+- 비즈콜 API 주소·Interface ID 및 계약 번호 등록 전이므로 실제 통화 연결 시험은 보류
