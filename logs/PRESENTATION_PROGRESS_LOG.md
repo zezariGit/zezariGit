@@ -5028,3 +5028,9 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 원인 분석, CSS 수정, 빌드 및 문서화: 약 10분
+
+### 운영 검증 및 배포
+- GitHub `main` 구현 커밋: `d75d81c`
+- Vercel 운영 배포: `dpl_5v5SL9g748esp5w1fHvf1WkBPq4o` READY
+- 1280px 운영 화면에서 안내문 637px, 저장 버튼 320px로 분리 배치 확인
+- 안내문 한 줄 표시, 페이지 가로 넘침 없음, 브라우저 콘솔 오류 없음 확인
