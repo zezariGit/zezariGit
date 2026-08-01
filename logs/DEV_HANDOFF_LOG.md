@@ -7126,6 +7126,10 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `npm run build`: passed with all 26 generated routes and the dynamic `/find/[key]` route.
 - `git diff --check`: passed.
 - With no Interface ID configured, configuration status now reports only `BIZCALL_INTERFACE_ID` as missing while resolving the standard API host from the server default.
+- GitHub `main` implementation commit: `e2da700`.
+- Vercel production deployment: `dpl_BjpPx24rqTTPHTQvXvAd2i2CLyvf` (`READY`).
+- `https://zezari.family`, `https://zezari.vercel.app`, and the Vercel production alias returned HTTP 200 with matching response sizes.
+- An eligible live QR page returned HTTP 200, kept private guardian fields absent, and correctly remained at `안심번호 준비중` because the external Interface ID is still unavailable.
 
 ### Time Spent
 - Production DB diagnosis, portal and specification verification, API-host validation, source correction, and documentation: about 40 minutes.

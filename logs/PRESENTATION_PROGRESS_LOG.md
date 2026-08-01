@@ -5106,6 +5106,9 @@ This file is the cumulative presentation-ready project log. It is written so the
 - Next.js 전체 운영 빌드 성공
 - `git diff --check` 성공
 - Interface ID 미설정 시 표준 API 주소는 기본 적용되고 남은 설정값은 `BIZCALL_INTERFACE_ID` 하나로 표시됨
+- GitHub `main` 구현 커밋 `e2da700` 및 Vercel 운영 배포 `dpl_BjpPx24rqTTPHTQvXvAd2i2CLyvf` READY 확인
+- `zezari.family`, `zezari.vercel.app` HTTP 200 확인
+- 운영 QR 페이지에서 보호자 개인정보 비노출 유지 및 Interface ID 미설정에 따른 `안심번호 준비중` 상태 확인
 
 ### 반영시간
 - 운영 진단, 포털·규격 확인, 서버 보강 및 문서화: 약 40분
