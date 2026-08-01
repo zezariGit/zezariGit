@@ -2642,6 +2642,7 @@ a {
 
 .ad-option-grid-section {
   min-width: 0;
+  overflow: hidden;
   display: grid;
   gap: var(--space-sm);
 }
