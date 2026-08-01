@@ -1057,8 +1057,11 @@ function SafePhonePoolManagementSection({ safePhonePoolData }) {
           <p>QR 공개 페이지가 열리면 사용 가능한 번호를 보호자 연락처에 {config.leaseHours}시간 연결합니다. 남은 번호가 없으면 가장 먼저 매칭된 번호를 회수해 새 보호자에게 배정합니다.</p>
           <p className={config.configured ? "safe-phone-config-state ready" : "safe-phone-config-state warning"}>
             {config.configured
-              ? "비즈콜 API 연결 준비 완료"
-              : `실제 매칭 전 서버 설정 필요: ${config.missing.join(", ") || "비즈콜 연동 비활성"}`}
+              ? `비즈콜 API 연결 준비 완료 (${config.apiBaseUrlSource === "default" ? "표준 API 주소" : "환경변수 API 주소"})`
+              : config.enabled
+                ? `실제 매칭 전 델피콤에서 발급한 Interface ID 설정 필요: ${config.missing.join(", ")}`
+                : "비즈콜 연동이 비활성화되어 있습니다."
+            }
           </p>
         </div>
         <form action={addSafePhonePoolNumberAction} className="safe-phone-add-form">

@@ -70,21 +70,21 @@ DB 스키마 버전은 `20`이다.
 
 ```dotenv
 BIZCALL_ENABLED=true
-BIZCALL_API_BASE_URL=
+BIZCALL_API_BASE_URL=https://api.050bizcall.co.kr
 BIZCALL_INTERFACE_ID=
 BIZCALL_TIMEOUT_MS=8000
 ```
 
-- `BIZCALL_API_BASE_URL`: 델피콤/비즈콜에서 계약 계정에 안내한 HTTPS 연동 서버 주소
+- `BIZCALL_API_BASE_URL`: 표준값은 `https://api.050bizcall.co.kr`; 계약별 주소를 별도로 안내받은 경우에만 덮어쓴다.
 - `BIZCALL_INTERFACE_ID`: 델피콤에서 발행한 20자 이하 Interface ID
 - `BIZCALL_TIMEOUT_MS`: API 최대 대기 시간, 기본 8초
 
-규격서에는 `/link/...` 상대 경로만 있으므로 API 기본 URL을 임의로 추정하면 안 된다.
+Interface ID는 비즈콜 포털 로그인 ID와 다른 연동 전용 코드다.
 
 ## 7. 운영 절차
 
 1. 비즈콜 계약 계정에서 050 회선을 할당한다.
-2. 비즈콜 담당자로부터 API 기본 URL과 Interface ID를 확인한다.
+2. 비즈콜 담당자로부터 Interface ID를 확인한다. 계약별 API 주소를 별도로 안내받았다면 함께 확인한다.
 3. 로컬 `.env.local`과 Vercel Production 환경변수에 등록한다.
 4. 관리자 `보호자 관리 > 기본정보 > 안심번호 발급/재연결`을 실행한다.
 5. 보호자 실제 전화에서 050 번호로 시험 통화한다.
@@ -109,7 +109,7 @@ BIZCALL_TIMEOUT_MS=8000
 
 ## 10. 남은 외부 설정
 
-소스 구현은 완료했지만 실제 050 발급 시험에는 비즈콜 계약 계정의 API 기본 URL, Interface ID, 사용 가능한 할당 회선이 필요하다. 해당 값은 소스와 문서에 기록하지 않고 Vercel 환경변수로만 관리한다.
+소스 구현은 완료했지만 실제 050 발급 시험에는 비즈콜 계약 계정의 Interface ID와 사용 가능한 할당 회선이 필요하다. Interface ID는 소스와 문서에 기록하지 않고 Vercel 환경변수로만 관리한다.
 
 ## 11. 2026-07-31 계정 및 운영환경 확인
 
@@ -117,6 +117,6 @@ BIZCALL_TIMEOUT_MS=8000
 - 신규 매핑은 `/link/auto_mapp.do`, 전화번호 변경과 해지는 `/link/set_vn.do`를 사용한다.
 - 로그인된 비즈콜 서비스 현황에서 전체 가상번호 100개, 할당 가상번호 5개가 확인되어 미할당 회선을 사용할 수 있는 계정 상태다.
 - `050번호 관리` 화면에서 가상번호와 착신번호 매핑 관리 기능이 활성화되어 있음을 확인했다.
-- 로컬 `.env.local`과 Vercel 환경변수에는 `BIZCALL_API_BASE_URL`, `BIZCALL_INTERFACE_ID`가 아직 등록되어 있지 않다.
-- 따라서 계약과 회선은 준비되어 있지만, API 기본 URL과 Interface ID를 비즈콜에서 확인해 서버 환경변수에 등록하기 전에는 REAL_QR_FIND의 자동 발급 호출이 실행되지 않는다.
+- 로컬 `.env.local`과 Vercel 환경변수에는 `BIZCALL_INTERFACE_ID`가 아직 등록되어 있지 않다.
+- 따라서 계약과 회선은 준비되어 있지만, Interface ID를 비즈콜에서 확인해 서버 환경변수에 등록하기 전에는 REAL_QR_FIND의 자동 발급 호출이 실행되지 않는다.
 - 실제 전화번호, 계정 비밀번호, API 인증값은 산출물과 로그에 기록하지 않았다.

@@ -7097,3 +7097,35 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Authenticated production verification confirmed the new menu, zero-state pool grid, configuration warning, responsive layout, and no browser console errors.
 - An active public QR page showed `안심번호 준비중` while omitting guardian name, raw phone, email, and address.
 - No contracted 050 number was added and no Bizcall call was made because the required server API base URL and Interface ID are not configured.
+
+## 2026-08-02 KST - Public QR Safe-Phone Mapping Failure Diagnosis
+
+### User Requirement
+- Opening a managed-subject page through either its QR code or direct link must immediately connect an unmapped Bizcall 050 number to the guardian's contact number.
+- The public page must display the connected 050 number instead of `안심번호 준비중`.
+
+### Root Cause
+- The public request reached the shared-pool allocation code, selected pool rows, and then failed before the provider mapping call because local and Vercel environments had no `BIZCALL_INTERFACE_ID`.
+- Production pool rows recorded the missing Bizcall configuration as their latest error. No raw guardian phone was returned to the browser.
+- The signed-in Bizcall portal showed that available virtual numbers remain, so pool capacity was not the cause.
+- A read-only request confirmed the standard API host responds at `https://api.050bizcall.co.kr`.
+- The portal member login ID is not the API Interface ID; using it returned Bizcall result code 2. No mapping request was made with that invalid value.
+
+### Source Changes
+- `lib/bizcall.js`: added the verified standard API host as the default while retaining the environment override for contract-specific hosts.
+- `lib/db.js`: validates Bizcall configuration before claiming a new pool row, preventing missing credentials from changing an otherwise reusable number to `failed`.
+- Existing valid 24-hour assignments are reused before configuration validation, so a temporary environment issue does not hide an already connected safe number.
+- `app/admin/page.js`: changed the configuration status to identify the one remaining required value as the Delphicom-issued Interface ID and to distinguish it from the portal login ID.
+- `.env.example` and Bizcall deliverables were updated without storing credentials, contracted numbers, or raw guardian phones.
+
+### External Dependency
+- Real mapping and call verification remain blocked until Delphicom provides the contract's `BIZCALL_INTERFACE_ID` and it is added to local/Vercel server environments.
+- Once that value is present, the next eligible QR/link request retries a failed or available pool row and calls `/link/auto_expire_update.do` with a 24-hour expiry.
+
+### Verification
+- `npm run build`: passed with all 26 generated routes and the dynamic `/find/[key]` route.
+- `git diff --check`: passed.
+- With no Interface ID configured, configuration status now reports only `BIZCALL_INTERFACE_ID` as missing while resolving the standard API host from the server default.
+
+### Time Spent
+- Production DB diagnosis, portal and specification verification, API-host validation, source correction, and documentation: about 40 minutes.
