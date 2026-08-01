@@ -6,13 +6,17 @@ import { getServerSession } from "next-auth";
 import { isAdminSession } from "../../lib/admin";
 import { authOptions } from "../../lib/auth";
 import {
+  addSafePhonePoolNumber,
+  assignSafePhonePoolNumberForAdmin,
   createProductCatalogItem,
+  deleteSafePhonePoolNumber,
   generateQrCodes,
   createAdminPaymentRefund,
   getAdminMessageById,
   getAdminMessageRecipients,
   isDbAdminSession,
   markAdminMessageSent,
+  releaseSafePhonePoolNumberForAdmin,
   saveAdminCoupon,
   saveAdminMessage,
   saveAdminMessageTemplate,
@@ -31,7 +35,6 @@ import {
   setSubscriptionAdminMemo,
   setSubscriptionAdminTest,
   setSubscriptionPlanPrice,
-  syncGuardianSafePhoneForAdmin,
 } from "../../lib/db";
 import { notifyGuardiansFromAdmin } from "../../lib/push";
 
@@ -61,22 +64,59 @@ export async function setGuardianAdminMemoAction(formData) {
   redirect(withNotice(getReturnTo(formData, "/admin?section=guardians"), "관리 메모가 저장되었습니다."));
 }
 
-export async function syncGuardianSafePhoneAction(formData) {
+export async function addSafePhonePoolNumberAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  try {
+    await addSafePhonePoolNumber(formData);
+    revalidatePath("/admin");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=safe-phones"), error.message || "안심번호를 추가하지 못했습니다.", "error"));
+  }
+  redirect(withNotice(getReturnTo(formData, "/admin?section=safe-phones"), "안심번호가 풀에 추가되었습니다."));
+}
+
+export async function assignSafePhonePoolNumberAction(formData) {
   const session = await getServerSession(authOptions);
   if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
 
   let result;
   try {
-    result = await syncGuardianSafePhoneForAdmin(formData);
+    result = await assignSafePhonePoolNumberForAdmin(formData);
     revalidatePath("/admin");
-    revalidatePath("/");
   } catch (error) {
-    redirect(withNotice(getReturnTo(formData, "/admin?section=guardians"), error.message || "안심번호 발급에 실패했습니다.", "error"));
+    redirect(withNotice(getReturnTo(formData, "/admin?section=safe-phones"), error.message || "안심번호를 매칭하지 못했습니다.", "error"));
   }
-  redirect(withNotice(
-    getReturnTo(formData, "/admin?section=guardians"),
-    `${result.safePhone} 안심번호가 보호자 연락처에 연결되었습니다.`
-  ));
+  redirect(withNotice(getReturnTo(formData, "/admin?section=safe-phones"), `${result.safePhone} 번호가 보호자에게 24시간 매칭되었습니다.`));
+}
+
+export async function releaseSafePhonePoolNumberAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  let result;
+  try {
+    result = await releaseSafePhonePoolNumberForAdmin(formData);
+    revalidatePath("/admin");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=safe-phones"), error.message || "안심번호 매칭을 해제하지 못했습니다.", "error"));
+  }
+  redirect(withNotice(getReturnTo(formData, "/admin?section=safe-phones"), `${result.safePhone} 번호의 매칭이 해제되었습니다.`));
+}
+
+export async function deleteSafePhonePoolNumberAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  let result;
+  try {
+    result = await deleteSafePhonePoolNumber(formData);
+    revalidatePath("/admin");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=safe-phones"), error.message || "안심번호를 삭제하지 못했습니다.", "error"));
+  }
+  redirect(withNotice(getReturnTo(formData, "/admin?section=safe-phones"), `${result.safePhone} 번호가 풀에서 삭제되었습니다.`));
 }
 
 export async function generateQrCodesAction(formData) {

@@ -73,7 +73,7 @@ Screenshots supplied during planning are structure references. Final UI styling 
 
 ## Current Privacy Note
 
-The guardian's private `phone` value remains available for authenticated owner/admin workflows, but the public QR page uses `safe_phone` only. If no safe number has been issued yet, the public page shows `안심번호 준비중`.
+The guardian's private `phone` value remains available for authenticated owner/admin workflows, but a valid public QR access only shows a 24-hour shared number allocated from `safe_phone_pool`. If no pool number can be allocated, the public page shows `안심번호 준비중` and never falls back to the private phone.
 
 The active public QR page does not display the guardian's name, email, or address. It provides the safe-number call link, guardian message/audio, and one `위치공유` button. The location action does not ask the finder to enter a phone number or location description.
 

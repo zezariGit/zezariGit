@@ -275,10 +275,8 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
         <InfoRow label="수령인" value={guardian.name || "이름 미입력"} actionLabel="주소록관리 >" href="/?tab=guardian" />
         <InfoRow label="주소" value={formatFullAddress(guardian.address, guardian.address_detail)} />
         <InfoRow
-          label="연락처"
-          value={guardian.safe_phone_status === "active" && guardian.safe_phone
-            ? `안심번호 ${guardian.safe_phone}`
-            : "안심번호 준비중"}
+          label="안심번호 운영"
+          value="QR 접근 시 24시간 자동 배정"
         />
       </div>
 
@@ -513,7 +511,7 @@ function GuardianForm({ guardian, session }) {
                   aria-readonly="true"
                 />
                 <small className="field-helper">
-                  연락받을 전화번호 저장 시 비즈콜 050 번호가 자동 발급·연결됩니다.
+                  실제 번호는 공개되지 않으며 QR 접근 시 공용 050 번호가 24시간 배정됩니다.
                 </small>
               </label>
               <label className="full-field">
@@ -702,12 +700,7 @@ function socialProviderLabel(provider) {
 }
 
 function safePhoneDisplayValue(guardian) {
-  if (guardian?.safe_phone_status === "active" && guardian?.safe_phone) {
-    return guardian.safe_phone;
-  }
-  if (guardian?.safe_phone_status === "failed") return "발급 재시도 필요";
-  if (guardian?.safe_phone_status === "provisioning") return "안심번호 발급 중";
-  return "안심번호 준비중";
+  return "QR 접근 시 24시간 자동 배정";
 }
 
 function subjectPhotoSrc(subject) {

@@ -493,3 +493,9 @@ Create a Korean mobile civic-service interface for REAL_QR_FIND using the projec
 ## 관리자 광고 옵션 그리드
 
 Create a desktop Korean admin screen for REAL_QR_FIND. Show two independent dense data grids titled `광고 노출 거리` and `광고 기간`. The distance grid has columns for order, option name, radius/country type, kilometers, user description, surcharge, visibility, and delete. The duration grid has columns for order, option name, days, user description, period price, visibility, and delete. Put a small add button above each grid and one save bar below. Match a quiet government-service admin style with white surfaces, civic blue, restrained purple actions, thin gray rules, compact controls, and horizontal scrolling for narrow screens.
+
+# 2026-08-01 - 비즈콜 안심번호 공유 풀
+
+## 24시간 자동 매칭 및 관리자 운영 구조
+
+Create a Korean system architecture and operations infographic for REAL_QR_FIND's shared Bizcall safe-phone pool. Show a finder opening an active managed-subject QR page, a Next.js server checking for an existing guardian lease, and a pool of 10 to 20 pre-issued 050 numbers. Visualize three decision paths: reuse the guardian's still-valid number, assign an available number for 24 hours, or reclaim the oldest assignment when the pool is full. Show the Bizcall `/link/auto_expire_update.do` request with `expire_hour=24`, without any real phone numbers or credentials. On the right, show a dense administrator master-detail screen with number add/delete, status filter, guardian search, manual 24-hour match, release button, match timestamp, expiry timestamp, and assignment history. Add privacy labels stating that the guardian's raw phone is server-only and never used as a public fallback. Use white work surfaces, civic blue, restrained purple actions, thin gray connectors, compact Korean labels, corners no larger than 8px, and no gradients.

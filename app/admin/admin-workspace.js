@@ -20,6 +20,7 @@ const MENU_ITEMS = [
   { id: "ad-pricing", label: "광고결제 관리", href: "/admin?section=ad-pricing", icon: "payment" },
   { id: "missing", label: "실종신고 관리", href: "/admin?section=missing", icon: "alert" },
   { id: "locations", label: "위치공유 관리", href: "/admin?section=locations", icon: "pin" },
+  { id: "safe-phones", label: "안심번호 관리", href: "/admin?section=safe-phones", icon: "phone" },
   { id: "notifications", label: "알림 관리", href: "/admin?section=notifications", icon: "alert" },
   { id: "message-templates", label: "메시지 템플릿", href: "/admin?section=message-templates", icon: "chat" },
   { id: "inquiries", label: "고객 문의", href: "/admin?section=inquiries", icon: "chat" },
@@ -194,6 +195,14 @@ function iconPath(name) {
         <>
           <path d="M12 21s6-5.5 6-11a6 6 0 0 0-12 0c0 5.5 6 11 6 11z" />
           <circle cx="12" cy="10" r="2.2" />
+        </>
+      );
+    case "phone":
+      return (
+        <>
+          <path d="M7.2 3.8 4.7 5.2c-.8.5-1.1 1.4-.8 2.3 1.8 5.7 6.9 10.8 12.6 12.6.9.3 1.8 0 2.3-.8l1.4-2.5c.4-.8.2-1.7-.5-2.2l-2.8-2c-.7-.5-1.6-.4-2.2.2l-1 1c-1.9-1-4-3.1-5-5l1-1c.6-.6.7-1.5.2-2.2l-2-2.8c-.5-.7-1.4-.9-2.2-.5z" />
+          <path d="M14.5 5.5h5v5" />
+          <path d="m19.5 5.5-5.8 5.8" />
         </>
       );
     case "chat":

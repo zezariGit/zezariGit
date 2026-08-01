@@ -7041,3 +7041,51 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - At a 1280px operating viewport, the save area measured 637px for the guidance and 320px for the button; the guidance remained on one line.
 - Document client width and scroll width both measured 1265px, confirming no page-level horizontal overflow.
 - Visual inspection confirmed the guidance and button are separated and aligned; browser console errors were empty.
+
+## 2026-08-01 KST - Bizcall 24-Hour Shared Safe-Phone Pool
+
+### User Requirement
+- Avoid the cost of assigning one permanent Bizcall 050 number to every guardian.
+- Pre-register approximately 10 to 20 safe numbers and assign one to a guardian when a valid managed-subject QR page is opened.
+- Keep each mapping for about 24 hours, prevent concurrent duplicate use, and reclaim the oldest mapping when the pool is full.
+- Add administrator number-grid management, detail/history, manual release, guardian search, and manual assignment.
+
+### Architecture Decision
+- Replaced new permanent guardian provisioning with a server-managed lease pool.
+- Uses Bizcall `/link/auto_expire_update.do` with the selected virtual number and `expire_hour=24`; manual release continues to use `/link/set_vn.do`.
+- Keeps legacy `guardians.safe_phone*` columns only for migration compatibility. Public QR pages no longer read those columns.
+- Assigns only for active, guardian-activated, subject-matched QR pages covered by active period or product-included service access.
+- Reuses the guardian's valid lease, then prefers an available number, then recycles the oldest active lease.
+- Adds a 30-second per-guardian lock and per-number version claim to prevent duplicate mappings under concurrent QR requests.
+
+### Source Changes
+- `lib/bizcall.js`: added explicit-number 24-hour lease API adapter.
+- `lib/db.js`: schema version 31; added `safe_phone_pool`, `safe_phone_assignment_history`, and `safe_phone_assignment_locks`; added allocation, expiry, oldest-recycle, manual assignment/release/delete, guardian-phone-change release, and admin query logic.
+- `app/admin/page.js`, `app/admin/actions.js`, `app/admin/admin-workspace.js`: added `안심번호 관리` master-detail screen and protected server actions.
+- `app/find/[key]` data source: public access now receives only the current pool number or no number; private guardian phone is never returned as fallback.
+- `app/dashboard.js`, `app/actions.js`: changed guardian-facing wording from permanent issuance to QR-access 24-hour assignment.
+- `app/globals.css`: added responsive status cards, grids, detail/history, and manual-match styling.
+
+### Administrator Workflow
+- Register a contracted 050 number and optional admin memo.
+- Filter/search the pool and inspect current guardian, subject, match time, expiry, recent access, provider sync, and errors.
+- Search a guardian by name, phone, or email and manually assign the selected number for 24 hours.
+- Manually release a current mapping, delete a released number, review history, and download CSV.
+- The screen displays a configuration warning until the Bizcall API base URL and Interface ID are available on the server.
+
+### Privacy And Failure Rules
+- Raw guardian phone remains server-only and is not rendered by the public page.
+- Provider/configuration failure shows `안심번호 준비중`; there is no raw-phone fallback.
+- Provider credentials, interface ID values, real guardian phones, and contracted 050 numbers are not recorded in this log.
+
+### Verification
+- `npm run build`: passed after the pool, lock, public-query, and administrator UI changes.
+- `git diff --check`: passed before documentation and will be rerun before deployment.
+- Actual Bizcall mapping/call testing remains externally dependent on `BIZCALL_API_BASE_URL`, `BIZCALL_INTERFACE_ID`, and registered pool numbers.
+
+### Deliverables
+- `deliverables/BIZCALL_SAFE_PHONE_POOL.md`
+- Updated `deliverables/BIZCALL_SAFE_PHONE_INTEGRATION.md`, `DATABASE_SCHEMA.md`, `QR_MANAGEMENT.md`, `USER_MANUAL.md`, `README.md`, and `image_prompts/IMAGE_PROMPTS.md`.
+
+### Time Spent
+- Specification review, legacy-flow replacement, concurrency design, DB/server/UI implementation, build, and documentation: about 55 minutes.

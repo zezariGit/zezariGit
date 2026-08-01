@@ -6690,6 +6690,209 @@ a.inline-scroll-value {
   overflow-wrap: anywhere;
 }
 
+.safe-phone-admin-page {
+  display: grid;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+.safe-phone-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.safe-phone-stat-card {
+  min-height: 92px;
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  padding: var(--space-md);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+}
+
+.safe-phone-stat-card span {
+  color: var(--c-text-muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.safe-phone-stat-card strong {
+  color: var(--c-text);
+  font-size: 24px;
+}
+
+.safe-phone-stat-card.available {
+  border-top: 4px solid var(--c-success);
+}
+
+.safe-phone-stat-card.assigned {
+  border-top: 4px solid var(--c-primary);
+}
+
+.safe-phone-stat-card.failed {
+  border-top: 4px solid var(--c-danger);
+}
+
+.safe-phone-policy-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 0.8fr);
+  gap: var(--space-lg);
+  align-items: end;
+}
+
+.safe-phone-policy-panel h2,
+.safe-phone-policy-panel p {
+  margin: 0;
+}
+
+.safe-phone-policy-panel h2 {
+  margin-bottom: 6px;
+  font-size: 18px;
+}
+
+.safe-phone-policy-panel p {
+  color: var(--c-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.safe-phone-config-state {
+  margin-top: var(--space-sm) !important;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font-weight: 800;
+}
+
+.safe-phone-config-state.ready {
+  background: var(--c-success-bg);
+  color: var(--c-success);
+}
+
+.safe-phone-config-state.warning {
+  background: var(--c-warning-bg);
+  color: #8a5a00;
+}
+
+.safe-phone-add-form {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.7fr) minmax(200px, 1fr) auto;
+  align-items: end;
+  gap: var(--space-sm);
+}
+
+.safe-phone-add-form label,
+.safe-phone-guardian-search label,
+.safe-phone-manual-match label {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  color: var(--c-text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.safe-phone-add-form input,
+.safe-phone-guardian-search input,
+.safe-phone-manual-match select {
+  width: 100%;
+  min-width: 0;
+}
+
+.safe-phone-filter {
+  grid-template-columns: minmax(220px, 1fr) 150px auto auto;
+}
+
+.safe-phone-record-table {
+  min-width: 900px;
+}
+
+.safe-phone-record-table .admin-record-header,
+.safe-phone-record-table .admin-record-row {
+  grid-template-columns: 142px 104px minmax(110px, 0.9fr) minmax(105px, 0.8fr) 142px 142px;
+}
+
+.safe-phone-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 3px 7px;
+  border-radius: var(--radius-sm);
+  background: #eef1f4;
+  color: var(--c-text-muted);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.safe-phone-status.available {
+  background: var(--c-success-bg);
+  color: var(--c-success);
+}
+
+.safe-phone-status.assigned {
+  background: var(--c-primary-light);
+  color: var(--c-primary-dark);
+}
+
+.safe-phone-status.assigning,
+.safe-phone-status.releasing {
+  background: var(--c-warning-bg);
+  color: #8a5a00;
+}
+
+.safe-phone-status.failed {
+  background: var(--c-danger-bg);
+  color: var(--c-danger);
+}
+
+.safe-phone-detail-action,
+.safe-phone-delete-section form {
+  margin-top: var(--space-sm);
+}
+
+.safe-phone-detail-action button,
+.safe-phone-delete-section button,
+.safe-phone-manual-match button {
+  width: 100%;
+}
+
+.safe-phone-guardian-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--space-xs);
+}
+
+.safe-phone-manual-match {
+  display: grid;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+.safe-phone-manual-match p {
+  margin: 0;
+  color: var(--c-text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.safe-phone-history {
+  max-height: 280px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.safe-phone-delete-section > p {
+  margin-bottom: var(--space-sm);
+}
+
 @media (max-width: 1200px) {
   .admin-master-detail {
     grid-template-columns: 1fr;
@@ -6712,6 +6915,10 @@ a.inline-scroll-value {
     grid-template-columns: 1fr;
   }
 
+  .safe-phone-policy-panel {
+    grid-template-columns: 1fr;
+  }
+
   .guardian-admin-layout {
     grid-template-columns: 1fr;
   }
@@ -6727,6 +6934,18 @@ a.inline-scroll-value {
 }
 
 @media (max-width: 1100px) {
+  .safe-phone-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .safe-phone-add-form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .safe-phone-add-form button {
+    grid-column: 1 / -1;
+  }
+
   .admin-dashboard-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -6774,6 +6993,16 @@ a.inline-scroll-value {
 }
 
 @media (max-width: 620px) {
+  .safe-phone-stat-grid,
+  .safe-phone-add-form,
+  .safe-phone-guardian-search {
+    grid-template-columns: 1fr;
+  }
+
+  .safe-phone-add-form button {
+    grid-column: auto;
+  }
+
   .admin-dashboard-heading {
     align-items: stretch;
     display: grid;

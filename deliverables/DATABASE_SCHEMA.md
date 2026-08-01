@@ -4,7 +4,7 @@ Project: REAL_QR_FIND / zezari
 
 ## Status
 - Implemented in Turso.
-- Current schema version: `27`.
+- Current schema version: `31`.
 
 ## Tables
 
@@ -21,11 +21,11 @@ Stores one guardian profile per logged-in Google user.
 | `login_id` | TEXT | Guardian-chosen app ID |
 | `password_hash` | TEXT | PBKDF2 password hash, never plaintext |
 | `phone` | TEXT | Private guardian contact phone number, not shown on public QR pages |
-| `safe_phone` | TEXT | Public QR page safe/relay phone number, nullable until issued |
-| `safe_phone_status` | TEXT | Bizcall sync state: `pending`, `provisioning`, `active`, or `failed` |
-| `safe_phone_provider` | TEXT | Safe-number provider, currently `bizcall` or migrated `legacy` |
-| `safe_phone_synced_at` | TEXT | Last successful safe-number mapping timestamp |
-| `safe_phone_last_error` | TEXT | Last provisioning/remapping error without credentials or phone values |
+| `safe_phone` | TEXT | Legacy permanent safe-number field retained for compatibility; new public access uses `safe_phone_pool` |
+| `safe_phone_status` | TEXT | Legacy sync state or `on_demand` after migration to the shared pool |
+| `safe_phone_provider` | TEXT | Legacy provider marker or `bizcall_pool` |
+| `safe_phone_synced_at` | TEXT | Legacy successful mapping timestamp |
+| `safe_phone_last_error` | TEXT | Legacy mapping error without credentials or phone values |
 | `address` | TEXT | Guardian contact address shown on assigned QR find page |
 | `birth_date` | TEXT | Guardian birth date captured during direct signup or profile edit |
 | `phone_verified_at` | TEXT | Timestamp when phone verification was completed during direct signup |
@@ -36,6 +36,18 @@ Stores one guardian profile per logged-in Google user.
 | `is_admin` | INTEGER | `1` DB administrator, `0` normal guardian |
 | `created_at` | TEXT | Created timestamp |
 | `updated_at` | TEXT | Updated timestamp |
+
+### safe_phone_pool
+
+Stores administrator-registered 050 numbers and their current 24-hour guardian lease. `version` prevents two guardians from claiming the same number concurrently. When every number is assigned, the oldest assignment is replaced.
+
+### safe_phone_assignment_history
+
+Stores every assignment, expiry, manual release, phone-change release, and oldest-lease recycle event without storing credentials.
+
+### safe_phone_assignment_locks
+
+Stores a short-lived per-guardian lock while a Bizcall assignment request is running so concurrent QR page loads cannot allocate multiple 050 numbers to one guardian.
 
 ### subjects
 
@@ -315,7 +327,7 @@ Stores the browser-rendered advertisement poster separately so advertisement lis
 - QR activation sets `qr_codes.activated_at`; if the guardian has a paid subscription in `ready` status, activation starts the subscription period.
 - When a QR is assigned and activated, the public find page shows subject basic information and configured guardian response fields so the finder can respond.
 - Subject records can include a guardian message and guardian recorded audio. The public QR page shows/plays those values when present.
-- Public QR pages must not expose `guardians.phone`; they show `guardians.safe_phone` as the safe/relay number when available, or `안심번호 준비중` when not available.
+- Public QR pages must not expose `guardians.phone`. A valid QR access reuses or allocates a 24-hour number from `safe_phone_pool`; when no usable number or provider connection is available, it shows `안심번호 준비중` without a raw-phone fallback.
 - Each subject receives one QR assignment. Because each guardian can register up to 4 subjects, one guardian can have up to 4 assigned QR codes.
 - Logged-in guardians can register a browser push subscription from the dashboard.
 - Public find pages can call the notification API to send a push message to the assigned guardian.

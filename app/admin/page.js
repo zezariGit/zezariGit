@@ -29,6 +29,7 @@ import {
   getAdminOrdersData,
   getAdminPaymentsData,
   getAdminProductsData,
+  getAdminSafePhonePoolData,
   getAdminSubscriptionsData,
   getAdminSubscriptionPlansData,
   getAdminSubjectsData,
@@ -38,11 +39,14 @@ import {
   isDbAdminSession,
 } from "../../lib/db";
 import {
+  addSafePhonePoolNumberAction,
+  assignSafePhonePoolNumberAction,
+  deleteSafePhonePoolNumberAction,
   generateQrCodesAction,
+  releaseSafePhonePoolNumberAction,
   setGuardianActiveAction,
   setGuardianAdminMemoAction,
   setGuardianAdminAction,
-  syncGuardianSafePhoneAction,
   setAdPricingAction,
   setProductOrderFulfillmentAction,
   setQrAdminMemoAction,
@@ -94,7 +98,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "orders", "subscriptions", "ads", "ad-pricing", "missing", "locations", "notifications", "message-templates", "inquiries"].includes(resolvedSearchParams?.section)
+  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "orders", "subscriptions", "ads", "ad-pricing", "missing", "locations", "safe-phones", "notifications", "message-templates", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -179,6 +183,12 @@ export default async function AdminPage({ searchParams }) {
     startDate: resolvedSearchParams?.locationStart || "",
     endDate: resolvedSearchParams?.locationEnd || "",
   };
+  const selectedSafePhoneId = resolvedSearchParams?.safePhone || "";
+  const safePhoneFilters = {
+    query: resolvedSearchParams?.safePhoneQuery || "",
+    status: resolvedSearchParams?.safePhoneStatus || "all",
+    guardianQuery: resolvedSearchParams?.safePhoneGuardianQuery || "",
+  };
   const selectedMessageId = resolvedSearchParams?.message || "";
   const composeMessage = resolvedSearchParams?.compose === "1";
   const messageFilters = {
@@ -215,6 +225,7 @@ export default async function AdminPage({ searchParams }) {
   const adPricingData = activeSection === "ad-pricing" ? await getAdPricingSettings() : null;
   const missingReportsData = activeSection === "missing" ? await getAdminMissingReportsData(missingFilters) : null;
   const locationSharesData = activeSection === "locations" ? await getAdminLocationSharesData(locationFilters, selectedLocationShareId) : null;
+  const safePhonePoolData = activeSection === "safe-phones" ? await getAdminSafePhonePoolData(safePhoneFilters, selectedSafePhoneId) : null;
   const messagesData = activeSection === "notifications" ? await getAdminMessagesData(messageFilters, composeMessage ? "new" : selectedMessageId) : null;
   const messageTemplatesData = activeSection === "message-templates" ? await getAdminMessageTemplatesData(templateFilters, selectedTemplateId) : null;
   const inquiriesData = activeSection === "inquiries" ? await getAdminInquiriesData() : null;
@@ -256,6 +267,8 @@ export default async function AdminPage({ searchParams }) {
                 ? "실종신고 관리"
                 : activeSection === "locations"
                   ? "위치공유 관리"
+                  : activeSection === "safe-phones"
+                    ? "안심번호 관리"
                   : activeSection === "notifications"
                     ? "알림 관리"
                     : activeSection === "message-templates"
@@ -290,6 +303,8 @@ export default async function AdminPage({ searchParams }) {
                 ? "실종신고 접수 현황과 광고 상태, 발견 여부를 조회합니다."
                 : activeSection === "locations"
                   ? "QR 공개 페이지에서 공유된 발견 위치와 지도 링크를 조회합니다."
+                  : activeSection === "safe-phones"
+                    ? "공용 050 안심번호를 등록하고 24시간 자동·수동 매칭과 해제 이력을 관리합니다."
                   : activeSection === "notifications"
                     ? "가입 보호자에게 푸시 알림 메시지를 작성, 저장, 발송하고 결과를 확인합니다."
                     : activeSection === "message-templates"
@@ -336,6 +351,8 @@ export default async function AdminPage({ searchParams }) {
             <MissingReportManagementSection missingReportsData={missingReportsData} />
           ) : activeSection === "locations" ? (
             <LocationShareManagementSection locationSharesData={locationSharesData} />
+          ) : activeSection === "safe-phones" ? (
+            <SafePhonePoolManagementSection safePhonePoolData={safePhonePoolData} />
           ) : activeSection === "notifications" ? (
             <NotificationManagementSection messagesData={messagesData} composeMessage={composeMessage} />
           ) : activeSection === "message-templates" ? (
@@ -997,6 +1014,222 @@ function LocationShareManagementSection({ locationSharesData }) {
           <p className="empty-text">위치공유 이력을 선택해 주세요.</p>
         )}
       </aside>
+    </div>
+  );
+}
+
+function SafePhonePoolManagementSection({ safePhonePoolData }) {
+  const {
+    pool,
+    selectedSafePhone,
+    history,
+    guardians,
+    summary,
+    config,
+    filters,
+  } = safePhonePoolData;
+  const returnTo = buildSafePhonePoolUrl(filters, selectedSafePhone?.id);
+
+  return (
+    <div className="safe-phone-admin-page">
+      <section className="safe-phone-stat-grid" aria-label="안심번호 현황">
+        <article className="safe-phone-stat-card">
+          <span>전체 번호</span>
+          <strong>{summary.total.toLocaleString("ko-KR")}개</strong>
+        </article>
+        <article className="safe-phone-stat-card available">
+          <span>사용 가능</span>
+          <strong>{summary.available.toLocaleString("ko-KR")}개</strong>
+        </article>
+        <article className="safe-phone-stat-card assigned">
+          <span>매칭 중</span>
+          <strong>{summary.assigned.toLocaleString("ko-KR")}개</strong>
+        </article>
+        <article className="safe-phone-stat-card failed">
+          <span>확인 필요</span>
+          <strong>{(summary.assigning + summary.failed).toLocaleString("ko-KR")}개</strong>
+        </article>
+      </section>
+
+      <section className="admin-panel safe-phone-policy-panel">
+        <div>
+          <h2>24시간 공용 안심번호 풀</h2>
+          <p>QR 공개 페이지가 열리면 사용 가능한 번호를 보호자 연락처에 {config.leaseHours}시간 연결합니다. 남은 번호가 없으면 가장 먼저 매칭된 번호를 회수해 새 보호자에게 배정합니다.</p>
+          <p className={config.configured ? "safe-phone-config-state ready" : "safe-phone-config-state warning"}>
+            {config.configured
+              ? "비즈콜 API 연결 준비 완료"
+              : `실제 매칭 전 서버 설정 필요: ${config.missing.join(", ") || "비즈콜 연동 비활성"}`}
+          </p>
+        </div>
+        <form action={addSafePhonePoolNumberAction} className="safe-phone-add-form">
+          <input type="hidden" name="returnTo" value={returnTo} />
+          <label>
+            안심번호
+            <input name="safePhone" inputMode="tel" placeholder="050-0000-0000" required />
+          </label>
+          <label>
+            관리 메모
+            <input name="adminMemo" maxLength="500" placeholder="회선 구분 또는 계약 메모" />
+          </label>
+          <FormSubmitButton className="primary-button" pendingText="추가중">번호 추가</FormSubmitButton>
+        </form>
+      </section>
+
+      <div className="admin-master-detail safe-phone-master-detail">
+        <section className="admin-panel admin-master-panel">
+          <div className="panel-heading">
+            <h2>안심번호 그리드</h2>
+            <div className="admin-heading-actions">
+              <span>{pool.length}개 조회</span>
+              <AdminExportButton filename="zezari-safe-phone-pool.csv" rows={safePhonePoolExportRows(pool)} />
+            </div>
+          </div>
+
+          <form className="admin-master-filter safe-phone-filter" action="/admin">
+            <input type="hidden" name="section" value="safe-phones" />
+            <label>
+              통합 검색
+              <input name="safePhoneQuery" defaultValue={filters.query} placeholder="안심번호, 보호자, 연락처, 대상자" />
+            </label>
+            <label>
+              매칭 상태
+              <select name="safePhoneStatus" defaultValue={filters.status}>
+                <option value="all">전체</option>
+                <option value="available">사용 가능</option>
+                <option value="assigned">매칭 중</option>
+                <option value="assigning">매칭 처리중</option>
+                <option value="releasing">해제 처리중</option>
+                <option value="failed">확인 필요</option>
+              </select>
+            </label>
+            <button type="submit">조회</button>
+            <Link className="plain-button" href="/admin?section=safe-phones">초기화</Link>
+          </form>
+
+          <div className="admin-record-table-wrap">
+            <div className="admin-record-table safe-phone-record-table" role="table" aria-label="안심번호 풀 목록">
+              <div className="admin-record-header" role="row">
+                <span role="columnheader">안심번호</span>
+                <span role="columnheader">상태</span>
+                <span role="columnheader">보호자</span>
+                <span role="columnheader">관리대상</span>
+                <span role="columnheader">매칭일시</span>
+                <span role="columnheader">만료일시</span>
+              </div>
+              {pool.map((row) => (
+                <Link
+                  className={row.id === selectedSafePhone?.id ? "admin-record-row active" : "admin-record-row"}
+                  href={buildSafePhonePoolUrl(filters, row.id)}
+                  key={row.id}
+                  role="row"
+                >
+                  <strong role="cell" className="inline-scroll-value">{row.safe_phone}</strong>
+                  <em role="cell" className={`safe-phone-status ${row.status}`}>{safePhonePoolStatusLabel(row.status)}</em>
+                  <span role="cell">{row.guardian_name || "-"}</span>
+                  <span role="cell">{row.subject_name || "-"}</span>
+                  <time role="cell">{row.assigned_at ? formatRecentDateTime(row.assigned_at) : "-"}</time>
+                  <time role="cell">{row.expires_at ? formatRecentDateTime(row.expires_at) : "-"}</time>
+                </Link>
+              ))}
+              {pool.length === 0 && <p className="empty-text">등록된 안심번호가 없습니다. 계약 계정에 미리 할당된 050 번호를 추가해 주세요.</p>}
+            </div>
+          </div>
+        </section>
+
+        <aside className="admin-panel admin-detail-panel safe-phone-detail-panel">
+          {selectedSafePhone ? (
+            <>
+              <div className="admin-detail-heading">
+                <div>
+                  <span className="admin-detail-kicker">안심번호 상세</span>
+                  <h2>{selectedSafePhone.safe_phone}</h2>
+                  <p><em className={`safe-phone-status ${selectedSafePhone.status}`}>{safePhonePoolStatusLabel(selectedSafePhone.status)}</em></p>
+                </div>
+              </div>
+
+              <section className="admin-detail-section">
+                <h3>현재 매칭</h3>
+                <dl className="admin-detail-list">
+                  <div><dt>보호자</dt><dd>{selectedSafePhone.guardian_name || "미매칭"}</dd></div>
+                  <div><dt>연락처</dt><dd>{selectedSafePhone.guardian_phone || "-"}</dd></div>
+                  <div><dt>관리대상</dt><dd>{selectedSafePhone.subject_name || "-"}</dd></div>
+                  <div><dt>매칭일시</dt><dd>{selectedSafePhone.assigned_at ? formatRecentDateTime(selectedSafePhone.assigned_at) : "-"}</dd></div>
+                  <div><dt>최근 접근</dt><dd>{selectedSafePhone.last_accessed_at ? formatRecentDateTime(selectedSafePhone.last_accessed_at) : "-"}</dd></div>
+                  <div><dt>자동 해제</dt><dd>{selectedSafePhone.expires_at ? formatRecentDateTime(selectedSafePhone.expires_at) : "-"}</dd></div>
+                  <div><dt>최근 오류</dt><dd>{selectedSafePhone.last_error || "없음"}</dd></div>
+                  <div><dt>메모</dt><dd>{selectedSafePhone.admin_memo || "없음"}</dd></div>
+                </dl>
+                {selectedSafePhone.status !== "available" && (
+                  <form action={releaseSafePhonePoolNumberAction} className="safe-phone-detail-action">
+                    <input type="hidden" name="safePhoneId" value={selectedSafePhone.id} />
+                    <input type="hidden" name="returnTo" value={returnTo} />
+                    <FormSubmitButton className="plain-button" pendingText="해제중">현재 매칭 해제</FormSubmitButton>
+                  </form>
+                )}
+              </section>
+
+              <section className="admin-detail-section">
+                <h3>보호자 수동 매칭</h3>
+                <form className="safe-phone-guardian-search" action="/admin">
+                  <input type="hidden" name="section" value="safe-phones" />
+                  <input type="hidden" name="safePhone" value={selectedSafePhone.id} />
+                  <input type="hidden" name="safePhoneQuery" value={filters.query} />
+                  <input type="hidden" name="safePhoneStatus" value={filters.status} />
+                  <label>
+                    보호자 조회
+                    <input name="safePhoneGuardianQuery" defaultValue={filters.guardianQuery} placeholder="이름, 전화번호, 이메일" />
+                  </label>
+                  <button type="submit" className="plain-button">조회</button>
+                </form>
+                <form action={assignSafePhonePoolNumberAction} className="safe-phone-manual-match">
+                  <input type="hidden" name="safePhoneId" value={selectedSafePhone.id} />
+                  <input type="hidden" name="returnTo" value={returnTo} />
+                  <label>
+                    조회된 보호자
+                    <select name="guardianId" defaultValue="" required>
+                      <option value="" disabled>보호자를 선택해 주세요</option>
+                      {guardians.map((guardian) => (
+                        <option value={guardian.id} key={guardian.id}>
+                          {guardian.name || "이름 미입력"} / {guardian.phone} / {guardian.subject_name || "대상자 미등록"}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <p>기존 매칭이 있으면 즉시 해제하고 선택한 보호자 번호로 {config.leaseHours}시간 다시 연결합니다.</p>
+                  <FormSubmitButton className="primary-button" pendingText="매칭중">선택 보호자에게 매칭</FormSubmitButton>
+                </form>
+              </section>
+
+              <section className="admin-detail-section">
+                <h3>최근 매칭 이력</h3>
+                <div className="admin-detail-history safe-phone-history">
+                  {history.map((item) => (
+                    <div key={item.id}>
+                      <strong>{item.guardian_name || "보호자 정보 없음"} / {item.subject_name || "대상자 미지정"}</strong>
+                      <span>{item.source === "admin_manual" ? "관리자 수동 매칭" : "QR 접근 자동 매칭"}</span>
+                      <time>{formatRecentDateTime(item.assigned_at)} ~ {item.released_at ? formatRecentDateTime(item.released_at) : formatRecentDateTime(item.expires_at)}</time>
+                      <p>{safePhoneReleaseReasonLabel(item.release_reason, item.status)}</p>
+                    </div>
+                  ))}
+                  {history.length === 0 && <p className="empty-text">매칭 이력이 없습니다.</p>}
+                </div>
+              </section>
+
+              <section className="admin-detail-section safe-phone-delete-section">
+                <h3>번호 삭제</h3>
+                <p>매칭 중인 번호는 비즈콜 연결을 먼저 해제한 뒤 풀에서 삭제합니다.</p>
+                <form action={deleteSafePhonePoolNumberAction}>
+                  <input type="hidden" name="safePhoneId" value={selectedSafePhone.id} />
+                  <input type="hidden" name="returnTo" value="/admin?section=safe-phones" />
+                  <FormSubmitButton className="danger-button compact" pendingText="삭제중">안심번호 삭제</FormSubmitButton>
+                </form>
+              </section>
+            </>
+          ) : (
+            <p className="empty-text">상세정보를 볼 안심번호를 선택해 주세요.</p>
+          )}
+        </aside>
+      </div>
     </div>
   );
 }
@@ -3185,7 +3418,7 @@ function GuardianManagementSection({ adminData }) {
                       <div><dt>보호자 구분</dt><dd>{selectedGuardianType}</dd></div>
                       <div><dt>보호자 상태</dt><dd>{Number(selectedGuardian.is_active || 0) ? "일반" : "휴면/비활성"}</dd></div>
                       <div><dt>연락처</dt><dd>{selectedGuardian.phone || "-"}</dd></div>
-                      <div><dt>안심번호</dt><dd>{selectedGuardian.safe_phone || "-"} ({safePhoneStatusLabel(selectedGuardian.safe_phone_status)})</dd></div>
+                      <div><dt>안심번호</dt><dd><Link href={`/admin?section=safe-phones&safePhoneGuardianQuery=${encodeURIComponent(selectedGuardian.name || selectedGuardian.phone || "")}`}>공용 풀 매칭 조회</Link></dd></div>
                       <div><dt>생년월일</dt><dd>{formatDate(selectedGuardian.birth_date)}{selectedGuardian.birth_date ? ` (${calculateAgeLabel(selectedGuardian.birth_date)})` : ""}</dd></div>
                       <div><dt>성별</dt><dd>-</dd></div>
                       <div><dt>주소</dt><dd>{formatFullAddress(selectedGuardian.address, selectedGuardian.address_detail)}</dd></div>
@@ -3212,13 +3445,6 @@ function GuardianManagementSection({ adminData }) {
                       </FormSubmitButton>
                     </form>
 
-                    <form action={syncGuardianSafePhoneAction} className="guardian-withdraw-form">
-                      <input type="hidden" name="guardianId" value={selectedGuardian.id} />
-                      <input type="hidden" name="returnTo" value={returnTo} />
-                      <FormSubmitButton className="activate-button" pendingText="연결중">
-                        안심번호 발급/재연결
-                      </FormSubmitButton>
-                    </form>
                   </section>
 
                   <section className="guardian-tab-panel guardian-subject-panel">
@@ -4221,6 +4447,19 @@ function locationShareExportRows(shares = []) {
   }));
 }
 
+function safePhonePoolExportRows(rows = []) {
+  return rows.map((row) => ({
+    안심번호: row.safe_phone || "-",
+    상태: safePhonePoolStatusLabel(row.status),
+    보호자: row.guardian_name || "미매칭",
+    보호자연락처: row.guardian_phone || "-",
+    관리대상: row.subject_name || "-",
+    매칭일시: row.assigned_at ? formatRecentDateTime(row.assigned_at) : "-",
+    자동해제일시: row.expires_at ? formatRecentDateTime(row.expires_at) : "-",
+    최근오류: row.last_error || "",
+  }));
+}
+
 function adminMessageExportRows(messages = []) {
   return messages.map((message) => ({
     알림번호: message.message_number || "-",
@@ -4427,11 +4666,25 @@ function guardianTypeClass(guardian, subscription = null) {
   return "normal";
 }
 
-function safePhoneStatusLabel(status) {
-  if (status === "active") return "연결됨";
-  if (status === "provisioning") return "발급중";
-  if (status === "failed") return "재연결 필요";
-  return "준비중";
+function safePhonePoolStatusLabel(status) {
+  if (status === "available") return "사용 가능";
+  if (status === "assigned") return "매칭 중";
+  if (status === "assigning") return "매칭 처리중";
+  if (status === "releasing") return "해제 처리중";
+  if (status === "failed") return "확인 필요";
+  if (status === "disabled") return "사용 중지";
+  return "상태 확인";
+}
+
+function safePhoneReleaseReasonLabel(reason, status) {
+  if (!reason && status === "assigned") return "현재 매칭 유지 중";
+  if (reason === "lease_expired") return "24시간 만료로 자동 해제";
+  if (reason === "pool_reassigned_oldest") return "번호 부족으로 가장 오래된 매칭 회수";
+  if (reason === "pool_reassigned") return "새 보호자 매칭으로 교체";
+  if (reason === "guardian_phone_changed") return "보호자 연락처 변경으로 해제";
+  if (reason === "admin_manual_release") return "관리자 수동 해제";
+  if (reason === "admin_deleted") return "관리자 번호 삭제";
+  return reason || "매칭 종료";
 }
 
 function subscriptionStateClass(status) {
@@ -4792,6 +5045,15 @@ function buildLocationShareUrl(filters, shareId = "") {
   if (filters?.startDate) params.set("locationStart", filters.startDate);
   if (filters?.endDate) params.set("locationEnd", filters.endDate);
   if (shareId) params.set("locationShare", shareId);
+  return `/admin?${params.toString()}`;
+}
+
+function buildSafePhonePoolUrl(filters, safePhoneId = "") {
+  const params = new URLSearchParams({ section: "safe-phones" });
+  if (filters?.query) params.set("safePhoneQuery", filters.query);
+  if (filters?.status && filters.status !== "all") params.set("safePhoneStatus", filters.status);
+  if (filters?.guardianQuery) params.set("safePhoneGuardianQuery", filters.guardianQuery);
+  if (safePhoneId) params.set("safePhone", safePhoneId);
   return `/admin?${params.toString()}`;
 }
 

@@ -20,17 +20,13 @@ import {
 export async function saveGuardianAction(formData) {
   const session = await getServerSession(authOptions);
   if (!session) throw new Error("로그인이 필요합니다.");
-  let result;
   try {
-    result = await saveGuardianProfile(session, formData);
+    await saveGuardianProfile(session, formData);
     revalidatePath("/");
   } catch (error) {
     redirect(withNotice("/?tab=guardian", error.message || "필수값을 확인해주세요.", "error"));
   }
-  const message = result?.status === "active"
-    ? "보호자 정보와 안심번호가 저장되었습니다."
-    : "보호자 정보가 저장되었습니다. 안심번호는 발급 준비 중입니다.";
-  redirect(withNotice("/?tab=guardian", message));
+  redirect(withNotice("/?tab=guardian", "보호자 정보가 저장되었습니다. 안심번호는 QR 접근 시 24시간 자동 배정됩니다."));
 }
 
 export async function saveSubjectAction(formData) {
