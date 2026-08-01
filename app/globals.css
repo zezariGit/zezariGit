@@ -2635,11 +2635,13 @@ a {
 }
 
 .ad-option-admin-form {
+  min-width: 0;
   display: grid;
   gap: var(--space-md);
 }
 
 .ad-option-grid-section {
+  min-width: 0;
   display: grid;
   gap: var(--space-sm);
 }
@@ -2669,8 +2671,12 @@ a {
 }
 
 .ad-option-grid-wrap {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   max-height: 460px;
   overflow: auto;
+  overscroll-behavior: contain;
 }
 
 .ad-option-grid {

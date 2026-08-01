@@ -285,7 +285,7 @@ export default async function AdminPage({ searchParams }) {
             : activeSection === "ads"
               ? "사용자별 광고 진행사항과 심사, 집행 상태를 조회합니다."
               : activeSection === "ad-pricing"
-                ? "광고 기간과 범위에 적용할 결제 단가를 설정합니다."
+                ? "사용자 광고 신청에 표시할 노출 거리와 기간 옵션, 금액을 관리합니다."
               : activeSection === "missing"
                 ? "실종신고 접수 현황과 광고 상태, 발견 여부를 조회합니다."
                 : activeSection === "locations"
