@@ -7166,3 +7166,23 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Template analysis, deterministic image composition, privacy safeguard, responsive preview, builds, deployment, and real paused Meta verification: about 75 minutes.
+
+## 2026-08-03 KST - Legacy WordPress Solapi/SMS Audit
+
+### User Requirement
+- Inspect `reference/wp` for a Solapi API implementation used to send signup verification codes.
+
+### Findings
+- The extracted directory contains WordPress core only and has no `wp-content`, plugin, or theme source.
+- The adjacent `reference/wp.tar.gz` contains 3,228 archived paths but no `wp-content` or plugin files.
+- `reference/wp.sql` confirms the legacy site used `mshop-sms-s2` and `mshop-user-certification-s2`, including phone-certification form and field identifiers.
+- Exact SQL and source searches returned zero `solapi`, `coolsms`, Solapi API host, CoolSMS API host, or related API-key configuration matches.
+- No reusable SMS provider request code or credentials were found. The legacy provider cannot be identified as Solapi from the available backup.
+
+### Impact
+- The current generic SMS adapter cannot be configured from the WordPress backup.
+- A new Solapi API key, API secret, and registered sender number must be issued in the current Solapi account, then connected to the existing Next.js verification API.
+- No key, secret, phone number, or database credential was copied into source or documentation during this audit.
+
+### Time Spent
+- Source tree, archive index, and sanitized SQL metadata inspection: about 20 minutes.

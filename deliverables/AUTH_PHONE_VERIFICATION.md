@@ -66,3 +66,12 @@ SMS_DEV_BYPASS_CODE=
 - `reference/wp` did not include MShop plugin source files.
 - `reference/wp.sql` showed the legacy site used MShop members, SMS, and user-certification plugins with a required phone certification field.
 - The current implementation recreates that behavior in Next.js and Turso rather than porting PHP plugin internals.
+
+### 2026-08-03 Solapi Audit
+- `reference/wp` contains WordPress core files only; `wp-content/plugins` and `wp-content/mu-plugins` are absent.
+- `reference/wp.tar.gz` contains 3,228 paths but zero `wp-content` or plugin paths, so the missing plugin implementation cannot be recovered from that archive.
+- `reference/wp.sql` contains repeated activation/update traces for `mshop-sms-s2/mshop-sms-s2.php` and `mshop-user-certification-s2/mshop-user-certification-s2.php`.
+- The SQL also retains the legacy certification identifiers `certification_for_register`, `certification_number`, and `billing_phone_certification_number`.
+- Exact searches found zero occurrences of `solapi`, `coolsms`, `api.solapi.com`, and `api.coolsms.co.kr`.
+- No Solapi API key name, secret name, request host, HMAC code, or message-send function is available in the supplied backup.
+- Therefore the backup proves that MShop handled SMS certification, but it does not prove that Solapi was the underlying provider and cannot supply reusable Solapi credentials or request code.

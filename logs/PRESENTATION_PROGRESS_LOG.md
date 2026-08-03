@@ -5144,3 +5144,22 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 양식 분석, 합성 구현, 개인정보 보강, 빌드, 배포 및 실제 Meta 시험: 약 75분
+
+## 2026-08-03 - 구버전 문자 인증 및 Solapi 흔적 조사
+
+### 요구내용
+- `reference/wp`에서 회원가입 인증번호 문자 발송에 사용된 Solapi API 확인
+
+### 확인내용
+- 추출된 폴더에는 WordPress 코어만 있고 `wp-content`와 플러그인 소스가 없음
+- `wp.tar.gz`의 3,228개 경로에도 `wp-content`와 플러그인 파일이 없음
+- `wp.sql`에서 `mshop-sms-s2`, `mshop-user-certification-s2` 사용 및 휴대폰 인증 필드 흔적 확인
+- `solapi`, `coolsms`, 두 서비스 API 호스트와 관련 키 설정 검색 결과는 모두 0건
+
+### 결론
+- 구버전은 MShop 문자·본인인증 플러그인으로 인증번호를 처리했으나, 실제 하위 문자 공급자가 Solapi였다는 근거와 호출 코드는 백업에 없음
+- 현재 서비스 실연동에는 Solapi에서 새 API Key, API Secret, 등록 발신번호를 발급받아 기존 Next.js 문자 어댑터에 연결해야 함
+- 조사 과정에서 키, 시크릿, 전화번호, DB 계정은 산출물에 기록하지 않음
+
+### 반영시간
+- 소스, 압축 목록, SQL 메타데이터 조사: 약 20분
