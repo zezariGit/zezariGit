@@ -226,15 +226,15 @@ a {
   line-height: 1.45;
 }
 
-.phone-with-badge {
+.verification-complete-field {
   position: relative;
 }
 
-.phone-with-badge input {
+.verification-complete-field input {
   padding-right: 78px;
 }
 
-.phone-with-badge em {
+.verification-complete-field em {
   position: absolute;
   right: 8px;
   bottom: 7px;

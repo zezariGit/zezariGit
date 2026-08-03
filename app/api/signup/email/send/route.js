@@ -1,25 +1,17 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "../../../../../lib/auth";
-import { requestSignupPhoneVerification } from "../../../../../lib/db";
-import { isSignupSmsVerificationEnabled } from "../../../../../lib/sms";
+import { requestSignupEmailVerification } from "../../../../../lib/db";
 
 export async function POST(request) {
-  if (!isSignupSmsVerificationEnabled()) {
-    return NextResponse.json(
-      { ok: false, message: "휴대폰 인증은 현재 사용하지 않습니다. 이메일 인증을 이용해 주세요." },
-      { status: 410 }
-    );
-  }
-
   const session = await getServerSession(authOptions);
 
   try {
     const payload = await request.json();
-    const result = await requestSignupPhoneVerification(payload, session);
+    const result = await requestSignupEmailVerification(payload, session);
     return NextResponse.json({
       ok: true,
-      phone: result.phone,
+      email: result.email,
       expiresInSeconds: result.expiresInSeconds,
       devMode: result.devMode,
     });

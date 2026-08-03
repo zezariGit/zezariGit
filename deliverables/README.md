@@ -12,6 +12,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `INTEGRATION_SETUP.md`: Vercel and Turso integration status and setup guide.
 - `AUTH_SETUP.md`: Google login/signup setup requirements and environment variable plan.
 - `AUTH_PHONE_VERIFICATION.md`: server-issued signup phone verification APIs, SMS env variables, token rules, and DB behavior.
+- `AUTH_EMAIL_VERIFICATION.md`: active Resend email-code signup flow, one-time token security, Vercel environment setup, and disabled legacy SMS path.
 - `PWA_SETUP.md`: installable web app setup for desktop and mobile.
 - `ONBOARDING_FLOW.md`: three-page service introduction and skip behavior.
 - `DATABASE_SCHEMA.md`: Turso schema for guardians and subjects.

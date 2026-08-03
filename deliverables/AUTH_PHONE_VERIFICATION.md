@@ -2,6 +2,12 @@
 
 Project: REAL_QR_FIND
 
+## Current Status
+- This implementation is retained as a disabled rollback path as of 2026-08-03.
+- Signup screens no longer show or call SMS verification.
+- The phone routes return HTTP 410 by default and can only be re-enabled with `SIGNUP_SMS_VERIFICATION_ENABLED=true`.
+- The active signup verification flow is documented in `AUTH_EMAIL_VERIFICATION.md`.
+
 ## Purpose
 - Replace temporary client-generated signup verification codes with server-issued phone verification.
 - Apply the same phone verification requirement to direct ID signup and first-time SNS signup completion.

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 export default function SocialSignupCompletion({ guardian, session }) {
   const providerLabel = socialProviderLabel(session?.user?.provider);
-  const [step, setStep] = useState("phone");
+  const [step, setStep] = useState("email");
   const [form, setForm] = useState({
     phone: guardian?.phone || "",
     name: guardian?.name || session?.user?.name || "",
@@ -15,12 +15,12 @@ export default function SocialSignupCompletion({ guardian, session }) {
     serviceAgreed: false,
   });
   const [codeInput, setCodeInput] = useState(["", "", "", "", "", ""]);
-  const [verifiedPhone, setVerifiedPhone] = useState("");
-  const [phoneVerificationToken, setPhoneVerificationToken] = useState("");
+  const [verifiedEmail, setVerifiedEmail] = useState("");
+  const [emailVerificationToken, setEmailVerificationToken] = useState("");
   const [seconds, setSeconds] = useState(0);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [phoneVerificationLoading, setPhoneVerificationLoading] = useState(false);
+  const [emailVerificationLoading, setEmailVerificationLoading] = useState(false);
 
   useEffect(() => {
     if (seconds <= 0) return undefined;
@@ -32,45 +32,45 @@ export default function SocialSignupCompletion({ guardian, session }) {
 
   const update = (key, value) => {
     setForm((current) => ({ ...current, [key]: value }));
-    if (key === "phone") {
-      setVerifiedPhone("");
-      setPhoneVerificationToken("");
+    if (key === "email") {
+      setVerifiedEmail("");
+      setEmailVerificationToken("");
       setCodeInput(["", "", "", "", "", ""]);
     }
   };
 
   const requestCode = async () => {
-    const digits = form.phone.replace(/\D/g, "");
-    if (!/^01[016789]\d{7,8}$/.test(digits)) {
-      setMessage("휴대폰 번호를 정확히 입력해 주세요.");
+    const email = form.email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setMessage("이메일 주소를 정확히 입력해 주세요.");
       return;
     }
 
-    setPhoneVerificationLoading(true);
+    setEmailVerificationLoading(true);
     setMessage("");
 
     try {
-      const response = await fetch("/api/signup/phone/send", {
+      const response = await fetch("/api/signup/email/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: form.phone, purpose: "signup" }),
+        body: JSON.stringify({ email, purpose: "signup" }),
       });
       const data = await response.json();
       if (!response.ok || !data.ok) {
         setMessage(data.message || "인증번호 발송에 실패했습니다.");
-        setPhoneVerificationLoading(false);
+        setEmailVerificationLoading(false);
         return;
       }
 
       setCodeInput(["", "", "", "", "", ""]);
-      setVerifiedPhone("");
-      setPhoneVerificationToken("");
+      setVerifiedEmail("");
+      setEmailVerificationToken("");
       setSeconds(data.expiresInSeconds || 180);
-      setMessage("인증번호를 발송했습니다. 문자로 받은 6자리 번호를 입력해 주세요.");
+      setMessage("인증번호를 발송했습니다. 이메일로 받은 6자리 번호를 입력해 주세요.");
     } catch {
       setMessage("인증번호 발송 중 오류가 발생했습니다.");
     } finally {
-      setPhoneVerificationLoading(false);
+      setEmailVerificationLoading(false);
     }
   };
 
@@ -93,38 +93,38 @@ export default function SocialSignupCompletion({ guardian, session }) {
       return;
     }
 
-    setPhoneVerificationLoading(true);
+    setEmailVerificationLoading(true);
     setMessage("");
 
     try {
-      const response = await fetch("/api/signup/phone/verify", {
+      const response = await fetch("/api/signup/email/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: form.phone, code, purpose: "signup" }),
+        body: JSON.stringify({ email: form.email, code, purpose: "signup" }),
       });
       const data = await response.json();
       if (!response.ok || !data.ok) {
         setMessage(data.message || "인증번호가 일치하지 않습니다.");
-        setPhoneVerificationLoading(false);
+        setEmailVerificationLoading(false);
         return;
       }
 
-      setVerifiedPhone(data.phone || form.phone);
-      setPhoneVerificationToken(data.phoneVerificationToken || "");
+      setVerifiedEmail(data.email || form.email);
+      setEmailVerificationToken(data.emailVerificationToken || "");
       setStep("profile");
-      setMessage("휴대폰 인증이 완료되었습니다.");
+      setMessage("이메일 인증이 완료되었습니다.");
     } catch {
       setMessage("인증번호 확인 중 오류가 발생했습니다.");
     } finally {
-      setPhoneVerificationLoading(false);
+      setEmailVerificationLoading(false);
     }
   };
 
   const submit = async (event) => {
     event.preventDefault();
-    if (!verifiedPhone || !phoneVerificationToken) {
-      setStep("phone");
-      setMessage("휴대폰 인증을 먼저 완료해 주세요.");
+    if (!verifiedEmail || !emailVerificationToken) {
+      setStep("email");
+      setMessage("이메일 인증을 먼저 완료해 주세요.");
       return;
     }
 
@@ -137,8 +137,8 @@ export default function SocialSignupCompletion({ guardian, session }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
-          phone: verifiedPhone,
-          phoneVerificationToken,
+          email: verifiedEmail,
+          emailVerificationToken,
         }),
       });
       const data = await response.json();
@@ -163,31 +163,32 @@ export default function SocialSignupCompletion({ guardian, session }) {
           <button
             className="signup-back-button"
             type="button"
-            onClick={() => (step === "phone" ? signOut({ callbackUrl: "/" }) : setStep("phone"))}
+            onClick={() => (step === "email" ? signOut({ callbackUrl: "/" }) : setStep("email"))}
           >
             <span aria-hidden="true">‹</span>
             <span className="visually-hidden">이전</span>
           </button>
         )}
 
-        {step === "phone" && (
+        {step === "email" && (
           <div className="signup-step">
             <h1 className="login-title">회원가입</h1>
             <div className="signup-copy">
-              <strong>휴대폰 번호를 입력해주세요</strong>
-              <p>{providerLabel} 계정 확인이 완료되었습니다. 보호자 알림을 위해 휴대폰 인증을 진행해 주세요.</p>
+              <strong>이메일 주소를 확인해주세요</strong>
+              <p>{providerLabel}에서 확인된 이메일로 회원가입 인증을 진행해 주세요.</p>
             </div>
             <label className="signup-field">
-              <span>휴대폰 번호</span>
+              <span>이메일</span>
               <input
-                value={form.phone}
-                onChange={(event) => update("phone", event.target.value)}
-                placeholder="010 - 1234 - 5678"
-                inputMode="tel"
+                value={form.email}
+                onChange={(event) => update("email", event.target.value)}
+                placeholder="name@example.com"
+                type="email"
+                autoComplete="email"
               />
             </label>
-            <button className="login-submit" type="button" onClick={requestCode} disabled={phoneVerificationLoading}>
-              {phoneVerificationLoading ? "발송 중" : "인증코드 받기"}
+            <button className="login-submit" type="button" onClick={requestCode} disabled={emailVerificationLoading}>
+              {emailVerificationLoading ? "발송 중" : "인증코드 받기"}
             </button>
             <div className="signup-separator" />
             <div className="code-heading">
@@ -212,10 +213,10 @@ export default function SocialSignupCompletion({ guardian, session }) {
                 />
               ))}
             </div>
-            <button className="login-submit" type="button" onClick={verifyCode} disabled={phoneVerificationLoading}>
-              {phoneVerificationLoading ? "확인 중" : "확인"}
+            <button className="login-submit" type="button" onClick={verifyCode} disabled={emailVerificationLoading}>
+              {emailVerificationLoading ? "확인 중" : "확인"}
             </button>
-            <button className="signup-link centered-link" type="button" onClick={requestCode} disabled={phoneVerificationLoading}>
+            <button className="signup-link centered-link" type="button" onClick={requestCode} disabled={emailVerificationLoading}>
               인증번호가 오지 않았나요? 재전송
             </button>
           </div>
@@ -240,14 +241,21 @@ export default function SocialSignupCompletion({ guardian, session }) {
               <span>생년월일</span>
               <input value={form.birthDate} onChange={(event) => update("birthDate", event.target.value)} type="date" required />
             </label>
-            <label className="signup-field phone-with-badge">
-              <span>휴대폰 번호</span>
-              <input value={verifiedPhone} readOnly />
+            <label className="signup-field verification-complete-field">
+              <span>이메일</span>
+              <input value={verifiedEmail} readOnly />
               <em>인증완료</em>
             </label>
             <label className="signup-field">
-              <span>이메일</span>
-              <input value={form.email} onChange={(event) => update("email", event.target.value)} type="email" />
+              <span>휴대폰 번호</span>
+              <input
+                value={form.phone}
+                onChange={(event) => update("phone", event.target.value)}
+                placeholder="010 - 1234 - 5678"
+                inputMode="tel"
+                autoComplete="tel"
+                required
+              />
             </label>
             <div className="terms-box">
               <strong>필수동의</strong>

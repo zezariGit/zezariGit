@@ -7186,3 +7186,40 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Source tree, archive index, and sanitized SQL metadata inspection: about 20 minutes.
+
+## 2026-08-03 KST - Resend Email Verification Replaces Signup SMS
+
+### User Requirement
+- Replace signup SMS verification with email verification using Resend and Next.js API Route Handlers on Vercel.
+- Keep the existing SMS implementation in source, but hide and disable it instead of deleting it.
+
+### Source Changes
+- Added the Resend SDK and `lib/email-verification.js` server adapter with HTML/text verification messages.
+- Added `POST /api/signup/email/send` and `POST /api/signup/email/verify`.
+- Added `email_verifications` and `guardians.email_verified_at`; schema version increased from 31 to 32.
+- Added hashed 6-digit codes, 3-minute code expiry, 15-minute one-time tokens, five-send hourly limits, and five-attempt validation limits.
+- Changed direct and first-time SNS signup screens to verify email first; phone remains a required unverified contact field.
+- Changed final direct/SNS signup APIs to consume the email token and reject browser-only verification state.
+- Preserved `lib/sms.js`, phone verification DB functions, and phone routes. The routes now return HTTP 410 unless `SIGNUP_SMS_VERIFICATION_ENABLED=true`.
+- Added backward compatibility so existing completed phone-verified accounts are not forced through signup again.
+
+### Environment
+- Added documented variables: `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `EMAIL_DEV_BYPASS_CODE`, and `SIGNUP_SMS_VERIFICATION_ENABLED=false`.
+- Neither local nor Vercel environments contained a Resend key before this work.
+- After account-owner terms acceptance, Vercel Marketplace free resource `zezari-email` was provisioned for `zezari.family` in `ap-northeast-1` and connected to Production and Development.
+- Vercel created encrypted `RESEND_API_KEY` and `RESEND_EMAIL_DOMAIN` variables. The server derives `제자리 <auth@zezari.family>` from the integration domain unless an explicit sender override is configured.
+
+### Verification
+- `npm run build`: passed on Next.js 16.2.11; 28 generated pages and both email routes were present.
+- Isolated local DB/API flow passed: send, wrong-code rejection, token issuance, missing-token rejection, successful signup, and SMS HTTP 410.
+- Mobile 390 x 844 browser check passed: email-first copy, six code boxes on one row, hidden SMS copy, and no Next.js error overlay.
+- `EMAIL_DEV_BYPASS_CODE` was used only with `NODE_ENV=development` and an isolated local database.
+- Patched Next.js 16.2.9 to 16.2.11 and NextAuth 4.24.14 to 4.24.15, removing the direct framework/auth advisories shown by npm audit.
+- Three indirect high findings remain in Next.js-bundled PostCSS/Sharp packages; npm currently offers no compatible forward patch and suggests an invalid major downgrade, so no forced audit rewrite was applied.
+- Vercel Marketplace installation ID: `icfg_39wGQplk4oNBFX5gPEU9IvrS`; resource ID: `ir_EOjjWxWWpqteSZVa`.
+
+### Deliverable
+- `deliverables/AUTH_EMAIL_VERIFICATION.md`
+
+### Time Spent
+- Architecture, DB/API/UI implementation, dependency setup, isolated testing, mobile verification, and documentation: about 65 minutes.

@@ -47,7 +47,9 @@ export default async function GuardianDashboard({
       && guardian.birth_date
       && guardian.phone
       && (socialAccount
-        ? guardian.phone_verified_at && guardian.terms_privacy_agreed_at && guardian.terms_service_agreed_at
+        ? (guardian.email_verified_at || guardian.phone_verified_at)
+          && guardian.terms_privacy_agreed_at
+          && guardian.terms_service_agreed_at
         : guardian.login_id && guardian.password_hash)
   );
   const guardianActive = guardian.is_active !== 0;

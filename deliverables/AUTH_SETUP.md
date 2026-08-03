@@ -186,12 +186,18 @@ META_APP_SECRET=your-meta-app-secret
   - Shows the guardian dashboard when logged in.
 - `/api/signup/guardian`
   - Creates a guardian account before login.
-  - Validates phone format, birth date, app ID format, password strength, duplicate app ID, duplicate phone, and required terms agreement.
+  - Requires a one-time email verification token and validates email/phone format, birth date, app ID format, password strength, duplicates, and required terms agreement.
   - Stores PBKDF2 password hash only; plaintext passwords are never stored.
 - `/api/signup/complete`
   - Completes signup information for an already authenticated SNS user.
-  - Uses the current session's guardian row and updates name, phone, birth date, email, app ID, password hash, phone verification timestamp, and required terms timestamps.
+  - Uses the current session's guardian row and updates name, phone, birth date, verified email, account data, and required terms timestamps.
   - Rejects unauthenticated requests.
+- `/api/signup/email/send`
+  - Sends a six-digit signup code through Resend after email and duplicate checks.
+- `/api/signup/email/verify`
+  - Returns a 15-minute one-time token after server-side code verification.
+- `/api/signup/phone/send`, `/api/signup/phone/verify`
+  - Retained but hidden and disabled by default for rollback only.
 - `/api/auth/[...nextauth]`
   - Handles NextAuth routes.
   - Includes provider callback routes:

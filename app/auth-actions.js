@@ -37,8 +37,9 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState(initialMode === "signup" ? "signup" : "login");
   const [message, setMessage] = useState(authError ? "아이디 또는 비밀번호를 확인해 주세요." : "");
-  const [signupStep, setSignupStep] = useState("phone");
+  const [signupStep, setSignupStep] = useState("email");
   const [signup, setSignup] = useState({
+    email: "",
     phone: "",
     name: "",
     birthDate: "",
@@ -48,10 +49,10 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
     serviceAgreed: false,
   });
   const [codeInput, setCodeInput] = useState(["", "", "", "", "", ""]);
-  const [verifiedPhone, setVerifiedPhone] = useState("");
-  const [phoneVerificationToken, setPhoneVerificationToken] = useState("");
+  const [verifiedEmail, setVerifiedEmail] = useState("");
+  const [emailVerificationToken, setEmailVerificationToken] = useState("");
   const [signupLoading, setSignupLoading] = useState(false);
-  const [phoneVerificationLoading, setPhoneVerificationLoading] = useState(false);
+  const [emailVerificationLoading, setEmailVerificationLoading] = useState(false);
   const [signupCredentials, setSignupCredentials] = useState(null);
   const [codeSeconds, setCodeSeconds] = useState(0);
 
@@ -104,57 +105,57 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
 
   const updateSignup = (key, value) => {
     setSignup((current) => ({ ...current, [key]: value }));
-    if (key === "phone") {
-      setVerifiedPhone("");
-      setPhoneVerificationToken("");
+    if (key === "email") {
+      setVerifiedEmail("");
+      setEmailVerificationToken("");
       setCodeInput(["", "", "", "", "", ""]);
     }
   };
 
   const openSignup = () => {
     setMode("signup");
-    setSignupStep("phone");
+    setSignupStep("email");
     setMessage("");
   };
 
   const closeSignup = () => {
     setMode("login");
-    setSignupStep("phone");
+    setSignupStep("email");
     setMessage("");
   };
 
   const requestVerificationCode = async () => {
-    const digits = signup.phone.replace(/\D/g, "");
-    if (!/^01[016789]\d{7,8}$/.test(digits)) {
-      setMessage("휴대폰 번호를 정확히 입력해 주세요.");
+    const email = signup.email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setMessage("이메일 주소를 정확히 입력해 주세요.");
       return;
     }
 
-    setPhoneVerificationLoading(true);
+    setEmailVerificationLoading(true);
     setMessage("");
 
     try {
-      const response = await fetch("/api/signup/phone/send", {
+      const response = await fetch("/api/signup/email/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: signup.phone, purpose: "signup" }),
+        body: JSON.stringify({ email, purpose: "signup" }),
       });
       const data = await response.json();
       if (!response.ok || !data.ok) {
         setMessage(data.message || "인증번호 발송에 실패했습니다.");
-        setPhoneVerificationLoading(false);
+        setEmailVerificationLoading(false);
         return;
       }
 
       setCodeInput(["", "", "", "", "", ""]);
-      setVerifiedPhone("");
-      setPhoneVerificationToken("");
+      setVerifiedEmail("");
+      setEmailVerificationToken("");
       setCodeSeconds(data.expiresInSeconds || 180);
-      setMessage("인증번호를 발송했습니다. 문자로 받은 6자리 번호를 입력해 주세요.");
+      setMessage("인증번호를 발송했습니다. 이메일로 받은 6자리 번호를 입력해 주세요.");
     } catch {
       setMessage("인증번호 발송 중 오류가 발생했습니다.");
     } finally {
-      setPhoneVerificationLoading(false);
+      setEmailVerificationLoading(false);
     }
   };
 
@@ -178,38 +179,38 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
       return;
     }
 
-    setPhoneVerificationLoading(true);
+    setEmailVerificationLoading(true);
     setMessage("");
 
     try {
-      const response = await fetch("/api/signup/phone/verify", {
+      const response = await fetch("/api/signup/email/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: signup.phone, code, purpose: "signup" }),
+        body: JSON.stringify({ email: signup.email, code, purpose: "signup" }),
       });
       const data = await response.json();
       if (!response.ok || !data.ok) {
         setMessage(data.message || "인증번호가 일치하지 않습니다.");
-        setPhoneVerificationLoading(false);
+        setEmailVerificationLoading(false);
         return;
       }
 
-      setVerifiedPhone(data.phone || signup.phone);
-      setPhoneVerificationToken(data.phoneVerificationToken || "");
+      setVerifiedEmail(data.email || signup.email);
+      setEmailVerificationToken(data.emailVerificationToken || "");
       setSignupStep("profile");
-      setMessage("휴대폰 인증이 완료되었습니다.");
+      setMessage("이메일 인증이 완료되었습니다.");
     } catch {
       setMessage("인증번호 확인 중 오류가 발생했습니다.");
     } finally {
-      setPhoneVerificationLoading(false);
+      setEmailVerificationLoading(false);
     }
   };
 
   const submitSignup = async (event) => {
     event.preventDefault();
-    if (!verifiedPhone || !phoneVerificationToken) {
-      setSignupStep("phone");
-      setMessage("휴대폰 인증을 먼저 완료해 주세요.");
+    if (!verifiedEmail || !emailVerificationToken) {
+      setSignupStep("email");
+      setMessage("이메일 인증을 먼저 완료해 주세요.");
       return;
     }
 
@@ -222,8 +223,8 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...signup,
-          phone: verifiedPhone,
-          phoneVerificationToken,
+          email: verifiedEmail,
+          emailVerificationToken,
         }),
       });
       const data = await response.json();
@@ -267,31 +268,32 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
     return (
       <section className="auth-panel signup-card" aria-label="회원가입">
         {signupStep !== "done" && (
-          <button className="signup-back-button" type="button" onClick={signupStep === "phone" ? closeSignup : () => setSignupStep("phone")}>
+          <button className="signup-back-button" type="button" onClick={signupStep === "email" ? closeSignup : () => setSignupStep("email")}>
             <span aria-hidden="true">‹</span>
             <span className="visually-hidden">이전</span>
           </button>
         )}
 
-        {signupStep === "phone" && (
+        {signupStep === "email" && (
           <div className="signup-step">
             <h1 className="login-title">회원가입</h1>
             <div className="signup-copy">
-              <strong>휴대폰 번호를 입력해주세요</strong>
-              <p>보호자 본인확인과 알림 보호를 위해 사용됩니다.</p>
+              <strong>이메일 주소를 입력해주세요</strong>
+              <p>회원가입 확인을 위해 이메일 인증을 진행해 주세요.</p>
             </div>
 
             <label className="signup-field">
-              <span>휴대폰 번호</span>
+              <span>이메일</span>
               <input
-                value={signup.phone}
-                onChange={(event) => updateSignup("phone", event.target.value)}
-                placeholder="010 - 1234 - 5678"
-                inputMode="tel"
+                value={signup.email}
+                onChange={(event) => updateSignup("email", event.target.value)}
+                placeholder="name@example.com"
+                type="email"
+                autoComplete="email"
               />
             </label>
-            <button className="login-submit" type="button" onClick={requestVerificationCode} disabled={phoneVerificationLoading}>
-              {phoneVerificationLoading ? "발송 중" : "인증코드 받기"}
+            <button className="login-submit" type="button" onClick={requestVerificationCode} disabled={emailVerificationLoading}>
+              {emailVerificationLoading ? "발송 중" : "인증코드 받기"}
             </button>
 
             <div className="signup-separator" />
@@ -318,10 +320,10 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
                 />
               ))}
             </div>
-            <button className="login-submit" type="button" onClick={verifyCode} disabled={phoneVerificationLoading}>
-              {phoneVerificationLoading ? "확인 중" : "확인"}
+            <button className="login-submit" type="button" onClick={verifyCode} disabled={emailVerificationLoading}>
+              {emailVerificationLoading ? "확인 중" : "확인"}
             </button>
-            <button className="signup-link centered-link" type="button" onClick={requestVerificationCode} disabled={phoneVerificationLoading}>
+            <button className="signup-link centered-link" type="button" onClick={requestVerificationCode} disabled={emailVerificationLoading}>
               인증번호가 오지 않았나요? 재전송
             </button>
           </div>
@@ -343,10 +345,21 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
               <span>생년월일</span>
               <input value={signup.birthDate} onChange={(event) => updateSignup("birthDate", event.target.value)} type="date" required />
             </label>
-            <label className="signup-field phone-with-badge">
-              <span>휴대폰 번호</span>
-              <input value={verifiedPhone} readOnly />
+            <label className="signup-field verification-complete-field">
+              <span>이메일</span>
+              <input value={verifiedEmail} readOnly />
               <em>인증완료</em>
+            </label>
+            <label className="signup-field">
+              <span>휴대폰 번호</span>
+              <input
+                value={signup.phone}
+                onChange={(event) => updateSignup("phone", event.target.value)}
+                placeholder="010 - 1234 - 5678"
+                inputMode="tel"
+                autoComplete="tel"
+                required
+              />
             </label>
             <label className="signup-field">
               <span>아이디</span>
