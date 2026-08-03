@@ -5132,10 +5132,15 @@ This file is the cumulative presentation-ready project log. It is written so the
 - Next.js 전체 운영 빌드 성공
 - `git diff --check` 성공
 - 사용하지 않게 된 `html-to-image` 의존성 제거 확인
-- 운영 배포와 실제 Meta 광고 시험 결과는 완료 후 같은 항목에 추가 기록
+- GitHub 구현 커밋 `bdb51f3`, 개인정보 보강 커밋 `8163aa6` 반영
+- Vercel 운영 배포 `dpl_FjdF448eUcsWWy8Jn1ukteRzxuwZ` READY 확인
+- `zezari.family`, `zezari.vercel.app`, 실종광고 양식 이미지 HTTP 200 확인
+- 실제 Meta 시험에서 캠페인·광고세트·소재·광고 ID 정상 발급
+- Meta 저장 이미지를 다시 내려받아 1080 x 1350 양식, 대상자 정보, 메시지, QR이 유지되는 것 확인
+- 캠페인과 광고세트는 PAUSED, 광고도 PAUSED 설정 상태로 생성해 노출 및 비용 발생 없음
 
 ### 공식 산출물
 - `deliverables/MISSING_AD_TEMPLATE_CREATIVE.md`
 
 ### 반영시간
-- 양식 분석, 합성 구현, 화면 스타일, 빌드 및 1차 문서화: 약 45분
+- 양식 분석, 합성 구현, 개인정보 보강, 빌드, 배포 및 실제 Meta 시험: 약 75분

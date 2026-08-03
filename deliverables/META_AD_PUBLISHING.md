@@ -120,3 +120,8 @@ There are no remaining Meta asset, token, Page, funding-source, policy, or API c
 - Long names and messages are fitted inside their designated fields without changing the template geometry.
 - The QR destination remains the Meta advertisement click destination, so mobile viewers can open the managed-subject page without scanning the on-screen QR.
 - Layout and verification details are documented in `deliverables/MISSING_AD_TEMPLATE_CREATIVE.md`.
+- Production deployment `dpl_FjdF448eUcsWWy8Jn1ukteRzxuwZ` reached `READY` for implementation commit `8163aa6`.
+- A real Meta smoke test created campaign `120256212491970550`, ad set `120256212492220550`, creative `2055151212544843`, and ad `120256212493240550`.
+- The campaign and ad set reached effective status `PAUSED`; the configured ad status remained `PAUSED` while Meta review was pending.
+- Graph API verification confirmed that the stored image is the new fixed-template creative and the destination is the same managed-subject public URL encoded by the QR.
+- The smoke test was never activated, so no delivery or spend was initiated.
