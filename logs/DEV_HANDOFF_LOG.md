@@ -7229,3 +7229,19 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Architecture, DB/API/UI implementation, dependency setup, isolated testing, mobile verification, and documentation: about 65 minutes.
+
+## 2026-08-03 KST - Meta Missing-Person Ad Delivery Verification
+
+### User Requirement
+- Confirm whether Meta ad `ZEZARI AD-2B5B7E67EC 나하하 서울특별시 송파구 가락1동` is live and receiving impressions on Facebook.
+
+### Verification
+- Confirmed the ad in Ads Manager account `604475922197751` and cross-checked it through Meta Graph API v23.0 using the configured server credential without exposing the credential.
+- Campaign `120256218502040550`: `ACTIVE` / effective status `ACTIVE`.
+- Ad set `120256218502490550`: `ACTIVE` / effective status `ACTIVE`; scheduled from `2026-08-03 19:41:36 KST` through `2026-08-09 23:59:59 KST`; lifetime budget KRW 67,200.
+- Ad `120256218503930550`: `ACTIVE` / configured status `ACTIVE` / effective status `ACTIVE`.
+- Verification time was `2026-08-03 19:33:58 KST`, before the scheduled start time.
+- Meta Insights returned no rows, so impressions, reach, clicks, and spend had not started at verification time. The ad was approved/configured for delivery but was not yet actually exposed.
+
+### Time Spent
+- Ads Manager inspection, Graph API status/insights verification, and documentation: about 10 minutes.
