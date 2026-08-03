@@ -27,7 +27,12 @@
 - Guardian phone change: authenticated send/verify/save passed; save without verification rejected.
 - Email fallback routes: HTTP 410 while disabled.
 - Mobile layout: six verification inputs remain on one line.
-- Production build and whitespace checks passed before release.
+- Production build and whitespace checks passed.
+- Vercel production deployment `dpl_HGbV2Y5p79PHwwu5moLiSZYJrQ2m` reached `READY`.
+- `https://zezari.family` and `https://zezari.vercel.app` returned HTTP 200.
+- Production Turso reported schema version 34 with both new columns and the guardian verification index.
+- Production email verification returned HTTP 410 and invalid SMS input returned HTTP 400, confirming the active route flags and validation order.
+- Production browser verification confirmed SMS-first copy, six code inputs on one row, no horizontal overflow, and no Next.js error overlay.
 
 ## Operating Notes
 - Keep the Solapi sender number verified and funded.

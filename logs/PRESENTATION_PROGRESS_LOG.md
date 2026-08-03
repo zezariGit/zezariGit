@@ -5293,3 +5293,11 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - Solapi 설정, DB·API·UI 구현, 실문자·격리 테스트, 마이그레이션 보완, 문서화 및 배포 작업: 약 75분
+
+### 운영반영 결과
+- GitHub `main` 커밋 `8172f65` 푸시 완료
+- Vercel 운영 배포 `dpl_HGbV2Y5p79PHwwu5moLiSZYJrQ2m` READY 및 `zezari.family` 연결 완료
+- `zezari.family`, `zezari.vercel.app` 모두 HTTP 200 확인
+- 운영 Turso 스키마 34와 보호자·Solapi 추적 컬럼 및 인덱스 확인
+- 운영 이메일 인증 API HTTP 410, 잘못된 SMS 번호 HTTP 400 확인
+- 운영 회원가입 화면에서 SMS 안내, 인증번호 6칸 한 줄, 가로 넘침 없음, 오류 오버레이 없음 확인

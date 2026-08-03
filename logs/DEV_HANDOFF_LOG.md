@@ -7324,3 +7324,11 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Solapi setup, DB/API/UI implementation, real/isolated verification, migration hardening, documentation, and release work: about 75 minutes.
+
+### Release Result
+- GitHub commit `8172f65` (`feat: restore Solapi SMS verification`) was pushed to `main`.
+- Vercel production deployment `dpl_HGbV2Y5p79PHwwu5moLiSZYJrQ2m` reached `READY` and was aliased to `https://zezari.family`.
+- `https://zezari.family` and `https://zezari.vercel.app` both returned HTTP 200.
+- Production Turso reached schema version 34 with `guardian_id`, `provider_message_id`, and `idx_phone_verifications_guardian` present.
+- Production email verification returned HTTP 410, while invalid SMS input returned HTTP 400 after schema initialization.
+- Production browser verification confirmed the SMS-first signup copy, six code boxes on one row, no horizontal overflow, and no Next.js error overlay.
