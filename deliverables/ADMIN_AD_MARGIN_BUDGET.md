@@ -45,4 +45,6 @@ Meta 일평균 예산 = floor(Meta 전체 기간 예산 / 광고 일수)
 - 70,000원/20% 계산 결과 56,000원 확인
 - 격리 DB에서 스키마 버전 33, 기본 마진율 4, 광고별 마진율 컬럼 생성 확인
 - Next.js production build 통과
-
+- Vercel production deployment `dpl_9VQxMiuLMpYTZ5eBEwiAZ3zZSxaK` READY 확인
+- 운영 Turso 스키마 33, 기본 마진율 4%, 광고별 마진율 컬럼 확인
+- 기존 테스트 광고는 결제 70,000원, Meta 예산 67,200원, 예산 버전 2, 마진율 NULL로 유지 확인

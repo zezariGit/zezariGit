@@ -5242,6 +5242,10 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 70,000원/20% → Meta 56,000원
 - 격리 DB 스키마 33, 기본 마진 4%, 광고별 마진 컬럼 확인
 - Next.js 전체 빌드 성공
+- GitHub 구현 커밋 `4cfcb15` 반영
+- Vercel 운영 배포 `dpl_9VQxMiuLMpYTZ5eBEwiAZ3zZSxaK` READY 확인
+- 운영 Turso 스키마 33, 기본 마진율 4%, 광고별 마진율 컬럼 확인
+- 기존 테스트 광고는 결제 70,000원·Meta 예산 67,200원·예산 버전 2·마진율 미적용 상태로 보존 확인
 
 ### 공식 산출물
 - `deliverables/ADMIN_AD_MARGIN_BUDGET.md`

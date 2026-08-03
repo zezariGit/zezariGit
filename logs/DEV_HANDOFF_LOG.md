@@ -7269,6 +7269,11 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `git diff --check`: passed.
 - Formula checks: KRW 70,000 at 4% gives KRW 67,200; at 20% gives KRW 56,000.
 - Isolated local DB: schema version 33, default margin 4%, and `subject_ads.meta_margin_percent` confirmed.
+- GitHub implementation commit: `4cfcb15`.
+- Vercel production deployment `dpl_9VQxMiuLMpYTZ5eBEwiAZ3zZSxaK`: `READY`.
+- Production Turso migration verified: schema version 33, default margin 4%, and per-ad margin column present.
+- Existing Meta ad `120256218503930550` remained unchanged at guardian amount KRW 70,000, Meta budget KRW 67,200, budget version 2, and NULL margin snapshot.
+- The in-app browser had a Meta session but no zezari administrator session, so the production admin URL correctly returned the administrator login screen; authenticated admin visual interaction was not available in that browser session.
 
 ### Deliverable
 - `deliverables/ADMIN_AD_MARGIN_BUDGET.md`
