@@ -69,6 +69,10 @@ SIGNUP_SMS_VERIFICATION_ENABLED=false
   - signup with valid token: completed;
   - legacy SMS send route: HTTP 410.
 - 390 x 844 browser check: email field and all six code inputs render on one line, SMS signup copy is absent, and no framework error overlay is present.
+- GitHub commit `d2b7836` was deployed as Vercel production deployment `dpl_CkVxJSMgepWKW9mg3BirYDj8eoZb` with status `READY`.
+- Both `https://zezari.family` and `https://zezari.vercel.app` returned HTTP 200 after deployment.
+- The production email send route returned HTTP 200 and `devMode:false` for Resend's official `delivered@resend.dev` test recipient.
+- The production legacy SMS send route returned HTTP 410, and the production signup page had zero captured console errors.
 - Security patch updates applied: Next.js 16.2.9 to 16.2.11 and NextAuth 4.24.14 to 4.24.15. This removed the direct Next.js and NextAuth advisories reported against the previous versions.
 - `npm audit --omit=dev` still reports three indirect high findings in Next.js-bundled PostCSS/Sharp dependencies; the audit tool currently offers no compatible forward patch for this Next.js line, so they remain tracked rather than forcing a breaking downgrade.
 

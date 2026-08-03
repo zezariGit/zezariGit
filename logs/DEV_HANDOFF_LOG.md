@@ -7217,6 +7217,12 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Patched Next.js 16.2.9 to 16.2.11 and NextAuth 4.24.14 to 4.24.15, removing the direct framework/auth advisories shown by npm audit.
 - Three indirect high findings remain in Next.js-bundled PostCSS/Sharp packages; npm currently offers no compatible forward patch and suggests an invalid major downgrade, so no forced audit rewrite was applied.
 - Vercel Marketplace installation ID: `icfg_39wGQplk4oNBFX5gPEU9IvrS`; resource ID: `ir_EOjjWxWWpqteSZVa`.
+- GitHub production commit: `d2b7836` (`feat: replace signup SMS with Resend email verification`).
+- Vercel production deployment `dpl_CkVxJSMgepWKW9mg3BirYDj8eoZb`: `READY`.
+- `https://zezari.family` and `https://zezari.vercel.app` returned HTTP 200 after deployment.
+- A production `POST /api/signup/email/send` request to Resend's official `delivered@resend.dev` test recipient returned HTTP 200 with `devMode:false`, confirming the live route used Resend instead of the development bypass.
+- Production `POST /api/signup/phone/send` returned HTTP 410 with the email-verification guidance, confirming the preserved SMS route is disabled.
+- Production browser verification confirmed the email-first signup screen, six code boxes on one row, and zero captured console errors.
 
 ### Deliverable
 - `deliverables/AUTH_EMAIL_VERIFICATION.md`

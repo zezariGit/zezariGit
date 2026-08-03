@@ -5191,6 +5191,12 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 모바일 390 x 844에서 이메일 입력과 인증번호 6칸 한 줄 표시, 오류 화면 없음 확인
 - Next.js 16.2.9 → 16.2.11, NextAuth 4.24.14 → 4.24.15 보안 패치 적용으로 기존 직접 취약점 제거
 - Next.js 내부 PostCSS/Sharp의 간접 high 3건은 현재 호환 가능한 상향 패치가 없어 후속 추적
+- GitHub 운영 커밋 `d2b7836` 반영
+- Vercel 운영 배포 `dpl_CkVxJSMgepWKW9mg3BirYDj8eoZb` READY 확인
+- `zezari.family`, `zezari.vercel.app` HTTP 200 확인
+- 운영 이메일 발송 API를 Resend 공식 테스트 수신 주소로 호출해 HTTP 200 및 `devMode:false` 확인
+- 운영 SMS 발송 API가 HTTP 410으로 비활성화된 상태 확인
+- 운영 회원가입 화면에서 이메일 우선 안내, 인증번호 6칸 한 줄 배치, 콘솔 오류 0건 확인
 
 ### 공식 산출물
 - `deliverables/AUTH_EMAIL_VERIFICATION.md`
