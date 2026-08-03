@@ -7146,6 +7146,7 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Rebuilt the on-screen preview in `app/ad-campaign-modal.js` and `app/globals.css` as fixed overlays on the supplied form.
 - Replaced responsive DOM screenshot generation with deterministic browser Canvas composition at 1080 x 1350.
 - Added cover-cropped subject photo rendering, contained QR rendering, fitted identity text, and bounded multi-line guardian-message rendering.
+- Added shared mobile-number sanitization for both the poster message and Meta primary text so a guardian message cannot expose a raw `010` number outside the safe-phone flow.
 - Removed the no-longer-needed `html-to-image` dependency.
 - Preserved the existing payment, stored-creative, automatic Meta publishing, and clickable managed-subject URL flow.
 

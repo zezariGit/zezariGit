@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import FormSubmitButton from "./form-submit-button";
 import ModalScrollLock from "./modal-scroll-lock";
 import { formatDateOnly } from "../lib/date-format";
+import { sanitizeAdGuardianMessage } from "../lib/ad-creative-text";
 import {
   calculateMetaAdBudget,
   normalizeMetaAdBudgetSettings,
@@ -341,7 +342,7 @@ function MissingAdPreview({ subject, quote, startDate, endDate, regionLabel, dis
   const photoSrc = subjectPhotoSrc(subject);
   const age = calculateAge(subject?.birth_date);
   const gender = formatGender(subject?.gender);
-  const message = String(subject?.guardian_message || "").trim() || "보호자가 작성한 메시지가 이 영역에 표시됩니다.";
+  const message = sanitizeAdGuardianMessage(subject?.guardian_message) || "보호자가 작성한 메시지가 이 영역에 표시됩니다.";
   const qrTargetUrl = subject?.qr_target_url || "";
 
   return (
@@ -401,7 +402,7 @@ async function createMissingAdCreativeImage(subject) {
   drawFittedText(context, age ? `${age}세` : "-", 765, 575, 270, 62);
   drawFittedText(context, formatGender(subject?.gender), 765, 719, 270, 62);
 
-  const guardianMessage = String(subject?.guardian_message || "").trim()
+  const guardianMessage = sanitizeAdGuardianMessage(subject?.guardian_message)
     || "보호자가 작성한 메시지가 이 영역에 표시됩니다.";
   drawWrappedText(context, guardianMessage, {
     x: 660,
