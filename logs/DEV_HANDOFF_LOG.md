@@ -7133,3 +7133,30 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Production DB diagnosis, portal and specification verification, API-host validation, source correction, and documentation: about 40 minutes.
+
+## 2026-08-03 KST - Fixed-Template Missing-Person Meta Creative
+
+### User Requirement
+- Replace the current captured missing-person advertisement with the exact form in `reference/실종광고 양식.png`.
+- Place the managed-subject photo in the left frame, QR in the lower blank, name/age/gender in the right fields, and guardian message in the yellow field.
+- Deploy the change and verify an actual Meta advertisement.
+
+### Source Changes
+- Added the supplied 1080 x 1350 template as `public/assets/missing-ad-template.png`.
+- Rebuilt the on-screen preview in `app/ad-campaign-modal.js` and `app/globals.css` as fixed overlays on the supplied form.
+- Replaced responsive DOM screenshot generation with deterministic browser Canvas composition at 1080 x 1350.
+- Added cover-cropped subject photo rendering, contained QR rendering, fitted identity text, and bounded multi-line guardian-message rendering.
+- Removed the no-longer-needed `html-to-image` dependency.
+- Preserved the existing payment, stored-creative, automatic Meta publishing, and clickable managed-subject URL flow.
+
+### Verification
+- `npm run build`: passed.
+- `git diff --check`: passed.
+- Confirmed there are no remaining `html-to-image` source or dependency references.
+- Final production deployment and active Meta delivery test are recorded below after completion.
+
+### Deliverable
+- `deliverables/MISSING_AD_TEMPLATE_CREATIVE.md`
+
+### Time Spent
+- Template analysis, deterministic image composition, responsive preview, build, and initial documentation: about 45 minutes.

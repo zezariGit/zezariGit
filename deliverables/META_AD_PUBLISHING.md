@@ -112,3 +112,11 @@ There are no remaining Meta asset, token, Page, funding-source, policy, or API c
 - Store effective delivery/review status separately from configured status.
 - Reconcile reach, impressions, clicks, spend, and contact conversions.
 - Add scheduled retry and operator alerts for repeated publication failures.
+
+## 2026-08-03 Fixed Missing-Person Creative Template
+- The current advertisement creative uses `reference/실종광고 양식.png` as an exact fixed background copied to `public/assets/missing-ad-template.png`.
+- A browser Canvas creates a deterministic 1080 x 1350 JPEG instead of resizing a responsive DOM screenshot.
+- The managed-subject photo is placed in the left frame, name/age/gender in the right fields, guardian message in the yellow field, and the subject QR in the lower-left blank.
+- Long names and messages are fitted inside their designated fields without changing the template geometry.
+- The QR destination remains the Meta advertisement click destination, so mobile viewers can open the managed-subject page without scanning the on-screen QR.
+- Layout and verification details are documented in `deliverables/MISSING_AD_TEMPLATE_CREATIVE.md`.

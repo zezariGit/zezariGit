@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { toJpeg } from "html-to-image";
 import FormSubmitButton from "./form-submit-button";
 import ModalScrollLock from "./modal-scroll-lock";
 import { formatDateOnly } from "../lib/date-format";
@@ -52,7 +51,6 @@ export default function AdCampaignModal({
   const [locationMessage, setLocationMessage] = useState("");
   const [locating, setLocating] = useState(false);
   const [capturePending, setCapturePending] = useState(false);
-  const creativeRef = useRef(null);
   const creativeInputRef = useRef(null);
   const capturedSubmitRef = useRef(false);
   const selectedDistance = distanceOptions.find((option) => option.id === distanceOptionId) || distanceOptions[0];
@@ -98,19 +96,11 @@ export default function AdCampaignModal({
     event.preventDefault();
     const form = event.currentTarget;
     const submitter = event.nativeEvent.submitter;
-    if (!creativeRef.current || !creativeInputRef.current || !canSubmit) return;
+    if (!creativeInputRef.current || !canSubmit) return;
 
     setCapturePending(true);
     try {
-      const node = creativeRef.current;
-      const ratio = node.offsetWidth > 0 ? node.offsetHeight / node.offsetWidth : 1.25;
-      const dataUrl = await toJpeg(node, {
-        backgroundColor: "#ffffff",
-        cacheBust: true,
-        quality: 0.9,
-        canvasWidth: 1080,
-        canvasHeight: Math.max(1080, Math.round(1080 * ratio)),
-      });
+      const dataUrl = await createMissingAdCreativeImage(subject);
       if (dataUrl.length > 1.8 * 1024 * 1024) throw new Error("광고 이미지 용량이 너무 큽니다.");
       creativeInputRef.current.value = dataUrl;
       capturedSubmitRef.current = true;
@@ -257,7 +247,6 @@ export default function AdCampaignModal({
               endDate={endDate}
             />
             <MissingAdPreview
-              creativeRef={creativeRef}
               subject={subject}
               quote={quote}
               startDate={startDate}
@@ -348,7 +337,7 @@ function SummarySubject({ subject }) {
   );
 }
 
-function MissingAdPreview({ creativeRef, subject, quote, startDate, endDate, regionLabel, distance, metaBudget }) {
+function MissingAdPreview({ subject, quote, startDate, endDate, regionLabel, distance, metaBudget }) {
   const photoSrc = subjectPhotoSrc(subject);
   const age = calculateAge(subject?.birth_date);
   const gender = formatGender(subject?.gender);
@@ -358,23 +347,17 @@ function MissingAdPreview({ creativeRef, subject, quote, startDate, endDate, reg
   return (
     <section className="ad-preview-step full-field" aria-label="광고 미리보기">
       <div className="ad-preview-heading"><div><strong>광고 미리보기</strong><span>결제 후 이 화면을 이미지화해 Meta 광고 소재로 사용합니다.</span></div><em>{formatCurrency(quote.amount)}</em></div>
-      <article ref={creativeRef} className="missing-ad-poster" data-ad-creative="missing-person-preview" data-subject-id={subject.id}>
-        <header className="missing-ad-poster-header"><strong>실종자를 찾습니다</strong><span>여러분의 작은 제보가 가족을 만날 수 있게 합니다.</span></header>
-        <div className="missing-ad-poster-body">
-          <div className="missing-ad-photos">
-            <div className="missing-ad-main-photo">{photoSrc ? <img src={photoSrc} alt={`${subject.name} 사진`} /> : <span aria-hidden="true" />}</div>
-            <div className="missing-ad-thumb-row" aria-hidden="true">{[0, 1, 2].map((index) => <span key={index}>{photoSrc ? <img src={photoSrc} alt="" /> : null}</span>)}</div>
-          </div>
-          <div className="missing-ad-info">
-            <dl><div><dt>이름</dt><dd>{subject.name || "-"}</dd></div><div><dt>나이</dt><dd>{age ? `${age}세` : "-"}</dd></div><div><dt>성별</dt><dd>{gender}</dd></div></dl>
-            <div className="missing-ad-message"><strong>보호자 메시지</strong><p>{message}</p></div>
-          </div>
+      <article className="missing-ad-poster" data-ad-creative="missing-person-template" data-subject-id={subject.id}>
+        <div className="missing-ad-template-photo">
+          {photoSrc ? <img src={photoSrc} alt={`${subject.name} 사진`} /> : <span>사진 없음</span>}
         </div>
-        <footer className="missing-ad-poster-footer">
-          <div className="missing-ad-contact"><strong>발견즉시 연락부탁드립니다</strong><span>qr을 스캔하시면 보호자에게 연락할 수 있습니다</span></div>
-          <div className="missing-ad-qr">{subject?.qr_image ? <img src={subject.qr_image} alt={`${subject.name} QR 코드`} /> : <span>QR</span>}</div>
-          {qrTargetUrl ? <span className="missing-ad-direct-url">관리대상 페이지: {qrTargetUrl}</span> : null}
-        </footer>
+        <strong className="missing-ad-template-value name">{subject.name || "-"}</strong>
+        <strong className="missing-ad-template-value age">{age ? `${age}세` : "-"}</strong>
+        <strong className="missing-ad-template-value gender">{gender}</strong>
+        <p className="missing-ad-template-message">{message}</p>
+        <div className="missing-ad-template-qr">
+          {subject?.qr_image ? <img src={subject.qr_image} alt={`${subject.name} QR 코드`} /> : <span>QR</span>}
+        </div>
       </article>
       <div className="ad-preview-meta">
         <span>기간: {formatDate(startDate)} ~ {formatDate(endDate)} / {quote.days}일</span>
@@ -384,6 +367,160 @@ function MissingAdPreview({ creativeRef, subject, quote, startDate, endDate, reg
       </div>
     </section>
   );
+}
+
+async function createMissingAdCreativeImage(subject) {
+  if (typeof document !== "undefined" && document.fonts?.ready) {
+    await document.fonts.ready.catch(() => null);
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 1080;
+  canvas.height = 1350;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("광고 이미지 캔버스를 생성하지 못했습니다.");
+
+  const photoSrc = subjectPhotoSrc(subject);
+  const [template, photo, qr] = await Promise.all([
+    loadCreativeImage("/assets/missing-ad-template.png", "실종광고 양식을 불러오지 못했습니다."),
+    photoSrc ? loadCreativeImage(photoSrc, "관리대상 사진을 불러오지 못했습니다.") : Promise.resolve(null),
+    subject?.qr_image ? loadCreativeImage(subject.qr_image, "관리대상 QR 코드를 불러오지 못했습니다.") : Promise.resolve(null),
+  ]);
+
+  context.drawImage(template, 0, 0, canvas.width, canvas.height);
+  if (photo) {
+    drawCoverImage(context, photo, 36, 396, 462, 558);
+  } else {
+    context.fillStyle = "#f3f4f6";
+    context.fillRect(36, 396, 462, 558);
+    drawCenteredText(context, "사진 없음", 267, 675, 52, 360, "#6b7280");
+  }
+
+  const age = calculateAge(subject?.birth_date);
+  drawFittedText(context, String(subject?.name || "-"), 765, 431, 270, 62);
+  drawFittedText(context, age ? `${age}세` : "-", 765, 575, 270, 62);
+  drawFittedText(context, formatGender(subject?.gender), 765, 719, 270, 62);
+
+  const guardianMessage = String(subject?.guardian_message || "").trim()
+    || "보호자가 작성한 메시지가 이 영역에 표시됩니다.";
+  drawWrappedText(context, guardianMessage, {
+    x: 660,
+    y: 842,
+    maxWidth: 350,
+    maxHeight: 154,
+    fontSize: 35,
+    minFontSize: 24,
+    lineHeightRatio: 1.24,
+    maxLines: 4,
+  });
+
+  if (qr) {
+    context.fillStyle = "#ffffff";
+    context.fillRect(58, 1079, 236, 236);
+    drawContainImage(context, qr, 66, 1087, 220, 220);
+  } else {
+    context.fillStyle = "#ffffff";
+    context.fillRect(58, 1079, 236, 236);
+    drawCenteredText(context, "QR", 176, 1197, 54, 180, "#111827");
+  }
+
+  return canvas.toDataURL("image/jpeg", 0.92);
+}
+
+function loadCreativeImage(src, errorMessage) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.decoding = "async";
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error(errorMessage));
+    image.src = src;
+  });
+}
+
+function drawCoverImage(context, image, x, y, width, height) {
+  const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+  const sourceWidth = width / scale;
+  const sourceHeight = height / scale;
+  const sourceX = Math.max(0, (image.naturalWidth - sourceWidth) / 2);
+  const sourceY = Math.max(0, (image.naturalHeight - sourceHeight) / 2);
+  context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
+}
+
+function drawContainImage(context, image, x, y, width, height) {
+  const scale = Math.min(width / image.naturalWidth, height / image.naturalHeight);
+  const drawWidth = image.naturalWidth * scale;
+  const drawHeight = image.naturalHeight * scale;
+  context.drawImage(image, x + (width - drawWidth) / 2, y + (height - drawHeight) / 2, drawWidth, drawHeight);
+}
+
+function drawFittedText(context, text, x, centerY, maxWidth, preferredSize) {
+  let fontSize = preferredSize;
+  context.fillStyle = "#111111";
+  context.textAlign = "left";
+  context.textBaseline = "middle";
+  while (fontSize > 34) {
+    context.font = `900 ${fontSize}px "Malgun Gothic", "Apple SD Gothic Neo", sans-serif`;
+    if (context.measureText(text).width <= maxWidth) break;
+    fontSize -= 2;
+  }
+  context.fillText(text, x, centerY, maxWidth);
+}
+
+function drawCenteredText(context, text, centerX, centerY, fontSize, maxWidth, color) {
+  context.fillStyle = color;
+  context.font = `800 ${fontSize}px "Malgun Gothic", "Apple SD Gothic Neo", sans-serif`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText(text, centerX, centerY, maxWidth);
+}
+
+function drawWrappedText(context, text, options) {
+  const words = Array.from(String(text || "").replace(/\s+/g, " ").trim());
+  let fontSize = options.fontSize;
+
+  while (fontSize >= options.minFontSize) {
+    context.font = `800 ${fontSize}px "Malgun Gothic", "Apple SD Gothic Neo", sans-serif`;
+    const lines = wrapCanvasCharacters(context, words, options.maxWidth);
+    const lineHeight = fontSize * options.lineHeightRatio;
+    if (lines.length <= options.maxLines && lines.length * lineHeight <= options.maxHeight) {
+      context.fillStyle = "#111111";
+      context.textAlign = "left";
+      context.textBaseline = "top";
+      lines.forEach((line, index) => context.fillText(line, options.x, options.y + index * lineHeight, options.maxWidth));
+      return;
+    }
+    fontSize -= 2;
+  }
+
+  context.font = `800 ${options.minFontSize}px "Malgun Gothic", "Apple SD Gothic Neo", sans-serif`;
+  const lines = wrapCanvasCharacters(context, words, options.maxWidth).slice(0, options.maxLines);
+  if (lines.length === options.maxLines) {
+    while (lines[lines.length - 1] && context.measureText(`${lines[lines.length - 1]}…`).width > options.maxWidth) {
+      lines[lines.length - 1] = lines[lines.length - 1].slice(0, -1);
+    }
+    lines[lines.length - 1] = `${lines[lines.length - 1]}…`;
+  }
+  const lineHeight = options.minFontSize * options.lineHeightRatio;
+  context.fillStyle = "#111111";
+  context.textAlign = "left";
+  context.textBaseline = "top";
+  lines.forEach((line, index) => context.fillText(line, options.x, options.y + index * lineHeight, options.maxWidth));
+}
+
+function wrapCanvasCharacters(context, characters, maxWidth) {
+  const lines = [];
+  let line = "";
+  characters.forEach((character) => {
+    const candidate = `${line}${character}`;
+    if (line && context.measureText(candidate).width > maxWidth) {
+      lines.push(line.trimEnd());
+      line = character.trimStart();
+    } else {
+      line = candidate;
+    }
+  });
+  if (line) lines.push(line.trimEnd());
+  return lines;
 }
 
 function normalizeDistanceOptions(rows) {
