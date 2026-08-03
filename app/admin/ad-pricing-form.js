@@ -20,10 +20,20 @@ const DEFAULT_DURATIONS = [
 ];
 
 export default function AdPricingForm({ setting, action }) {
+  const [marginPercent, setMarginPercent] = useState(() => normalizeMarginPercent(setting));
   const [distanceOptions, setDistanceOptions] = useState(() => normalizeDistances(setting?.distanceOptions));
   const [durationOptions, setDurationOptions] = useState(() => normalizeDurations(setting?.durationOptions));
   const serializedDistances = useMemo(() => JSON.stringify(distanceOptions), [distanceOptions]);
   const serializedDurations = useMemo(() => JSON.stringify(durationOptions), [durationOptions]);
+  const marginExample = useMemo(() => {
+    const paymentAmount = 70000;
+    const metaBudgetAmount = Math.floor(paymentAmount * (100 - marginPercent) / 100);
+    return {
+      paymentAmount,
+      marginAmount: paymentAmount - metaBudgetAmount,
+      metaBudgetAmount,
+    };
+  }, [marginPercent]);
 
   function updateDistance(index, key, value) {
     setDistanceOptions((current) => current.map((option, optionIndex) => (
@@ -69,8 +79,41 @@ export default function AdPricingForm({ setting, action }) {
   return (
     <form className="ad-option-admin-form" action={action}>
       <input type="hidden" name="returnTo" value="/admin?section=ad-pricing" />
+      <input type="hidden" name="metaMarginPercent" value={marginPercent} />
       <input type="hidden" name="distanceOptionsJson" value={serializedDistances} />
       <input type="hidden" name="durationOptionsJson" value={serializedDurations} />
+
+      <section className="admin-panel ad-margin-settings">
+        <header>
+          <div>
+            <h2>Meta 광고예산 마진율</h2>
+            <p>보호자 결제금액에서 서비스 마진을 제외한 금액을 Meta 광고의 전체 기간 예산으로 편성합니다.</p>
+          </div>
+        </header>
+        <div className="ad-margin-settings-body">
+          <label>
+            서비스 마진율
+            <span className="ad-option-number-field percent">
+              <input
+                type="number"
+                min="0"
+                max="90"
+                step="1"
+                value={marginPercent}
+                onChange={(event) => setMarginPercent(clampMarginPercent(event.target.value))}
+                aria-label="서비스 마진율"
+              />
+              <span>%</span>
+            </span>
+          </label>
+          <dl className="ad-margin-example">
+            <div><dt>보호자 결제금액</dt><dd>{formatCurrency(marginExample.paymentAmount)}</dd></div>
+            <div><dt>서비스 마진</dt><dd>{formatCurrency(marginExample.marginAmount)}</dd></div>
+            <div className="total"><dt>Meta 집행예산</dt><dd>{formatCurrency(marginExample.metaBudgetAmount)}</dd></div>
+          </dl>
+        </div>
+        <p className="ad-margin-policy-note">저장 후 새로 신청하는 광고부터 적용되며, 기존 결제·집행 광고의 예산은 변경되지 않습니다.</p>
+      </section>
 
       <OptionGridSection
         title="광고 노출 거리"
@@ -170,8 +213,8 @@ export default function AdPricingForm({ setting, action }) {
       </OptionGridSection>
 
       <div className="ad-option-save-bar">
-        <p>삭제와 추가는 저장 버튼을 누른 뒤 반영되며, 저장 즉시 새 광고 신청 화면에 적용됩니다.</p>
-        <FormSubmitButton className="action" pendingText="저장중">거리·기간 옵션 저장</FormSubmitButton>
+        <p>마진율과 옵션 변경은 저장 버튼을 누른 뒤 반영되며, 저장 즉시 새 광고 신청 화면에 적용됩니다.</p>
+        <FormSubmitButton className="action" pendingText="저장중">마진율·거리·기간 저장</FormSubmitButton>
       </div>
     </form>
   );
@@ -241,4 +284,18 @@ function createOptionId(prefix) {
     return `${prefix}-${crypto.randomUUID().slice(0, 8)}`;
   }
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function normalizeMarginPercent(setting) {
+  return clampMarginPercent(setting?.marginPercent ?? setting?.meta_margin_percent ?? 4);
+}
+
+function clampMarginPercent(value) {
+  const number = Math.floor(Number(value));
+  if (!Number.isFinite(number)) return 4;
+  return Math.min(90, Math.max(0, number));
+}
+
+function formatCurrency(value) {
+  return `${Number(value || 0).toLocaleString("ko-KR")}원`;
 }

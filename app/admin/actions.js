@@ -390,9 +390,9 @@ export async function setAdPricingAction(formData) {
     revalidatePath("/admin");
     revalidatePath("/");
   } catch (error) {
-    redirect(withNotice(getReturnTo(formData, "/admin?section=ad-pricing"), error.message || "광고 거리·기간 옵션 저장에 실패했습니다.", "error"));
+    redirect(withNotice(getReturnTo(formData, "/admin?section=ad-pricing"), error.message || "광고 마진율·거리·기간 저장에 실패했습니다.", "error"));
   }
-  redirect(withNotice(getReturnTo(formData, "/admin?section=ad-pricing"), "광고 거리·기간 옵션이 저장되었습니다."));
+  redirect(withNotice(getReturnTo(formData, "/admin?section=ad-pricing"), "광고 마진율·거리·기간 설정이 저장되었습니다."));
 }
 
 export async function setAdminSubjectAdStatusAction(formData) {

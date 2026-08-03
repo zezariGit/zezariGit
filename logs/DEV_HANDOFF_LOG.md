@@ -7245,3 +7245,33 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Ads Manager inspection, Graph API status/insights verification, and documentation: about 10 minutes.
+
+## 2026-08-03 KST - Administrator-Controlled Ad Margin and Meta Budget
+
+### User Requirement
+- Determine whether a KRW 70,000 guardian payment caused the KRW 67,200 Meta budget.
+- Let administrators set a service margin percentage in Advertisement Payment Management and use it to allocate future Meta budgets.
+
+### Analysis
+- The existing KRW 67,200 was not calculated by subtracting 4% from the payment. It came from the independent legacy formula: Seoul capital multiplier, 10km radius, and seven days.
+- The identical 4% difference was coincidental.
+
+### Source Changes
+- Added `ad_settings.meta_margin_percent` with a 4% default and administrator validation from 0% through 90%.
+- Added a margin-rate setting and live KRW 70,000 example to `/admin?section=ad-pricing`.
+- Added `calculateMetaBudgetFromPayment()`: Meta lifetime budget is the guardian payment less the stored margin percentage.
+- Added nullable `subject_ads.meta_margin_percent` and budget version 3 so every new ad keeps the margin used when requested.
+- Updated the guardian preview, payment summary, administrator detail, and CSV output with the stored margin and budget.
+- Preserved existing paid and active advertisements without recalculation; budget versions 1 and 2 continue using their stored amounts.
+
+### Verification
+- `npm run build`: passed with 28 routes.
+- `git diff --check`: passed.
+- Formula checks: KRW 70,000 at 4% gives KRW 67,200; at 20% gives KRW 56,000.
+- Isolated local DB: schema version 33, default margin 4%, and `subject_ads.meta_margin_percent` confirmed.
+
+### Deliverable
+- `deliverables/ADMIN_AD_MARGIN_BUDGET.md`
+
+### Time Spent
+- Formula analysis, DB/UI implementation, compatibility safeguards, and isolated verification: about 50 minutes.

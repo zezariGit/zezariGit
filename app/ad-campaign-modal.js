@@ -6,7 +6,7 @@ import ModalScrollLock from "./modal-scroll-lock";
 import { formatDateOnly } from "../lib/date-format";
 import { sanitizeAdGuardianMessage } from "../lib/ad-creative-text";
 import {
-  calculateMetaAdBudget,
+  calculateMetaBudgetFromPayment,
   normalizeMetaAdBudgetSettings,
 } from "../lib/meta-ad-budget";
 
@@ -62,13 +62,10 @@ export default function AdCampaignModal({
     ? "대한민국"
     : cleanRegionLabel(location.label);
   const quote = calculateOptionQuote(selectedDistance, selectedDuration);
-  const metaBudget = calculateMetaAdBudget({
+  const metaBudget = calculateMetaBudgetFromPayment({
+    paymentAmount: quote.amount,
     days: quote.days,
-    radiusKm: quote.radiusKm,
-    region: regionLabel,
-    defaultRadiusKm: Number(pricing?.defaultRadiusKm || 10),
-    extraRadiusUnitKm: Number(pricing?.extraRadiusUnitKm || 10),
-    settings: metaBudgetSettings,
+    marginPercent: metaBudgetSettings.marginPercent,
   });
   const activeAd = ["active", "paused", "ready"].includes(subject?.ad_status || "");
   const canSubmit = Boolean(
@@ -363,7 +360,7 @@ function MissingAdPreview({ subject, quote, startDate, endDate, regionLabel, dis
       <div className="ad-preview-meta">
         <span>기간: {formatDate(startDate)} ~ {formatDate(endDate)} / {quote.days}일</span>
         <span>범위: {distance?.coverageType === "country" ? "대한민국 전체" : `${regionLabel} / 반경 ${distance?.radiusKm}km`}</span>
-        <span>Meta 예상 집행예산: {formatCurrency(metaBudget.amount)} / 보호자 결제금액과 별도</span>
+        <span>Meta 예상 집행예산: {formatCurrency(metaBudget.amount)} / 서비스 마진 {metaBudget.marginPercent}% 반영</span>
         {qrTargetUrl ? <a href={qrTargetUrl} target="_blank" rel="noreferrer">관리대상정보 페이지 열기</a> : <span>관리대상정보 링크는 QR 매칭 후 표시됩니다.</span>}
       </div>
     </section>

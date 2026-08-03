@@ -1992,7 +1992,8 @@ function AdPricingManagementSection({ setting }) {
           <h2>광고 노출 거리와 기간 설정</h2>
           <p>
             거리와 기간 옵션을 그리드에서 자유롭게 추가·수정·삭제할 수 있습니다. 저장한 활성 옵션은
-            사용자 광고 설정 화면에 바로 반영되며, 결제금액은 선택한 기간 금액과 거리 추가금액의 합계로 검증합니다.
+            사용자 광고 설정 화면에 바로 반영됩니다. 보호자 결제금액은 기간 금액과 거리 추가금액의 합계이며,
+            Meta 집행예산은 관리자가 저장한 서비스 마진율을 제외해 계산합니다.
           </p>
         </div>
       </section>
@@ -2205,7 +2206,11 @@ function AdManagementSection({ adsData }) {
                       <div><dt>보호자 결제금액</dt><dd>{formatCurrency(selectedAd.amount)}</dd></div>
                       <div><dt>Meta 일예산</dt><dd>{formatCurrency(selectedAd.meta_daily_budget)}</dd></div>
                       <div><dt>Meta 총예산(%)</dt><dd>{formatCurrency(selectedAd.meta_budget_amount)} ({adBudgetProgressPercent(selectedAd)}% 소진)</dd></div>
-                      <div><dt>Meta 지역 가중치</dt><dd>{metaRegionTierAdminLabel(selectedAd.meta_region_tier)} {Number(selectedAd.meta_region_multiplier_percent || 100)}%</dd></div>
+                      {Number(selectedAd.meta_budget_version || 1) >= 3 ? (
+                        <div><dt>서비스 마진율</dt><dd>{Number(selectedAd.meta_margin_percent || 0)}%</dd></div>
+                      ) : (
+                        <div><dt>Meta 지역 가중치</dt><dd>{metaRegionTierAdminLabel(selectedAd.meta_region_tier)} {Number(selectedAd.meta_region_multiplier_percent || 100)}%</dd></div>
+                      )}
                       <div><dt>광고지역</dt><dd>{selectedAd.region || "-"}</dd></div>
                       <div><dt>지도 반경</dt><dd className="inline-scroll-value">{formatAdTargetLocation(selectedAd)}</dd></div>
                       <div><dt>광고기간</dt><dd>{formatDate(selectedAd.start_date)} ~ {formatDate(selectedAd.end_date)}</dd></div>
@@ -4417,6 +4422,7 @@ function adExportRows(ads = []) {
     보호자결제금액: formatCurrency(ad.amount),
     Meta일예산: formatCurrency(ad.meta_daily_budget),
     Meta총예산: formatCurrency(ad.meta_budget_amount),
+    서비스마진율: Number(ad.meta_budget_version || 1) >= 3 ? `${Number(ad.meta_margin_percent || 0)}%` : "기존 지역공식",
     Meta지역가중치: `${metaRegionTierAdminLabel(ad.meta_region_tier)} ${Number(ad.meta_region_multiplier_percent || 100)}%`,
     광고비소진율: `${adBudgetProgressPercent(ad)}%`,
     클릭수: formatMetricValue(ad.click_count),

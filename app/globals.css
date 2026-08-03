@@ -2550,6 +2550,85 @@ a {
   gap: var(--space-md);
 }
 
+.ad-margin-settings {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.ad-margin-settings > header h2,
+.ad-margin-settings > header p,
+.ad-margin-policy-note {
+  margin: 0;
+}
+
+.ad-margin-settings > header h2 {
+  color: var(--c-text);
+  font-size: 1rem;
+}
+
+.ad-margin-settings > header p,
+.ad-margin-policy-note {
+  margin-top: 5px;
+  color: var(--c-text-muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.ad-margin-settings-body {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.45fr) minmax(360px, 1fr);
+  gap: var(--space-md);
+  align-items: end;
+}
+
+.ad-margin-settings-body > label {
+  display: grid;
+  gap: 6px;
+  color: var(--c-text);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.ad-option-number-field.percent {
+  width: min(100%, 220px);
+}
+
+.ad-margin-example {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-sm);
+  margin: 0;
+}
+
+.ad-margin-example > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--c-border-strong);
+  background: var(--c-surface-soft);
+}
+
+.ad-margin-example > div.total {
+  border-left-color: var(--c-primary);
+}
+
+.ad-margin-example dt,
+.ad-margin-example dd {
+  margin: 0;
+}
+
+.ad-margin-example dt {
+  color: var(--c-text-muted);
+  font-size: 0.76rem;
+}
+
+.ad-margin-example dd {
+  color: var(--c-text);
+  font-weight: 900;
+  white-space: nowrap;
+}
+
 .ad-option-grid-section {
   min-width: 0;
   overflow: hidden;
@@ -12735,6 +12814,8 @@ button:disabled:hover {
   .ad-pricing-inline-fields,
   .ad-pricing-inline-fields.three-columns,
   .ad-pricing-example,
+  .ad-margin-settings-body,
+  .ad-margin-example,
   .find-profile {
     grid-template-columns: 1fr;
   }
