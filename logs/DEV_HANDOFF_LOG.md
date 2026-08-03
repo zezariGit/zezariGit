@@ -7332,3 +7332,5 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Production Turso reached schema version 34 with `guardian_id`, `provider_message_id`, and `idx_phone_verifications_guardian` present.
 - Production email verification returned HTTP 410, while invalid SMS input returned HTTP 400 after schema initialization.
 - Production browser verification confirmed the SMS-first signup copy, six code boxes on one row, no horizontal overflow, and no Next.js error overlay.
+- Follow-up detected that the manually managed `zezari.vercel.app` alias still pointed to a two-day-old deployment even though it returned HTTP 200.
+- Reassigned `zezari.vercel.app` to the latest READY deployment and verified HTTP 410 for disabled email verification, HTTP 400 for invalid SMS input, and the guardian `인증번호 받기` control on the authenticated screen.

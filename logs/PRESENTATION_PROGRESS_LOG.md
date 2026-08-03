@@ -5301,3 +5301,5 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 운영 Turso 스키마 34와 보호자·Solapi 추적 컬럼 및 인덱스 확인
 - 운영 이메일 인증 API HTTP 410, 잘못된 SMS 번호 HTTP 400 확인
 - 운영 회원가입 화면에서 SMS 안내, 인증번호 6칸 한 줄, 가로 넘침 없음, 오류 오버레이 없음 확인
+- 기존 `zezari.vercel.app`가 이틀 전 배포에 고정된 상태를 발견해 최신 READY 배포로 별칭 재연결
+- 기존 주소에서도 이메일 인증 HTTP 410, SMS 검증 HTTP 400, 보호자정보의 `인증번호 받기` 버튼 확인

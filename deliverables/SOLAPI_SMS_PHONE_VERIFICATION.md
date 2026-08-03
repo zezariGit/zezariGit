@@ -30,6 +30,7 @@
 - Production build and whitespace checks passed.
 - Vercel production deployment `dpl_HGbV2Y5p79PHwwu5moLiSZYJrQ2m` reached `READY`.
 - `https://zezari.family` and `https://zezari.vercel.app` returned HTTP 200.
+- The legacy `zezari.vercel.app` alias was found pinned to a two-day-old deployment and was reassigned to the latest production deployment; its API flags and guardian phone-verification UI then matched `zezari.family`.
 - Production Turso reported schema version 34 with both new columns and the guardian verification index.
 - Production email verification returned HTTP 410 and invalid SMS input returned HTTP 400, confirming the active route flags and validation order.
 - Production browser verification confirmed SMS-first copy, six code inputs on one row, no horizontal overflow, and no Next.js error overlay.
