@@ -1,83 +1,94 @@
-# Phone Verification Signup Integration
+# Solapi SMS Phone Verification
 
 Project: REAL_QR_FIND
 
 ## Current Status
-- This implementation is retained as a disabled rollback path as of 2026-08-03.
-- Signup screens no longer show or call SMS verification.
-- The phone routes return HTTP 410 by default and can only be re-enabled with `SIGNUP_SMS_VERIFICATION_ENABLED=true`.
-- The active signup verification flow is documented in `AUTH_EMAIL_VERIFICATION.md`.
+- Solapi SMS is the active identity check for direct signup and first-time SNS signup.
+- A guardian must verify every newly entered contact phone number before profile storage.
+- Resend email verification remains in source as a disabled fallback and is not shown in the active signup UI.
+- Administrators with an existing completed account are not forced through signup verification merely to sign in.
 
-## Purpose
-- Replace temporary client-generated signup verification codes with server-issued phone verification.
-- Apply the same phone verification requirement to direct ID signup and first-time SNS signup completion.
-- Keep NICE real-name identity verification as a later optional integration.
+## User Flows
 
-## User Flow
-- The guardian enters a Korean mobile phone number.
-- `인증코드 받기` calls `POST /api/signup/phone/send`.
-- The server generates a 6-digit code, stores only a hash, and sends the code through the configured SMS adapter.
-- The guardian enters the 6-digit code.
-- `확인` calls `POST /api/signup/phone/verify`.
-- On success, the server returns a 15-minute `phoneVerificationToken`.
-- Signup completion APIs consume that token once and save `guardians.phone_verified_at`.
+### Direct and SNS Signup
+1. The guardian enters a Korean mobile phone number.
+2. `POST /api/signup/phone/send` creates and sends a six-digit SMS code.
+3. `POST /api/signup/phone/verify` verifies the code and returns a 15-minute one-time `phoneVerificationToken`.
+4. `/api/signup/guardian` or `/api/signup/complete` consumes the token before saving the account.
+5. The server records `guardians.phone_verified_at`.
 
-## Administrator Exception
-- A signed-in account recognized by `ADMIN_EMAILS` or `guardians.is_admin = 1` bypasses the guardian signup-completion screen.
-- Administrators are not required to enter a phone verification code merely to sign in.
-- This exception changes only the post-login screen gate. It does not create a verification token or mark an unverified phone as verified.
-- Administrators can enter or update optional guardian profile information later from the authenticated information screen.
-- Inactive administrator records remain blocked by the existing account activation rule.
+SNS-provided name and email values are still prefilled. The phone verification requirement is identical for direct and first-time SNS signup.
+
+### Guardian Contact Number Change
+1. The signed-in guardian changes `연락받을 전화번호` on the guardian information screen.
+2. The phone component requests a code with purpose `guardian_phone_change`.
+3. The issued verification row is bound to the signed-in guardian ID.
+4. Profile saving consumes the one-time token and updates the phone plus `phone_verified_at`.
+5. Saving an unverified changed number, a duplicate number, an expired token, or another guardian's token is rejected.
+
+An unchanged current phone does not require another verification.
 
 ## API
 - `POST /api/signup/phone/send`
-  - Input: `phone`, optional `purpose`.
-  - Output: `phone`, `expiresInSeconds`.
-  - Behavior: rejects invalid phone numbers, already registered phone numbers, and excessive sends.
+  - Input: `phone`, `purpose` (`signup` or `guardian_phone_change`).
+  - Output: normalized `phone`, `expiresInSeconds`.
+  - The change purpose requires an authenticated guardian session.
 - `POST /api/signup/phone/verify`
-  - Input: `phone`, `code`, optional `purpose`.
-  - Output: `phone`, `phoneVerificationToken`, `expiresInSeconds`.
-  - Behavior: rejects expired codes, wrong codes, and too many attempts.
+  - Input: `phone`, `code`, `purpose`.
+  - Output: `phoneVerificationToken`, `expiresInSeconds`.
+  - The token is usable once and only for the same phone, purpose, and guardian binding.
+
+## Solapi Adapter
+- Package: `solapi` Node.js SDK.
+- The SDK is called only from the server through `lib/sms.js`.
+- Recipient and sender numbers are normalized to digits only.
+- The Solapi group ID is retained as `provider_message_id` for operational tracing.
+- Signup and phone-change messages use distinct labels.
+
+Official reference: https://solapi.com/developers/sdk/nodejs-sendingexample
 
 ## Database
+- Schema version: 34.
 - `phone_verifications`
-  - Stores phone, purpose, code hash, token hash, expiry timestamps, attempts, provider, status, and audit timestamps.
-  - Plain verification codes and plain verification tokens are not stored.
-- `guardians.phone_verified_at`
-  - Remains the final guardian-level verification marker.
+  - `guardian_id`: binds authenticated phone-change requests to one guardian.
+  - `phone`, `purpose`, `code_hash`, `token_hash`.
+  - code/token expiries, verification/consumption timestamps, attempts, send count.
+  - `provider`, `provider_message_id`, status, audit timestamps.
+- Plain verification codes, tokens, and Solapi credentials are never stored in the database.
 
 ## Environment Variables
 ```text
-SMS_PROVIDER=generic
-SMS_API_URL=
-SMS_API_KEY=
-SMS_API_SECRET=
-SMS_SENDER_NO=
+SIGNUP_SMS_VERIFICATION_ENABLED=true
+SOLAPI_API_KEY=
+SOLAPI_API_SECRET=
+SOLAPI_SENDER_NUMBER=
 SMS_DEV_BYPASS_CODE=
+
+SIGNUP_EMAIL_VERIFICATION_ENABLED=false
 ```
 
-- Production requires `SMS_API_URL` and `SMS_API_KEY`.
-- `SMS_DEV_BYPASS_CODE` works only outside production and should not be configured on Vercel production.
-- If SMS configuration is missing, the send API returns `문자 발송 설정이 필요합니다.`
+- The Solapi key, secret, and sender number are server-only.
+- `SMS_DEV_BYPASS_CODE` works only when `NODE_ENV` is not `production`; it must not be configured in Vercel Production.
+- The registered sender number must remain active in the Solapi console.
+- Vercel serverless outbound IPs are not fixed, so the Solapi key was configured for all IPs. Key secrecy and server-only use are therefore mandatory.
 
 ## Security Rules
-- Verification code length: 6 digits.
-- Code expiry: 3 minutes.
+- Code length: six digits.
+- Code expiry: three minutes.
 - Verification token expiry: 15 minutes.
-- Send limit: 5 requests per phone per hour.
-- Attempt limit: 5 wrong verification attempts per code.
-- Signup completion requires a valid one-time token.
+- Send limit: five requests per phone and purpose per hour.
+- Attempt limit: five incorrect attempts per issued code.
+- Existing guardian phone numbers cannot be reused by another account.
+- Every token is hashed, guardian/purpose scoped, and consumed once.
 
-## Reference Finding
-- `reference/wp` did not include MShop plugin source files.
-- `reference/wp.sql` showed the legacy site used MShop members, SMS, and user-certification plugins with a required phone certification field.
-- The current implementation recreates that behavior in Next.js and Turso rather than porting PHP plugin internals.
+## Verification Record
+- Next.js production build passed with all phone and email fallback routes.
+- Isolated API tests passed for invalid phone, send, wrong code, successful verification, token-required signup, token reuse rejection, and disabled email route.
+- Authenticated guardian tests passed for phone-change send/verify/save and unverified save rejection.
+- Mobile signup UI showed all six code inputs on one line.
+- Solapi accepted and completed one real API SMS with one success and zero failures.
 
-### 2026-08-03 Solapi Audit
-- `reference/wp` contains WordPress core files only; `wp-content/plugins` and `wp-content/mu-plugins` are absent.
-- `reference/wp.tar.gz` contains 3,228 paths but zero `wp-content` or plugin paths, so the missing plugin implementation cannot be recovered from that archive.
-- `reference/wp.sql` contains repeated activation/update traces for `mshop-sms-s2/mshop-sms-s2.php` and `mshop-user-certification-s2/mshop-user-certification-s2.php`.
-- The SQL also retains the legacy certification identifiers `certification_for_register`, `certification_number`, and `billing_phone_certification_number`.
-- Exact searches found zero occurrences of `solapi`, `coolsms`, `api.solapi.com`, and `api.coolsms.co.kr`.
-- No Solapi API key name, secret name, request host, HMAC code, or message-send function is available in the supplied backup.
-- Therefore the backup proves that MShop handled SMS certification, but it does not prove that Solapi was the underlying provider and cannot supply reusable Solapi credentials or request code.
+## Operations
+- Monitor Solapi balance, sender-number expiry, and message logs.
+- Rotate a leaked key immediately in Solapi and Vercel.
+- Never place credentials in Git, screenshots, logs, deliverables, or browser-side code.

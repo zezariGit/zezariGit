@@ -3460,6 +3460,68 @@ select:focus {
   grid-column: 1 / -1;
 }
 
+.guardian-phone-verification {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface-muted);
+}
+
+.guardian-phone-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.guardian-phone-input-row .outline-action,
+.guardian-phone-code-panel .action {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--c-primary-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-primary-dark);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.guardian-phone-input-row .outline-action:disabled {
+  border-color: var(--c-border);
+  background: #eef1f4;
+  color: var(--c-text-muted);
+}
+
+.guardian-phone-code-panel {
+  display: grid;
+  gap: 10px;
+  max-width: 420px;
+}
+
+.guardian-phone-code-panel .action {
+  background: var(--c-primary);
+  color: #ffffff;
+}
+
+.phone-verification-message {
+  margin: 0;
+  color: var(--c-danger);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.phone-verification-message.success {
+  color: var(--c-success);
+}
+
+@media (max-width: 520px) {
+  .guardian-phone-input-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .subject-list {
   display: grid;
   gap: 14px;

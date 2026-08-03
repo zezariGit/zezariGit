@@ -2,12 +2,13 @@
 
 Project: REAL_QR_FIND
 
-## Purpose
-- Use Resend email verification as the active signup identity check for direct and first-time SNS signup.
-- Keep the legacy SMS implementation in source while hiding it from the UI and disabling its API routes by default.
-- Run email delivery from Next.js Route Handlers on Vercel; never expose the Resend API key to the browser.
+## Current Status
+- Resend email verification is retained as a disabled fallback as of 2026-08-03.
+- `SIGNUP_EMAIL_VERIFICATION_ENABLED=false` makes both email verification routes return HTTP 410.
+- Active direct and first-time SNS signup uses Solapi SMS as documented in `AUTH_PHONE_VERIFICATION.md`.
+- The implementation and Vercel Resend variables are preserved for a controlled rollback; the active UI does not call these routes.
 
-## Active User Flow
+## Retained Fallback Flow
 1. The guardian enters or confirms an email address.
 2. `POST /api/signup/email/send` validates duplicates and request limits, creates a 6-digit code, stores only its hash, and sends it through Resend.
 3. The guardian enters the 6-digit code within 3 minutes.
@@ -15,7 +16,7 @@ Project: REAL_QR_FIND
 5. `/api/signup/guardian` or `/api/signup/complete` consumes the token before saving the account.
 6. The verified email timestamp is stored in `guardians.email_verified_at`.
 
-The phone number remains a required guardian contact field, but signup does not send or request an SMS code.
+This flow is not active while `SIGNUP_EMAIL_VERIFICATION_ENABLED=false`.
 
 ## APIs
 - `POST /api/signup/email/send`
@@ -26,10 +27,9 @@ The phone number remains a required guardian contact field, but signup does not 
   - Input: `email`, `code`, optional `purpose`.
   - Output: `emailVerificationToken`, `expiresInSeconds`.
   - Limits: five incorrect attempts per issued code.
-- Legacy `/api/signup/phone/send` and `/api/signup/phone/verify`
-  - Remain in source for possible rollback.
-  - Return HTTP 410 unless `SIGNUP_SMS_VERIFICATION_ENABLED=true` is deliberately configured.
-  - No current signup screen calls these routes.
+- `/api/signup/phone/send` and `/api/signup/phone/verify`
+  - Are the active Solapi SMS routes.
+  - Support both signup and authenticated guardian contact-number changes.
 
 ## Database
 - `email_verifications`
@@ -45,7 +45,7 @@ RESEND_API_KEY=
 RESEND_EMAIL_DOMAIN=zezari.family
 RESEND_FROM_EMAIL=제자리 <auth@zezari.family>
 EMAIL_DEV_BYPASS_CODE=
-SIGNUP_SMS_VERIFICATION_ENABLED=false
+SIGNUP_EMAIL_VERIFICATION_ENABLED=false
 ```
 
 - `RESEND_API_KEY` is server-only and should be provisioned through the Vercel Resend Marketplace integration or stored as an encrypted Vercel environment variable.

@@ -45,8 +45,10 @@ Project: REAL_QR_FIND
 - When SNS provider data includes name or email, those values are prefilled in the signup information step.
 - Existing complete guardians go directly to the dashboard after SNS login.
 - Phone verification is implemented through server-issued SMS verification APIs. The screen no longer displays test codes.
-- Production SMS delivery requires the SMS environment variables documented in `AUTH_PHONE_VERIFICATION.md`.
+- Production SMS delivery uses the server-side Solapi Node SDK and the environment variables documented in `AUTH_PHONE_VERIFICATION.md`.
 - Local development can use `SMS_DEV_BYPASS_CODE`; this bypass is disabled in production.
+- Changing the guardian contact phone number also requires a new SMS code before the profile can be saved.
+- Resend email verification remains available in source as a disabled fallback and is not shown in the active flow.
 - Guardian ID/password login works after the guardian profile has saved `아이디` and `비밀번호`.
 
 ## Google Cloud Console Requirements
@@ -186,18 +188,16 @@ META_APP_SECRET=your-meta-app-secret
   - Shows the guardian dashboard when logged in.
 - `/api/signup/guardian`
   - Creates a guardian account before login.
-  - Requires a one-time email verification token and validates email/phone format, birth date, app ID format, password strength, duplicates, and required terms agreement.
+  - Requires a one-time phone verification token and validates email/phone format, birth date, app ID format, password strength, duplicates, and required terms agreement.
   - Stores PBKDF2 password hash only; plaintext passwords are never stored.
 - `/api/signup/complete`
   - Completes signup information for an already authenticated SNS user.
-  - Uses the current session's guardian row and updates name, phone, birth date, verified email, account data, and required terms timestamps.
+  - Uses the current session's guardian row and updates name, verified phone, birth date, email, account data, and required terms timestamps.
   - Rejects unauthenticated requests.
-- `/api/signup/email/send`
-  - Sends a six-digit signup code through Resend after email and duplicate checks.
-- `/api/signup/email/verify`
-  - Returns a 15-minute one-time token after server-side code verification.
 - `/api/signup/phone/send`, `/api/signup/phone/verify`
-  - Retained but hidden and disabled by default for rollback only.
+  - Send and verify six-digit codes through Solapi for signup and authenticated guardian phone changes.
+- `/api/signup/email/send`, `/api/signup/email/verify`
+  - Retained as a disabled Resend fallback and return HTTP 410 by default.
 - `/api/auth/[...nextauth]`
   - Handles NextAuth routes.
   - Includes provider callback routes:

@@ -7280,3 +7280,47 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Formula analysis, DB/UI implementation, compatibility safeguards, and isolated verification: about 50 minutes.
+
+## 2026-08-03 KST - Solapi SMS Signup and Guardian Phone Reverification
+
+### User Requirement
+- Restore signup verification from Resend email to SMS.
+- Use the signed-in Solapi account for production SMS delivery.
+- Require SMS verification every time a guardian changes the contact phone number.
+- Preserve the email implementation in source while hiding and disabling it.
+- Configure Vercel, push to GitHub, deploy, and test the live service.
+
+### Implementation
+- Added the official `solapi` Node.js SDK and a server-only sending adapter in `lib/sms.js`.
+- Activated SMS by default with `SIGNUP_SMS_VERIFICATION_ENABLED=true`; disabled email routes with `SIGNUP_EMAIL_VERIFICATION_ENABLED=false` and HTTP 410 responses.
+- Restored the six-digit SMS-first flow for direct signup and first-time SNS signup while preserving SNS name/email prefill.
+- Added `GuardianPhoneVerification` to the guardian information screen. A changed contact number cannot be saved without an authenticated, guardian-bound verification token.
+- Added the `guardian_phone_change` purpose, duplicate-phone rejection, one-time token consumption, and `phone_verified_at` refresh.
+- Increased DB schema version from 33 to 34 and added `guardian_id` and `provider_message_id` to `phone_verifications`.
+- Ordered the existing-DB migration so columns are added before the guardian index is created.
+- Kept the Resend package, routes, DB table, and Vercel variables as a disabled rollback path.
+
+### Solapi and Vercel Configuration
+- Created a dedicated Solapi server API credential and used the verified active sender number.
+- Stored `SOLAPI_API_KEY`, `SOLAPI_API_SECRET`, `SOLAPI_SENDER_NUMBER`, and both verification feature flags as encrypted Vercel Production and Development variables.
+- No credential value was written to Git, logs, or deliverables.
+- The Vercel serverless environment has no fixed outbound IP, so the Solapi credential permits all IPs and is protected by server-only storage.
+
+### Verification
+- `npm run build`: passed on Next.js 16.2.11 with 28 generated routes.
+- `git diff --check`: passed; only expected Windows line-ending notices were reported.
+- Schema 33 migration fixture upgraded to version 34 with both new columns and `idx_phone_verifications_guardian` present.
+- Isolated direct-signup API flow passed: invalid number rejection, send, wrong-code rejection, verification token issuance, successful signup, and token reuse rejection.
+- Authenticated guardian phone-change flow passed: send, verify, save, changed current number display, and unverified save rejection.
+- Email send route returned HTTP 410 while disabled.
+- Mobile browser layout showed all six verification inputs on one row.
+- Solapi real API test completed with one success and zero failures in the provider message log.
+- `npm audit --omit=dev` still reports three existing high indirect findings through Next.js-bundled PostCSS/Sharp; npm offers only an invalid Next.js 9.3.3 downgrade, so no forced rewrite was applied.
+
+### Deliverables
+- `deliverables/AUTH_PHONE_VERIFICATION.md`
+- `deliverables/SOLAPI_SMS_PHONE_VERIFICATION.md`
+- Updated `deliverables/AUTH_EMAIL_VERIFICATION.md`, `deliverables/AUTH_SETUP.md`, `deliverables/README.md`, and `.env.example`.
+
+### Time Spent
+- Solapi setup, DB/API/UI implementation, real/isolated verification, migration hardening, documentation, and release work: about 75 minutes.

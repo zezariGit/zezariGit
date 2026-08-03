@@ -9,6 +9,7 @@ import {
 } from "./actions";
 import AdCampaignModal from "./ad-campaign-modal";
 import FormSubmitButton from "./form-submit-button";
+import GuardianPhoneVerification from "./guardian-phone-verification";
 import KakaoPostcodeAddress from "./kakao-postcode-address";
 import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
 import ModalScrollLock from "./modal-scroll-lock";
@@ -497,10 +498,7 @@ function GuardianForm({ guardian, session }) {
                   </label>
                 </>
               )}
-              <label>
-                연락받을 전화번호
-                <input name="phone" defaultValue={guardian.phone || ""} required />
-              </label>
+              <GuardianPhoneVerification currentPhone={guardian.phone || ""} />
               <label>
                 생년월일
                 <input name="birthDate" type="date" defaultValue={guardian.birth_date || ""} />
