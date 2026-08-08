@@ -7372,3 +7372,12 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Specification and portal analysis, API authentication diagnosis, DB/API/UI implementation, real controlled verification, and documentation: about 85 minutes.
+
+### Release Result
+- GitHub implementation commit `8b1f978` was pushed to `main`.
+- Vercel production deployment `dpl_2oQUBGrRSUxueNoRGCrU7PNzcNRN` reached `READY`.
+- The latest deployment was assigned to both `https://zezari.family` and `https://zezari.vercel.app`.
+- Both domains and an eligible public QR page returned HTTP 200.
+- The production safe-phone API returned HTTP 200, completed a real provider assignment, and the controlled number was immediately released in Bizcall and Turso without placing a call.
+- Production Turso remained at schema version 35 and the final assignment source was recorded as `provider_auto`.
+- Production browser verification confirmed the call-time button and phone-shaped guardian-message redaction.

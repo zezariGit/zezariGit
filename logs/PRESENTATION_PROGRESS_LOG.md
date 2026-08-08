@@ -5338,3 +5338,11 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 규격·포털 분석, API 인증 진단, DB·API·화면 구현, 실연동 검증, 문서화: 약 85분
+
+### 운영반영 결과
+- GitHub `main` 구현 커밋 `8b1f978` 푸시 완료
+- Vercel 운영 배포 `dpl_2oQUBGrRSUxueNoRGCrU7PNzcNRN` READY
+- `zezari.family`, `zezari.vercel.app`, 활성 공개 QR 페이지 HTTP 200
+- 운영 API 실제 자동 배정 성공 후 전화 발신 없이 즉시 비즈콜·DB 해제
+- 운영 DB 스키마 35와 공급자 자동 배정 이력 확인
+- 운영 브라우저에서 통화 시점 버튼과 보호자 메시지 전화번호 마스킹 확인

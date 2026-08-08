@@ -93,5 +93,6 @@ BIZCALL_TIMEOUT_MS=8000
 - 실제 비즈콜 자동 배정, 컬러링·알림멘트 적용, 1시간 자동 해제 갱신 성공
 - 시험 번호는 실제 전화 발신 없이 즉시 비즈콜과 DB에서 해제
 - 보호자 원전화번호가 공개 응답에 포함되지 않음
+- Vercel 운영 배포 후 `zezari.family`, `zezari.vercel.app`, 공개 QR 페이지와 통화 배정 API 정상 응답 확인
 
 참고 규격: `reference/Bizcall 서비스 [안심번호] HTTPS 연동규격서_v_1_29(2024).pdf`
