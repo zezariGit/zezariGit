@@ -30,6 +30,7 @@ import {
   setProductOrderFulfillment,
   setQrAdminMemo,
   setQrActive,
+  setQrAdminTestActivation,
   setQrLifecycle,
   setQrSubject,
   setSubscriptionAdminMemo,
@@ -155,6 +156,24 @@ export async function setQrActiveAction(formData) {
             ? "QR이 활성화되었습니다. 24시간 이내 비활성화는 구독기간에 포함하지 않았습니다."
             : "QR이 활성화되었습니다.";
   redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), message));
+}
+
+export async function setQrAdminTestActivationAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  let result;
+  try {
+    result = await setQrAdminTestActivation(formData);
+    revalidatePath("/admin");
+    revalidatePath("/find/[key]", "page");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=subjects"), error.message || "QR 수동 활성화에 실패했습니다.", "error"));
+  }
+  const message = result?.active
+    ? "구매 없이 QR이 수동 활성화되었습니다. 주문·결제 내역은 생성되지 않았습니다."
+    : "QR의 관리자 테스트 활성화가 해제되었습니다.";
+  redirect(withNotice(getReturnTo(formData, "/admin?section=subjects"), message));
 }
 
 export async function setQrLifecycleAction(formData) {

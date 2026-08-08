@@ -116,6 +116,15 @@ Project: REAL_QR_FIND / zezari
   - The server checks both `code` and `public_key` before insert.
   - Generation retries on collision.
 
+### Subject QR Manual Test Activation
+- The subject detail QR tab provides `구매 없이 QR 수동 활성화` for administrators.
+- The override applies only to the selected QR and does not create order, payment, subscription, or revenue records.
+- Public subject details, on-demand safe-phone calling, and location sharing are enabled during the test override.
+- `qr_codes.activation_source` distinguishes `admin_test` from `guardian_purchase`.
+- A reversible `수동 활성화 해제` control returns the QR to activation-waiting state.
+- Existing purchase activations cannot be overwritten by the test action.
+- Unmatching, rematching, or discarding a QR clears its activation source so access cannot leak to another subject.
+
 ## Files
 - `lib/db.js`
 - `app/admin/page.js`

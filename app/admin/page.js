@@ -48,6 +48,7 @@ import {
   setProductOrderFulfillmentAction,
   setQrAdminMemoAction,
   setQrActiveAction,
+  setQrAdminTestActivationAction,
   setQrLifecycleAction,
   setQrSubjectAction,
   setAdminSubjectAdMemoAction,
@@ -3753,6 +3754,7 @@ function SubjectManagementSection({ adminSubjectsData, selectedSubjectQrImage })
                       <div>
                         <div className="guardian-detail-row"><strong>QR 번호</strong><span className="inline-scroll-value">{selectedSubject.qr_code || "미매칭"}</span>{selectedSubject.qr_target_url && <Link href={selectedSubject.qr_target_url} target="_blank">상세보기 &gt;</Link>}</div>
                         <div className="guardian-detail-row"><strong>QR 상태</strong><span>{qrAdminStateLabel(selectedSubject)}</span></div>
+                        <div className="guardian-detail-row"><strong>활성화 구분</strong><span>{qrActivationSourceLabel(selectedSubject.qr_activation_source)}</span></div>
                         <div className="guardian-detail-row"><strong>발급일</strong><span>{formatRecentDateTime(selectedSubject.qr_updated_at)}</span></div>
                         <div className="guardian-detail-row"><strong>활성화 시점</strong><span>{formatRecentDateTime(selectedSubject.qr_activated_at)}</span></div>
                         <div className="guardian-detail-row"><strong>기간 보정 시작</strong><span>{formatRecentDateTime(selectedSubject.qr_subscription_hold_started_at)}</span></div>
@@ -3760,6 +3762,34 @@ function SubjectManagementSection({ adminSubjectsData, selectedSubjectQrImage })
                         <div className="guardian-detail-row"><strong>최근 수정일</strong><span>{formatRecentDateTime(selectedSubject.qr_updated_at)}</span></div>
                       </div>
                     </article>
+                    {selectedSubject.qr_id && (
+                      <div className="subject-qr-toggle-control admin-test-activation-control">
+                        <div>
+                          <strong>관리자 수기 테스트</strong>
+                          <p>
+                            {selectedSubject.qr_activation_source === "admin_test"
+                              ? "현재 이 대상자 QR은 결제 없이 테스트 활성화되어 있습니다."
+                              : selectedSubject.qr_activated_at
+                                ? "정상 구매 절차로 활성화된 QR은 테스트 활성화로 덮어쓰지 않습니다."
+                                : "해당 QR만 공개 페이지, 안심번호, 위치공유를 결제 없이 테스트합니다. 주문·결제·구독 내역은 생성되지 않습니다."}
+                          </p>
+                        </div>
+                        {(!selectedSubject.qr_activated_at || selectedSubject.qr_activation_source === "admin_test") && (
+                          <form action={setQrAdminTestActivationAction}>
+                            <input type="hidden" name="qrId" value={selectedSubject.qr_id} />
+                            <input type="hidden" name="subjectId" value={selectedSubject.id} />
+                            <input type="hidden" name="activate" value={selectedSubject.qr_activation_source === "admin_test" ? "0" : "1"} />
+                            <input type="hidden" name="returnTo" value={buildSubjectAdminUrl(filters, selectedSubject.id)} />
+                            <FormSubmitButton
+                              className={selectedSubject.qr_activation_source === "admin_test" ? "plain-button" : "activate-button"}
+                              pendingText={selectedSubject.qr_activation_source === "admin_test" ? "해제중" : "활성화중"}
+                            >
+                              {selectedSubject.qr_activation_source === "admin_test" ? "수동 활성화 해제" : "구매 없이 QR 수동 활성화"}
+                            </FormSubmitButton>
+                          </form>
+                        )}
+                      </div>
+                    )}
                     {selectedSubject.qr_id && (
                       <div className="subject-qr-toggle-control">
                         <div>
@@ -4707,6 +4737,12 @@ function qrAdminStateLabel(subject) {
   if (!Number(subject.qr_is_active || 0)) return "비활성";
   if (subject.qr_activated_at) return "활성";
   return "활성화 대기";
+}
+
+function qrActivationSourceLabel(source) {
+  if (source === "admin_test") return "관리자 테스트";
+  if (source === "guardian_purchase") return "보호자 구매 활성화";
+  return "-";
 }
 
 function qrAdminStateClass(subject) {

@@ -70,8 +70,9 @@ export default async function FindPage({ params, searchParams }) {
   }
 
   const owner = Boolean(session && getGuardianKey(session) === data.guardian_google_id);
-  const subscriptionReady = data.subscription_status === "ready";
-  const subscriptionActive = hasActiveAccess(
+  const adminTestActive = data.qr_activation_source === "admin_test";
+  const subscriptionReady = !adminTestActive && data.subscription_status === "ready";
+  const subscriptionActive = adminTestActive || hasActiveAccess(
     data.subscription_status,
     data.subscription_period_end,
     data.subscription_access_type

@@ -7381,3 +7381,31 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - The production safe-phone API returned HTTP 200, completed a real provider assignment, and the controlled number was immediately released in Bizcall and Turso without placing a call.
 - Production Turso remained at schema version 35 and the final assignment source was recorded as `provider_auto`.
 - Production browser verification confirmed the call-time button and phone-shaped guardian-message redaction.
+
+## 2026-08-08 KST - Admin Subject QR Manual Test Activation
+
+### User Requirement
+- Add an administrator control in Subject Management detail view to activate a subject QR without a product purchase.
+- Allow manual end-to-end testing of the public QR flow.
+
+### Implementation
+- Added `구매 없이 QR 수동 활성화` and reversible `수동 활성화 해제` controls to the subject detail QR tab.
+- Added server-side administrator authorization and QR/subject ownership validation.
+- Added `qr_codes.activation_source` and raised the DB schema version from 35 to 36.
+- Implemented a subject-specific `admin_test` override without creating or modifying orders, payments, subscriptions, or revenue.
+- Connected the override to public subject information, on-demand safe-phone requests, and location sharing.
+- Preserved normal purchase activation as `guardian_purchase` and blocked test activation from overwriting it.
+- Cleared activation timestamps and sources when a QR is unassigned, rematched, or discarded.
+
+### Verification
+- `npm run build`: passed on Next.js 16.2.11 with all 28 routes generated.
+- `git diff --check`: passed apart from expected Windows line-ending notices.
+- Verified the UI only shows activation for a pending QR or deactivation for an `admin_test` QR.
+- Verified public access checks recognize only the selected QR's `admin_test` source and do not grant guardian-wide subscription access.
+
+### Deliverables
+- `deliverables/ADMIN_SUBJECT_QR_MANUAL_ACTIVATION.md`
+- Updated `deliverables/QR_MANAGEMENT.md`.
+
+### Time Spent
+- Data model, server action, administrator UI, public-flow integration, verification, and documentation: about 25 minutes.
