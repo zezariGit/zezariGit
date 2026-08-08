@@ -7409,3 +7409,10 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Data model, server action, administrator UI, public-flow integration, verification, and documentation: about 25 minutes.
+
+### Release Result
+- GitHub commit `4b8a8c9` (`feat: add admin QR test activation`) was pushed to `main`.
+- Vercel production deployment `dpl_64vzmo6sKREkz61S4ZgNgo2m7Pth` reached `READY`.
+- The deployment was assigned to both `https://zezari.family` and `https://zezari.vercel.app`.
+- The deployment URL, both production domains, and a matched public QR route returned HTTP 200.
+- Production Turso migrated from schema version 35 to 36 and includes `qr_codes.activation_source`.

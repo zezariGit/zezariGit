@@ -5372,3 +5372,9 @@ This file is the cumulative presentation-ready project log. It is written so the
 
 ### 반영시간
 - 데이터·서버액션·관리자화면·공개흐름·문서 반영: 약 25분
+
+### 운영반영 결과
+- GitHub `main` 커밋 `4b8a8c9` 푸시 완료
+- Vercel 운영 배포 `dpl_64vzmo6sKREkz61S4ZgNgo2m7Pth` READY
+- `zezari.family`, `zezari.vercel.app`, 매칭된 공개 QR 페이지 HTTP 200
+- 운영 Turso 스키마 36 및 QR 활성화 출처 컬럼 반영 확인
