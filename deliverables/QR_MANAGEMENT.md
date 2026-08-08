@@ -90,7 +90,7 @@ Project: REAL_QR_FIND / zezari
 - Inactive key: shows a disabled QR message.
 - Active but unassigned key: shows a not-yet-connected QR message.
 - Active assigned key: shows the managed subject information, guardian message/audio when present, the safe-number contact action, and a single `위치공유` action.
-- The public QR page does not render the guardian's name, email, address, or raw phone number. A valid page access requests a 24-hour number from `safe_phone_pool` and shows only that number as `안심번호`; if allocation is unavailable it shows `안심번호 준비중`.
+- The public QR page does not render the guardian's name, email, address, or raw phone number. It requests a temporary 050 number only when the finder presses `안심번호로 보호자에게 전화하기`; ordinary page views allocate nothing.
 - The former `보호자에게 알리기` button and finder contact/location-description fields have been removed.
 - `위치공유` requests the device location permission and sends only latitude, longitude, and accuracy from the browser.
 - The subject photo uses a rounded portrait frame that is approximately 1.7 times larger than the previous circular image.

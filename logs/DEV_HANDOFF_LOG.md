@@ -7334,3 +7334,41 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Production browser verification confirmed the SMS-first signup copy, six code boxes on one row, no horizontal overflow, and no Next.js error overlay.
 - Follow-up detected that the manually managed `zezari.vercel.app` alias still pointed to a two-day-old deployment even though it returned HTTP 200.
 - Reassigned `zezari.vercel.app` to the latest READY deployment and verified HTTP 410 for disabled email verification, HTTP 400 for invalid SMS input, and the guardian `인증번호 받기` control on the authenticated screen.
+
+## 2026-08-08 KST - Bizcall On-Demand Safe-Phone Assignment
+
+### User Requirement
+- Do not reserve or preload 100 Bizcall numbers in the application.
+- Assign a temporary safe number only when a finder actually chooses to call a guardian.
+- Allow provider inventory to grow beyond 100 numbers without source changes or local-number registration.
+- Apply the contract coloring and guardian announcement, update Vercel, deploy, and run a real integration test.
+
+### Implementation
+- Replaced QR-page-load allocation with `POST /api/find/[key]/safe-phone` from a client call button.
+- Added Bizcall `/link/auto_expire_mapp.do` provider-side automatic selection with a one-hour expiry.
+- Applied the contract coloring and announcement through `/link/set_vn.do`, then reconfirmed expiry through `/link/auto_expire_update.do`.
+- Corrected Bizcall authentication to Base64-encode the MD5 hexadecimal text expected by the live account.
+- Added request rate limiting, a per-guardian concurrency lock, valid-lease reuse, provider-full handling, and compensation release after partial failure.
+- Converted `safe_phone_pool` into provider-returned observed state with `allocation_source`; it is no longer application inventory.
+- Added `safe_phone_call_requests` with a non-reversible requester hash and no raw IP or guardian phone.
+- Updated the public page so page views allocate nothing and the real guardian phone is never a fallback.
+- Reworked the administrator safe-phone page into automatic assignment status, history, CSV, and emergency release controls.
+- Increased Turso schema version from 34 to 35.
+
+### Verification
+- `npm run build`: passed with the new dynamic safe-phone API route.
+- `git diff --check`: passed apart from expected Windows line-ending notices.
+- Production Turso schema migration reached version 35 with the new column and request table.
+- Active QR page returned HTTP 200, displayed the call-time button, omitted the old pending-number state, and generated no call request on page view.
+- Live Bizcall test completed automatic assignment, coloring/announcement application, and expiry update.
+- The controlled test placed no telephone call and immediately released the number in both Bizcall and Turso.
+- No provider credential, contract ID, private phone, or assigned number was written to source logs or deliverables.
+- Public-screen verification found a guardian message containing a directly typed phone number; public find data now replaces phone-shaped text with the safe-phone button guidance while preserving the authenticated source record.
+
+### Deliverables
+- `deliverables/BIZCALL_SAFE_PHONE_POOL.md`
+- `deliverables/BIZCALL_ON_DEMAND_CALL_ASSIGNMENT.md`
+- Updated `deliverables/DATABASE_SCHEMA.md`, `QR_MANAGEMENT.md`, `USER_MANUAL.md`, `README.md`, and `image_prompts/IMAGE_PROMPTS.md`.
+
+### Time Spent
+- Specification and portal analysis, API authentication diagnosis, DB/API/UI implementation, real controlled verification, and documentation: about 85 minutes.

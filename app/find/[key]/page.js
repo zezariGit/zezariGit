@@ -7,6 +7,7 @@ import { getFindPageDataByKey } from "../../../lib/db";
 import { formatDateOnly } from "../../../lib/date-format";
 import LocationShareButton from "./location-share-button";
 import GuardianVoicePlayer from "./guardian-voice-player";
+import SafePhoneCallButton from "./safe-phone-call-button";
 
 export const dynamic = "force-dynamic";
 
@@ -159,16 +160,7 @@ export default async function FindPage({ params, searchParams }) {
           </div>
         </div>
 
-        <div className="find-key-box find-safe-phone-card">
-          <span>안심번호</span>
-          {data.safe_phone ? (
-            <a className="find-safe-phone-link" href={`tel:${String(data.safe_phone).replace(/\D/g, "")}`}>
-              {data.safe_phone}
-            </a>
-          ) : (
-            <strong>안심번호 준비중</strong>
-          )}
-        </div>
+        <SafePhoneCallButton qrKey={data.public_key} />
 
         <div className="find-guardian-message">
           <h2>보호자 안내</h2>

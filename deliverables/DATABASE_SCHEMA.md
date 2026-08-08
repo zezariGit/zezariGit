@@ -4,7 +4,7 @@ Project: REAL_QR_FIND / zezari
 
 ## Status
 - Implemented in Turso.
-- Current schema version: `31`.
+- Current schema version: `35`.
 
 ## Tables
 
@@ -39,7 +39,11 @@ Stores one guardian profile per logged-in Google user.
 
 ### safe_phone_pool
 
-Stores administrator-registered 050 numbers and their current 24-hour guardian lease. `version` prevents two guardians from claiming the same number concurrently. When every number is assigned, the oldest assignment is replaced.
+Stores 050 numbers returned by Bizcall on actual finder call requests. It is an observed-state table, not a preloaded inventory. `allocation_source='provider_auto'` identifies the active call-time design.
+
+### safe_phone_call_requests
+
+Stores rate-limited call-button requests, QR/guardian/subject references, a non-reversible requester hash, assignment result, reuse flag, and expiry. Raw requester IP and guardian phone values are not stored here.
 
 ### safe_phone_assignment_history
 
@@ -47,7 +51,7 @@ Stores every assignment, expiry, manual release, phone-change release, and oldes
 
 ### safe_phone_assignment_locks
 
-Stores a short-lived per-guardian lock while a Bizcall assignment request is running so concurrent QR page loads cannot allocate multiple 050 numbers to one guardian.
+Stores a short-lived per-guardian lock while a Bizcall call-time assignment request is running so repeated button presses cannot allocate multiple 050 numbers to one guardian.
 
 ### subjects
 
@@ -327,7 +331,7 @@ Stores the browser-rendered advertisement poster separately so advertisement lis
 - QR activation sets `qr_codes.activated_at`; if the guardian has a paid subscription in `ready` status, activation starts the subscription period.
 - When a QR is assigned and activated, the public find page shows subject basic information and configured guardian response fields so the finder can respond.
 - Subject records can include a guardian message and guardian recorded audio. The public QR page shows/plays those values when present.
-- Public QR pages must not expose `guardians.phone`. A valid QR access reuses or allocates a 24-hour number from `safe_phone_pool`; when no usable number or provider connection is available, it shows `안심번호 준비중` without a raw-phone fallback.
+- Public QR pages must not expose `guardians.phone`. Page views do not allocate numbers. A valid call-button request reuses an active short lease or asks Bizcall to auto-assign a number; provider failure never falls back to the raw phone.
 - Each subject receives one QR assignment. Because each guardian can register up to 4 subjects, one guardian can have up to 4 assigned QR codes.
 - Logged-in guardians can register a browser push subscription from the dashboard.
 - Public find pages can call the notification API to send a push message to the assigned guardian.

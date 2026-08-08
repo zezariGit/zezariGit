@@ -26,7 +26,8 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `PUSH_NOTIFICATION_SETUP.md`: guardian browser push registration and QR find-page notification flow.
 - `PUBLIC_GUARDIAN_VOICE_PLAYBACK.md`: public QR page guardian voice playback button, states, access conditions, and privacy notes.
 - `BIZCALL_SAFE_PHONE_INTEGRATION.md`: Bizcall 050 issuance/remapping flow, guardian sync states, privacy rules, and server-only environment variables.
-- `BIZCALL_SAFE_PHONE_POOL.md`: 24-hour shared 050-number pool, QR-access assignment, oldest-lease recycling, concurrency controls, and administrator pool management.
+- `BIZCALL_SAFE_PHONE_POOL.md`: call-time Bizcall auto assignment, one-hour expiry, concurrency controls, privacy, administrator history, and real API verification.
+- `BIZCALL_ON_DEMAND_CALL_ASSIGNMENT.md`: concise handoff pointer for the active provider-managed allocation architecture.
 - `PRIVACY_POLICY_PAGE.md`: user-facing privacy policy route, footer-link placement, current data handling scope, and maintenance rules.
 - `ADVERTISING_SETUP.md`: dashboard subject advertisement modal, admin daily rate, advertisement progress foundation, and Meta API preparation.
 - `META_AD_PUBLISHING.md`: browser-captured ad creative, Meta image/campaign/ad-set/creative/ad publishing flow, readiness checks, and remaining Page requirement.

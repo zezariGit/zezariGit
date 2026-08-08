@@ -8788,12 +8788,29 @@ button:disabled:hover {
 }
 
 .find-safe-phone-card {
+  display: grid;
+  gap: 10px;
   align-items: start;
+  padding: var(--space-md);
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: var(--radius-md);
+  background: var(--c-accent-light);
 }
 
-.find-safe-phone-card .find-safe-phone-link,
-.find-safe-phone-card strong {
+.find-safe-phone-label {
+  color: var(--c-primary-dark);
+  font-weight: 800;
+}
+
+.find-safe-phone-card p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.find-safe-phone-card .find-safe-phone-link {
   font-size: 1.05rem;
+  font-weight: 800;
+  text-align: center;
 }
 
 .find-action-stack {
