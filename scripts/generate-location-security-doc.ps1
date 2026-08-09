@@ -64,8 +64,14 @@ function Add-EvidenceImage {
   param(
     [Parameter(Mandatory)]$Document,
     [Parameter(Mandatory)][string]$Path,
-    [Parameter(Mandatory)][string]$Caption
+    [Parameter(Mandatory)][string]$Caption,
+    [switch]$PageBreakBefore
   )
+  if ($PageBreakBefore) {
+    $breakRange = $Document.Content
+    $breakRange.Collapse(0)
+    $breakRange.InsertBreak(7)
+  }
   Add-Paragraph -Document $Document -Text $Caption -Style -3 -SpaceAfter 4
   $range = $Document.Content
   $range.Collapse(0)
@@ -156,22 +162,24 @@ try {
 
   Add-Paragraph -Document $document -Text "4.1 주요설비내역" -Style -2
   Add-Table -Document $document -Rows @(
-    @("장비항목", "활용기능", "설치·운영장소"),
-    @("Vercel CDN·웹 호스팅", "HTTPS, PWA, 정적자원", "Vercel 클라우드"),
-    @("Vercel Functions", "인증, 위치공유 API, 암호화·파기", "Vercel 서버리스 실행환경"),
-    @("Turso/libSQL", "회원·QR·위치 암호문·취급대장·접근로그", "Turso 클라우드"),
-    @("GitHub", "소스·변경·배포 이력", "GitHub 클라우드"),
-    @("관리자 업무용 PC", "운영·민원·보안 점검", "사업장 내 지정 단말"),
-    @("사업장 네트워크", "관리자 인터넷 접속", "사업장 내 네트워크 장비")
+    @("구분", "장비항목·현재규격·활용기능"),
+    @("1", "Vercel Cloud 웹·애플리케이션 논리서버: 프로젝트 zezari, Next.js 16.3.0, Node.js 24.x, Production READY, Function iad1. 글로벌 CDN·HTTPS·PWA·SSR 및 인증·QR·결제·광고·위치공유 API 처리"),
+    @("2", "Turso Cloud DB 논리서버: libSQL/SQLite 3.47.0, aws-ap-northeast-1, 스키마 37, 업무 테이블 37개, 논리용량 6.68 MB. 회원·QR·업무데이터·위치 암호문·동의·취급대장·접근기록 저장"),
+    @("3", "GitHub Cloud 형상·배포이력 저장소: zezariGit/zezariGit, main. 소스·변경이력·배포 기준점과 Vercel Production 자동 배포 연동, .env.local 저장소 제외"),
+    @("4", "관리자 업무용 PC·사업장 네트워크: 관리자 로그인, 권한·대장·민원·사고대응. 실제 모델·OS·자산번호·설치주소·백신·화면잠금 자료는 운영자 첨부"),
+    @("5", "발견자·보호자 스마트폰: QR 스캔, 단발성 GPS 위치 산출, Web Push 수신. 회사 보유 설비가 아닌 이용자 소유 외부 단말")
   )
 
   Add-Paragraph -Document $document -Text "4.2 설치장소 및 확인서류" -Style -2
-  Add-Paragraph -Document $document -Text "클라우드 장비는 Vercel 및 Turso가 운영하는 데이터센터에 설치된다. 제출 시 Vercel 프로젝트·도메인·기능·Invoice, Turso 데이터베이스·리전·백업·Invoice, GitHub 저장소 권한 화면을 첨부한다. 별도 IDC 계약서가 없으면 서비스 제공자명과 이용 중인 기능이 확인되는 계정정보·청구 화면으로 대체한다. 관리자 PC와 네트워크 장비는 사업장 주소, 장비 사진, 백신 실시간 감시, 최근 업데이트일, OS 자동업데이트와 화면잠금 자료를 첨부한다. 비밀키와 토큰 값은 반드시 마스킹한다." -Style -1
+  Add-Paragraph -Document $document -Text "자체 물리 서버는 없고 Vercel·Turso·GitHub 관리형 클라우드의 논리설비를 사용한다. 현재 Vercel Function은 iad1(Washington, D.C., USA), Turso DB는 aws-ap-northeast-1(Tokyo, Japan)이다. 국외 처리·이전 고지와 서버·DB 리전 정렬 여부를 검토한다. 제출 시 Vercel 프로젝트·도메인·기능·Invoice, Turso 데이터베이스·리전·백업·Invoice, GitHub 저장소 권한 화면을 첨부한다. 별도 IDC 계약서가 없으면 제공자명과 이용 기능이 확인되는 계정정보·청구 화면으로 대체한다. 관리자 PC와 네트워크 장비는 실제 모델·설치주소·백신·업데이트·화면잠금 자료를 첨부하며 비밀키와 토큰은 마스킹한다." -Style -1
 
   Add-Paragraph -Document $document -Text "5. 구현 증빙 화면" -Style -2
   Add-EvidenceImage -Document $document -Path "C:\REAL_QR_FIND\deliverables\location-service\evidence\01-location-security-dashboard.png" -Caption "[증빙 1] 위치정보 보안관리: 암호화·자동파기·권한표·취급대장·접근기록"
-  Add-EvidenceImage -Document $document -Path "C:\REAL_QR_FIND\deliverables\location-service\evidence\02-admin-social-login.png" -Caption "[증빙 2] 관리자 식별 및 인증 화면"
-  Add-EvidenceImage -Document $document -Path "C:\REAL_QR_FIND\deliverables\location-service\evidence\03-location-consent.png" -Caption "[증빙 3] 발견자 위치정보 별도 동의 화면"
+  Add-EvidenceImage -Document $document -Path "C:\REAL_QR_FIND\deliverables\location-service\evidence\02-admin-social-login.png" -Caption "[증빙 2] 관리자 식별 및 인증 화면" -PageBreakBefore
+  Add-EvidenceImage -Document $document -Path "C:\REAL_QR_FIND\deliverables\location-service\evidence\03-location-consent.png" -Caption "[증빙 3] 발견자 위치정보 별도 동의 화면" -PageBreakBefore
+  Add-EvidenceImage -Document $document -Path "C:\REAL_QR_FIND\deliverables\location-service\evidence\04-vercel-project-deployment.png" -Caption "[증빙 4] Vercel 프로젝트·운영배포·Function 리전 확인" -PageBreakBefore
+  Add-EvidenceImage -Document $document -Path "C:\REAL_QR_FIND\deliverables\location-service\evidence\05-turso-database-status.png" -Caption "[증빙 5] Turso 운영 DB·리전·스키마·논리용량 확인" -PageBreakBefore
+  Add-EvidenceImage -Document $document -Path "C:\REAL_QR_FIND\deliverables\location-service\evidence\06-github-repository-deployment.png" -Caption "[증빙 6] GitHub 저장소·운영 브랜치·배포연동 확인" -PageBreakBefore
 
   $end = $document.Content
   $end.Collapse(0)

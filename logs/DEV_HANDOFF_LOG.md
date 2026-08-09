@@ -7467,3 +7467,43 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Production responses included HSTS, MIME sniffing, frame, referrer, and geolocation permission headers.
 - Unauthenticated security-ledger export returned HTTP 401 and location submission without explicit consent returned HTTP 400.
 - Production Turso reported schema version 37, all seven security tables, and 16 expired raw-location destruction records.
+
+## 2026-08-09 KST - Production Major Equipment Inventory and Evidence
+
+### User Requirement
+- Complete business-plan section 4 with the actual REAL_QR_FIND infrastructure configuration.
+- Extract reliable Vercel, Turso, and GitHub operating data and provide filing-ready captures where possible.
+
+### Implementation
+- Classified the service as a managed-cloud logical-server architecture with no company-owned physical server.
+- Documented Vercel as the web/application logical server: project `zezari`, Next.js 16.3.0, Node.js 24.x, READY production deployment, and Function region `iad1`.
+- Documented Turso as the database logical server: libSQL/SQLite 3.47.0, `aws-ap-northeast-1`, schema 37, 37 business tables, and 6.68 MB logical size.
+- Documented GitHub as the source/change/deployment-history repository: `zezariGit/zezariGit`, `main`, Vercel production deployment linkage, and `.env.local` exclusion.
+- Separated administrator PC/network equipment, user-owned smartphones, and external APIs from the core logical servers.
+- Added a filing note that the current Vercel Function and Turso DB are in the United States and Japan respectively, requiring cross-border disclosure and region-alignment review.
+- Added a reusable metadata collector and a redacted evidence-image generator. No API key, token, secret, or original Turso host was printed.
+- Updated section 4.1, section 4.2, the supplemental DOCX/PDF, and the location-service deliverable index.
+
+### Verification
+- Confirmed the Vercel project, production deployment ID/status, domains, runtime, and Function region from local project metadata and `vercel inspect`.
+- Confirmed Turso region, database engine, schema version, table count, page count, page size, and logical size using read-only metadata queries.
+- Confirmed GitHub remote, branch, commit snapshot, deployment relationship, and `.env.local` ignore status from Git metadata.
+- Rendered the 56-page PDF and visually checked the major-equipment table and all six evidence pages for clipping, overlap, and orphaned captions.
+- Confirmed that evidence JSON and images contain no credential values.
+
+### Deliverables
+- `deliverables/location-service/MAJOR_EQUIPMENT_INVENTORY.md`
+- `deliverables/location-service/REAL_QR_FIND_위치기반서비스_사업계획서_보안보완본.docx`
+- `deliverables/location-service/REAL_QR_FIND_위치기반서비스_사업계획서_보안보완본.pdf`
+- `deliverables/location-service/evidence/04-vercel-project-deployment.png`
+- `deliverables/location-service/evidence/05-turso-database-status.png`
+- `deliverables/location-service/evidence/06-github-repository-deployment.png`
+- `scripts/collect-infrastructure-evidence.mjs`
+- `scripts/generate-infrastructure-evidence.ps1`
+
+### Time Spent
+- Infrastructure inspection, official-source verification, redacted evidence generation, document revision, and visual QA: about 55 minutes.
+
+### Filing Follow-up
+- Replace or supplement the generated CLI/API evidence with signed-in provider account and billing captures when filing guidance requires provider-native screenshots.
+- Attach current TLS certificate details, Vercel/Turso invoices, backup/encryption confirmation, administrator PC security evidence, and administrator MFA evidence.

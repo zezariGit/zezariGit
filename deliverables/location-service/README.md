@@ -17,6 +17,7 @@
 | `REAL_QR_FIND_위치기반서비스_사업계획서_보안보완본.docx` | 검토 요청사항과 실제 구현 증빙을 원본 뒤에 합친 Word 제출 검토본 |
 | `REAL_QR_FIND_위치기반서비스_사업계획서_보안보완본.pdf` | 보안 보완 내용과 증빙 화면을 포함한 전체 PDF 검토본 |
 | `LOCATION_SECURITY_COMPLIANCE.md` | 검토 항목별 구현 상태, 권한표, 데이터 흐름, 제출 증빙 안내 |
+| `MAJOR_EQUIPMENT_INVENTORY.md` | Vercel·Turso·GitHub 실제 운영정보 기반 주요설비·설치장소 기재안 |
 | `evidence/*.png` | 위치정보 보안관리, 관리자 인증, 발견자 별도 동의 구현 화면 |
 | `assets/*.png` | 보호조직, 서비스 시나리오, 데이터 흐름, 보호조치, 설비 구성도 |
 

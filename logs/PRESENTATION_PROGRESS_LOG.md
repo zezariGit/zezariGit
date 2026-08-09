@@ -5426,3 +5426,42 @@ This file is the cumulative presentation-ready project log. It is written so the
 - HSTS·MIME·프레임·리퍼러·위치권한 보안 응답 헤더 확인
 - 비로그인 취급대장 내보내기 HTTP 401, 별도 동의 없는 위치전송 HTTP 400 확인
 - 운영 Turso 스키마 37, 보안 테이블 7개, 만료 원본 위치 파기 16건 확인
+
+## 2026-08-09 - 실제 운영환경 기준 주요설비내역 및 증빙 작성
+
+### 요구내용
+- 현재 REAL_QR_FIND 구성에 맞춰 사업계획서 4.1 주요설비내역과 4.2 설치장소 작성
+- Vercel, Turso, GitHub에서 확인 가능한 운영값과 제출용 캡처 준비
+
+### 반영내용
+- 자체 물리서버가 없는 관리형 클라우드 논리서버 구조로 정리
+- Vercel 웹·애플리케이션 서버의 프로젝트, Next.js·Node.js 버전, 운영배포, 도메인, Function 리전 확인
+- Turso DB의 libSQL/SQLite 버전, 리전, 스키마, 테이블 수, 논리용량 확인
+- GitHub 소스·변경이력·배포기준 저장소와 Vercel 자동배포 연결 확인
+- 관리자 PC·사업장 네트워크와 이용자 스마트폰을 핵심 서버와 구분
+- OAuth, Toss, Solapi, Bizcall, Meta, Web Push, Kakao Map을 외부 연동 서비스로 별도 분류
+- 인증키·토큰·시크릿과 원본 DB 호스트를 제외한 증빙 이미지 3종 생성
+- 보안보완본 DOCX·PDF의 주요설비 표와 증빙 4~6 반영
+- 현재 Vercel Function은 미국, Turso DB는 일본에 있어 국외 처리·이전 고지 및 리전 정렬 검토사항 명시
+
+### 검증결과
+- Vercel 프로젝트·운영배포·도메인·런타임·리전 확인
+- Turso 운영 DB 엔진·스키마 37·업무 테이블 37개·논리용량 6.68 MB 확인
+- GitHub `main`, 운영 기준 커밋, `.env.local` 제외, Vercel 배포 연결 확인
+- 56쪽 PDF 렌더링 후 주요설비 표와 증빙 6개 페이지의 잘림·겹침·제목 분리 여부 확인
+- 생성된 JSON·이미지에 비밀값이 포함되지 않은 상태 확인
+
+### 공식 산출물
+- `deliverables/location-service/MAJOR_EQUIPMENT_INVENTORY.md`
+- `deliverables/location-service/REAL_QR_FIND_위치기반서비스_사업계획서_보안보완본.docx`
+- `deliverables/location-service/REAL_QR_FIND_위치기반서비스_사업계획서_보안보완본.pdf`
+- `deliverables/location-service/evidence/04-vercel-project-deployment.png`
+- `deliverables/location-service/evidence/05-turso-database-status.png`
+- `deliverables/location-service/evidence/06-github-repository-deployment.png`
+
+### 반영시간
+- 운영 인프라 확인, 공식자료 대조, 마스킹 증빙 생성, 문서 보완, 시각 검수: 약 55분
+
+### 제출 전 추가 준비
+- 제출기관이 제공자 원본 화면을 요구하면 Vercel·Turso·GitHub 로그인 상태의 계정·리전·청구 화면을 추가
+- TLS 인증서, Vercel·Turso Invoice, 백업·암호화 확인, 관리자 PC 보안, 관리자 MFA 자료 첨부

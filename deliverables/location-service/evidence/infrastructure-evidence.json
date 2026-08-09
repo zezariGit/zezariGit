@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-08-09T10:01:45.062Z",
+  "vercel": {
+    "provider": "Vercel managed cloud",
+    "projectName": "zezari",
+    "projectId": "prj_OeC7fuyodD8Y8ZGFvRQILEAdyLKp",
+    "framework": "Next.js 16.3.0",
+    "runtime": "Node.js 24.x",
+    "deploymentId": "dpl_5aGWLWv1kkTGrjhCWULZKdFiAYaq",
+    "deploymentStatus": "Ready",
+    "functionRegion": "iad1",
+    "domains": "zezari.family / zezari.vercel.app"
+  },
+  "turso": {
+    "provider": "Turso Cloud / libSQL",
+    "host": "zezariturso-***.aws-ap-northeast-1.turso.io",
+    "regionCode": "aws-ap-northeast-1",
+    "sqliteVersion": "3.47.0",
+    "schemaVersion": 37,
+    "schemaUpdatedAt": "2026-08-09 05:06:38",
+    "tableCount": 37,
+    "pageCount": 1710,
+    "pageSize": 4096,
+    "logicalBytes": 7004160
+  },
+  "github": {
+    "provider": "GitHub Cloud",
+    "repository": "https://github.com/zezariGit/zezariGit",
+    "branch": "main",
+    "commit": "430f06b3b17e",
+    "commitCount": 229,
+    "lastCommit": "2026-08-09T14:34:16+09:00",
+    "envIgnored": true,
+    "deploymentIntegration": "GitHub main push -> Vercel production deployment"
+  }
+}
+
