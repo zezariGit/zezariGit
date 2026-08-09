@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth";
+import { headers } from "next/headers";
 import Link from "next/link";
 import QRCode from "qrcode";
 import FormSubmitButton from "../form-submit-button";
@@ -23,6 +24,7 @@ import {
   getAdminData,
   getAdminInquiriesData,
   getAdminLocationSharesData,
+  getAdminLocationSecurityData,
   getAdminMessagesData,
   getAdminMessageTemplatesData,
   getAdminMissingReportsData,
@@ -57,6 +59,7 @@ import {
   saveAdminCouponAction,
   saveAdminMessageAction,
   saveAdminMessageTemplateAction,
+  saveLocationStaffPermissionAction,
   setSubscriptionAdminMemoAction,
   setSubscriptionAdminTestAction,
   setSubscriptionPlanPriceAction,
@@ -64,6 +67,11 @@ import {
 
 export default async function AdminPage({ searchParams }) {
   const session = await getServerSession(authOptions);
+  const requestHeaders = await headers();
+  const adminRequestMeta = {
+    ipAddress: (requestHeaders.get("x-forwarded-for") || "").split(",")[0]?.trim() || requestHeaders.get("x-real-ip") || "",
+    userAgent: requestHeaders.get("user-agent") || "",
+  };
   const resolvedSearchParams = await searchParams;
   const enabledProviders = getConfiguredProviderIds();
   const notice = resolvedSearchParams?.notice || "";
@@ -96,7 +104,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "orders", "subscriptions", "ads", "ad-pricing", "missing", "locations", "safe-phones", "notifications", "message-templates", "inquiries"].includes(resolvedSearchParams?.section)
+  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "orders", "subscriptions", "ads", "ad-pricing", "missing", "locations", "location-security", "safe-phones", "notifications", "message-templates", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -222,7 +230,12 @@ export default async function AdminPage({ searchParams }) {
   const adsData = activeSection === "ads" ? await getAdminAdsData(adFilters, selectedAdId) : null;
   const adPricingData = activeSection === "ad-pricing" ? await getAdPricingSettings() : null;
   const missingReportsData = activeSection === "missing" ? await getAdminMissingReportsData(missingFilters) : null;
-  const locationSharesData = activeSection === "locations" ? await getAdminLocationSharesData(locationFilters, selectedLocationShareId) : null;
+  const locationSharesData = activeSection === "locations"
+    ? await getAdminLocationSharesData(locationFilters, selectedLocationShareId, session, adminRequestMeta)
+    : null;
+  const locationSecurityData = activeSection === "location-security"
+    ? await getAdminLocationSecurityData(session, adminRequestMeta)
+    : null;
   const safePhonePoolData = activeSection === "safe-phones" ? await getAdminSafePhonePoolData(safePhoneFilters, selectedSafePhoneId) : null;
   const messagesData = activeSection === "notifications" ? await getAdminMessagesData(messageFilters, composeMessage ? "new" : selectedMessageId) : null;
   const messageTemplatesData = activeSection === "message-templates" ? await getAdminMessageTemplatesData(templateFilters, selectedTemplateId) : null;
@@ -265,6 +278,8 @@ export default async function AdminPage({ searchParams }) {
                 ? "실종신고 관리"
                 : activeSection === "locations"
                   ? "위치공유 관리"
+                  : activeSection === "location-security"
+                    ? "위치정보 보안관리"
                   : activeSection === "safe-phones"
                     ? "안심번호 관리"
                   : activeSection === "notifications"
@@ -301,6 +316,8 @@ export default async function AdminPage({ searchParams }) {
                 ? "실종신고 접수 현황과 광고 상태, 발견 여부를 조회합니다."
                 : activeSection === "locations"
                   ? "QR 공개 페이지에서 공유된 발견 위치와 지도 링크를 조회합니다."
+                  : activeSection === "location-security"
+                    ? "위치정보관리책임자·취급자 권한, 취급대장, 접근기록과 보호조치 상태를 관리합니다."
                   : activeSection === "safe-phones"
                     ? "실제 통화 요청 시 비즈콜이 자동 배정한 임시 안심번호와 해제 이력을 관리합니다."
                   : activeSection === "notifications"
@@ -349,6 +366,8 @@ export default async function AdminPage({ searchParams }) {
             <MissingReportManagementSection missingReportsData={missingReportsData} />
           ) : activeSection === "locations" ? (
             <LocationShareManagementSection locationSharesData={locationSharesData} />
+          ) : activeSection === "location-security" ? (
+            <LocationSecurityManagementSection data={locationSecurityData} />
           ) : activeSection === "safe-phones" ? (
             <SafePhonePoolManagementSection safePhonePoolData={safePhonePoolData} />
           ) : activeSection === "notifications" ? (
@@ -894,7 +913,16 @@ function MissingReportManagementSection({ missingReportsData }) {
 }
 
 function LocationShareManagementSection({ locationSharesData }) {
-  const { shares, selectedShare, filters } = locationSharesData;
+  const { shares, selectedShare, filters, accessDenied, access } = locationSharesData;
+
+  if (accessDenied) {
+    return (
+      <section className="admin-panel location-security-denied">
+        <h2>위치정보 접근 권한이 없습니다</h2>
+        <p>위치정보관리책임자가 해당 관리자 계정을 위치정보취급자로 지정해야 열람할 수 있습니다.</p>
+      </section>
+    );
+  }
 
   return (
     <div className="admin-master-detail admin-location-master-detail">
@@ -903,7 +931,11 @@ function LocationShareManagementSection({ locationSharesData }) {
           <h2>위치공유 목록</h2>
           <div className="admin-heading-actions">
             <span>{shares.length}건 조회</span>
-            <AdminExportButton filename="zezari-location-shares.csv" rows={locationShareExportRows(shares)} />
+            {access.canExport && (
+              <a className="plain-button" href="/api/admin/location-security/export?type=locations">
+                엑셀 다운로드
+              </a>
+            )}
           </div>
         </div>
 
@@ -952,8 +984,8 @@ function LocationShareManagementSection({ locationSharesData }) {
                 <span role="cell">{share.guardian_display_name || "보호자 미입력"}</span>
                 <span role="cell">{share.finder_contact || "미입력"}</span>
                 <span role="cell">{share.address_label || "지도 링크 확인"}</span>
-                <span role="cell">{formatCoordinate(share.latitude)}</span>
-                <span role="cell">{formatCoordinate(share.longitude)}</span>
+                <span role="cell">{share.destroyed_at ? "파기됨" : formatCoordinate(share.latitude)}</span>
+                <span role="cell">{share.destroyed_at ? "파기됨" : formatCoordinate(share.longitude)}</span>
               </Link>
             ))}
             {shares.length === 0 && <p className="empty-text">공유된 위치 이력이 없습니다.</p>}
@@ -979,6 +1011,7 @@ function LocationShareManagementSection({ locationSharesData }) {
             <section className="admin-detail-section">
               <h3>위치 정보</h3>
               <dl className="admin-detail-list">
+                <div><dt>보존 상태</dt><dd>{selectedShare.destroyed_at ? `파기 완료 (${formatRecentDateTime(selectedShare.destroyed_at)})` : `암호화 보관 중 (${formatRecentDateTime(selectedShare.retention_expires_at)}까지)`}</dd></div>
                 <div><dt>주소/설명</dt><dd>{selectedShare.address_label || "지도 링크 확인"}</dd></div>
                 <div><dt>위도</dt><dd>{formatCoordinate(selectedShare.latitude)}</dd></div>
                 <div><dt>경도</dt><dd>{formatCoordinate(selectedShare.longitude)}</dd></div>
@@ -1014,6 +1047,166 @@ function LocationShareManagementSection({ locationSharesData }) {
       </aside>
     </div>
   );
+}
+
+function LocationSecurityManagementSection({ data }) {
+  if (data.accessDenied) {
+    return (
+      <section className="admin-panel location-security-denied">
+        <h2>위치정보 보안관리 접근 권한이 없습니다</h2>
+        <p>위치정보관리책임자가 위치정보취급자 권한을 부여해야 합니다.</p>
+      </section>
+    );
+  }
+
+  const { access, staff, permissionHistory, ledger, accessLogs, status } = data;
+  return (
+    <div className="location-security-page">
+      <section className="location-security-summary" aria-label="위치정보 보호조치 현황">
+        <article><span>저장 암호화</span><strong>{status.encryptionConfigured ? "정상" : "설정 필요"}</strong><small>{status.encryptionAlgorithm}</small></article>
+        <article><span>원본 보존</span><strong>{status.rawRetentionHours}시간</strong><small>만료 후 자동 파기</small></article>
+        <article><span>보관 중</span><strong>{status.retainedLocationShares}건</strong><small>전체 {status.totalLocationShares}건</small></article>
+        <article><span>파기 완료</span><strong>{status.destroyedLocationShares}건</strong><small>좌표·지도 URL 삭제</small></article>
+        <article><span>로그인 차단</span><strong>{status.loginFailureLimit}회 실패</strong><small>{status.loginLockMinutes}분 접근 제한</small></article>
+      </section>
+
+      <section className="admin-panel location-protection-panel">
+        <div className="panel-heading">
+          <div>
+            <h2>기술적 보호조치</h2>
+            <p>운영 화면 캡처 시 아래 상태와 함께 Vercel 인증서·방화벽 화면을 별첨합니다.</p>
+          </div>
+        </div>
+        <div className="location-protection-grid">
+          <dl>
+            <div><dt>식별·인증</dt><dd>개별 계정, 비밀번호 규칙, 3회 실패 잠금</dd></div>
+            <div><dt>저장 암호화</dt><dd>{status.encryptionAlgorithm} + 키 분리 보관</dd></div>
+            <div><dt>구간 암호화</dt><dd>{status.transportEncryption}</dd></div>
+          </dl>
+          <dl>
+            <div><dt>단계별 권한</dt><dd>관리책임자 / 취급자 / 시스템 자동수집 분리</dd></div>
+            <div><dt>접근기록</dt><dd>{status.accessLogRetention}, 연속 해시로 위변조 확인</dd></div>
+            <div><dt>권한 이력</dt><dd>{status.permissionHistoryRetention} 보존</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <section className="admin-panel location-staff-panel">
+        <div className="panel-heading">
+          <div>
+            <h2>위치정보관리책임자·취급자</h2>
+            <p>수집은 시스템만 수행하며, 취급자는 이용·제공만 허용하는 최소권한 구조입니다.</p>
+          </div>
+        </div>
+        <div className="location-staff-table" role="table" aria-label="위치정보 취급자 권한">
+          <div className="location-staff-row header" role="row">
+            <span>관리자</span><span>역할</span><span>수집</span><span>이용</span><span>제공</span><span>파기</span><span>내보내기</span><span>권한관리</span><span>상태/관리</span>
+          </div>
+          {staff.map((item) => (
+            <div className="location-staff-row" role="row" key={item.id}>
+              <span><strong>{item.name || item.login_id || "관리자"}</strong><small>{item.email || item.google_email || "-"}</small></span>
+              <span>{item.role === "manager" ? "관리책임자" : item.role === "handler" ? "취급자" : "미지정"}</span>
+              <span>{permissionMark(item.can_collect)}</span>
+              <span>{permissionMark(item.can_use)}</span>
+              <span>{permissionMark(item.can_provide)}</span>
+              <span>{permissionMark(item.can_destroy)}</span>
+              <span>{permissionMark(item.can_export)}</span>
+              <span>{permissionMark(item.can_manage_roles)}</span>
+              <span>
+                {access.canManageRoles ? (
+                  <form action={saveLocationStaffPermissionAction} className="location-role-form">
+                    <input type="hidden" name="guardianId" value={item.id} />
+                    <input type="hidden" name="returnTo" value="/admin?section=location-security" />
+                    <select name="role" defaultValue={item.role === "manager" ? "manager" : "handler"} aria-label={`${item.name || "관리자"} 위치정보 역할`}>
+                      <option value="handler">취급자</option>
+                      <option value="manager">관리책임자</option>
+                    </select>
+                    <select name="isActive" defaultValue={Number(item.is_active || 0) === 1 ? "1" : "0"} aria-label={`${item.name || "관리자"} 위치정보 권한 상태`}>
+                      <option value="1">활성</option>
+                      <option value="0">회수</option>
+                    </select>
+                    <input name="reason" defaultValue={item.reason || "업무상 최소 권한 부여"} aria-label="권한 변경 사유" />
+                    <FormSubmitButton pendingText="저장 중">저장</FormSubmitButton>
+                  </form>
+                ) : (
+                  <em>{Number(item.is_active || 0) === 1 ? "활성" : "회수"}</em>
+                )}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="admin-panel location-ledger-panel">
+        <div className="panel-heading">
+          <div><h2>위치정보 취급대장</h2><p>수집·이용·제공·파기 사실을 실제 좌표 없이 자동 기록합니다.</p></div>
+          {access.canExport && <a className="plain-button" href="/api/admin/location-security/export?type=ledger">엑셀 다운로드</a>}
+        </div>
+        <div className="location-audit-table-wrap">
+          <div className="location-audit-table ledger" role="table" aria-label="위치정보 취급대장">
+            <div className="location-audit-row header" role="row"><span>일시</span><span>구분</span><span>대상</span><span>취득경로/방법</span><span>제공받는 자</span><span>목적</span><span>결과</span></div>
+            {ledger.map((item) => (
+              <div className="location-audit-row" role="row" key={item.id}>
+                <time>{formatRecentDateTime(item.created_at)}</time>
+                <span>{locationLedgerEventLabel(item.event_type)}</span>
+                <span title={item.data_subject_ref}>{shortAuditRef(item.data_subject_ref)}</span>
+                <span>{item.acquisition_route || item.method || "-"}</span>
+                <span>{item.recipient || "제3자 제공 없음"}</span>
+                <span>{item.purpose}</span>
+                <span>{item.result}</span>
+              </div>
+            ))}
+            {ledger.length === 0 && <p className="empty-text">기록된 위치정보 취급 내역이 없습니다.</p>}
+          </div>
+        </div>
+      </section>
+
+      <section className="admin-panel location-access-panel">
+        <div className="panel-heading">
+          <div><h2>위치정보시스템 접근기록</h2><p>관리자 인증·열람·권한 변경·내보내기 기록을 1년 이상 보존합니다.</p></div>
+          {access.canExport && <a className="plain-button" href="/api/admin/location-security/export?type=access">엑셀 다운로드</a>}
+        </div>
+        <div className="location-audit-table-wrap">
+          <div className="location-audit-table access" role="table" aria-label="위치정보시스템 접근기록">
+            <div className="location-audit-row header" role="row"><span>일시</span><span>작업</span><span>취급자</span><span>대상</span><span>목적</span><span>결과</span><span>무결성</span></div>
+            {accessLogs.map((item) => (
+              <div className="location-audit-row" role="row" key={item.id}>
+                <time>{formatRecentDateTime(item.created_at)}</time>
+                <span>{item.action}</span>
+                <span title={item.actor_ref}>{shortAuditRef(item.actor_ref)}</span>
+                <span>{item.target_type}</span>
+                <span>{item.purpose}</span>
+                <span>{item.result}</span>
+                <span title={item.entry_hash}>{shortAuditRef(item.entry_hash)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="admin-panel location-permission-history-panel">
+        <div className="panel-heading"><div><h2>권한 부여·변경·말소 이력</h2><p>권한 변경 기록은 5년 이상 보존합니다.</p></div></div>
+        <div className="location-permission-history-list">
+          {permissionHistory.slice(0, 50).map((item) => (
+            <div key={item.id}><time>{formatRecentDateTime(item.created_at)}</time><strong>{item.action}</strong><span>{item.purpose}</span><code>{shortAuditRef(item.entry_hash)}</code></div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function permissionMark(value) {
+  return Number(value || 0) === 1 ? <strong className="permission-yes">O</strong> : <span className="permission-no">-</span>;
+}
+
+function shortAuditRef(value) {
+  const text = String(value || "");
+  return text ? `${text.slice(0, 10)}...` : "-";
+}
+
+function locationLedgerEventLabel(value) {
+  return ({ collect: "수집", use: "이용", provide: "제공", view: "열람", export: "내보내기", destroy: "파기" })[value] || value || "-";
 }
 
 function SafePhonePoolManagementSection({ safePhonePoolData }) {

@@ -20,6 +20,7 @@ const MENU_ITEMS = [
   { id: "ad-pricing", label: "광고결제 관리", href: "/admin?section=ad-pricing", icon: "payment" },
   { id: "missing", label: "실종신고 관리", href: "/admin?section=missing", icon: "alert" },
   { id: "locations", label: "위치공유 관리", href: "/admin?section=locations", icon: "pin" },
+  { id: "location-security", label: "위치정보 보안", href: "/admin?section=location-security", icon: "shield" },
   { id: "safe-phones", label: "안심번호 관리", href: "/admin?section=safe-phones", icon: "phone" },
   { id: "notifications", label: "알림 관리", href: "/admin?section=notifications", icon: "alert" },
   { id: "message-templates", label: "메시지 템플릿", href: "/admin?section=message-templates", icon: "chat" },

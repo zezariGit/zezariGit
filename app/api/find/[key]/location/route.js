@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { createLocationShareForFindPage, getFindPageDataByKey } from "../../../../../lib/db";
+import {
+  createLocationShareForFindPage,
+  getFindPageDataByKey,
+  recordLocationProvisionResult,
+} from "../../../../../lib/db";
 import { isPushConfigured, notifyGuardianLocationShared } from "../../../../../lib/push";
 
 export async function POST(request, { params }) {
@@ -21,6 +25,7 @@ export async function POST(request, { params }) {
   }
 
   if (!isPushConfigured()) {
+    await recordLocationProvisionResult(share.id, { sent: 0, total: 0 });
     return NextResponse.json({
       ok: true,
       sent: 0,
@@ -39,6 +44,7 @@ export async function POST(request, { params }) {
     addressLabel: share.addressLabel,
     finderContact: share.finderContact,
   });
+  await recordLocationProvisionResult(share.id, result);
 
   return NextResponse.json({
     ok: true,

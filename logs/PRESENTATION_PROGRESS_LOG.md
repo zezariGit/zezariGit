@@ -5378,3 +5378,43 @@ This file is the cumulative presentation-ready project log. It is written so the
 - Vercel 운영 배포 `dpl_64vzmo6sKREkz61S4ZgNgo2m7Pth` READY
 - `zezari.family`, `zezari.vercel.app`, 매칭된 공개 QR 페이지 HTTP 200
 - 운영 Turso 스키마 36 및 QR 활성화 출처 컬럼 반영 확인
+
+## 2026-08-09 - 위치정보 보안 기능 및 사업계획서 보완
+
+### 요구내용
+- 위치기반서비스 사업계획서 검토 요청사항에 맞춘 실제 보안 기능 보완
+- 로그인 실패 제한, 비밀번호 규칙, 단계별 최소권한, 취급대장·접근기록 구현
+- 주요설비·설치장소·기술적 보호조치와 구현 화면을 문서에 누적
+
+### 반영내용
+- 로그인 3회 연속 실패 시 15분 잠금, 비밀번호 변경 시 조합 규칙 검증
+- 위도·경도·정확도·위치설명 AES-256-GCM 저장 암호화
+- 별도 동의 버전·시각 저장, 시간당 요청 제한, 원본 위치 24시간 자동 파기
+- 시스템 자동처리, 위치정보관리책임자, 위치정보취급자, 일반관리자의 단계별 권한 분리
+- 수집·제공·파기 취급대장과 인증·열람·내보내기·권한변경 접근기록 및 무결성 해시 적용
+- 관리자 `위치정보 보안` 화면과 권한 기반 CSV 내보내기 추가
+- HTTPS/HSTS와 브라우저 보안 응답 헤더, 개인정보처리방침·위치동의 화면 보완
+- DB 스키마 37 반영
+
+### 검증결과
+- Next.js 16.3.0 전체 빌드와 공백 검사 성공
+- 호환 범위 의존성 갱신 후 운영 의존성 보안 감사 0건 확인
+- 잘못된 비밀번호 3회 후 15분 잠금 확인
+- 암호화·복호화와 동의 없는 위치공유 차단 확인
+- 관리자 보안 화면의 권한표·취급대장·파기내역·접근제어 확인
+- 24시간을 초과한 기존 원본 위치 16건 자동 파기 및 파기대장 기록
+- 보안 보완본 DOCX·PDF 전체 페이지 시각 검수
+
+### 공식 산출물
+- `deliverables/location-service/LOCATION_SECURITY_COMPLIANCE.md`
+- `deliverables/location-service/REAL_QR_FIND_위치기반서비스_사업계획서_보안보완본.docx`
+- `deliverables/location-service/REAL_QR_FIND_위치기반서비스_사업계획서_보안보완본.pdf`
+- `deliverables/location-service/evidence/*.png`
+
+### 반영시간
+- 참고자료 분석, 보안·DB·관리화면 구현, 시험, 증빙·문서 작성: 약 120분
+
+### 제출 전 운영자 준비사항
+- Vercel/Turso 계약·계정·Invoice·리전·백업·암호화·Firewall/WAF 화면
+- 제출일 기준 잔여기간 1개월 이상 TLS 인증서
+- 관리자 PC 백신·OS 업데이트·화면잠금, 관리자 MFA, 담당자 지정·교육·점검 기록

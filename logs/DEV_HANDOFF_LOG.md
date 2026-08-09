@@ -7416,3 +7416,46 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - The deployment was assigned to both `https://zezari.family` and `https://zezari.vercel.app`.
 - The deployment URL, both production domains, and a matched public QR route returned HTTP 200.
 - Production Turso migrated from schema version 35 to 36 and includes `qr_codes.activation_source`.
+
+## 2026-08-09 KST - Location Information Security Controls and Filing Supplement
+
+### User Requirement
+- Address the location-based service business-plan review checklist with real application security controls.
+- Separate location manager and handler duties, enforce authentication controls, and maintain use/provision/access ledgers.
+- Prepare updated DOCX/PDF evidence without exposing secrets.
+
+### Implementation
+- Added three-failure credential lockout for 15 minutes and applied the existing 8-16 character letter/number/special-character rule to password changes.
+- Added AES-256-GCM encryption for latitude, longitude, accuracy, and location description; the key is stored separately from source and DB.
+- Added explicit consent version/time storage, request throttling, 24-hour raw-location expiry, automatic destruction, and destruction ledger entries.
+- Added staged location roles: system automation, location manager, location handler, and ordinary administrator. All-stage permission is no longer granted to every role.
+- Added hash-chained permission history, use/provision/destruction ledger, and access/export/authentication logs.
+- Added administrator `위치정보 보안` screen and permission-checked CSV exports.
+- Added HTTPS/HSTS, frame, MIME, referrer, and browser-permission response headers.
+- Updated the privacy policy and public location-consent UI.
+- Raised Turso schema version from 36 to 37.
+
+### Verification
+- Next.js 16.3.0 production build and whitespace checks passed.
+- `npm audit --omit=dev` returned zero vulnerabilities after refreshing the compatible dependency lockfile.
+- Invalid login testing confirmed lockout after three failures and a 15-minute lock period.
+- Encryption round trip confirmed ciphertext versioning and plaintext restoration only with the configured key.
+- Location API rejected requests without the current consent version.
+- The administrator security screen displayed encryption status, staged permissions, destruction ledger, and protected export controls.
+- Existing location records older than the new 24-hour raw retention period were destroyed during migration; 16 destruction entries were recorded.
+- The security supplement PDF was rendered page by page and checked for table, screenshot, and Korean text clipping.
+
+### Deliverables
+- `deliverables/location-service/LOCATION_SECURITY_COMPLIANCE.md`
+- `deliverables/location-service/REAL_QR_FIND_위치기반서비스_사업계획서_보안보완본.docx`
+- `deliverables/location-service/REAL_QR_FIND_위치기반서비스_사업계획서_보안보완본.pdf`
+- `deliverables/location-service/evidence/*.png`
+- `scripts/generate-location-security-doc.ps1`
+
+### Time Spent
+- Reference review, security/data implementation, administrator UI, tests, evidence capture, and document generation: about 120 minutes.
+
+### Operational Evidence Still Required
+- Vercel/Turso account, region, invoice, backup/encryption and firewall/WAF screens.
+- TLS certificate detail with at least one month remaining at filing time.
+- Administrator PC antivirus, OS update, screen lock, MFA, personnel designation, education, and inspection records.

@@ -6,10 +6,16 @@ export default function LocationShareButton({ qrKey }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [mapUrl, setMapUrl] = useState("");
+  const [consented, setConsented] = useState(false);
 
   const shareLocation = async () => {
     setMessage("");
     setMapUrl("");
+
+    if (!consented) {
+      setMessage("위치정보 수집·이용 및 보호자 제공에 동의해 주세요.");
+      return;
+    }
 
     if (!navigator.geolocation) {
       setMessage("이 브라우저에서는 위치공유를 사용할 수 없습니다.");
@@ -26,6 +32,8 @@ export default function LocationShareButton({ qrKey }) {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy,
+          consent: true,
+          consentVersion: "2026-08-09",
         }),
       });
       const data = await response.json().catch(() => ({}));
@@ -43,6 +51,17 @@ export default function LocationShareButton({ qrKey }) {
 
   return (
     <div className="find-location-share">
+      <div className="find-location-consent">
+        <label>
+          <input
+            type="checkbox"
+            checked={consented}
+            onChange={(event) => setConsented(event.target.checked)}
+          />
+          <span>현재 위치의 수집·이용 및 지정 보호자 제공에 동의합니다.</span>
+        </label>
+        <p>위도·경도·정확도는 안전한 인계를 위해 보호자에게 전달되며 24시간 후 자동 파기됩니다.</p>
+      </div>
       <button className="primary-button" type="button" onClick={shareLocation} disabled={loading}>
         {loading ? "위치 확인중" : "위치공유"}
       </button>

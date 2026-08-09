@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { getServerSession } from "next-auth";
 import { isAdminSession } from "../../lib/admin";
 import { authOptions } from "../../lib/auth";
@@ -20,6 +21,7 @@ import {
   saveAdminCoupon,
   saveAdminMessage,
   saveAdminMessageTemplate,
+  saveLocationStaffPermission,
   setAdminSubjectAdMemo,
   setAdminSubjectAdStatus,
   setAdPricingSettings,
@@ -38,6 +40,25 @@ import {
   setSubscriptionPlanPrice,
 } from "../../lib/db";
 import { notifyGuardiansFromAdmin } from "../../lib/push";
+
+export async function saveLocationStaffPermissionAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  let result;
+  try {
+    const requestHeaders = await headers();
+    result = await saveLocationStaffPermission(formData, session, {
+      ipAddress: (requestHeaders.get("x-forwarded-for") || "").split(",")[0]?.trim() || requestHeaders.get("x-real-ip") || "",
+      userAgent: requestHeaders.get("user-agent") || "",
+    });
+    revalidatePath("/admin");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=location-security"), error.message || "위치정보 권한 저장에 실패했습니다.", "error"));
+  }
+  const roleLabel = result.role === "manager" ? "위치정보관리책임자" : "위치정보취급자";
+  redirect(withNotice(getReturnTo(formData, "/admin?section=location-security"), `${result.guardianName} 계정의 ${roleLabel} 권한이 저장되었습니다.`));
+}
 
 export async function setGuardianActiveAction(formData) {
   const session = await getServerSession(authOptions);

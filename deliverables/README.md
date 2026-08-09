@@ -53,6 +53,8 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `NAVER_LOGIN_REVIEW_RESUBMISSION.md`: Naver rejection fixes, passwordless first-signup flow, review screenshots, submitted explanation, and re-review status.
 - `FOLLOW_UP_TASKS.md`: cumulative deferred work checklist, including remaining Naver, Kakao, and Facebook production login verification.
 - `location-service/`: 공식 HWPX 양식 순서를 반영한 위치기반서비스 사업계획서 원고, HWP·HWPX·PDF·DOCX, 보호조직·데이터흐름·설비 구조도와 재생성 안내.
+- `location-service/LOCATION_SECURITY_COMPLIANCE.md`: 위치정보 암호화, 자동 파기, 단계별 최소권한, 취급대장·접근기록과 제출 증빙 대응표.
+- `location-service/REAL_QR_FIND_위치기반서비스_사업계획서_보안보완본.docx|pdf`: 기존 사업계획서에 보안 검토 요청사항과 구현 화면을 누적한 제출 검토본.
 - `ADMIN_COUPON_MANAGEMENT.md`: admin coupon ledger, discount conditions, issue limits, status management, and user coupon registration validation.
 - `ADMIN_NOTIFICATION_MANAGEMENT.md`: admin notification/message grid, right-side compose panel, push delivery action, and delivery result tracking.
 - `ADMIN_MESSAGE_TEMPLATE_MANAGEMENT.md`: admin message template grid, locked automatic templates, push/KakaoTalk channel settings, and template seed data.
