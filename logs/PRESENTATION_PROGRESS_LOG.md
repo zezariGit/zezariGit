@@ -5418,3 +5418,11 @@ This file is the cumulative presentation-ready project log. It is written so the
 - Vercel/Turso 계약·계정·Invoice·리전·백업·암호화·Firewall/WAF 화면
 - 제출일 기준 잔여기간 1개월 이상 TLS 인증서
 - 관리자 PC 백신·OS 업데이트·화면잠금, 관리자 MFA, 담당자 지정·교육·점검 기록
+
+### 운영반영 결과
+- GitHub `main` 구현 커밋 `d4bedc7` 푸시 완료
+- Vercel 운영 배포 `dpl_AtAreJjMqyi1AjNmUNA6v9WEP2g1` READY
+- `zezari.family`, `zezari.vercel.app`, 개인정보처리방침, 관리자 진입, 활성 공개 QR 경로 HTTP 200
+- HSTS·MIME·프레임·리퍼러·위치권한 보안 응답 헤더 확인
+- 비로그인 취급대장 내보내기 HTTP 401, 별도 동의 없는 위치전송 HTTP 400 확인
+- 운영 Turso 스키마 37, 보안 테이블 7개, 만료 원본 위치 파기 16건 확인
