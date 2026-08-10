@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>REAL_QR_FIND 위치정보 암호화 저장 증빙</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: #f3f6f9;
+        color: #172033;
+        font-family: Arial, "Malgun Gothic", sans-serif;
+      }
+      main { width: min(1120px, calc(100% - 48px)); margin: 34px auto 54px; }
+      h1 { margin: 0 0 8px; font-size: 28px; }
+      h2 {
+        margin: 0;
+        padding: 16px 18px;
+        border-bottom: 1px solid #d7dee7;
+        background: #eef4f8;
+        font-size: 18px;
+      }
+      .subtitle { margin: 0 0 24px; color: #546174; line-height: 1.6; }
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+      .metric, section {
+        overflow: hidden;
+        border: 1px solid #c8d2de;
+        border-radius: 8px;
+        background: #fff;
+      }
+      .metric { padding: 18px; }
+      .metric span { display: block; margin-bottom: 8px; color: #607086; font-size: 13px; }
+      .metric strong { font-size: 24px; }
+      section { margin-top: 16px; }
+      table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+      th, td {
+        padding: 12px 14px;
+        border-right: 1px solid #d7dee7;
+        border-bottom: 1px solid #d7dee7;
+        text-align: left;
+        vertical-align: top;
+      }
+      th:last-child, td:last-child { border-right: 0; }
+      tr:last-child td { border-bottom: 0; }
+      th { background: #f8fafc; color: #415066; font-size: 13px; }
+      td { font-size: 14px; }
+      code {
+        color: #0b4f7c;
+        font-family: Consolas, monospace;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+      .status {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 5px;
+        background: #e7f6ec;
+        color: #176c35;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .destroyed { background: #fff2df; color: #8a5200; }
+      .note {
+        padding: 16px 18px;
+        border-top: 1px solid #ead6a5;
+        background: #fff8e8;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .foot { margin-top: 14px; color: #68758a; font-size: 12px; line-height: 1.6; }
+      @media (max-width: 760px) {
+        main { width: calc(100% - 24px); margin-top: 18px; }
+        .summary { grid-template-columns: 1fr; }
+        section { overflow-x: auto; }
+        table { min-width: 840px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>REAL_QR_FIND 위치정보 암호화 저장 증빙</h1>
+      <p class="subtitle">
+        Turso DB <strong>location_shares</strong> 테이블 기준 · 암호화 방식 AES-256-GCM · 확인일 2026-08-10
+      </p>
+
+      <div class="summary">
+        <div class="metric"><span>위치공유 누적 기록</span><strong>16건</strong></div>
+        <div class="metric"><span>현재 보존 중 암호문</span><strong>0건</strong></div>
+        <div class="metric"><span>보존기간 만료 파기</span><strong>16건</strong></div>
+      </div>
+
+      <section>
+        <h2>암호화 저장 컬럼</h2>
+        <table>
+          <thead>
+            <tr><th style="width: 23%">컬럼명</th><th style="width: 18%">DB 형식</th><th>보호 방식</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>latitude_encrypted</code></td><td>TEXT</td><td><span class="status">암호화</span> 위도 AES-256-GCM 암호문</td></tr>
+            <tr><td><code>longitude_encrypted</code></td><td>TEXT</td><td><span class="status">암호화</span> 경도 AES-256-GCM 암호문</td></tr>
+            <tr><td><code>accuracy_encrypted</code></td><td>TEXT</td><td><span class="status">암호화</span> 위치 정확도 AES-256-GCM 암호문</td></tr>
+            <tr><td><code>address_encrypted</code></td><td>TEXT</td><td><span class="status">암호화</span> 위치 설명 AES-256-GCM 암호문</td></tr>
+            <tr><td><code>destroyed_at</code></td><td>TEXT</td><td><span class="status destroyed">파기 기록</span> 보존기간 만료 시 암호문 NULL 처리 시각</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>암호문 저장 형식 샘플 3건</h2>
+        <table>
+          <thead><tr><th style="width: 23%">컬럼명</th><th>암호문 예시</th></tr></thead>
+          <tbody>
+            <tr><td><code>latitude_encrypted</code></td><td><code>v1.oPkh3yiVz_663XTH.bPBGHjJEdU-dFwOGj5IBVQ.OAbKJVWs_5ZT</code></td></tr>
+            <tr><td><code>longitude_encrypted</code></td><td><code>v1.2vsu5fPnQXjp5BXG.vqdlH9VeByjV0yIQsVozsg.XPqxkGN-gIW-FA</code></td></tr>
+            <tr><td><code>accuracy_encrypted</code></td><td><code>v1.uWN_kbZGq0dwt1Xj.H1YbAKhn1v7I6ZDJamZMNQ.Hd1SZQ</code></td></tr>
+          </tbody>
+        </table>
+        <div class="note">
+          <strong>증빙 기준:</strong> 위 3건은 실제 서비스와 동일한 암호화 함수 및 운영 키 설정으로 만든
+          비식별 테스트 암호문이며 DB에는 저장하지 않았습니다. 현재 실제 16건은 보존기간 만료 정책에 따라
+          위치 암호문이 모두 파기되어, 실제 사용자 위치 암호문은 화면에 노출하지 않았습니다.
+        </div>
+      </section>
+
+      <p class="foot">
+        저장 시 평문 위도·경도는 0으로 대체되고 암호화 컬럼에만 암호문이 기록됩니다.
+        복호화 키는 DB가 아닌 Vercel 환경변수 LOCATION_DATA_ENCRYPTION_KEY로 분리 관리됩니다.
+      </p>
+    </main>
+  </body>
+</html>

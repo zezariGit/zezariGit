@@ -5470,3 +5470,19 @@ This file is the cumulative presentation-ready project log. It is written so the
 - GitHub `main` 커밋 `a04fcbe` 푸시 완료
 - Vercel 운영 배포 `dpl_AHxyf7e7YPsbpD6RbATeL9eUYKAa` READY, Function 리전 `iad1` 확인
 - `zezari.family`, `zezari.vercel.app` 최신 배포 연결 및 HTTP 200 확인
+
+## 2026-08-10 - 위치정보 암호화 저장 증빙 화면
+
+### 요구내용
+- 암호화 위치 컬럼과 암호문 샘플 2~3건을 인앱 브라우저 및 캡처 이미지로 확인
+
+### 반영내용
+- 운영 연결 DB를 읽기 전용으로 조회하여 위치공유 누적 16건, 보존기간 만료 파기 16건, 현재 보존 중 암호문 0건 확인
+- `latitude_encrypted`, `longitude_encrypted`, `accuracy_encrypted`, `address_encrypted` 컬럼과 AES-256-GCM 보호 방식을 표로 정리
+- 실제 이용자 위치 대신 동일 암호화 함수로 만든 비식별 테스트 암호문 3건을 증빙용으로 표시
+- 실제 사용자 정보, 복호화 좌표, 키와 토큰은 증빙에서 제외
+
+### 산출물 및 반영시간
+- `deliverables/location-service/evidence/07-location-encryption-evidence.html`
+- `deliverables/location-service/evidence/07-location-encryption-evidence.png`
+- 확인 및 캡처: 약 15분
