@@ -7549,3 +7549,23 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Signed-in account inspection, popup handling, redacted-scope capture, and evidence logging: about 15 minutes.
+
+## 2026-08-14 KST - Vercel Hosting Account and Provider Evidence
+
+### User Requirement
+- Confirm whether Vercel is the hosting service and capture the hosting account screen with service-provider information.
+
+### Implementation and Verification
+- Confirmed that Vercel is the web application hosting and production deployment service for the current architecture.
+- Captured the signed-in Vercel project overview showing team `zezariVercel`, Hobby plan, project `zezari`, production deployment `Ready`, domains `zezari.family` and `real-qr-find.vercel.app`, and source branch `main`.
+- Captured Vercel's official Terms of Service identifying the service provider as `Vercel Inc.`.
+- Captured the official notice address stated in the Terms of Service: `440 N Barranca Ave #4133, Covina, CA 91723`.
+- Excluded environment variables, access tokens, payment methods, and personal account credentials from the evidence.
+
+### Deliverables
+- `deliverables/location-service/evidence/10-vercel-hosting-account.png`
+- `deliverables/location-service/evidence/11-vercel-service-provider-info.png`
+- `deliverables/location-service/evidence/12-vercel-service-provider-address.png`
+
+### Time Spent
+- Account verification, official provider-document inspection, safe capture, and evidence logging: about 10 minutes.

@@ -5501,3 +5501,21 @@ This file is the cumulative presentation-ready project log. It is written so the
 - `deliverables/location-service/evidence/08-turso-account-database.png`
 - `deliverables/location-service/evidence/09-vercel-account-project.png`
 - 확인 및 캡처: 약 15분
+
+## 2026-08-14 - Vercel 호스팅 계정·서비스 제공사업자 증빙
+
+### 요구내용
+- 현재 호스팅 서비스가 Vercel인지 확인하고, 호스팅 계정과 서비스 제공사업자 정보를 포함한 화면을 캡처
+
+### 반영내용
+- Vercel이 현재 웹 애플리케이션의 운영 호스팅·배포 서비스임을 확인
+- 팀 `zezariVercel`, Hobby 플랜, 프로젝트 `zezari`, 운영상태 Ready, 도메인 `zezari.family`·`real-qr-find.vercel.app`, 배포 브랜치 `main` 화면 캡처
+- Vercel 공식 이용약관에서 서비스 제공 주체 `Vercel Inc.` 확인 및 캡처
+- 공식 약관상 통지 주소 `440 N Barranca Ave #4133, Covina, CA 91723` 확인 및 캡처
+- 환경변수, API 키, 인증 토큰, 결제수단과 로그인 자격증명은 캡처에서 제외
+
+### 산출물 및 반영시간
+- `deliverables/location-service/evidence/10-vercel-hosting-account.png`
+- `deliverables/location-service/evidence/11-vercel-service-provider-info.png`
+- `deliverables/location-service/evidence/12-vercel-service-provider-address.png`
+- 확인 및 캡처: 약 10분
