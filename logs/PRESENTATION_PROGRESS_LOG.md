@@ -5524,3 +5524,20 @@ This file is the cumulative presentation-ready project log. It is written so the
 - GitHub `main` 커밋 `1b0eac8` 푸시 완료
 - Vercel 운영 배포 `dpl_2yrLpXeDUGBr9mDiRULsT572CSsh` READY 확인
 - `zezari.family`, `zezari.vercel.app`, `real-qr-find.vercel.app` HTTP 200 확인
+
+## 2026-08-14 - 위치정보 이용·제공 및 열람·고지 취급대장
+
+### 요구내용
+- 위치공유 발생 시 대상, 취득경로, 제공 서비스, 제공받는 자, 이용일시를 전자적으로 자동 기록·보존
+- 위치정보주체 열람·고지 처리 시 취급자, 요청자, 목적, 일시를 취급대장에 기록
+
+### 반영내용
+- 위치공유와 보호자 알림 결과가 자동 기록되는 `location_use_ledger`를 요청 양식 5개 열로 관리자 화면에 표시
+- DB 스키마 38 및 수정·삭제 UI가 없는 `location_disclosure_ledger` 추가
+- 열람·고지 요청자 식별값과 목적을 입력하면 취급자와 일시를 서버에서 자동 기록
+- 두 원장 CSV 다운로드와 조회·내보내기 접근기록 연동
+- 원장에는 실제 좌표를 저장하지 않고 연속 무결성 해시를 보존
+
+### 산출물 및 반영시간
+- `deliverables/location-service/LOCATION_USE_PROVISION_LEDGER.md`
+- 빌드 및 검증: 약 25분

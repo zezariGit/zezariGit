@@ -21,6 +21,7 @@ import {
   saveAdminCoupon,
   saveAdminMessage,
   saveAdminMessageTemplate,
+  recordLocationDisclosure,
   saveLocationStaffPermission,
   setAdminSubjectAdMemo,
   setAdminSubjectAdStatus,
@@ -58,6 +59,23 @@ export async function saveLocationStaffPermissionAction(formData) {
   }
   const roleLabel = result.role === "manager" ? "위치정보관리책임자" : "위치정보취급자";
   redirect(withNotice(getReturnTo(formData, "/admin?section=location-security"), `${result.guardianName} 계정의 ${roleLabel} 권한이 저장되었습니다.`));
+}
+
+export async function recordLocationDisclosureAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  try {
+    const requestHeaders = await headers();
+    await recordLocationDisclosure(formData, session, {
+      ipAddress: (requestHeaders.get("x-forwarded-for") || "").split(",")[0]?.trim() || requestHeaders.get("x-real-ip") || "",
+      userAgent: requestHeaders.get("user-agent") || "",
+    });
+    revalidatePath("/admin");
+  } catch (error) {
+    redirect(withNotice("/admin?section=location-security", error.message || "열람·고지 사실을 기록하지 못했습니다.", "error"));
+  }
+  redirect(withNotice("/admin?section=location-security", "열람·고지 사실이 취급대장에 기록되었습니다."));
 }
 
 export async function setGuardianActiveAction(formData) {

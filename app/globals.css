@@ -181,6 +181,60 @@
   overflow-wrap: anywhere;
 }
 
+.location-use-provision-row,
+.location-disclosure-row {
+  display: grid;
+  border-bottom: 1px solid #d6e0e7;
+}
+
+.location-use-provision-row {
+  grid-template-columns: 150px minmax(280px, 1.5fr) minmax(180px, 1fr) minmax(220px, 1.2fr) 160px;
+  min-width: 1050px;
+}
+
+.location-disclosure-row {
+  grid-template-columns: 170px minmax(180px, 1fr) minmax(360px, 2fr) 160px;
+  min-width: 900px;
+}
+
+.location-use-provision-row.header,
+.location-disclosure-row.header {
+  background: #e8f2f8;
+  font-weight: 800;
+}
+
+.location-use-provision-row > *,
+.location-disclosure-row > * {
+  min-width: 0;
+  padding: 10px 8px;
+  border-right: 1px solid #d6e0e7;
+  overflow-wrap: anywhere;
+}
+
+.location-disclosure-form {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) 140px minmax(280px, 1.5fr) 120px;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 14px;
+  border: 1px solid #d6e0e7;
+  background: #f7fafc;
+}
+
+.location-disclosure-form label {
+  display: grid;
+  gap: 6px;
+  font-weight: 800;
+}
+
+.location-disclosure-form input,
+.location-disclosure-form select,
+.location-disclosure-form button {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+}
+
 .location-permission-history-list {
   max-height: 360px;
   overflow: auto;
@@ -207,6 +261,10 @@
   .location-protection-grid {
     grid-template-columns: 1fr;
   }
+
+  .location-disclosure-form {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -217,6 +275,10 @@
   .location-permission-history-list > div {
     grid-template-columns: 1fr;
     gap: 4px;
+  }
+
+  .location-disclosure-form {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -60,6 +60,7 @@ import {
   saveAdminMessageAction,
   saveAdminMessageTemplateAction,
   saveLocationStaffPermissionAction,
+  recordLocationDisclosureAction,
   setSubscriptionAdminMemoAction,
   setSubscriptionAdminTestAction,
   setSubscriptionPlanPriceAction,
@@ -1059,7 +1060,7 @@ function LocationSecurityManagementSection({ data }) {
     );
   }
 
-  const { access, staff, permissionHistory, ledger, accessLogs, status } = data;
+  const { access, staff, permissionHistory, ledger, disclosures, accessLogs, status } = data;
   return (
     <div className="location-security-page">
       <section className="location-security-summary" aria-label="위치정보 보호조치 현황">
@@ -1139,24 +1140,49 @@ function LocationSecurityManagementSection({ data }) {
 
       <section className="admin-panel location-ledger-panel">
         <div className="panel-heading">
-          <div><h2>위치정보 취급대장</h2><p>수집·이용·제공·파기 사실을 실제 좌표 없이 자동 기록합니다.</p></div>
+          <div><h2>위치정보 이용·제공사실 확인 자료</h2><p>위치공유가 발생하면 실제 좌표 없이 전자적으로 자동 기록하고 보존합니다.</p></div>
           {access.canExport && <a className="plain-button" href="/api/admin/location-security/export?type=ledger">엑셀 다운로드</a>}
         </div>
         <div className="location-audit-table-wrap">
-          <div className="location-audit-table ledger" role="table" aria-label="위치정보 취급대장">
-            <div className="location-audit-row header" role="row"><span>일시</span><span>구분</span><span>대상</span><span>취득경로/방법</span><span>제공받는 자</span><span>목적</span><span>결과</span></div>
+          <div className="location-audit-table use-provision" role="table" aria-label="위치정보 이용 제공사실 확인 자료">
+            <div className="location-use-provision-row header" role="row"><span>대상</span><span>취득경로</span><span>제공 서비스</span><span>제공받는 자</span><span>이용일시</span></div>
             {ledger.map((item) => (
-              <div className="location-audit-row" role="row" key={item.id}>
-                <time>{formatRecentDateTime(item.created_at)}</time>
-                <span>{locationLedgerEventLabel(item.event_type)}</span>
+              <div className="location-use-provision-row" role="row" key={item.id}>
                 <span title={item.data_subject_ref}>{shortAuditRef(item.data_subject_ref)}</span>
                 <span>{item.acquisition_route || item.method || "-"}</span>
+                <span>{item.service_name || "제자리 QR 안심 서비스"}</span>
                 <span>{item.recipient || "제3자 제공 없음"}</span>
-                <span>{item.purpose}</span>
-                <span>{item.result}</span>
+                <time>{formatRecentDateTime(item.created_at)}</time>
               </div>
             ))}
-            {ledger.length === 0 && <p className="empty-text">기록된 위치정보 취급 내역이 없습니다.</p>}
+            {ledger.length === 0 && <p className="empty-text">기록된 위치정보 이용·제공 내역이 없습니다.</p>}
+          </div>
+        </div>
+      </section>
+
+      <section className="admin-panel location-disclosure-panel">
+        <div className="panel-heading">
+          <div><h2>열람·고지 사실 취급대장</h2><p>위치정보주체의 열람·고지 요청과 처리 사실을 기록하고 보존합니다.</p></div>
+          {access.canExport && <a className="plain-button" href="/api/admin/location-security/export?type=disclosures">엑셀 다운로드</a>}
+        </div>
+        <form action={recordLocationDisclosureAction} className="location-disclosure-form">
+          <label>요청자<input name="requesterRef" required maxLength={200} placeholder="접수번호 또는 요청자 식별값" /></label>
+          <label>처리 구분<select name="noticeType" defaultValue="view_notice"><option value="view">열람</option><option value="notice">고지</option><option value="view_notice">열람·고지</option></select></label>
+          <label>목적<input name="purpose" required maxLength={500} placeholder="열람·고지 요청 및 처리 목적" /></label>
+          <FormSubmitButton pendingText="기록 중">취급대장 기록</FormSubmitButton>
+        </form>
+        <div className="location-audit-table-wrap">
+          <div className="location-audit-table disclosure" role="table" aria-label="열람 고지 사실 취급대장">
+            <div className="location-disclosure-row header" role="row"><span>취급자</span><span>요청자</span><span>목적</span><span>일시</span></div>
+            {disclosures.map((item) => (
+              <div className="location-disclosure-row" role="row" key={item.id}>
+                <span title={item.handler_ref}>{shortAuditRef(item.handler_ref)}</span>
+                <span>{item.requester_ref}</span>
+                <span>{item.purpose}</span>
+                <time>{formatRecentDateTime(item.created_at)}</time>
+              </div>
+            ))}
+            {disclosures.length === 0 && <p className="empty-text">기록된 열람·고지 사실이 없습니다.</p>}
           </div>
         </div>
       </section>
