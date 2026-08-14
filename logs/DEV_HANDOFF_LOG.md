@@ -7531,3 +7531,21 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Read-only DB verification, safe sample generation, evidence-page creation, and visual capture: about 15 minutes.
+
+## 2026-08-14 KST - Cloud Account and Logical Server Evidence
+
+### User Requirement
+- Capture the signed-in cloud account and service screens from the in-app browser.
+
+### Implementation and Verification
+- Captured the Vercel team/project overview after the user explicitly approved dismissing the 2FA recommendation prompt.
+- Verified Vercel team `zezariVercel`, Hobby plan, project `zezari`, production status `Ready`, domains `zezari.family` and `real-qr-find.vercel.app`, GitHub source `zezariGit/zezariGit`, and production branch `main`.
+- Captured the Turso Cloud database overview showing account `zezarigit`, Free plan, group `default`, database `zezariturso`, and active database status.
+- Excluded environment variables, API tokens, database credentials, billing details, payment methods, and personal contact information from the captures.
+
+### Deliverables
+- `deliverables/location-service/evidence/08-turso-account-database.png`
+- `deliverables/location-service/evidence/09-vercel-account-project.png`
+
+### Time Spent
+- Signed-in account inspection, popup handling, redacted-scope capture, and evidence logging: about 15 minutes.

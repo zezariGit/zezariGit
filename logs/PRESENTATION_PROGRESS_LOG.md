@@ -5486,3 +5486,18 @@ This file is the cumulative presentation-ready project log. It is written so the
 - `deliverables/location-service/evidence/07-location-encryption-evidence.html`
 - `deliverables/location-service/evidence/07-location-encryption-evidence.png`
 - 확인 및 캡처: 약 15분
+
+## 2026-08-14 - 클라우드 계정·논리설비 증빙 캡처
+
+### 요구내용
+- 인앱 브라우저에 로그인된 Vercel과 Turso 계정·서비스 화면 캡처
+
+### 반영내용
+- Vercel 팀 `zezariVercel`, Hobby 플랜, 프로젝트 `zezari`, 운영배포 Ready, 운영 도메인과 GitHub `main` 연결 화면 캡처
+- Turso 계정 `zezarigit`, Free 플랜, 그룹 `default`, DB `zezariturso`, Active 상태 화면 캡처
+- 환경변수, API 키, 인증 토큰, DB 접속정보, 결제수단과 개인정보는 캡처에서 제외
+
+### 산출물 및 반영시간
+- `deliverables/location-service/evidence/08-turso-account-database.png`
+- `deliverables/location-service/evidence/09-vercel-account-project.png`
+- 확인 및 캡처: 약 15분
