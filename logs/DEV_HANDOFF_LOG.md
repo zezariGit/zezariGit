@@ -7569,3 +7569,7 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Account verification, official provider-document inspection, safe capture, and evidence logging: about 10 minutes.
+
+### Publication
+- GitHub commit `1b0eac8` was pushed to `main`.
+- Vercel production deployment `dpl_2yrLpXeDUGBr9mDiRULsT572CSsh` reached `READY`; `zezari.family`, `zezari.vercel.app`, and `real-qr-find.vercel.app` returned HTTP 200.
