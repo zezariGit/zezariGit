@@ -61,6 +61,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `ADMIN_MESSAGE_TEMPLATE_MANAGEMENT.md`: admin message template grid, locked automatic templates, push/KakaoTalk channel settings, and template seed data.
 - `USER_MANUAL.md`: Google Docs user manual link, coverage, and maintenance rule.
 - `MAINTENANCE_REQUEST_SHEET.md`: Google Sheets maintenance request template, tester workflow, status definitions, and privacy rules.
+- `SECURITY_HARDENING_REVIEW_2026-08-14.md`: 운영 소스 보안 점검 범위, 취약점 개선 조치, 검증 결과와 잔여 운영 과제.
 - Current UI feedback pattern: submit buttons show inline progress bars, and server actions show bottom status messages via `notice` query parameters.
 
 ## Planned Deliverables

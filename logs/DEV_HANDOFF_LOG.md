@@ -7661,3 +7661,42 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Form design, Google Sheets construction, validation, visual verification, and documentation: about 20 minutes.
+
+## 2026-08-14 KST - Production Source Security Hardening
+
+### User Requirement
+- Audit the currently deployed source for security weaknesses while excluding `reference/`.
+- Remediate findings without materially changing existing features.
+
+### Audit Findings
+- No vulnerable production npm dependencies were reported.
+- Stored image upload paths accepted all `image/*` MIME types, allowing an executable SVG risk.
+- Push subscription endpoints needed an allowlist before being used by the push sender.
+- Verification sends needed requester-based rate limits, and one-time tokens needed atomic consumption.
+- Public guardian notification and map-search routes needed abuse limits.
+- Admin CSV exports could interpret user-controlled values as spreadsheet formulas.
+- Admin return paths accepted network-path URLs, and legacy notification links required client-side defense.
+
+### Implementation
+- Restricted image and audio formats, verified raster file signatures, and stopped trusting hidden existing-media fields.
+- Added push endpoint and key validation, safe notification URL normalization, public API and verification request limits.
+- Made email/SMS verification token consumption atomic and required the production NextAuth secret for verification hashing.
+- Increased PBKDF2 to 310,000 iterations while retaining compatibility with existing hashes.
+- Required active status for DB administrators and explicitly enabled secure production cookies.
+- Protected admin redirects and CSV exports, added partial CSP and supporting browser security headers.
+- Added no-store headers to sensitive signup, notification, push, and location responses.
+- Added `npm run security:check` and the security review deliverable.
+
+### Verification
+- `npm audit --omit=dev --json`: 0 vulnerabilities.
+- `npm run security:check`: passed.
+- `npm run build`: passed.
+- `git diff --check`: passed.
+- Local production HTTP check: home 200 with CSP/HSTS/nosniff; unauthenticated notifications 401 with no-store.
+- Git ignore and tracked-secret pattern checks passed.
+
+### Deliverable
+- `deliverables/SECURITY_HARDENING_REVIEW_2026-08-14.md`
+
+### Time Spent
+- Source audit, remediation, regression checks, documentation, and local verification: about 40 minutes.

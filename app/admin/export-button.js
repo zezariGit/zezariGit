@@ -35,8 +35,13 @@ export default function AdminExportButton({ filename, rows, disabledText = "ë‹¤ì
 }
 
 function csvCell(value) {
-  const text = String(value ?? "");
+  const text = neutralizeSpreadsheetFormula(String(value ?? ""));
   return `"${text.replace(/"/g, '""')}"`;
+}
+
+function neutralizeSpreadsheetFormula(value) {
+  const leading = value.replace(/^\s+/, "");
+  return /^[=+\-@\t\r\n]/.test(leading) ? `'${value}` : value;
 }
 
 function normalizeFilename(filename) {

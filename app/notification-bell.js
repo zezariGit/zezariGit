@@ -184,6 +184,7 @@ function SwipeNotificationItem({ notification, onDelete }) {
   const [offset, setOffset] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const actionUrl = safeNotificationUrl(notification.url);
 
   const updateOffset = (value) => {
     const limited = Math.max(-132, Math.min(132, value));
@@ -246,23 +247,35 @@ function SwipeNotificationItem({ notification, onDelete }) {
       >
         <strong>{notification.title || "REAL_QR_FIND 알림"}</strong>
         {notification.body && <span>{renderLinkedText(notification.body)}</span>}
-        {notification.url && (
+        {actionUrl && (
           <a
             className="notification-action-link"
-            href={notification.url}
-            target={isExternalUrl(notification.url) ? "_blank" : undefined}
-            rel={isExternalUrl(notification.url) ? "noreferrer" : undefined}
+            href={actionUrl}
+            target={isExternalUrl(actionUrl) ? "_blank" : undefined}
+            rel={isExternalUrl(actionUrl) ? "noreferrer" : undefined}
             onPointerDown={(event) => event.stopPropagation()}
             onPointerMove={(event) => event.stopPropagation()}
             onClick={(event) => event.stopPropagation()}
           >
-            {notificationActionLabel(notification.url)}
+            {notificationActionLabel(actionUrl)}
           </a>
         )}
         <time dateTime={notification.created_at}>{formatNotificationTime(notification.created_at)}</time>
       </div>
     </li>
   );
+}
+
+function safeNotificationUrl(value) {
+  const text = String(value || "").trim();
+  if (text.startsWith("/") && !text.startsWith("//") && !text.includes("\\")) return text;
+
+  try {
+    const url = new URL(text);
+    return url.protocol === "https:" && !url.username && !url.password ? url.toString() : "";
+  } catch {
+    return "";
+  }
 }
 
 function renderLinkedText(text) {

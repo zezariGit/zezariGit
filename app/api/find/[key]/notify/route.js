@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { getFindPageDataByKey } from "../../../../../lib/db";
+import { enforcePublicApiRateLimit, getFindPageDataByKey } from "../../../../../lib/db";
 import { isPushConfigured, notifyGuardianFound } from "../../../../../lib/push";
+import { getRequestSecurityMeta } from "../../../../../lib/request-security";
 
-export async function POST(_request, { params }) {
+export async function POST(request, { params }) {
   const resolvedParams = await params;
   const data = await getFindPageDataByKey(resolvedParams?.key);
 
@@ -20,6 +21,20 @@ export async function POST(_request, { params }) {
   }
   if (!isPushConfigured()) {
     return NextResponse.json({ message: "푸시 알림 설정이 필요합니다." }, { status: 503 });
+  }
+
+  try {
+    await enforcePublicApiRateLimit({
+      action: `find-notify:${data.public_key}`,
+      identity: getRequestSecurityMeta(request).identity,
+      maxRequests: 5,
+      windowMinutes: 10,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { message: error.message || "알림 요청이 너무 많습니다." },
+      { status: 429, headers: { "Cache-Control": "no-store" } },
+    );
   }
 
   const result = await notifyGuardianFound({

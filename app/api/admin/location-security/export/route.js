@@ -38,8 +38,13 @@ function toCsv(rows) {
 }
 
 function escapeCsv(value) {
-  const text = String(value ?? "");
+  const text = neutralizeSpreadsheetFormula(String(value ?? ""));
   return `"${text.replaceAll('"', '""')}"`;
+}
+
+function neutralizeSpreadsheetFormula(value) {
+  const leading = value.replace(/^\s+/, "");
+  return /^[=+\-@\t\r\n]/.test(leading) ? `'${value}` : value;
 }
 
 function getClientIp(request) {

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifySignupEmailCode } from "../../../../../lib/db";
 import { isSignupEmailVerificationEnabled } from "../../../../../lib/email-verification";
+import { NO_STORE_HEADERS } from "../../../../../lib/request-security";
 
 export async function POST(request) {
   if (!isSignupEmailVerificationEnabled()) {
@@ -18,14 +19,14 @@ export async function POST(request) {
       email: result.email,
       emailVerificationToken: result.emailVerificationToken,
       expiresInSeconds: result.expiresInSeconds,
-    });
+    }, { headers: NO_STORE_HEADERS });
   } catch (error) {
     return NextResponse.json(
       {
         ok: false,
         message: error.message || "인증번호를 확인해 주세요.",
       },
-      { status: 400 }
+      { status: 400, headers: NO_STORE_HEADERS }
     );
   }
 }

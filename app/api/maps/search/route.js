@@ -1,9 +1,24 @@
 import { NextResponse } from "next/server";
+import { enforcePublicApiRateLimit } from "../../../../lib/db";
+import { getRequestSecurityMeta } from "../../../../lib/request-security";
 
 const NOMINATIM_SEARCH_URL = "https://nominatim.openstreetmap.org/search";
 const NOMINATIM_REVERSE_URL = "https://nominatim.openstreetmap.org/reverse";
 
 export async function GET(request) {
+  try {
+    await enforcePublicApiRateLimit({
+      action: "map-search",
+      identity: getRequestSecurityMeta(request).identity,
+      maxRequests: 60,
+      windowMinutes: 10,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { message: error.message || "지도 검색 요청이 너무 많습니다." },
+      { status: 429, headers: { "Cache-Control": "no-store" } },
+    );
+  }
   const { searchParams } = new URL(request.url);
   const query = String(searchParams.get("query") || "").trim();
   const lat = Number(searchParams.get("lat"));
@@ -13,7 +28,7 @@ export async function GET(request) {
     return reverseGeocode(lat, lng);
   }
 
-  if (query.length < 2) {
+  if (query.length < 2 || query.length > 120) {
     return NextResponse.json({ message: "검색어를 2글자 이상 입력해 주세요." }, { status: 400 });
   }
 

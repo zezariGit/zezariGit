@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "security:check": "node scripts/security-regression-check.mjs"
   },
   "dependencies": {
     "@libsql/client": "^0.17.3",

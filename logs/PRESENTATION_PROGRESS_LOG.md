@@ -5599,3 +5599,30 @@ This file is the cumulative presentation-ready project log. It is written so the
 - Google Sheets: https://docs.google.com/spreadsheets/d/1i8gbKgnTgBiMXSaEFXrTn7u7iv9YxA8q6G3DqJRubu4/edit
 - `deliverables/MAINTENANCE_REQUEST_SHEET.md`
 - 제작 및 검증: 약 20분
+
+## 2026-08-14 - 운영 소스 보안 점검 및 개선
+
+### 요구내용
+- `reference/`를 제외한 현재 운영 소스의 취약점 점검
+- 기존 기능을 최대한 유지하면서 발견 사항 개선
+
+### 반영내용
+- 이미지 MIME·실제 파일 시그니처 검증으로 저장형 실행 파일 차단
+- 보호자 음성 형식·용량 제한과 기존 미디어 hidden 필드 신뢰 제거
+- 푸시 구독 공급자 주소·암호화 키 검증 및 알림 URL 안전화
+- 인증번호 발송, 공개 보호자 알림, 지도 검색 요청 제한
+- 인증 완료 토큰의 동시 재사용 차단과 운영 전용 시크릿 강제
+- 비밀번호 해시 강화와 기존 회원 호환 유지
+- 관리자 활성 계정 확인, 내부 리다이렉트 제한, CSV 수식 주입 방어
+- 민감 API 캐시 방지와 CSP 등 브라우저 보안 헤더 추가
+- 보안 회귀 검사 명령 추가
+
+### 검증 및 결과
+- 운영 npm 취약점 0건
+- 보안 회귀 검사·Next.js 프로덕션 빌드·공백 검사 통과
+- 로컬 운영 서버에서 홈 200, 보안 헤더, 알림함 비로그인 401 및 no-store 확인
+- 기능·DB 스키마 변경 없이 서버 경계 중심으로 보강
+
+### 산출물 및 반영시간
+- `deliverables/SECURITY_HARDENING_REVIEW_2026-08-14.md`
+- 점검·개선·검증·문서화: 약 40분

@@ -489,7 +489,15 @@ export async function setAdminSubjectAdMemoAction(formData) {
 
 function getReturnTo(formData, fallback) {
   const value = String(formData.get("returnTo") || "").trim();
-  return value && value.startsWith("/") ? value : fallback;
+  const isLocalAdminPath =
+    value === "/admin" ||
+    value.startsWith("/admin?") ||
+    value.startsWith("/admin#") ||
+    value.startsWith("/admin/");
+  if (!isLocalAdminPath || value.startsWith("//") || value.includes("\\") || /[\u0000-\u001f\u007f]/.test(value)) {
+    return fallback;
+  }
+  return value;
 }
 
 function withNotice(path, message, type = "success") {

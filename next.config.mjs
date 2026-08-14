@@ -17,6 +17,10 @@ const nextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "geolocation=(self), microphone=(self), camera=()" },
           { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
+          { key: "Content-Security-Policy", value: "object-src 'none'; base-uri 'self'; frame-ancestors 'self'" },
+          { key: "X-DNS-Prefetch-Control", value: "off" },
+          { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
+          { key: "Origin-Agent-Cluster", value: "?1" },
         ],
       },
       {

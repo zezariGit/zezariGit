@@ -26,6 +26,8 @@ export async function GET(_request, { params }) {
       "Content-Type": match[1],
       "Cache-Control": "private, max-age=3600",
       "Content-Disposition": 'inline; filename="zezari-meta-ad-creative.jpg"',
+      "Content-Security-Policy": "default-src 'none'; sandbox",
+      "X-Content-Type-Options": "nosniff",
     },
   });
 }
