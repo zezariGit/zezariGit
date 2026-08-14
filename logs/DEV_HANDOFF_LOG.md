@@ -7619,3 +7619,24 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Production read-only query, privacy-safe evidence composition, and browser capture: about 15 minutes.
+
+## 2026-08-14 KST - Server and Administrator PC Security Evidence
+
+### User Requirement
+- Determine whether security software on the managed server and administrator PC can be verified.
+
+### Verification
+- Confirmed Windows 11 Pro with Windows Defender registered and active.
+- Confirmed Defender antivirus, real-time protection, behavior monitoring, network inspection, and downloaded-file scanning are enabled.
+- Confirmed Windows Firewall is enabled for Domain, Private, and Public profiles.
+- Confirmed current Defender engine/signature metadata; quick scan age was six days and no completed full scan was recorded.
+- Confirmed Vercel is managed infrastructure without customer OS/antivirus visibility; official Vercel evidence documents platform firewall, DDoS mitigation, continuous cloud-security scanning, SOC 2 Type 2, and ISO 27001:2022 controls.
+
+### Deliverables
+- `deliverables/location-service/SECURITY_PROGRAM_EVIDENCE.md`
+- `deliverables/location-service/evidence/14-admin-pc-security-evidence.html`
+- `deliverables/location-service/evidence/14-admin-pc-security-evidence.png`
+- `deliverables/location-service/evidence/15-vercel-managed-security-evidence.png`
+
+### Time Spent
+- Local security inspection, official provider verification, and evidence capture: about 15 minutes.

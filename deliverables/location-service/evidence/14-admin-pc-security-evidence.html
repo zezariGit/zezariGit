@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>관리자 PC 보안프로그램 운영 증빙</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #eef3f7; color: #14283b; font-family: "Malgun Gothic", Arial, sans-serif; }
+    main { width: min(1080px, calc(100% - 40px)); margin: 28px auto; }
+    header, section { border: 1px solid #afc6d7; background: #fff; }
+    header { padding: 24px; }
+    section { margin-top: 16px; padding: 20px; }
+    h1 { margin: 0 0 8px; font-size: 27px; }
+    h2 { margin: 0 0 12px; font-size: 19px; }
+    p { margin: 6px 0; line-height: 1.55; }
+    .ok { color: #126b40; font-weight: 800; }
+    .warn { color: #955b00; font-weight: 800; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .item { min-height: 88px; padding: 13px; border: 1px solid #c6d5df; background: #f8fbfd; }
+    .item span { display: block; color: #607487; font-size: 13px; }
+    .item strong { display: block; margin-top: 7px; font-size: 17px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 11px; border: 1px solid #c8d5de; text-align: left; }
+    th { width: 32%; background: #dcecf7; }
+    .note { padding: 12px 14px; border-left: 4px solid #2e88bc; background: #eaf5fb; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>관리자 PC 보안프로그램 운영 증빙</h1>
+      <p>PowerShell 및 Windows Security Center 읽기 전용 확인 · 2026-08-14 KST</p>
+      <p class="ok">Windows Defender와 전체 네트워크 프로필 방화벽이 활성화되어 있습니다.</p>
+    </header>
+
+    <section>
+      <h2>운영체제 및 백신</h2>
+      <table>
+        <tr><th>운영체제</th><td>Microsoft Windows 11 Pro · 10.0.26200</td></tr>
+        <tr><th>등록 백신</th><td>Windows Defender</td></tr>
+        <tr><th>보안 엔진</th><td>1.1.26070.7</td></tr>
+        <tr><th>보안 인텔리전스</th><td>1.457.155.0 · 2026-08-14 07:00:31 KST 업데이트</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>보호 기능 상태</h2>
+      <div class="grid">
+        <div class="item"><span>Defender 서비스</span><strong class="ok">활성</strong></div>
+        <div class="item"><span>바이러스 백신</span><strong class="ok">활성</strong></div>
+        <div class="item"><span>실시간 보호</span><strong class="ok">활성</strong></div>
+        <div class="item"><span>행동 모니터링</span><strong class="ok">활성</strong></div>
+        <div class="item"><span>네트워크 검사</span><strong class="ok">활성</strong></div>
+        <div class="item"><span>다운로드 파일 검사</span><strong class="ok">활성</strong></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Windows 방화벽</h2>
+      <table>
+        <tr><th>도메인 네트워크</th><td class="ok">활성</td></tr>
+        <tr><th>개인 네트워크</th><td class="ok">활성</td></tr>
+        <tr><th>공용 네트워크</th><td class="ok">활성</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>검사 이력</h2>
+      <p>빠른 검사: 6일 전</p>
+      <p class="warn">전체 검사 완료 기록 없음</p>
+      <p class="note">제출용 최신 증빙을 만들기 전 Defender 보안 인텔리전스 업데이트, 빠른 검사와 전체 검사를 순서대로 수행하는 것을 권장합니다.</p>
+    </section>
+  </main>
+</body>
+</html>

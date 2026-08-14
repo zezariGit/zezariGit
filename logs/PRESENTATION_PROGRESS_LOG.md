@@ -5564,3 +5564,21 @@ This file is the cumulative presentation-ready project log. It is written so the
 - `deliverables/location-service/evidence/13-location-ledger-production-evidence.html`
 - `deliverables/location-service/evidence/13-location-ledger-production-evidence.png`
 - 조회 및 캡처: 약 15분
+
+## 2026-08-14 - 서버·관리자 PC 보안프로그램 증빙
+
+### 요구내용
+- 서버와 관리자 PC의 보안프로그램 운영 여부 확인
+
+### 확인내용
+- 관리자 PC Windows Defender 백신·실시간 보호·행동 감시·네트워크 검사·다운로드 검사 활성 확인
+- Domain, Private, Public Windows 방화벽 활성 확인
+- 빠른 검사는 6일 전, 전체 검사 완료 기록 없음 확인
+- Vercel 관리형 서버는 고객의 OS 백신 직접 확인이 불가능하여 공식 플랫폼 방화벽, DDoS 방어, 지속 스캔, SOC 2 Type 2, ISO 27001:2022 자료로 증빙
+
+### 산출물 및 반영시간
+- `deliverables/location-service/SECURITY_PROGRAM_EVIDENCE.md`
+- `deliverables/location-service/evidence/14-admin-pc-security-evidence.html`
+- `deliverables/location-service/evidence/14-admin-pc-security-evidence.png`
+- `deliverables/location-service/evidence/15-vercel-managed-security-evidence.png`
+- 확인 및 캡처: 약 15분
