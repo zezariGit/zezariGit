@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>위치정보 이용·제공 원장 운영 DB 증빙</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #eef3f7; color: #15263a; font-family: "Malgun Gothic", Arial, sans-serif; }
+    main { width: min(1180px, calc(100% - 40px)); margin: 24px auto; }
+    header { padding: 22px 24px; border: 1px solid #abc5d9; background: #fff; }
+    h1 { margin: 0 0 8px; font-size: 26px; }
+    h2 { margin: 0; font-size: 18px; }
+    p { margin: 6px 0 0; line-height: 1.55; }
+    .safe { color: #12653c; font-weight: 700; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 14px 0; }
+    .metric, section { border: 1px solid #b8ccd9; background: #fff; }
+    .metric { padding: 14px; }
+    .metric span { display: block; color: #607386; font-size: 13px; }
+    .metric strong { display: block; margin-top: 5px; font-size: 18px; }
+    section { margin-top: 14px; padding: 18px; }
+    table { width: 100%; margin-top: 12px; border-collapse: collapse; table-layout: fixed; }
+    th, td { padding: 10px 9px; border: 1px solid #cbd7df; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+    th { background: #dcecf7; font-size: 13px; }
+    td { font-size: 13px; line-height: 1.45; }
+    code { font-family: Consolas, monospace; font-size: 12px; white-space: nowrap; }
+    .note { padding: 12px 14px; border-left: 4px solid #2d88bd; background: #eaf5fb; }
+    .warn { color: #7a4a00; }
+    @media (max-width: 800px) { .grid { grid-template-columns: 1fr 1fr; } main { width: calc(100% - 20px); } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>위치정보 이용·제공 원장 운영 DB 증빙</h1>
+      <p>운영 Turso DB 읽기 전용 조회 · 공개키 <code>zrf-kbg9hhmcsn7rm3</code></p>
+      <p class="safe">실제 좌표, 보호자 개인정보, DB URL·인증 토큰은 표시하지 않았습니다.</p>
+    </header>
+
+    <div class="grid">
+      <div class="metric"><span>DB 스키마</span><strong>Version 38</strong></div>
+      <div class="metric"><span>위치공유 저장</span><strong>1건 확인</strong></div>
+      <div class="metric"><span>자동 원장</span><strong>수집 1 + 제공 1</strong></div>
+      <div class="metric"><span>열람·고지 원장</span><strong>테이블 생성 확인</strong></div>
+    </div>
+
+    <section>
+      <h2>1. 위치공유 저장 상태</h2>
+      <table>
+        <thead><tr><th>공유 식별값</th><th>저장일시</th><th>보존만료</th><th>좌표 원문</th><th>암호화 저장</th><th>파기상태</th></tr></thead>
+        <tbody><tr><td><code>5ce46576…ba4d4</code></td><td>2026-08-14 16:11:51 KST</td><td>2026-08-15 16:11:50 KST</td><td>위도 0 / 경도 0</td><td>위도 51자<br>경도 54자<br>정확도 50자<br>위치설명 87자</td><td>보존 중</td></tr></tbody>
+      </table>
+      <p class="note">좌표 원문은 저장하지 않고 AES-256-GCM 암호문만 저장되며, 이번 건은 24시간 보존 정책이 적용됐습니다.</p>
+    </section>
+
+    <section>
+      <h2>2. 위치정보 이용·제공사실 확인 자료</h2>
+      <table>
+        <thead><tr><th>대상</th><th>취득경로</th><th>제공 서비스</th><th>제공받는 자</th><th>이용일시</th><th>결과</th></tr></thead>
+        <tbody>
+          <tr><td><code>40bbf443…941e</code></td><td>QR 공개 페이지 / 단말기 브라우저 Geolocation API</td><td>제자리 QR 안심 서비스</td><td>관리대상이 등록된 보호자</td><td>2026-08-14 16:11:52 KST</td><td>수집 성공</td></tr>
+          <tr><td><code>785e195d…a932</code></td><td>앱 푸시 알림 및 보호자 알림함</td><td>제자리 QR 안심 서비스</td><td><code>guardian:6372…fab2</code></td><td>2026-08-14 16:11:53 KST</td><td>제공 성공</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>3. 무결성 및 동의 확인</h2>
+      <table>
+        <thead><tr><th>항목</th><th>확인 결과</th></tr></thead>
+        <tbody>
+          <tr><td>동의 버전</td><td><code>2026-08-09</code> · 위도, 경도, 정확도 · 지정 보호자 제공 · 24시간 보존</td></tr>
+          <tr><td>수집 원장 해시</td><td><code>995ad5e9…6949</code></td></tr>
+          <tr><td>제공 원장 이전 해시</td><td><code>995ad5e9…6949</code> · 수집 원장 해시와 일치</td></tr>
+          <tr><td>제공 원장 해시</td><td><code>e2aef836…0460</code></td></tr>
+        </tbody>
+      </table>
+      <p class="note warn">증빙 화면은 운영 DB 조회 결과를 비식별화한 자료이며 원본 좌표나 개인 식별정보를 포함하지 않습니다.</p>
+    </section>
+  </main>
+</body>
+</html>

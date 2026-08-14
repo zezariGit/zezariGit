@@ -7599,3 +7599,23 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - GitHub commit `1e73260` was pushed to `main`.
 - Vercel deployment `dpl_5Efa3B3MRgnADyqLUWkZgY4Ge7eG` reached `READY`.
 - `zezari.family`, `zezari.vercel.app`, and `real-qr-find.vercel.app` returned HTTP 200.
+
+## 2026-08-14 KST - Production Location Ledger Verification
+
+### User Requirement
+- Verify that the location share submitted from public key `zrf-kbg9hhmcsn7rm3` was stored in the production database and capture evidence.
+
+### Read-only Production Verification
+- Confirmed schema version 38 and the `location_disclosure_ledger` table.
+- Confirmed a new `location_shares` row at `2026-08-14 16:11:51 KST` with a 24-hour retention deadline.
+- Confirmed raw latitude and longitude compatibility columns contain `0`, while latitude, longitude, accuracy, and address ciphertext fields are populated.
+- Confirmed one automatic `collect` ledger row and one `provide` ledger row; both completed successfully.
+- Confirmed the provision row's `previous_hash` equals the collection row's `entry_hash`, preserving the ledger chain.
+- Excluded coordinates, guardian details, DB URL, and authentication tokens from the evidence.
+
+### Deliverables
+- `deliverables/location-service/evidence/13-location-ledger-production-evidence.html`
+- `deliverables/location-service/evidence/13-location-ledger-production-evidence.png`
+
+### Time Spent
+- Production read-only query, privacy-safe evidence composition, and browser capture: about 15 minutes.

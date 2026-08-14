@@ -5546,3 +5546,21 @@ This file is the cumulative presentation-ready project log. It is written so the
 - GitHub `main` 커밋 `1e73260` 푸시 완료
 - Vercel 배포 `dpl_5Efa3B3MRgnADyqLUWkZgY4Ge7eG` READY 확인
 - 운영 도메인 3개 HTTP 200 확인
+
+## 2026-08-14 - 운영 위치공유·원장 저장 검증
+
+### 요구내용
+- 공개 관리대상 페이지에서 수행한 위치공유가 운영 DB와 이용·제공 원장에 정상 저장됐는지 조회하고 캡처
+
+### 확인내용
+- 공개키 `zrf-kbg9hhmcsn7rm3`의 신규 위치공유 1건 확인
+- 저장일시 `2026-08-14 16:11:51 KST`, 24시간 보존만료 적용 확인
+- 원문 좌표는 0, 위도·경도·정확도·위치설명 암호문은 모두 저장 확인
+- 수집 원장 1건, 보호자 제공 원장 1건 성공 확인
+- 수집 원장 해시와 제공 원장 이전 해시가 일치하여 원장 연결 무결성 확인
+- 실제 좌표, 보호자 개인정보, DB 인증정보는 증빙에서 제외
+
+### 산출물 및 반영시간
+- `deliverables/location-service/evidence/13-location-ledger-production-evidence.html`
+- `deliverables/location-service/evidence/13-location-ledger-production-evidence.png`
+- 조회 및 캡처: 약 15분
