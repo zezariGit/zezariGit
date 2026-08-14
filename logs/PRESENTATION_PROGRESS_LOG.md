@@ -5582,3 +5582,20 @@ This file is the cumulative presentation-ready project log. It is written so the
 - `deliverables/location-service/evidence/14-admin-pc-security-evidence.png`
 - `deliverables/location-service/evidence/15-vercel-managed-security-evidence.png`
 - 확인 및 캡처: 약 15분
+
+## 2026-08-14 - 외부 테스터 유지보수 요청서
+
+### 요구내용
+- 개발 발주자와 테스터가 테스트 중 발견한 오류와 추가 요구사항을 화면 캡처와 함께 전달할 수 있는 Google Sheets 양식 제작
+
+### 반영내용
+- 화면·URL·캡처 링크, 현재 상황, 재현 절차, 기대 결과와 요구사항을 한 행에서 관리하는 22개 항목 구성
+- 오류·개선·추가 요구사항·문의 구분과 심각도, 우선순위, 처리 상태, 재테스트 결과 드롭다운 적용
+- 고정 헤더, 필터형 표, 상태별 색상, 예시 요청 1건 적용
+- 별도 `작성안내`, `코드목록` 탭과 개인정보 마스킹 기준 추가
+- 프로젝트 이메일 `general@zezari.com` 편집 권한 및 Google Sheets 실제 화면 확인
+
+### 산출물 및 반영시간
+- Google Sheets: https://docs.google.com/spreadsheets/d/1i8gbKgnTgBiMXSaEFXrTn7u7iv9YxA8q6G3DqJRubu4/edit
+- `deliverables/MAINTENANCE_REQUEST_SHEET.md`
+- 제작 및 검증: 약 20분

@@ -7640,3 +7640,24 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Local security inspection, official provider verification, and evidence capture: about 15 minutes.
+
+## 2026-08-14 KST - External Tester Maintenance Request Sheet
+
+### User Requirement
+- Create a Google Sheets maintenance request form for the project owner and external testers.
+- Let testers attach screenshots and describe the current situation and requested result.
+
+### Implementation
+- Created the native Google Sheet `REAL_QR_FIND 유지보수 요청서`.
+- Added a 22-column request ledger covering test environment, screen/URL, screenshot link, issue details, reproduction steps, expected result, requirement, severity, priority, status, developer response, completion date, and retest result.
+- Added dropdowns for request type, severity, priority, workflow status, and retest result.
+- Added frozen headers, a native filterable table, status color rules, a completed example row, a writing guide, and a code-definition tab.
+- Added privacy guidance requiring masking of phone numbers, addresses, emails, and faces and prohibiting passwords, authentication codes, and API keys.
+- Granted `general@zezari.com` editor access and verified the sheet visually in Google Sheets.
+
+### Deliverable
+- Google Sheet: https://docs.google.com/spreadsheets/d/1i8gbKgnTgBiMXSaEFXrTn7u7iv9YxA8q6G3DqJRubu4/edit
+- `deliverables/MAINTENANCE_REQUEST_SHEET.md`
+
+### Time Spent
+- Form design, Google Sheets construction, validation, visual verification, and documentation: about 20 minutes.
