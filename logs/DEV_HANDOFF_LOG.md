@@ -7700,3 +7700,10 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Source audit, remediation, regression checks, documentation, and local verification: about 40 minutes.
+
+### Publication
+- Security source commit `a034371` was pushed to GitHub `main`.
+- Vercel production deployment `dpl_73DwtxGAFjb6ZzGM1NgcyiVYXtKm` reached `READY`.
+- Reassigned the legacy `zezari.vercel.app` alias to the current production deployment.
+- `zezari.family`, `zezari.vercel.app`, and `real-qr-find.vercel.app` returned HTTP 200 with CSP, HSTS, and nosniff headers.
+- Production notifications returned unauthenticated HTTP 401 with `Cache-Control: no-store`; no production error logs were found in the post-deploy scan.

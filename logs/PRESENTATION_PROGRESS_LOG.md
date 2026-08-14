@@ -5626,3 +5626,10 @@ This file is the cumulative presentation-ready project log. It is written so the
 ### 산출물 및 반영시간
 - `deliverables/SECURITY_HARDENING_REVIEW_2026-08-14.md`
 - 점검·개선·검증·문서화: 약 40분
+
+### 배포결과
+- GitHub `main` 보안 소스 커밋 `a034371` 반영
+- Vercel 운영 배포 `dpl_73DwtxGAFjb6ZzGM1NgcyiVYXtKm` READY
+- 구형 `zezari.vercel.app` 별칭을 최신 운영 배포에 재연결
+- `zezari.family`, `zezari.vercel.app`, `real-qr-find.vercel.app` HTTP 200 및 보안 헤더 확인
+- 배포 직후 운영 오류 로그 없음
