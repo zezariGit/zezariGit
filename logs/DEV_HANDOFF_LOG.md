@@ -7799,3 +7799,27 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `zezari.family`, `zezari.vercel.app`, and `real-qr-find.vercel.app` returned HTTP 200 with theme color `#111111` and HSTS.
 - Authenticated production verification confirmed zero visible top tabs, three subject cards, the subject-add button, and the preserved guardian/subject edit routes.
 - No production error logs were found in the post-deployment scan.
+
+## 2026-08-19 KST - Dashboard Header, Carousel Indicator, and Unlimited Subjects
+
+### User Requirement
+- Remove the black dashboard app bar and the `Z 제자리` brand while returning the notification bell to the upper-left position.
+- Keep My Page available in the upper-right corner.
+- Make missing report, product purchase, and My Page quick actions use the same visual treatment.
+- Add page dots below the subject carousel and darken the dot for the current swipe page.
+- Remove the guardian limit of four subjects and allow continued subject registration.
+
+### Reflected Work
+- Removed the dashboard app-bar markup and restored independent upper-left notification and upper-right My Page controls.
+- Removed the first quick-action special case so all three buttons share the white background, black border, and black icon/text style.
+- Added `app/managed-subject-carousel.js`, which tracks horizontal scroll position, updates the active page dot, and supports dot-button navigation.
+- Kept three subjects per carousel page and made the subject-add button permanently available on the final page.
+- Removed the four-subject guard from `saveSubject()` and always render one blank subject-registration form after existing subjects.
+- Removed the maximum-four guidance, `/4` counters, and the administrator `/4명` badge.
+
+### Verification and Time Spent
+- `npm run build`: passed.
+- `npm run security:check`: passed.
+- `git diff --check`: no whitespace errors.
+- Local production server returned without browser console warnings or errors.
+- Implementation, regression review, documentation, and local verification: about 30 minutes.

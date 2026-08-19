@@ -13,6 +13,7 @@ import GuardianPhoneVerification from "./guardian-phone-verification";
 import KakaoPostcodeAddress from "./kakao-postcode-address";
 import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
 import ModalScrollLock from "./modal-scroll-lock";
+import ManagedSubjectCarousel from "./managed-subject-carousel";
 import NotificationBell from "./notification-bell";
 import PushNotificationButton from "./push-notification-button";
 import QRCode from "qrcode";
@@ -39,7 +40,6 @@ export default async function GuardianDashboard({
 }) {
   const subjectsWithQr = await withSubjectQrImages(subjects);
   const selectedAdSubject = subjectsWithQr.find((subject) => subject.id === adSubjectId) || null;
-  const emptySlots = Array.from({ length: Math.max(0, 4 - subjectsWithQr.length) });
   const registeredSubject = subjectsWithQr.find((subject) => subject.id === registeredSubjectId) || null;
   const admin = isAdminSession(session) || Number(guardian.is_admin || 0) === 1;
   const socialAccount = isSocialAccount(session);
@@ -65,24 +65,18 @@ export default async function GuardianDashboard({
     <main className="dashboard-page">
       <section className={`dashboard-shell${guardianComplete && guardianActive ? " has-corner" : ""}`}>
         {guardianComplete && guardianActive && (
-          <header className="dashboard-app-bar">
-            <Link className="dashboard-brand" href="/?tab=dashboard" aria-label="제자리 대시보드">
-              <span aria-hidden="true">Z</span>
-              제자리
+          <div className="dashboard-corner-bar" aria-label="사용자 빠른 메뉴">
+            <NotificationBell />
+            <Link
+              className="corner-icon-button my-page-corner-link"
+              href={myPageHref}
+              aria-label="마이페이지"
+              title="마이페이지"
+              data-tooltip="마이페이지"
+            >
+              <PersonIcon />
             </Link>
-            <div className="dashboard-corner-bar" aria-label="사용자 빠른 메뉴">
-              <NotificationBell />
-              <Link
-                className="corner-icon-button my-page-corner-link"
-                href={myPageHref}
-                aria-label="마이페이지"
-                title="마이페이지"
-                data-tooltip="마이페이지"
-              >
-                <PersonIcon />
-              </Link>
-            </div>
-          </header>
+          </div>
         )}
         <div className="dashboard-content">
         <header className="dashboard-header">
@@ -163,7 +157,7 @@ export default async function GuardianDashboard({
         ) : isGuardianTab ? (
           <GuardianInfoTab guardian={guardian} session={session} />
         ) : (
-          <SubjectsInfoTab subjects={subjectsWithQr} emptySlots={emptySlots} registeredSubject={registeredSubject} />
+          <SubjectsInfoTab subjects={subjectsWithQr} registeredSubject={registeredSubject} />
         )}
 
         <div className="install-area dashboard-install">
@@ -382,7 +376,7 @@ function InfoRow({ label, value, actionLabel = "", href = "" }) {
   );
 }
 
-function SubjectsInfoTab({ subjects, emptySlots, registeredSubject }) {
+function SubjectsInfoTab({ subjects, registeredSubject }) {
   if (registeredSubject) {
     return <SubjectRegistrationComplete subject={registeredSubject} />;
   }
@@ -392,15 +386,15 @@ function SubjectsInfoTab({ subjects, emptySlots, registeredSubject }) {
       <div className="panel-heading subjects-heading">
         <div>
           <h2 id="subjects-info">대상자 등록</h2>
-          <p>보호자 1명당 최대 4명까지 등록할 수 있습니다.</p>
+          <p>관리대상 정보를 등록하거나 기존 정보를 수정할 수 있습니다.</p>
         </div>
-        <span>{subjects.length}/4명</span>
+        <span>등록 {subjects.length}명</span>
       </div>
       <div className="subject-list">
         {subjects.map((subject) => (
           <SubjectForm key={subject.id} subject={subject} />
         ))}
-        {emptySlots.length > 0 && <SubjectForm />}
+        <SubjectForm />
       </div>
     </section>
   );
@@ -408,7 +402,6 @@ function SubjectsInfoTab({ subjects, emptySlots, registeredSubject }) {
 
 function StatusDashboard({ subjects }) {
   const pageSize = 3;
-  const maxSubjects = 4;
   const subjectPages = [];
   for (let index = 0; index < subjects.length; index += pageSize) {
     subjectPages.push(subjects.slice(index, index + pageSize));
@@ -422,7 +415,7 @@ function StatusDashboard({ subjects }) {
           <h2>현재 상태</h2>
           <span className="status-subject-count">등록 대상 {subjects.length}명</span>
         </div>
-        <div className="managed-carousel" aria-label="관리대상 목록, 한 화면에 3명씩 표시">
+        <ManagedSubjectCarousel pageCount={subjectPages.length}>
           <div className="managed-pages">
             {subjectPages.map((pageSubjects, pageIndex) => (
               <div className="managed-page" key={`managed-page-${pageIndex}`}>
@@ -451,7 +444,7 @@ function StatusDashboard({ subjects }) {
                     </div>
                   </article>
                 ))}
-                {pageIndex === subjectPages.length - 1 && subjects.length < maxSubjects && (
+                {pageIndex === subjectPages.length - 1 && (
                   <div className="managed-add-row">
                     <Link className="managed-add-button" href="/?tab=subjects#subjects-info" aria-label="관리대상 추가" title="관리대상 추가">
                       <span aria-hidden="true">+</span>
@@ -461,7 +454,7 @@ function StatusDashboard({ subjects }) {
               </div>
             ))}
           </div>
-        </div>
+        </ManagedSubjectCarousel>
         <div className="quick-actions">
           <Link href="/missing-report">
             <AlertIcon />

@@ -3384,7 +3384,7 @@ function AdminRoleManagementSection({ adminUsersData }) {
                   </em>
                   {baseAdmin && <em className="status-badge qr-needed">기본관리자</em>}
                   {!user.is_active && <em className="status-badge searching">비활성 사용자</em>}
-                  <em className="status-badge neutral">{user.subject_count || 0}/4명</em>
+                  <em className="status-badge neutral">관리대상 {user.subject_count || 0}명</em>
                 </div>
                 <form action={setGuardianAdminAction}>
                   <input type="hidden" name="guardianId" value={user.id} />
