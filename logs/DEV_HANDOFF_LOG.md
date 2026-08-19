@@ -7823,3 +7823,11 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `git diff --check`: no whitespace errors.
 - Local production server returned without browser console warnings or errors.
 - Implementation, regression review, documentation, and local verification: about 30 minutes.
+
+### Publication
+- Source commit `6b44e6f` was pushed to GitHub `main`.
+- Vercel production deployment `dpl_JBjTqZM91duksEqaTNUz7TbmCfbK` reached `READY`.
+- Reassigned `zezari.vercel.app` to the same deployment.
+- Authenticated production verification used an account with four subjects and confirmed two carousel pages, two page dots, active-dot switching, and the always-available fifth-subject registration form.
+- Confirmed the notification bell at upper left, My Page at upper right, no app bar or brand, and identical styling for all three quick actions.
+- `zezari.family`, `zezari.vercel.app`, and `real-qr-find.vercel.app` returned HTTP 200 with HSTS; no post-deployment production error logs were found.

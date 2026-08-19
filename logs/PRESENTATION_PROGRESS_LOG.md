@@ -5658,6 +5658,14 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 로컬 운영 서버 콘솔 오류 없음
 - 구현·검증·문서화: 약 30분
 
+### 배포결과
+- GitHub `main` 커밋 `6b44e6f` 반영
+- Vercel 운영 배포 `dpl_JBjTqZM91duksEqaTNUz7TbmCfbK` READY
+- `zezari.vercel.app`를 최신 운영 배포에 재연결
+- 관리대상 4명이 등록된 운영 계정에서 2페이지·점 2개·현재 점 전환과 다섯 번째 신규 입력 양식 확인
+- 알림 왼쪽 위, 마이페이지 오른쪽 위, 상단 바 제거와 빠른 메뉴 3개 동일 스타일 확인
+- 세 운영 주소 HTTP 200·HSTS 확인, 배포 직후 운영 오류 로그 없음
+
 ## 2026-08-19 - 운영 구성·서비스·계정 통합대장
 
 ### 요구내용
