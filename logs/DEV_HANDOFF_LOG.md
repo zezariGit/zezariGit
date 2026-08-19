@@ -7791,3 +7791,11 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Deliverable and Time Spent
 - `deliverables/USER_DASHBOARD_BLACK_THEME.md`
 - Implementation, responsive styling, build/security checks, and browser verification: about 45 minutes.
+
+### Publication
+- Source commit `e10ba48` was pushed to GitHub `main`.
+- Vercel production deployment `dpl_CCwZ8K3wtehLEkmuFUXYxyC91Z5f` reached `READY`.
+- Reassigned `zezari.vercel.app` to the same current production deployment.
+- `zezari.family`, `zezari.vercel.app`, and `real-qr-find.vercel.app` returned HTTP 200 with theme color `#111111` and HSTS.
+- Authenticated production verification confirmed zero visible top tabs, three subject cards, the subject-add button, and the preserved guardian/subject edit routes.
+- No production error logs were found in the post-deployment scan.

@@ -49,3 +49,14 @@
 - 로컬 운영 빌드 PC 화면: 검정색 토큰과 PWA 테마 적용, 콘솔 오류 없음
 - 로컬 운영 빌드 390px 모바일 화면: 가로 넘침 없음
 
+## 운영 반영
+
+- GitHub 소스 커밋: `e10ba48`
+- Vercel 운영 배포: `dpl_CCwZ8K3wtehLEkmuFUXYxyC91Z5f`
+- 운영 확인 주소:
+  - `https://zezari.family`
+  - `https://zezari.vercel.app`
+  - `https://real-qr-find.vercel.app`
+- 세 주소에서 HTTP 200, 검정색 테마 `#111111`, HSTS 헤더를 확인했다.
+- 로그인된 운영 계정에서 상단 탭 제거, 관리대상 3명, 추가 버튼, 관리대상 편집 경로와 보호자 편집 경로를 확인했다.
+- 배포 직후 Vercel 운영 오류 로그가 없음을 확인했다.
