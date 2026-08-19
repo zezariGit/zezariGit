@@ -5687,6 +5687,12 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 보안 회귀 검사와 공백 오류 검사 통과
 - 구현·라우팅 검토·반응형 스타일·문서화: 약 25분
 
+### 배포결과
+- GitHub `main` 커밋 `f90f21c` 반영
+- Vercel 운영 배포 `dpl_B6kFRmmSZoems2y91V2LxzJZAFkF` READY 및 `zezari.vercel.app` 최신 연결
+- 390px 운영 화면에서 마이페이지 대상자 4명 목록, 검색창 없음, 신규 양식 1개, 수정 양식 1개 확인
+- 모바일 가로 넘침과 브라우저 콘솔 오류 없음
+
 ## 2026-08-19 - 운영 구성·서비스·계정 통합대장
 
 ### 요구내용

@@ -7853,3 +7853,9 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `npm run security:check`: passed.
 - `git diff --check`: no whitespace errors.
 - Implementation, routing review, responsive styling, documentation, and local regression checks: about 25 minutes.
+
+### Publication
+- Source commit `f90f21c` was pushed to GitHub `main`.
+- Vercel production deployment `dpl_B6kFRmmSZoems2y91V2LxzJZAFkF` reached `READY`, and `zezari.vercel.app` was reassigned to it.
+- Authenticated 390px production verification confirmed four My Page subject rows, zero subject-search inputs, one blank new-subject form, and one selected-subject edit form.
+- No mobile horizontal overflow or browser console warnings/errors were found.
