@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "security:check": "node scripts/security-regression-check.mjs"
+    "security:check": "node scripts/security-regression-check.mjs",
+    "test:qr-claim": "node scripts/qr-signup-claim-regression.mjs"
   },
   "dependencies": {
     "@libsql/client": "^0.17.3",

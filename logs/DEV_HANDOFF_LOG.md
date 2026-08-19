@@ -7859,3 +7859,37 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Vercel production deployment `dpl_B6kFRmmSZoems2y91V2LxzJZAFkF` reached `READY`, and `zezari.vercel.app` was reassigned to it.
 - Authenticated 390px production verification confirmed four My Page subject rows, zero subject-search inputs, one blank new-subject form, and one selected-subject edit form.
 - No mobile horizontal overflow or browser console warnings/errors were found.
+
+## 2026-08-19 KST - Unassigned QR External-Sales Signup And Exact Subject Matching
+
+### User Requirement
+- Add regular signup and Google, Kakao, Naver, and Facebook signup actions to the unassigned QR page.
+- Keep the existing SMS phone verification and guardian-information steps.
+- Require at least one managed subject after signup.
+- When signup starts from an unassigned QR, connect that exact QR to the first newly registered subject.
+- Preserve normal signup behavior that assigns one remaining unassigned QR.
+
+### Reflected Work
+- Added `POST /api/qr-claim/start` and an HTTP-only `zezari_qr_signup_claim` cookie.
+- Applied the shared hashed-identity public API limiter at 10 claim starts per 10 minutes.
+- Added DB schema version 39 with hashed claim, claim expiry, and claim-start columns on `qr_codes`.
+- Reserved the scanned QR for two hours and excluded active reservations from ordinary oldest-unassigned-QR allocation.
+- Added atomic exact-QR assignment conditions and compensating subject deletion when exact matching fails.
+- Added regular signup, existing-member login, and four SNS signup buttons to the public unassigned QR screen.
+- Preserved Solapi phone verification for regular and SNS signup and removed dashboard bypass actions from new-member completion screens.
+- Forced non-admin guardians with zero subjects into the one-subject registration route.
+- Added a scanned-QR waiting banner and a distinct exact-QR completion message.
+
+### Verification
+- `npm run build`: passed.
+- `npm run security:check`: passed.
+- `npm run test:qr-claim`: exact reserved-QR assignment and normal allocation reservation exclusion passed on an isolated libSQL database.
+- `git diff --check`: no whitespace errors.
+- Production Turso schema version 39 and all three `signup_claim_*` columns confirmed.
+- Desktop and 375px mobile browser verification confirmed all six entry actions, equal button widths, and no horizontal overflow.
+- A stale localhost NextAuth cookie emitted a development-only JWT decryption warning; the public page correctly rendered unauthenticated and this does not affect the production-domain session cookie.
+
+### Deliverable And Time Spent
+- `deliverables/QR_EXTERNAL_SALES_ONBOARDING.md`
+- `scripts/qr-signup-claim-regression.mjs`
+- Flow analysis, DB design, implementation, automated checks, and responsive verification: about 55 minutes.

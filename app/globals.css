@@ -9112,6 +9112,70 @@ button:disabled:hover {
   overflow-wrap: anywhere;
 }
 
+.qr-claim-actions {
+  display: grid;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.qr-claim-primary,
+.qr-claim-login {
+  width: 100%;
+}
+
+.qr-claim-divider {
+  margin: 4px 0 0;
+}
+
+.qr-claim-divider span {
+  white-space: nowrap;
+}
+
+.qr-claim-social-list .action {
+  width: 100%;
+  min-height: 46px;
+}
+
+.qr-claim-actions button:disabled {
+  cursor: wait;
+  opacity: 0.58;
+}
+
+.qr-claim-error {
+  padding: 10px 12px;
+  border: 1px solid #f2c1bf;
+  border-radius: var(--radius-sm);
+  background: #fff5f4;
+  color: #a73931 !important;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.qr-claim-note {
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.qr-claim-registration-banner {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--c-primary-border);
+  border-radius: var(--radius-md);
+  background: var(--c-primary-light);
+  color: var(--c-text);
+}
+
+.qr-claim-registration-banner strong {
+  font-size: 0.95rem;
+}
+
+.qr-claim-registration-banner span {
+  color: var(--c-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
 .find-safe-phone-link {
   width: fit-content;
   color: var(--c-primary-dark);

@@ -38,6 +38,8 @@ export default async function GuardianDashboard({
   adSubjectId = "",
   editSubjectId = "",
   registeredSubjectId = "",
+  registeredQrClaim = false,
+  hasQrSignupClaim = false,
 }) {
   const subjectsWithQr = await withSubjectQrImages(subjects);
   const selectedAdSubject = subjectsWithQr.find((subject) => subject.id === adSubjectId) || null;
@@ -125,7 +127,7 @@ export default async function GuardianDashboard({
 
         {!guardianComplete ? (
           <>
-            <SocialSignupCompletion guardian={guardian} session={session} />
+            <SocialSignupCompletion guardian={guardian} session={session} qrClaim={hasQrSignupClaim} />
             <div className="install-area dashboard-install">
               <PwaInstallPrompt />
             </div>
@@ -159,7 +161,12 @@ export default async function GuardianDashboard({
         ) : isGuardianTab ? (
           <GuardianInfoTab guardian={guardian} session={session} />
         ) : (
-          <SubjectsInfoTab selectedSubject={selectedEditSubject} registeredSubject={registeredSubject} />
+          <SubjectsInfoTab
+            selectedSubject={selectedEditSubject}
+            registeredSubject={registeredSubject}
+            registeredQrClaim={registeredQrClaim}
+            hasQrSignupClaim={hasQrSignupClaim}
+          />
         )}
 
         <div className="install-area dashboard-install">
@@ -401,9 +408,9 @@ function InfoRow({ label, value, actionLabel = "", href = "" }) {
   );
 }
 
-function SubjectsInfoTab({ selectedSubject, registeredSubject }) {
+function SubjectsInfoTab({ selectedSubject, registeredSubject, registeredQrClaim = false, hasQrSignupClaim = false }) {
   if (registeredSubject) {
-    return <SubjectRegistrationComplete subject={registeredSubject} />;
+    return <SubjectRegistrationComplete subject={registeredSubject} qrClaimed={registeredQrClaim} />;
   }
 
   const editing = Boolean(selectedSubject);
@@ -418,6 +425,12 @@ function SubjectsInfoTab({ selectedSubject, registeredSubject }) {
         <span>{editing ? selectedSubject.name : "신규"}</span>
       </div>
       <div className="subject-list">
+        {hasQrSignupClaim && !editing && (
+          <div className="qr-claim-registration-banner" role="status">
+            <strong>스캔한 미배정 QR 연결 대기 중</strong>
+            <span>이 대상자를 저장하면 방금 접근한 QR이 자동으로 연결됩니다.</span>
+          </div>
+        )}
         <SubjectForm subject={selectedSubject || undefined} />
       </div>
     </section>
@@ -678,7 +691,7 @@ function SubjectForm({ subject }) {
   );
 }
 
-function SubjectRegistrationComplete({ subject }) {
+function SubjectRegistrationComplete({ subject, qrClaimed = false }) {
   return (
     <section className="subject-complete-phone" aria-label="관리대상 등록 완료">
       <div className="phone-notch" aria-hidden="true" />
@@ -696,8 +709,8 @@ function SubjectRegistrationComplete({ subject }) {
         </div>
         <h2>등록이 완료되었습니다.</h2>
         <p>
-          <strong>{subject.name}</strong> 대상자 전용 QR코드가 생성되었어요.
-          QR코드는 상품 구매 단계에서 확인하실 수 있습니다.
+          <strong>{subject.name}</strong> 대상자 전용 QR코드가 {qrClaimed ? "연결되었어요." : "생성되었어요."}
+          {qrClaimed ? " 방금 스캔한 상품의 QR을 그대로 사용할 수 있습니다." : " QR코드는 상품 구매 단계에서 확인하실 수 있습니다."}
         </p>
         {subject.qr_code && <em>{subject.qr_code}</em>}
         <Link className="login-submit subject-complete-action" href="/shop">

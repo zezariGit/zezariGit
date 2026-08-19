@@ -30,7 +30,7 @@ const socialProviders = [
   },
 ];
 
-export function LoginAuthPanel({ enabledProviders = [], authError = "", initialMode = "login" }) {
+export function LoginAuthPanel({ enabledProviders = [], authError = "", initialMode = "login", qrClaim = false }) {
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
@@ -91,11 +91,11 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
       loginId: loginId.trim(),
       password,
       redirect: false,
-      callbackUrl: "/",
+      callbackUrl: qrClaim ? "/?tab=subjects&mode=new&qrClaim=1" : "/",
     });
 
     if (result?.ok) {
-      window.location.href = result.url || "/";
+      window.location.href = result.url || (qrClaim ? "/?tab=subjects&mode=new&qrClaim=1" : "/");
       return;
     }
 
@@ -417,11 +417,8 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
             <div className="complete-mark" aria-hidden="true">✓</div>
             <h1>회원가입이 완료되었습니다!</h1>
             <p>zezari 서비스에 오신 것을 환영합니다. 소중한 가족의 안전을 함께 지켜요.</p>
-            <button className="login-submit" type="button" disabled={signupLoading} onClick={() => signInAfterSignup("/?tab=info#subjects-info")}>
+            <button className="login-submit" type="button" disabled={signupLoading} onClick={() => signInAfterSignup(qrClaim ? "/?tab=subjects&mode=new&qrClaim=1" : "/?tab=subjects&mode=new")}>
               대상자 등록하기
-            </button>
-            <button className="outline-login-button" type="button" disabled={signupLoading} onClick={() => signInAfterSignup("/?tab=dashboard")}>
-              대시보드 바로가기
             </button>
           </div>
         )}
@@ -492,7 +489,11 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
       </div>
 
       <p className="sns-login-title">SNS 계정으로 간편 로그인</p>
-      <SocialLoginButtons enabledProviders={enabledProviders} variant="icons" />
+      <SocialLoginButtons
+        enabledProviders={enabledProviders}
+        variant="icons"
+        callbackUrl={qrClaim ? "/?tab=subjects&mode=new&qrClaim=1" : undefined}
+      />
 
       <div className="signup-helper">
         <span>계정이 없으신가요?</span>
@@ -512,11 +513,11 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
   );
 }
 
-export function SocialLoginButtons({ enabledProviders = [], variant = "stack" }) {
-  return <SocialLoginButtonsInner enabledProviders={enabledProviders} variant={variant} />;
+export function SocialLoginButtons({ enabledProviders = [], variant = "stack", callbackUrl }) {
+  return <SocialLoginButtonsInner enabledProviders={enabledProviders} variant={variant} callbackUrl={callbackUrl} />;
 }
 
-function SocialLoginButtonsInner({ enabledProviders = [], variant = "stack" }) {
+function SocialLoginButtonsInner({ enabledProviders = [], variant = "stack", callbackUrl }) {
   const enabled = new Set(enabledProviders);
   const providers = variant === "icons"
     ? [socialProviders[1], socialProviders[2], socialProviders[0], socialProviders[3]]
@@ -533,7 +534,7 @@ function SocialLoginButtonsInner({ enabledProviders = [], variant = "stack" }) {
             className={variant === "icons" ? `social-icon-button ${className}` : `action social-action ${className}`}
             type="button"
             key={id}
-            onClick={() => !disabled && signIn(id)}
+            onClick={() => !disabled && signIn(id, callbackUrl ? { callbackUrl } : undefined)}
             disabled={disabled}
             title={configured ? `${label}로 계속하기` : `${label} 설정 필요`}
             aria-label={configured ? `${label}로 계속하기` : `${label} 설정 필요`}
@@ -631,7 +632,7 @@ function formatTimer(seconds) {
   return `${minutes}:${rest}`;
 }
 
-function GoogleLogo() {
+export function GoogleLogo() {
   return (
     <svg className="google-logo" viewBox="0 0 24 24" aria-hidden="true">
       <path
@@ -654,7 +655,7 @@ function GoogleLogo() {
   );
 }
 
-function KakaoLogo() {
+export function KakaoLogo() {
   return (
     <svg className="social-logo" viewBox="0 0 24 24" aria-hidden="true">
       <path
@@ -665,7 +666,7 @@ function KakaoLogo() {
   );
 }
 
-function NaverLogo() {
+export function NaverLogo() {
   return (
     <svg className="social-logo" viewBox="0 0 24 24" aria-hidden="true">
       <path fill="#ffffff" d="M7 6h3.85l3.3 4.78V6H17v12h-3.85l-3.3-4.78V18H7V6z" />
@@ -673,7 +674,7 @@ function NaverLogo() {
   );
 }
 
-function FacebookLogo() {
+export function FacebookLogo() {
   return (
     <svg className="social-logo" viewBox="0 0 24 24" aria-hidden="true">
       <path

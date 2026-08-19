@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../lib/auth";
@@ -15,7 +16,13 @@ import {
   saveGuardianPaymentMethod,
   saveGuardianProfile,
   saveSubject,
+  getActiveQrSignupClaim,
 } from "../lib/db";
+import {
+  QR_SIGNUP_CLAIM_COOKIE,
+  decodeQrSignupClaim,
+  hashQrSignupClaimToken,
+} from "../lib/qr-signup-claim";
 
 export async function saveGuardianAction(formData) {
   const session = await getServerSession(authOptions);
@@ -32,19 +39,42 @@ export async function saveGuardianAction(formData) {
 export async function saveSubjectAction(formData) {
   const session = await getServerSession(authOptions);
   if (!session) throw new Error("로그인이 필요합니다.");
+  const cookieStore = await cookies();
+  const rawQrClaim = cookieStore.get(QR_SIGNUP_CLAIM_COOKIE)?.value || "";
   const subjectId = String(formData.get("subjectId") || "").trim();
   const subjectRoute = subjectId
     ? `/?tab=subjects&editSubject=${encodeURIComponent(subjectId)}`
     : "/?tab=subjects&mode=new";
   let result;
   try {
-    result = await saveSubject(session, formData);
+    let qrSignupClaim = null;
+    if (rawQrClaim) {
+      const parsed = decodeQrSignupClaim(rawQrClaim);
+      if (!parsed) {
+        cookieStore.delete(QR_SIGNUP_CLAIM_COOKIE);
+        throw new Error("QR 연결 정보가 올바르지 않습니다. 미배정 QR을 다시 스캔해 주세요.");
+      }
+      const tokenHash = hashQrSignupClaimToken(parsed.token);
+      const activeClaim = await getActiveQrSignupClaim(parsed.publicKey, tokenHash);
+      if (!activeClaim) {
+        cookieStore.delete(QR_SIGNUP_CLAIM_COOKIE);
+        throw new Error("QR 연결 시간이 만료되었습니다. 미배정 QR을 다시 스캔해 주세요.");
+      }
+      qrSignupClaim = { publicKey: parsed.publicKey, tokenHash };
+    }
+
+    result = await saveSubject(session, formData, { qrSignupClaim });
+    if (result?.qrClaimConsumed) cookieStore.delete(QR_SIGNUP_CLAIM_COOKIE);
     revalidatePath("/");
   } catch (error) {
     redirect(withNotice(subjectRoute, error.message || "필수값을 확인해주세요.", "error"));
   }
   if (result?.isNew) {
-    redirect(withNotice(`/?tab=subjects&registered=${encodeURIComponent(result.subjectId)}`, "관리대상 등록이 완료되었습니다."));
+    const claimQuery = result.qrClaimConsumed ? "&qrClaimed=1" : "";
+    const message = result.qrClaimConsumed
+      ? "관리대상 등록과 스캔한 QR 연결이 완료되었습니다."
+      : "관리대상 등록이 완료되었습니다.";
+    redirect(withNotice(`/?tab=subjects&registered=${encodeURIComponent(result.subjectId)}${claimQuery}`, message));
   }
   redirect(withNotice(`/?tab=subjects&editSubject=${encodeURIComponent(result.subjectId)}`, "관리대상 정보가 수정되었습니다."));
 }

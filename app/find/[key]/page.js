@@ -1,13 +1,14 @@
 import { getServerSession } from "next-auth";
 import { activateQrAction } from "../../actions";
 import StatusToast from "../../status-toast";
-import { authOptions } from "../../../lib/auth";
+import { authOptions, getConfiguredProviderIds } from "../../../lib/auth";
 import { getGuardianKey } from "../../../lib/db";
 import { getFindPageDataByKey } from "../../../lib/db";
 import { formatDateOnly } from "../../../lib/date-format";
 import LocationShareButton from "./location-share-button";
 import GuardianVoicePlayer from "./guardian-voice-player";
 import SafePhoneCallButton from "./safe-phone-call-button";
+import QrClaimSignupActions from "./qr-claim-signup-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,7 @@ export default async function FindPage({ params, searchParams }) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
   const session = await getServerSession(authOptions);
+  const enabledProviders = getConfiguredProviderIds();
   const data = await getFindPageDataByKey(resolvedParams?.key);
   const notice = resolvedSearchParams?.notice || "";
   const noticeType = resolvedSearchParams?.noticeType || "success";
@@ -63,6 +65,11 @@ export default async function FindPage({ params, searchParams }) {
             <span>QR 코드</span>
             <strong>{data.code}</strong>
           </div>
+          <QrClaimSignupActions
+            publicKey={data.public_key}
+            enabledProviders={enabledProviders}
+            signedIn={Boolean(session)}
+          />
         </section>
         <StatusToast message={notice} type={noticeType} />
       </main>

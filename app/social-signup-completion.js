@@ -3,7 +3,7 @@
 import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 
-export default function SocialSignupCompletion({ guardian, session }) {
+export default function SocialSignupCompletion({ guardian, session, qrClaim = false }) {
   const providerLabel = socialProviderLabel(session?.user?.provider);
   const [step, setStep] = useState("phone");
   const [form, setForm] = useState({
@@ -289,11 +289,8 @@ export default function SocialSignupCompletion({ guardian, session }) {
             <div className="complete-mark" aria-hidden="true">✓</div>
             <h1>회원가입이 완료되었습니다!</h1>
             <p>zezari 서비스에 오신 것을 환영합니다. 소중한 가족의 안전을 함께 지켜요.</p>
-            <button className="login-submit" type="button" onClick={() => window.location.assign("/?tab=info#subjects-info")}>
+            <button className="login-submit" type="button" onClick={() => window.location.assign(qrClaim ? "/?tab=subjects&mode=new&qrClaim=1" : "/?tab=subjects&mode=new")}>
               대상자 등록하기
-            </button>
-            <button className="outline-login-button" type="button" onClick={() => window.location.assign("/?tab=dashboard")}>
-              대시보드 바로가기
             </button>
           </div>
         )}
