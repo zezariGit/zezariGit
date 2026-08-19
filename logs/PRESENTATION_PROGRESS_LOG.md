@@ -5834,3 +5834,11 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 375px 모바일에서 동일 버튼 폭, 가로 넘침 없음, 브라우저 오류 없음 확인
 - `deliverables/QR_EXTERNAL_SALES_ONBOARDING.md` 갱신
 - 분석·구현·검증: 약 40분
+
+### 배포결과
+- GitHub `main` 기능 커밋 `856e221` 반영
+- Vercel 운영 배포 `dpl_7wxBumdJTvT7oHcMLktnLBdxYd4J` READY 및 `zezari.vercel.app` 재연결
+- 운영 Turso 스키마 버전 40과 선점 컬럼 생성 확인
+- 임시 선점 QR로 세 운영 도메인의 가입 진입 6개, HTTPS 응답, 가입 예약 성공 확인
+- 테스트 QR을 즉시 미선점 상태로 복구하고 예약값 제거, 가입 버튼 미노출과 예약 거부 확인
+- 테스트 과정에서 회원·대상자·주문·결제·영구 QR 매칭 데이터는 생성하지 않음

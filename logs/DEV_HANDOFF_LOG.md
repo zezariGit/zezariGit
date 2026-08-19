@@ -7931,3 +7931,12 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - 375px verification confirmed six equal-width buttons, no horizontal overflow, and no browser console warnings/errors.
 - Updated `deliverables/QR_EXTERNAL_SALES_ONBOARDING.md`, deliverables index, and image-generation prompt.
 - Analysis, schema work, implementation, and automated verification: about 40 minutes.
+
+### Publication
+- Feature commit `856e221` was pushed to GitHub `main`.
+- Vercel production deployment `dpl_7wxBumdJTvT7oHcMLktnLBdxYd4J` reached `READY`; `zezari.vercel.app` was reassigned to the same deployment.
+- Production Turso migrated to schema version 40 and both `store_sale_reserved` columns were confirmed.
+- A conditionally selected production test QR rendered all six signup/login actions on `zezari.family`, `zezari.vercel.app`, and `real-qr-find.vercel.app`; all returned HTTP 200 with HSTS.
+- The selected QR claim API returned HTTP 200 and one HTTP-only claim cookie.
+- The test QR was immediately restored to its original unselected state with all claim fields cleared; the public page then hid signup actions and the claim API returned HTTP 409.
+- No production subject, guardian, order, payment, or permanent QR assignment was created during verification.
