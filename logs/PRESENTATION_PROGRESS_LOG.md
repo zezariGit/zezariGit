@@ -5802,3 +5802,10 @@ This file is the cumulative presentation-ready project log. It is written so the
 - `deliverables/QR_EXTERNAL_SALES_ONBOARDING.md`
 - `scripts/qr-signup-claim-regression.mjs`
 - 분석·구현·검증: 약 55분
+
+### 배포결과
+- GitHub `main` 커밋 `8e4ec29` 반영
+- Vercel 운영 배포 `dpl_C8R2trr5mD6Wz9nLJpwFTeMoPNVU` READY
+- `zezari.vercel.app` 최신 운영 배포 재연결
+- `zezari.family`, `zezari.vercel.app`, `real-qr-find.vercel.app` HTTP 200 및 HSTS 확인
+- 375px 운영 화면에서 가입 진입 버튼 6개, 가로 넘침 없음, 브라우저 오류 없음 확인

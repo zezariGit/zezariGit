@@ -7893,3 +7893,11 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `deliverables/QR_EXTERNAL_SALES_ONBOARDING.md`
 - `scripts/qr-signup-claim-regression.mjs`
 - Flow analysis, DB design, implementation, automated checks, and responsive verification: about 55 minutes.
+
+### Publication
+- Source commit `8e4ec29` was pushed to GitHub `main`.
+- Vercel production deployment `dpl_C8R2trr5mD6Wz9nLJpwFTeMoPNVU` reached `READY`.
+- Reassigned `zezari.vercel.app` to the same production deployment.
+- `zezari.family`, `zezari.vercel.app`, and `real-qr-find.vercel.app` returned HTTP 200 with HSTS and rendered all regular/SNS signup actions on an unassigned QR page.
+- Production 375px browser verification confirmed six enabled entry buttons, no horizontal overflow, and no browser console warnings or errors.
+- Production invalid-key API verification returned HTTP 409 without creating a reservation.
