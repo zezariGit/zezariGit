@@ -9,6 +9,7 @@ export default function NotificationBell() {
   const [message, setMessage] = useState("");
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const popoverRef = useRef(null);
 
   const loadNotifications = useCallback(async () => {
     setLoading(true);
@@ -121,6 +122,22 @@ export default function NotificationBell() {
     updateInstalledAppBadge(unreadCount);
   }, [unreadCount]);
 
+  useEffect(() => {
+    if (!open) return undefined;
+    const closeFromOutside = (event) => {
+      if (!popoverRef.current?.contains(event.target)) setOpen(false);
+    };
+    const closeFromKeyboard = (event) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("pointerdown", closeFromOutside);
+    window.addEventListener("keydown", closeFromKeyboard);
+    return () => {
+      document.removeEventListener("pointerdown", closeFromOutside);
+      window.removeEventListener("keydown", closeFromKeyboard);
+    };
+  }, [open]);
+
   const toggleOpen = async () => {
     const nextOpen = !open;
     setOpen(nextOpen);
@@ -131,7 +148,7 @@ export default function NotificationBell() {
   };
 
   return (
-    <div className="notification-bell-wrap">
+    <div className="notification-bell-wrap" ref={popoverRef}>
       <button
         className="corner-icon-button notification-bell-button"
         type="button"

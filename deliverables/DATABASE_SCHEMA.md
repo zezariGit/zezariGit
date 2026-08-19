@@ -4,7 +4,7 @@ Project: REAL_QR_FIND / zezari
 
 ## Status
 - Implemented in Turso.
-- Current schema version: `35`.
+- Current schema version: `41`.
 
 ## Tables
 
@@ -32,9 +32,22 @@ Stores one guardian profile per logged-in Google user.
 | `terms_privacy_agreed_at` | TEXT | Timestamp for required privacy collection/use agreement |
 | `terms_service_agreed_at` | TEXT | Timestamp for required service terms agreement |
 | `email` | TEXT | Contact email |
+| `photo_data_url` | TEXT | Guardian profile image as a validated raster data URL |
+| `photo_name` | TEXT | Original guardian photo file name |
 | `is_active` | INTEGER | `1` active, `0` inactive |
 | `is_admin` | INTEGER | `1` DB administrator, `0` normal guardian |
 | `created_at` | TEXT | Created timestamp |
+| `updated_at` | TEXT | Updated timestamp |
+
+### image_upload_settings
+
+Stores the administrator-managed image limits used by both browser guidance and authoritative server validation.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | TEXT | Primary key, currently `default` |
+| `guardian_photo_max_bytes` | INTEGER | Guardian profile photo limit, default 1MB |
+| `subject_photo_max_bytes` | INTEGER | Managed-subject photo limit, default 1MB |
 | `updated_at` | TEXT | Updated timestamp |
 
 ### safe_phone_pool

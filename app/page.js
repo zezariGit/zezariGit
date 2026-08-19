@@ -40,8 +40,8 @@ export default async function HomePage({ searchParams }) {
   if (session) {
     const dashboardData = await getDashboardData(session, {
       includeSubjects: true,
-      includeSubjectDetails: activeTab === "subjects" || showMyPage || Boolean(adSubjectId),
-      includeSubscription: showMyPage,
+      includeSubjectDetails: activeTab === "subjects" || Boolean(adSubjectId),
+      includeSubscription: true,
       includeSubscriptionPlans: false,
       includeAdDailyRate: activeTab === "dashboard" && Boolean(adSubjectId),
     });

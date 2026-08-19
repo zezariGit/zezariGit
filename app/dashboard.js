@@ -10,10 +10,11 @@ import {
 import AdCampaignModal from "./ad-campaign-modal";
 import FormSubmitButton from "./form-submit-button";
 import GuardianPhoneVerification from "./guardian-phone-verification";
+import ImageFileInput from "./image-file-input";
 import KakaoPostcodeAddress from "./kakao-postcode-address";
 import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
-import ModalScrollLock from "./modal-scroll-lock";
 import ManagedSubjectCarousel from "./managed-subject-carousel";
+import MyPageOverlay, { OpenMyPageButton } from "./my-page-overlay";
 import NotificationBell from "./notification-bell";
 import PushNotificationButton from "./push-notification-button";
 import QRCode from "qrcode";
@@ -32,6 +33,7 @@ export default async function GuardianDashboard({
   subscription,
   subscriptionPlans = [],
   adPricing = {},
+  imageUploadSettings = {},
   session,
   activeTab = "dashboard",
   showMyPage = false,
@@ -41,7 +43,8 @@ export default async function GuardianDashboard({
   registeredQrClaim = false,
   hasQrSignupClaim = false,
 }) {
-  const subjectsWithQr = await withSubjectQrImages(subjects);
+  const qrImageSubjectIds = new Set([adSubjectId, editSubjectId, registeredSubjectId].filter(Boolean));
+  const subjectsWithQr = await withSubjectQrImages(subjects, qrImageSubjectIds);
   const selectedAdSubject = subjectsWithQr.find((subject) => subject.id === adSubjectId) || null;
   const selectedEditSubject = subjectsWithQr.find((subject) => subject.id === editSubjectId) || null;
   const registeredSubject = subjectsWithQr.find((subject) => subject.id === registeredSubjectId) || null;
@@ -62,7 +65,6 @@ export default async function GuardianDashboard({
   const isGuardianTab = activeTab === "guardian";
   const isSubjectsTab = activeTab === "subjects";
   const currentTab = isGuardianTab ? "guardian" : isSubjectsTab ? "subjects" : "dashboard";
-  const myPageHref = `/?tab=${currentTab}&panel=my`;
   const closeMyPageHref = `/?tab=${currentTab}`;
 
   return (
@@ -71,16 +73,25 @@ export default async function GuardianDashboard({
         {guardianComplete && guardianActive && (
           <div className="dashboard-corner-bar" aria-label="사용자 빠른 메뉴">
             <NotificationBell />
-            <Link
+            <OpenMyPageButton
               className="corner-icon-button my-page-corner-link"
-              href={myPageHref}
-              aria-label="마이페이지"
               title="마이페이지"
-              data-tooltip="마이페이지"
             >
               <PersonIcon />
-            </Link>
+            </OpenMyPageButton>
           </div>
+        )}
+        {guardianComplete && guardianActive && (
+          <MyPageOverlay initialOpen={showMyPage} closeHref={closeMyPageHref}>
+            <MyPageTab
+              guardian={guardian}
+              subjects={subjectsWithQr}
+              subscription={subscription}
+              session={session}
+              admin={admin}
+              closeHref={closeMyPageHref}
+            />
+          </MyPageOverlay>
         )}
         <div className="dashboard-content">
         <header className="dashboard-header">
@@ -134,20 +145,6 @@ export default async function GuardianDashboard({
           </>
         ) : (
           <>
-        {showMyPage && (
-          <section className="modal-backdrop my-page-backdrop" aria-label="마이페이지" role="dialog" aria-modal="true">
-            <ModalScrollLock />
-            <MyPageTab
-              guardian={guardian}
-              subjects={subjectsWithQr}
-              subscription={subscription}
-              session={session}
-              admin={admin}
-              closeHref={closeMyPageHref}
-            />
-          </section>
-        )}
-
         {isDashboard ? (
           <DashboardTab
             guardian={guardian}
@@ -159,13 +156,14 @@ export default async function GuardianDashboard({
             selectedAdSubject={selectedAdSubject}
           />
         ) : isGuardianTab ? (
-          <GuardianInfoTab guardian={guardian} session={session} />
+          <GuardianInfoTab guardian={guardian} session={session} imageUploadSettings={imageUploadSettings} />
         ) : (
           <SubjectsInfoTab
             selectedSubject={selectedEditSubject}
             registeredSubject={registeredSubject}
             registeredQrClaim={registeredQrClaim}
             hasQrSignupClaim={hasQrSignupClaim}
+            imageUploadSettings={imageUploadSettings}
           />
         )}
 
@@ -220,11 +218,11 @@ function DashboardTab({
   );
 }
 
-function GuardianInfoTab({ guardian, session }) {
+function GuardianInfoTab({ guardian, session, imageUploadSettings }) {
   return (
     <section className="dashboard-panel info-panel guardian-info-panel">
       <h2 id="guardian-info">보호자 정보</h2>
-      <GuardianForm guardian={guardian} session={session} />
+      <GuardianForm guardian={guardian} session={session} imageUploadSettings={imageUploadSettings} />
     </section>
   );
 }
@@ -249,13 +247,13 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
       <div className="my-page-title-row">
         <h2>내 정보</h2>
         {closeHref && (
-          <Link className="my-page-close-button" href={closeHref} aria-label="마이페이지 닫기">
+          <button className="my-page-close-button" type="button" data-my-page-close aria-label="마이페이지 닫기">
             닫기
-          </Link>
+          </button>
         )}
       </div>
-      <div className="my-profile-avatar" aria-hidden="true">
-        <span />
+      <div className="my-profile-avatar" aria-hidden={!guardian.photo_url}>
+        {guardian.photo_url ? <img src={guardian.photo_url} alt="" /> : <span />}
       </div>
 
       <div className="my-page-section">
@@ -408,7 +406,7 @@ function InfoRow({ label, value, actionLabel = "", href = "" }) {
   );
 }
 
-function SubjectsInfoTab({ selectedSubject, registeredSubject, registeredQrClaim = false, hasQrSignupClaim = false }) {
+function SubjectsInfoTab({ selectedSubject, registeredSubject, registeredQrClaim = false, hasQrSignupClaim = false, imageUploadSettings }) {
   if (registeredSubject) {
     return <SubjectRegistrationComplete subject={registeredSubject} qrClaimed={registeredQrClaim} />;
   }
@@ -431,7 +429,7 @@ function SubjectsInfoTab({ selectedSubject, registeredSubject, registeredQrClaim
             <span>이 대상자를 저장하면 방금 접근한 QR이 자동으로 연결됩니다.</span>
           </div>
         )}
-        <SubjectForm subject={selectedSubject || undefined} />
+        <SubjectForm subject={selectedSubject || undefined} imageUploadSettings={imageUploadSettings} />
       </div>
     </section>
   );
@@ -501,21 +499,37 @@ function StatusDashboard({ subjects }) {
             <BagIcon />
             상품 구매
           </Link>
-          <Link href="/?tab=dashboard&panel=my">
+          <OpenMyPageButton title="내 정보">
             <PersonIcon />
             내 정보
-          </Link>
+          </OpenMyPageButton>
         </div>
       </div>
     </section>
   );
 }
 
-function GuardianForm({ guardian, session }) {
+function GuardianForm({ guardian, session, imageUploadSettings }) {
   const socialAccount = isSocialAccount(session);
 
   return (
     <form action={saveGuardianAction} className="form-grid">
+              <label className="full-field guardian-photo-upload">
+                <span>보호자 사진</span>
+                <span className="guardian-photo-upload-row">
+                  <span className="guardian-photo-preview" aria-hidden={!guardian.photo_url}>
+                    {guardian.photo_url ? <img src={guardian.photo_url} alt="" /> : <span />}
+                  </span>
+                  <span className="guardian-photo-upload-control">
+                    <ImageFileInput
+                      name="guardianPhoto"
+                      label="보호자 사진"
+                      maxBytes={imageUploadSettings?.guardianPhotoMaxBytes || 1024 * 1024}
+                    />
+                    <small>{formatUploadLimit(imageUploadSettings?.guardianPhotoMaxBytes)}MB 이하 JPEG, PNG, WebP, GIF</small>
+                  </span>
+                </span>
+              </label>
               <label>
                 이름
                 <input name="guardianName" defaultValue={guardian.name || ""} required />
@@ -579,7 +593,7 @@ function GuardianForm({ guardian, session }) {
   );
 }
 
-function SubjectForm({ subject }) {
+function SubjectForm({ subject, imageUploadSettings }) {
   const isExisting = Boolean(subject?.id);
 
   return (
@@ -602,7 +616,12 @@ function SubjectForm({ subject }) {
             )}
           </span>
           <span className="camera-chip" aria-hidden="true">사진</span>
-          <input name="photo" type="file" accept="image/*" />
+          <ImageFileInput
+            name="photo"
+            label="관리대상 사진"
+            maxBytes={imageUploadSettings?.subjectPhotoMaxBytes || 1024 * 1024}
+          />
+          <small className="subject-photo-limit">{formatUploadLimit(imageUploadSettings?.subjectPhotoMaxBytes)}MB 이하</small>
         </label>
 
         <div className="target-field-stack">
@@ -782,10 +801,10 @@ function adStatusLabel(status) {
   return "연동 대기";
 }
 
-async function withSubjectQrImages(subjects) {
+async function withSubjectQrImages(subjects, subjectIds = new Set()) {
   return Promise.all(
     subjects.map(async (subject) => {
-      if (!subject.qr_target_url) return subject;
+      if (!subject.qr_target_url || !subjectIds.has(subject.id)) return subject;
       return {
         ...subject,
         qr_image: await QRCode.toDataURL(subject.qr_target_url, {
@@ -799,4 +818,9 @@ async function withSubjectQrImages(subjects) {
       };
     })
   );
+}
+
+function formatUploadLimit(bytes) {
+  const megabytes = Math.max(1, Number(bytes) || 1024 * 1024) / (1024 * 1024);
+  return Number.isInteger(megabytes) ? String(megabytes) : megabytes.toFixed(1).replace(/\.0$/, "");
 }

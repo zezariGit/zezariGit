@@ -67,6 +67,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `operations/SERVICE_CONFIGURATION_REGISTER.md`: OAuth, Solapi, Toss Payments, Meta, Bizcall, Push 등 서비스별 환경변수와 운영상태 대장.
 - `operations/ACCOUNT_ACCESS_REGISTER.md`: 로그인 URL, 계정 식별자, MFA·복구·비밀번호 관리자 항목을 관리하는 무비밀 접근대장.
 - `USER_DASHBOARD_BLACK_THEME.md`: 검정색 공통 테마, 상단 탭 제거, 3명 단위 가로 스와이프와 관리대상 추가 진입 구조.
+- `IMAGE_UPLOAD_MANAGEMENT.md`: 보호자·관리대상 사진의 DB 기반 용량 제한, 관리자 설정, 서버 검증, 사용자 초과파일 알림과 팝업 성능 개선.
 - Current UI feedback pattern: submit buttons show inline progress bars, and server actions show bottom status messages via `notice` query parameters.
 
 ## Planned Deliverables

@@ -1576,10 +1576,13 @@ a {
   overscroll-behavior: contain;
   touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
+  align-content: start;
+  grid-auto-rows: max-content;
 }
 
 .modal-footer {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: var(--space-xs);
   padding-top: var(--space-sm);
@@ -1587,6 +1590,12 @@ a {
 }
 
 .modal-close-button {
+  width: auto;
+  height: auto;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-self: center;
+  justify-content: center;
   min-height: 38px;
   align-items: center;
   padding: 0 var(--space-md);
@@ -3602,7 +3611,8 @@ a {
   margin-top: 20px;
 }
 
-.quick-actions a {
+.quick-actions a,
+.quick-actions button {
   min-height: 82px;
   display: grid;
   place-items: center;
@@ -3614,6 +3624,7 @@ a {
   font-size: 13px;
   font-weight: 900;
   text-align: center;
+  cursor: pointer;
 }
 
 .quick-actions span {
@@ -4579,7 +4590,8 @@ body {
 .admin-link,
 .plain-button,
 .dashboard-menu a,
-.quick-actions a {
+.quick-actions a,
+.quick-actions button {
   border-radius: var(--radius-sm);
   font-family: var(--font);
   transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
@@ -4706,6 +4718,7 @@ textarea:focus {
 .managed-list,
 .managed-card,
 .quick-actions a,
+.quick-actions button,
 .guardian-row,
 .admin-subject-card {
   border: 0.5px solid var(--c-border);
@@ -4736,7 +4749,8 @@ textarea:focus {
   color: #ffffff;
 }
 
-.quick-actions a {
+.quick-actions a,
+.quick-actions button {
   color: var(--c-text);
 }
 
@@ -8023,6 +8037,94 @@ a.inline-scroll-value {
   overflow-wrap: anywhere;
 }
 
+.image-upload-settings-panel {
+  display: grid;
+  gap: 20px;
+}
+
+.image-upload-settings-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.image-upload-settings-heading h2,
+.image-upload-settings-heading p {
+  margin: 0;
+}
+
+.image-upload-settings-heading p {
+  margin-top: 6px;
+  color: var(--c-text-muted);
+  line-height: 1.5;
+}
+
+.image-upload-settings-heading > span {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-primary-light);
+  color: var(--c-primary-dark);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.image-upload-settings-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.image-upload-setting-card {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border: 0.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+}
+
+.image-upload-setting-name {
+  color: var(--c-text);
+  font-size: 0.92rem;
+  font-weight: 900;
+}
+
+.image-upload-setting-card > strong {
+  color: var(--c-primary-dark);
+  font-size: 1.65rem;
+}
+
+.image-upload-setting-card > small,
+.image-upload-settings-note small {
+  color: var(--c-text-muted);
+  line-height: 1.45;
+}
+
+.image-upload-settings-note {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 5px 12px;
+  padding: 14px;
+  border: 0.5px solid var(--c-info-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-info-bg);
+}
+
+.image-upload-settings-note small {
+  grid-column: 1 / -1;
+}
+
+.image-upload-settings-save {
+  grid-column: 1 / -1;
+  justify-self: end;
+  min-width: 180px;
+}
+
 .admin-role-badges {
   display: flex;
   flex-wrap: wrap;
@@ -8120,6 +8222,63 @@ button:disabled:hover {
   box-shadow: 0 29px 0 13px var(--c-primary);
   transform: translateY(-8px);
   opacity: 0.85;
+}
+
+.my-profile-avatar img,
+.guardian-photo-preview img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.guardian-photo-upload {
+  display: grid;
+  gap: 8px;
+}
+
+.guardian-photo-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.guardian-photo-preview {
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 0.5px solid var(--c-primary-border);
+  border-radius: 50%;
+  background: var(--c-primary-light);
+}
+
+.guardian-photo-preview > span {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--c-primary);
+  box-shadow: 0 27px 0 12px var(--c-primary);
+  transform: translateY(-8px);
+}
+
+.guardian-photo-upload-control {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.guardian-photo-upload-control input {
+  max-width: 100%;
+}
+
+.guardian-photo-upload-control small,
+.subject-photo-limit {
+  color: var(--c-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .my-page-section {
@@ -8689,7 +8848,7 @@ button:disabled:hover {
 .subject-avatar-picker {
   position: relative;
   width: 78px;
-  height: 78px;
+  height: 96px;
   justify-self: center;
   display: block;
   cursor: pointer;
@@ -8739,6 +8898,14 @@ button:disabled:hover {
   color: var(--c-text-muted);
   font-size: 10px;
   font-weight: 800;
+}
+
+.subject-photo-limit {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: max-content;
+  transform: translateX(-50%);
 }
 
 .target-field-stack {
@@ -13999,9 +14166,44 @@ button:disabled:hover {
 }
 
 @media (max-width: 720px) {
+  .ad-modal-backdrop {
+    align-items: center;
+  }
+
   .ad-option-modal {
+    height: auto;
+    align-self: center;
     max-height: calc(100dvh - 20px);
     padding: var(--space-md);
+  }
+
+  .modal-footer {
+    min-height: 48px;
+  }
+
+  .modal-close-button {
+    min-width: 72px;
+  }
+
+  .image-upload-settings-heading {
+    display: grid;
+  }
+
+  .image-upload-settings-heading > span {
+    justify-self: start;
+  }
+
+  .image-upload-settings-form {
+    grid-template-columns: 1fr;
+  }
+
+  .image-upload-settings-note,
+  .image-upload-settings-save {
+    grid-column: 1;
+  }
+
+  .image-upload-settings-save {
+    width: 100%;
   }
 
   .ad-choice-card {
@@ -14346,7 +14548,8 @@ button:disabled:hover {
   gap: 10px;
 }
 
-.quick-actions a {
+.quick-actions a,
+.quick-actions button {
   min-height: 76px;
   flex-direction: row;
   gap: 9px;
@@ -14357,7 +14560,8 @@ button:disabled:hover {
   font-weight: 900;
 }
 
-.quick-actions a:hover {
+.quick-actions a:hover,
+.quick-actions button:hover {
   background: var(--c-primary-light);
   color: var(--c-primary);
   text-decoration: none;
@@ -14460,7 +14664,8 @@ button:disabled:hover {
     font-size: 0.68rem;
   }
 
-  .quick-actions a {
+  .quick-actions a,
+  .quick-actions button {
     min-width: 0;
     min-height: 72px;
     flex-direction: column;

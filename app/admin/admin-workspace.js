@@ -16,6 +16,7 @@ const MENU_ITEMS = [
   { id: "payments", label: "결제 관리", href: "/admin?section=payments", icon: "payment" },
   { id: "coupons", label: "쿠폰 관리", href: "/admin?section=coupons", icon: "coupon" },
   { id: "products", label: "상품 관리", href: "/admin?section=products", icon: "box" },
+  { id: "image-uploads", label: "이미지업로드 관리", href: "/admin?section=image-uploads", icon: "image" },
   { id: "ads", label: "광고 관리", href: "/admin?section=ads", icon: "megaphone" },
   { id: "ad-pricing", label: "광고결제 관리", href: "/admin?section=ad-pricing", icon: "payment" },
   { id: "missing", label: "실종신고 관리", href: "/admin?section=missing", icon: "alert" },
@@ -174,6 +175,14 @@ function iconPath(name) {
           <path d="M4 8.5 12 4l8 4.5-8 4.5z" />
           <path d="M4 8.5v7L12 20l8-4.5v-7" />
           <path d="M12 13v7" />
+        </>
+      );
+    case "image":
+      return (
+        <>
+          <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
+          <circle cx="8.5" cy="9" r="1.5" />
+          <path d="m5.5 17 4.2-4.2 2.8 2.8 2.5-2.5 3.5 3.9" />
         </>
       );
     case "megaphone":

@@ -29,6 +29,7 @@ import {
   setGuardianActive,
   setGuardianAdminMemo,
   setGuardianAdmin,
+  setImageUploadSettings,
   setProductCatalogItem,
   setProductOrderFulfillment,
   setQrAdminMemo,
@@ -90,6 +91,20 @@ export async function setGuardianActiveAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin"), error.message || "상태 변경에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin"), "보호자 상태가 수정되었습니다."));
+}
+
+export async function setImageUploadSettingsAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  try {
+    await setImageUploadSettings(formData);
+    revalidatePath("/");
+    revalidatePath("/admin");
+  } catch (error) {
+    redirect(withNotice("/admin?section=image-uploads", error.message || "이미지 제한을 저장하지 못했습니다.", "error"));
+  }
+  redirect(withNotice("/admin?section=image-uploads", "이미지 업로드 제한이 저장되었습니다."));
 }
 
 export async function setGuardianAdminMemoAction(formData) {

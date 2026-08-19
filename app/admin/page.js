@@ -37,6 +37,7 @@ import {
   getAdminSubjectsData,
   getAdminUsersData,
   getAdPricingSettings,
+  getImageUploadSettings,
   getQrAdminData,
   isDbAdminSession,
 } from "../../lib/db";
@@ -46,6 +47,7 @@ import {
   setGuardianActiveAction,
   setGuardianAdminMemoAction,
   setGuardianAdminAction,
+  setImageUploadSettingsAction,
   setAdPricingAction,
   setProductOrderFulfillmentAction,
   setQrAdminMemoAction,
@@ -106,7 +108,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "orders", "subscriptions", "ads", "ad-pricing", "missing", "locations", "location-security", "safe-phones", "notifications", "message-templates", "inquiries"].includes(resolvedSearchParams?.section)
+  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "image-uploads", "orders", "subscriptions", "ads", "ad-pricing", "missing", "locations", "location-security", "safe-phones", "notifications", "message-templates", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -227,6 +229,7 @@ export default async function AdminPage({ searchParams }) {
     : null;
   const couponsData = activeSection === "coupons" ? await getAdminCouponsData(couponFilters, selectedCouponId) : null;
   const productsData = activeSection === "products" ? await getAdminProductsData() : null;
+  const imageUploadSettings = activeSection === "image-uploads" ? await getImageUploadSettings() : null;
   const ordersData = activeSection === "orders" ? await getAdminOrdersData(orderFilters, selectedOrderId) : null;
   const subscriptionsData = activeSection === "subscriptions" ? await getAdminSubscriptionsData(subscriptionFilters, selectedSubscriptionId) : null;
   const adsData = activeSection === "ads" ? await getAdminAdsData(adFilters, selectedAdId) : null;
@@ -268,6 +271,8 @@ export default async function AdminPage({ searchParams }) {
             ? "쿠폰 관리"
           : activeSection === "products"
             ? "상품 관리"
+            : activeSection === "image-uploads"
+              ? "이미지업로드 관리"
             : activeSection === "orders"
               ? "주문/배송 관리"
               : activeSection === "subscriptions"
@@ -306,6 +311,8 @@ export default async function AdminPage({ searchParams }) {
             ? "쿠폰 코드를 발행하고 할인 조건, 유효기간, 사용 가능 상태를 관리합니다."
           : activeSection === "products"
             ? "사용자 상품 선택 화면에 노출되는 상품 이미지, 가격, 활성 상태를 관리합니다."
+            : activeSection === "image-uploads"
+              ? "보호자와 관리대상 사진의 업로드 허용 용량을 관리합니다."
             : activeSection === "orders"
               ? "주문과 결제 상태를 조회하고 배송상태, 택배사, 송장번호를 관리합니다."
               : activeSection === "subscriptions"
@@ -356,6 +363,8 @@ export default async function AdminPage({ searchParams }) {
             <CouponManagementSection couponsData={couponsData} />
           ) : activeSection === "products" ? (
             <ProductManagementSection productsData={productsData} selectedProductId={resolvedSearchParams?.product || ""} />
+          ) : activeSection === "image-uploads" ? (
+            <ImageUploadManagementSection setting={imageUploadSettings} />
           ) : activeSection === "orders" ? (
             <OrderManagementSection ordersData={ordersData} />
           ) : activeSection === "subscriptions" ? (
@@ -590,6 +599,64 @@ function AdminDashboardSection({ dashboardData }) {
           </table>
         </section>
       </div>
+    </section>
+  );
+}
+
+function ImageUploadManagementSection({ setting }) {
+  return (
+    <section className="admin-panel image-upload-settings-panel" aria-labelledby="image-upload-settings-title">
+      <div className="image-upload-settings-heading">
+        <div>
+          <h2 id="image-upload-settings-title">사진 업로드 용량</h2>
+          <p>저장한 값은 사용자 화면의 파일 선택 안내와 서버 저장 검증에 즉시 동일하게 적용됩니다.</p>
+        </div>
+        <span>최대 설정 {setting.maxConfigurablePhotoMb}MB</span>
+      </div>
+      <form action={setImageUploadSettingsAction} className="image-upload-settings-form">
+        <label className="image-upload-setting-card">
+          <span className="image-upload-setting-name">보호자 사진</span>
+          <strong>{setting.guardianPhotoMaxMb}MB</strong>
+          <span className="input-with-unit">
+            <input
+              name="guardianPhotoMaxMb"
+              type="number"
+              min="1"
+              max={setting.maxConfigurablePhotoMb}
+              step="1"
+              defaultValue={setting.guardianPhotoMaxMb}
+              required
+            />
+            <span>MB</span>
+          </span>
+          <small>보호자정보에서 업로드하는 프로필 사진에 적용됩니다.</small>
+        </label>
+        <label className="image-upload-setting-card">
+          <span className="image-upload-setting-name">관리대상 사진</span>
+          <strong>{setting.subjectPhotoMaxMb}MB</strong>
+          <span className="input-with-unit">
+            <input
+              name="subjectPhotoMaxMb"
+              type="number"
+              min="1"
+              max={setting.maxConfigurablePhotoMb}
+              step="1"
+              defaultValue={setting.subjectPhotoMaxMb}
+              required
+            />
+            <span>MB</span>
+          </span>
+          <small>관리대상 등록과 수정에서 업로드하는 사진에 적용됩니다.</small>
+        </label>
+        <div className="image-upload-settings-note">
+          <strong>허용 형식</strong>
+          <span>JPEG, PNG, WebP, GIF</span>
+          <small>Vercel 요청 본문과 DB 저장 안정성을 위해 한 파일당 4MB까지 설정할 수 있습니다.</small>
+        </div>
+        <FormSubmitButton className="primary-button image-upload-settings-save" pendingText="저장중">
+          용량 제한 저장
+        </FormSubmitButton>
+      </form>
     </section>
   );
 }

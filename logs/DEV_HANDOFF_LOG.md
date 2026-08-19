@@ -7940,3 +7940,42 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - The selected QR claim API returned HTTP 200 and one HTTP-only claim cookie.
 - The test QR was immediately restored to its original unselected state with all claim fields cleared; the public page then hid signup actions and the claim API returned HTTP 409.
 - No production subject, guardian, order, payment, or permanent QR assignment was created during verification.
+
+## 2026-08-20 KST - Image Upload Policy And Popup Responsiveness
+
+### User Requirement
+- Confirm the current guardian and managed-subject photo upload limits.
+- Add an administrator image-upload menu that can change both limits and apply them to actual uploads.
+- Alert users with the configured limit when an oversized file is selected.
+- Close the notification and My Page popups when the backdrop is clicked or touched.
+- Open My Page faster.
+- Correct the vertically stretched close button in the mobile missing-ad modal.
+
+### Existing State Found
+- Managed-subject photos used the default `fileToDataUrl()` server limit of 1MB.
+- Guardian photo upload did not exist, so there was no guardian-photo limit.
+- My Page opened through a query-string navigation that reran dashboard data loading and generated QR images for every subject.
+- The mobile ad backdrop stretched the grid container to the viewport and distributed unused height across auto rows, stretching the footer and close control.
+
+### Reflected Work
+- Bumped the DB schema to version 41 and added `image_upload_settings` with separate guardian and subject byte limits.
+- Seeded both limits at 1MB and allowed administrators to set integer values from 1MB to 4MB.
+- Added `이미지업로드 관리` to the administrator sidebar with a two-setting form and shared success/error notices.
+- Added guardian photo columns, guardian profile uploader, authenticated image response route, and My Page avatar display.
+- Added reusable client file-size validation with a configured-MB alert and input reset.
+- Kept authoritative server MIME signature and size validation for guardian and managed-subject photos.
+- Replaced My Page server navigation with an immediate client overlay and preloaded the small subscription record in the dashboard batch.
+- Limited QR data-URL generation to the selected advertisement/edit/registration subject instead of every dashboard subject.
+- Added outside pointer and Escape dismissal to Notification and My Page popups.
+- Forced advertisement modal grid rows to content height and constrained the close button to a normal inline control on mobile.
+
+### Verification
+- `npm run build`: passed, including `/api/guardians/me/photo`.
+- `npm run security:check`: passed.
+- Isolated libSQL migration confirmed schema version 41, both guardian photo columns, and 1,048,576-byte defaults for both upload types.
+- Local 375px browser check found no horizontal overflow on the application shell.
+- `git diff --check`: passed before documentation updates.
+
+### Deliverable And Time Spent
+- `deliverables/IMAGE_UPLOAD_MANAGEMENT.md`
+- DB/UI analysis, implementation, build, schema test, and responsive inspection: about 50 minutes.
