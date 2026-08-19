@@ -436,7 +436,7 @@ function ProductConfiguration({
               ))}
             </select>
           ) : (
-            <a className="empty-shop-link" href="/?tab=subjects#subjects-info">
+            <a className="empty-shop-link" href="/?tab=subjects&mode=new#subjects-info">
               대상자를 먼저 등록해 주세요
             </a>
           )}

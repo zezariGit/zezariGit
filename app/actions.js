@@ -32,17 +32,21 @@ export async function saveGuardianAction(formData) {
 export async function saveSubjectAction(formData) {
   const session = await getServerSession(authOptions);
   if (!session) throw new Error("로그인이 필요합니다.");
+  const subjectId = String(formData.get("subjectId") || "").trim();
+  const subjectRoute = subjectId
+    ? `/?tab=subjects&editSubject=${encodeURIComponent(subjectId)}`
+    : "/?tab=subjects&mode=new";
   let result;
   try {
     result = await saveSubject(session, formData);
     revalidatePath("/");
   } catch (error) {
-    redirect(withNotice("/?tab=subjects", error.message || "필수값을 확인해주세요.", "error"));
+    redirect(withNotice(subjectRoute, error.message || "필수값을 확인해주세요.", "error"));
   }
   if (result?.isNew) {
     redirect(withNotice(`/?tab=subjects&registered=${encodeURIComponent(result.subjectId)}`, "관리대상 등록이 완료되었습니다."));
   }
-  redirect(withNotice("/?tab=subjects", "관리대상 정보가 수정되었습니다."));
+  redirect(withNotice(`/?tab=subjects&editSubject=${encodeURIComponent(result.subjectId)}`, "관리대상 정보가 수정되었습니다."));
 }
 
 export async function deleteSubjectAction(formData) {
@@ -52,9 +56,13 @@ export async function deleteSubjectAction(formData) {
     await deleteSubject(session, formData);
     revalidatePath("/");
   } catch (error) {
-    redirect(withNotice("/?tab=subjects", error.message || "삭제하지 못했습니다.", "error"));
+    const subjectId = String(formData.get("subjectId") || "").trim();
+    const returnTo = subjectId
+      ? `/?tab=subjects&editSubject=${encodeURIComponent(subjectId)}`
+      : "/?tab=dashboard&panel=my";
+    redirect(withNotice(returnTo, error.message || "삭제하지 못했습니다.", "error"));
   }
-  redirect(withNotice("/?tab=subjects", "관리대상 정보가 삭제되었습니다."));
+  redirect(withNotice("/?tab=dashboard&panel=my", "관리대상 정보가 삭제되었습니다."));
 }
 
 export async function createSubjectAdAction(formData) {

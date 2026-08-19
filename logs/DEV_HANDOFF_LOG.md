@@ -7831,3 +7831,25 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Authenticated production verification used an account with four subjects and confirmed two carousel pages, two page dots, active-dot switching, and the always-available fifth-subject registration form.
 - Confirmed the notification bell at upper left, My Page at upper right, no app bar or brand, and identical styling for all three quick actions.
 - `zezari.family`, `zezari.vercel.app`, and `real-qr-find.vercel.app` returned HTTP 200 with HSTS; no post-deployment production error logs were found.
+
+## 2026-08-19 KST - Single-Subject Registration and My Page Edit List
+
+### User Requirement
+- Show only one blank form when adding a new subject instead of listing every registered subject on the subject-information page.
+- Edit one selected subject at a time.
+- Move the subject editing entry points into My Page and grow the list as subjects are registered.
+- Do not implement subject-name search.
+
+### Reflected Work
+- Added the `editSubject` query parameter and owner-scoped subject selection in the existing dashboard data set.
+- Changed the subject-information route to render exactly one form: a blank form for new registration or the selected subject form for editing.
+- Replaced the former primary-subject summary in My Page with a full subject list showing image, name, status, gender, birth date, and an edit chevron.
+- Added a persistent `대상자 추가` action below the My Page list and updated the dashboard plus action and empty-shop link to the new-registration route.
+- Preserved the selected subject route after edit success or validation error, and return to the updated My Page list after deletion.
+- No subject-name search control or search data path was added.
+
+### Verification and Time Spent
+- `npm run build`: passed.
+- `npm run security:check`: passed.
+- `git diff --check`: no whitespace errors.
+- Implementation, routing review, responsive styling, documentation, and local regression checks: about 25 minutes.

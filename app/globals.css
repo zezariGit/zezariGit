@@ -8181,6 +8181,133 @@ button:disabled:hover {
   line-height: 1.45;
 }
 
+.my-section-heading > span {
+  color: var(--c-text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.my-subject-list {
+  display: grid;
+  gap: 8px;
+}
+
+.my-subject-row {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-text);
+  text-decoration: none;
+}
+
+.my-subject-row:hover {
+  border-color: var(--c-primary);
+  background: var(--c-primary-light);
+  color: var(--c-text);
+  text-decoration: none;
+}
+
+.my-subject-photo {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--c-border);
+  border-radius: 50%;
+  background: #f1f2f4;
+}
+
+.my-subject-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.my-subject-photo > span {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #aaaaaa;
+  box-shadow: 0 20px 0 9px #aaaaaa;
+  transform: translateY(-6px);
+}
+
+.my-subject-summary {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.my-subject-name-line {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.my-subject-name-line strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--c-text);
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.my-subject-name-line .status-badge {
+  flex: 0 0 auto;
+  min-width: 0;
+  padding: 3px 6px;
+  font-size: 0.65rem;
+}
+
+.my-subject-summary small {
+  color: var(--c-text-muted);
+  font-size: 0.75rem;
+}
+
+.my-subject-chevron {
+  color: var(--c-text);
+  font-size: 1.55rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.my-subject-add-button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--c-primary);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-primary);
+  font-size: 0.84rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.my-subject-add-button:hover {
+  background: var(--c-primary-light);
+  color: var(--c-primary);
+  text-decoration: none;
+}
+
+.my-subject-add-button > span {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
 .my-action-row {
   display: grid;
   grid-template-columns: 96px minmax(0, 1fr);

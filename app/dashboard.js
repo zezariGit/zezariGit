@@ -36,10 +36,12 @@ export default async function GuardianDashboard({
   activeTab = "dashboard",
   showMyPage = false,
   adSubjectId = "",
+  editSubjectId = "",
   registeredSubjectId = "",
 }) {
   const subjectsWithQr = await withSubjectQrImages(subjects);
   const selectedAdSubject = subjectsWithQr.find((subject) => subject.id === adSubjectId) || null;
+  const selectedEditSubject = subjectsWithQr.find((subject) => subject.id === editSubjectId) || null;
   const registeredSubject = subjectsWithQr.find((subject) => subject.id === registeredSubjectId) || null;
   const admin = isAdminSession(session) || Number(guardian.is_admin || 0) === 1;
   const socialAccount = isSocialAccount(session);
@@ -157,7 +159,7 @@ export default async function GuardianDashboard({
         ) : isGuardianTab ? (
           <GuardianInfoTab guardian={guardian} session={session} />
         ) : (
-          <SubjectsInfoTab subjects={subjectsWithQr} registeredSubject={registeredSubject} />
+          <SubjectsInfoTab selectedSubject={selectedEditSubject} registeredSubject={registeredSubject} />
         )}
 
         <div className="install-area dashboard-install">
@@ -221,7 +223,6 @@ function GuardianInfoTab({ guardian, session }) {
 }
 
 function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref = "" }) {
-  const primarySubject = subjects[0] || null;
   const subscriptionLabel = subscription?.status === "active"
     ? "이용중"
     : subscription?.status === "paused"
@@ -272,20 +273,44 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
       <div className="my-page-section">
         <div className="my-section-heading">
           <h3>대상자 정보</h3>
-          <Link href="/?tab=subjects#subjects-info">정보 수정 &gt;</Link>
+          <span>총 {subjects.length}명</span>
         </div>
-        {primarySubject ? (
-          <>
-            <InfoRow label="이름" value={primarySubject.name || "이름 미입력"} />
-            <InfoRow label="성별" value={primarySubject.gender || "성별 미입력"} />
-            <InfoRow label="생년월일" value={formatDate(primarySubject.birth_date)} />
-            <InfoRow label="보호자 메시지" value={primarySubject.guardian_message || "메시지 미입력"} />
-            <InfoRow label="사진" value={primarySubject.photo_name || (subjectPhotoSrc(primarySubject) ? "사진 등록됨" : "사진 미등록")} />
-          </>
+        {subjects.length > 0 ? (
+          <div className="my-subject-list">
+            {subjects.map((subject) => (
+              <Link
+                className="my-subject-row"
+                href={`/?tab=subjects&editSubject=${encodeURIComponent(subject.id)}#subjects-info`}
+                aria-label={`${subject.name} 정보 수정`}
+                key={subject.id}
+              >
+                <span className="my-subject-photo" aria-hidden={!subjectPhotoSrc(subject)}>
+                  {subjectPhotoSrc(subject) ? (
+                    <img src={subjectPhotoSrc(subject)} alt="" />
+                  ) : (
+                    <span aria-hidden="true" />
+                  )}
+                </span>
+                <span className="my-subject-summary">
+                  <span className="my-subject-name-line">
+                    <strong>{subject.name || "이름 미입력"}</strong>
+                    <em className={`status-badge ${statusClass(subject.status)}`}>
+                      {statusLabel(subject.status)}
+                    </em>
+                  </span>
+                  <small>{shortGender(subject.gender)} · {formatDate(subject.birth_date)}</small>
+                </span>
+                <span className="my-subject-chevron" aria-hidden="true">›</span>
+              </Link>
+            ))}
+          </div>
         ) : (
           <p className="my-empty-text">등록된 관리대상이 없습니다.</p>
         )}
-        {subjects.length > 1 && <p className="my-empty-text">외 {subjects.length - 1}명은 관리대상정보에서 확인할 수 있습니다.</p>}
+        <Link className="my-subject-add-button" href="/?tab=subjects&mode=new#subjects-info">
+          <span aria-hidden="true">+</span>
+          대상자 추가
+        </Link>
       </div>
 
       <div className="my-page-section">
@@ -376,25 +401,24 @@ function InfoRow({ label, value, actionLabel = "", href = "" }) {
   );
 }
 
-function SubjectsInfoTab({ subjects, registeredSubject }) {
+function SubjectsInfoTab({ selectedSubject, registeredSubject }) {
   if (registeredSubject) {
     return <SubjectRegistrationComplete subject={registeredSubject} />;
   }
+
+  const editing = Boolean(selectedSubject);
 
   return (
     <section className="subjects-workspace">
       <div className="panel-heading subjects-heading">
         <div>
-          <h2 id="subjects-info">대상자 등록</h2>
-          <p>관리대상 정보를 등록하거나 기존 정보를 수정할 수 있습니다.</p>
+          <h2 id="subjects-info">{editing ? "대상자 수정" : "대상자 등록"}</h2>
+          <p>{editing ? `${selectedSubject.name} 대상자의 정보를 수정합니다.` : "새 관리대상 한 명의 정보를 입력해 주세요."}</p>
         </div>
-        <span>등록 {subjects.length}명</span>
+        <span>{editing ? selectedSubject.name : "신규"}</span>
       </div>
       <div className="subject-list">
-        {subjects.map((subject) => (
-          <SubjectForm key={subject.id} subject={subject} />
-        ))}
-        <SubjectForm />
+        <SubjectForm subject={selectedSubject || undefined} />
       </div>
     </section>
   );
@@ -446,7 +470,7 @@ function StatusDashboard({ subjects }) {
                 ))}
                 {pageIndex === subjectPages.length - 1 && (
                   <div className="managed-add-row">
-                    <Link className="managed-add-button" href="/?tab=subjects#subjects-info" aria-label="관리대상 추가" title="관리대상 추가">
+                    <Link className="managed-add-button" href="/?tab=subjects&mode=new#subjects-info" aria-label="관리대상 추가" title="관리대상 추가">
                       <span aria-hidden="true">+</span>
                     </Link>
                   </div>
@@ -689,6 +713,12 @@ function SubjectRegistrationComplete({ subject }) {
 
 function formatDate(value) {
   return formatDateOnly(value);
+}
+
+function shortGender(value) {
+  const gender = String(value || "").trim();
+  if (!gender) return "성별 미입력";
+  return gender.replace("성", "");
 }
 
 function formatFullAddress(address, detailAddress) {

@@ -18,6 +18,7 @@ export default async function HomePage({ searchParams }) {
         : "dashboard";
   const showMyPage = resolvedSearchParams?.panel === "my" || requestedTab === "my";
   const adSubjectId = resolvedSearchParams?.adSubject || "";
+  const editSubjectId = resolvedSearchParams?.editSubject || "";
   const registeredSubjectId = resolvedSearchParams?.registered || "";
   const notice = resolvedSearchParams?.notice || "";
   const noticeType = resolvedSearchParams?.noticeType || "success";
@@ -42,6 +43,7 @@ export default async function HomePage({ searchParams }) {
           activeTab={activeTab}
           showMyPage={showMyPage}
           adSubjectId={adSubjectId}
+          editSubjectId={editSubjectId}
           registeredSubjectId={registeredSubjectId}
         />
         <UserPolicyFooter />
