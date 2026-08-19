@@ -7566,7 +7566,8 @@ a.inline-scroll-value {
 }
 
 .qr-lifecycle-badge,
-.qr-activation-badge {
+.qr-activation-badge,
+.qr-store-sale-badge {
   justify-self: center;
   min-width: 58px;
   padding: 6px 8px;
@@ -7575,6 +7576,11 @@ a.inline-scroll-value {
   font-style: normal;
   font-weight: 900;
   text-align: center;
+}
+
+.qr-store-sale-badge {
+  background: #111827;
+  color: #ffffff;
 }
 
 .qr-lifecycle-badge.in-use {

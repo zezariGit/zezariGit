@@ -7901,3 +7901,33 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `zezari.family`, `zezari.vercel.app`, and `real-qr-find.vercel.app` returned HTTP 200 with HSTS and rendered all regular/SNS signup actions on an unassigned QR page.
 - Production 375px browser verification confirmed six enabled entry buttons, no horizontal overflow, and no browser console warnings or errors.
 - Production invalid-key API verification returned HTTP 409 without creating a reservation.
+
+## 2026-08-19 KST - Administrator-Selected Store-Sale QR Reservation
+
+### User Requirement
+- Let administrators designate an active unassigned QR as `QR선점 - 스토어판매용` from the QR detail management tab.
+- Keep the reservation control disabled for already assigned QR codes.
+- Allow a store-sale reserved QR to be matched only through its public QR page, signup or login, and mandatory new-subject registration.
+- Keep normal signup allocation from consuming store-sale reserved QR inventory.
+
+### Reflected Work
+- Bumped the DB schema to version 40 and added `store_sale_reserved` and `store_sale_reserved_at` to `qr_codes`.
+- Added administrator reserve/release action with server-side checks for assignment, lifecycle, and active state.
+- Added store-sale state to the QR list, detail badges, basic information, management tab, activity timeline, status summary, and CSV export.
+- Disabled the reserve control for assigned, discarded, or inactive QR rows and hid manual matching while the QR remains store-sale reserved.
+- Blocked crafted administrator manual-match requests for reserved QR codes until reservation release.
+- Limited `POST /api/qr-claim/start` and active browser claims to administrator-reserved QR codes.
+- Excluded persistent store-sale reservations from normal oldest-unassigned-QR allocation even when no browser has started signup.
+- Required both the persistent administrator reservation and the two-hour browser claim in the atomic exact-QR assignment.
+- Cleared both reservation layers after successful assignment and cleared them on manual lifecycle transitions where the QR leaves the external-sale pool.
+- Unselected unassigned QR pages now show status guidance only; signup and SNS actions appear only on store-sale reserved QR pages.
+
+### Verification And Deliverables
+- `npm run test:qr-claim`: passed unselected-claim rejection, exact selected-QR assignment, reservation cleanup, and normal-allocation exclusion.
+- `npm run build`: passed.
+- `npm run security:check`: passed.
+- `git diff --check`: passed before documentation updates.
+- Isolated schema-version-40 libSQL browser verification confirmed that an unselected QR renders zero signup actions while a store-sale reserved QR renders six enabled regular/SNS/login actions.
+- 375px verification confirmed six equal-width buttons, no horizontal overflow, and no browser console warnings/errors.
+- Updated `deliverables/QR_EXTERNAL_SALES_ONBOARDING.md`, deliverables index, and image-generation prompt.
+- Analysis, schema work, implementation, and automated verification: about 40 minutes.

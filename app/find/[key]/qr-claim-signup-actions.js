@@ -90,7 +90,7 @@ export default function QrClaimSignupActions({ publicKey, enabledProviders = [],
       )}
 
       {message && <p className="qr-claim-error" role="alert">{message}</p>}
-      <p className="qr-claim-note">2시간 안에 보호자 정보와 첫 관리대상을 등록하면 지금 스캔한 QR이 자동으로 연결됩니다.</p>
+      <p className="qr-claim-note">이 QR은 스토어 판매용으로 선점되어 있습니다. 가입을 시작하면 2시간 동안 현재 가입자에게 임시 예약되며, 보호자 정보와 첫 관리대상을 등록할 때 정확히 연결됩니다.</p>
     </div>
   );
 }

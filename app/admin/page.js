@@ -52,6 +52,7 @@ import {
   setQrActiveAction,
   setQrAdminTestActivationAction,
   setQrLifecycleAction,
+  setQrStoreSaleReservationAction,
   setQrSubjectAction,
   setAdminSubjectAdMemoAction,
   setAdminSubjectAdStatusAction,
@@ -4138,7 +4139,12 @@ function QrManagementSection({ qrData, qrItems }) {
             note={`미활성화: ${formatMetricValue(qrData.inactiveCount)}개 / 활성화: ${formatMetricValue(qrData.activeCount)}개`}
             noteTone="positive"
           />
-          <GuardianStatCard icon="blocked" title="미사용" value={formatCountWithUnit(qrData.unusedCount, "개")} />
+          <GuardianStatCard
+            icon="blocked"
+            title="미사용"
+            value={formatCountWithUnit(qrData.unusedCount, "개")}
+            note={`스토어 선점: ${formatMetricValue(qrData.storeSaleReservedCount)}개`}
+          />
           <GuardianStatCard icon="blocked" title="폐기" value={formatCountWithUnit(qrData.discardedCount, "개")} noteTone={Number(qrData.discardedCount || 0) > 0 ? "negative" : "neutral"} />
         </div>
       </section>
@@ -4218,7 +4224,7 @@ function QrManagementSection({ qrData, qrItems }) {
                   <span role="cell" className="inline-scroll-value">{qr.code || "-"}</span>
                   <span role="cell">{formatQrSubjectLabel(qr)}</span>
                   <span role="cell">{qr.guardian_name || "미배정"}</span>
-                  <em role="cell" className={`qr-lifecycle-badge ${qrLifecycleClass(qr)}`}>{qrLifecycleLabel(qr.lifecycle_status)}</em>
+                  <em role="cell" className={`qr-lifecycle-badge ${qrLifecycleClass(qr)}`}>{Number(qr.store_sale_reserved || 0) === 1 ? "스토어 선점" : qrLifecycleLabel(qr.lifecycle_status)}</em>
                   <em role="cell" className={`qr-activation-badge ${qrActivationClass(qr)}`}>{qrActivationLabel(qr)}</em>
                   <time role="cell">{formatDateOnlyValue(qr.created_at)}</time>
                   <time role="cell">{formatDateOnlyValue(qr.activated_at)}</time>
@@ -4266,6 +4272,7 @@ function QrManagementSection({ qrData, qrItems }) {
                   <div className="qr-detail-badges">
                     <em className={`qr-lifecycle-badge ${qrLifecycleClass(selectedQr)}`}>{qrLifecycleLabel(selectedQr.lifecycle_status)}</em>
                     <em className={`qr-activation-badge ${qrActivationClass(selectedQr)}`}>{qrActivationLabel(selectedQr)}</em>
+                    {Number(selectedQr.store_sale_reserved || 0) === 1 && <em className="qr-store-sale-badge">스토어 판매 선점</em>}
                   </div>
                   <span>{selectedQr.subject_name || "미매칭"}</span>
                   <span>{selectedQr.guardian_name || "보호자 미배정"}</span>
@@ -4296,6 +4303,7 @@ function QrManagementSection({ qrData, qrItems }) {
                       <div><dt>누적 보정일</dt><dd>{formatMetricValue(selectedQr.subscription_hold_total_days)}일</dd></div>
                       <div><dt>QR 번호</dt><dd><span className="inline-scroll-value">{selectedQr.code || "-"}</span></dd></div>
                       <div><dt>고유키</dt><dd><span className="inline-scroll-value">{selectedQr.public_key || "-"}</span></dd></div>
+                      <div><dt>판매용 선점</dt><dd>{Number(selectedQr.store_sale_reserved || 0) === 1 ? `스토어 판매용 (${formatRecentDateTime(selectedQr.store_sale_reserved_at)})` : "일반 미배정"}</dd></div>
                       <div><dt>대상자정보페이지</dt><dd><a className="inline-scroll-value" href={selectedQr.target_url} target="_blank" rel="noreferrer">{selectedQr.target_url}</a></dd></div>
                     </dl>
                     <form action={setQrAdminMemoAction} className="guardian-detail-memo-form">
@@ -4328,13 +4336,32 @@ function QrManagementSection({ qrData, qrItems }) {
                         <div className="guardian-detail-row"><strong>현재 상태</strong><span>{qrLifecycleLabel(selectedQr.lifecycle_status)} / {qrActivationLabel(selectedQr)}</span></div>
                         <div className="guardian-detail-row"><strong>매칭 대상</strong><span>{formatQrSubjectLabel(selectedQr)}</span></div>
                         <div className="guardian-detail-row"><strong>보호자</strong><span>{selectedQr.guardian_name || "미배정"}</span></div>
+                        <div className="guardian-detail-row"><strong>판매 선점</strong><span>{Number(selectedQr.store_sale_reserved || 0) === 1 ? "스토어 판매용" : "미선점"}</span></div>
                       </article>
                       <div className="qr-detail-action-grid">
-                        {selectedQr.lifecycle_status !== "discarded" && !selectedQr.subject_id && (
+                        {selectedQr.lifecycle_status !== "discarded" && !selectedQr.subject_id && Number(selectedQr.store_sale_reserved || 0) !== 1 && (
                           <Link className="activate-button" href={buildQrAssignUrl(qrData, selectedQr.id)}>
                             매칭대상 조회
                           </Link>
                         )}
+                        <form action={setQrStoreSaleReservationAction}>
+                          <input type="hidden" name="qrId" value={selectedQr.id} />
+                          <input type="hidden" name="reserved" value={Number(selectedQr.store_sale_reserved || 0) === 1 ? "0" : "1"} />
+                          <input type="hidden" name="returnTo" value={selectedQrReturnTo} />
+                          <FormSubmitButton
+                            className={Number(selectedQr.store_sale_reserved || 0) === 1 ? "plain-button" : "activate-button"}
+                            pendingText={Number(selectedQr.store_sale_reserved || 0) === 1 ? "선점 해제중" : "선점 처리중"}
+                            disabled={Boolean(selectedQr.subject_id) || selectedQr.lifecycle_status === "discarded" || Number(selectedQr.is_active || 0) !== 1}
+                          >
+                            {selectedQr.subject_id
+                              ? "배정 QR - 선점 불가"
+                              : selectedQr.lifecycle_status === "discarded" || Number(selectedQr.is_active || 0) !== 1
+                                ? "사용 가능한 미배정 QR만 선점"
+                                : Number(selectedQr.store_sale_reserved || 0) === 1
+                                  ? "스토어 판매 선점 해제"
+                                  : "QR선점 - 스토어판매용"}
+                          </FormSubmitButton>
+                        </form>
                         {selectedQr.lifecycle_status !== "discarded" && selectedQr.subject_id && (
                           <form action={setQrSubjectAction}>
                             <input type="hidden" name="qrId" value={selectedQr.id} />
@@ -4737,6 +4764,8 @@ function qrExportRows(qrItems = []) {
     QR번호: qr.code,
     고유문자열: qr.public_key,
     상태: qrLifecycleLabel(qr.lifecycle_status),
+    스토어판매선점: Number(qr.store_sale_reserved || 0) === 1 ? "선점" : "미선점",
+    스토어판매선점일시: formatRecentDateTime(qr.store_sale_reserved_at),
     활성화상태: qrActivationLabel(qr),
     보호자: qr.guardian_name || "미배정",
     관리대상: formatQrSubjectLabel(qr),

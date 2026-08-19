@@ -35,6 +35,7 @@ import {
   setQrActive,
   setQrAdminTestActivation,
   setQrLifecycle,
+  setQrStoreSaleReservation,
   setQrSubject,
   setSubscriptionAdminMemo,
   setSubscriptionAdminTest,
@@ -240,6 +241,26 @@ export async function setQrAdminMemoAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), error.message || "QR 메모 저장에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), "QR 메모가 저장되었습니다."));
+}
+
+export async function setQrStoreSaleReservationAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  let result;
+  try {
+    result = await setQrStoreSaleReservation(formData);
+    revalidatePath("/admin");
+    revalidatePath("/find/[key]", "page");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), error.message || "스토어 판매용 QR 선점 설정에 실패했습니다.", "error"));
+  }
+  const message = !result?.changed
+    ? "QR의 스토어 판매 선점 상태가 이미 요청한 값입니다."
+    : result.reserved
+      ? `${result.code} QR이 스토어 판매용으로 선점되었습니다.`
+      : `${result.code} QR의 스토어 판매 선점이 해제되었습니다.`;
+  redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), message));
 }
 
 export async function setQrSubjectAction(formData) {

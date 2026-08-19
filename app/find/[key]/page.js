@@ -55,21 +55,30 @@ export default async function FindPage({ params, searchParams }) {
   }
 
   if (!data.subject_id || !data.guardian_id) {
+    const storeSaleReserved = Number(data.store_sale_reserved || 0) === 1;
     return (
       <main className="find-page">
         <section className="find-shell">
           <p className="intro-kicker">QR 확인 완료</p>
           <h1>아직 관리대상과 연결되지 않은 QR입니다</h1>
-          <p>보호자가 관리대상을 등록하면 이 QR에서 대상자 정보와 보호자 안심번호를 확인할 수 있습니다.</p>
+          <p>
+            {storeSaleReserved
+              ? "스토어 판매용 QR입니다. 가입 또는 로그인 후 첫 관리대상을 등록하면 이 QR과 바로 연결됩니다."
+              : "관리자가 아직 스토어 판매용으로 선점하지 않은 QR입니다. QR 상태는 판매처 또는 관리자에게 확인해 주세요."}
+          </p>
           <div className="find-key-box">
             <span>QR 코드</span>
             <strong>{data.code}</strong>
           </div>
-          <QrClaimSignupActions
-            publicKey={data.public_key}
-            enabledProviders={enabledProviders}
-            signedIn={Boolean(session)}
-          />
+          {storeSaleReserved ? (
+            <QrClaimSignupActions
+              publicKey={data.public_key}
+              enabledProviders={enabledProviders}
+              signedIn={Boolean(session)}
+            />
+          ) : (
+            <a className="admin-link" href="/">처음 화면</a>
+          )}
         </section>
         <StatusToast message={notice} type={noticeType} />
       </main>
