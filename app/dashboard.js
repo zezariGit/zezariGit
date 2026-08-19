@@ -65,21 +65,34 @@ export default async function GuardianDashboard({
     <main className="dashboard-page">
       <section className={`dashboard-shell${guardianComplete && guardianActive ? " has-corner" : ""}`}>
         {guardianComplete && guardianActive && (
-          <div className="dashboard-corner-bar" aria-label="사용자 빠른 메뉴">
-            <NotificationBell />
-            <Link
-              className="corner-icon-button my-page-corner-link"
-              href={myPageHref}
-              aria-label="마이페이지"
-              title="마이페이지"
-              data-tooltip="마이페이지"
-            >
-              <PersonIcon />
+          <header className="dashboard-app-bar">
+            <Link className="dashboard-brand" href="/?tab=dashboard" aria-label="제자리 대시보드">
+              <span aria-hidden="true">Z</span>
+              제자리
             </Link>
-          </div>
+            <div className="dashboard-corner-bar" aria-label="사용자 빠른 메뉴">
+              <NotificationBell />
+              <Link
+                className="corner-icon-button my-page-corner-link"
+                href={myPageHref}
+                aria-label="마이페이지"
+                title="마이페이지"
+                data-tooltip="마이페이지"
+              >
+                <PersonIcon />
+              </Link>
+            </div>
+          </header>
         )}
+        <div className="dashboard-content">
         <header className="dashboard-header">
           <div>
+            {guardianComplete && !isDashboard && (
+              <Link className="dashboard-back-link" href="/?tab=dashboard">
+                <span aria-hidden="true">‹</span>
+                대시보드로 돌아가기
+              </Link>
+            )}
             <p className="intro-kicker">{guardianComplete ? "보호자 대시보드" : "정보 입력"}</p>
             <h1 className="dashboard-title">
               {isDashboard
@@ -123,18 +136,6 @@ export default async function GuardianDashboard({
           </>
         ) : (
           <>
-        <nav className="dashboard-menu" aria-label="보호자 메뉴">
-          <Link className={isDashboard ? "active" : ""} href="/?tab=dashboard">
-            대시보드
-          </Link>
-          <Link className={isGuardianTab ? "active" : ""} href="/?tab=guardian">
-            보호자정보
-          </Link>
-          <Link className={isSubjectsTab ? "active" : ""} href="/?tab=subjects">
-            관리대상정보
-          </Link>
-        </nav>
-
         {showMyPage && (
           <section className="modal-backdrop my-page-backdrop" aria-label="마이페이지" role="dialog" aria-modal="true">
             <ModalScrollLock />
@@ -172,6 +173,7 @@ export default async function GuardianDashboard({
         )}
           </>
         )}
+        </div>
       </section>
     </main>
   );
@@ -200,10 +202,7 @@ function DashboardTab({
 
   return (
     <>
-      <StatusDashboard
-        guardian={guardian}
-        subjects={subjects}
-      />
+      <StatusDashboard subjects={subjects} />
       {selectedAdSubject && (
         <AdCampaignModal
           subject={selectedAdSubject}
@@ -214,13 +213,6 @@ function DashboardTab({
           endAction={endSubjectAdAction}
         />
       )}
-      <section className="dashboard-panel summary-panel">
-        <div className="panel-heading">
-          <h2>관리대상 요약</h2>
-          <span>{subjects.length}/4명</span>
-        </div>
-        <p>상태 변경이나 정보 수정은 정보입력 메뉴에서 진행할 수 있습니다.</p>
-      </section>
     </>
   );
 }
@@ -267,7 +259,7 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
       <div className="my-page-section">
         <div className="my-section-heading">
           <h3>보호자 정보</h3>
-          <Link href="/?tab=guardian">정보 수정 &gt;</Link>
+          <Link href="/?tab=guardian#guardian-info">정보 수정 &gt;</Link>
         </div>
         <InfoRow label="이름" value={guardian.name || "이름 미입력"} />
         <InfoRow
@@ -275,7 +267,7 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
           value={isSocialAccount(session) ? `${socialProviderLabel(session?.user?.provider)} 계정` : guardian.password_hash ? "********" : "미설정"}
         />
         <InfoRow label="연락처" value={guardian.phone || "연락처 미입력"} />
-        <InfoRow label="수령인" value={guardian.name || "이름 미입력"} actionLabel="주소록관리 >" href="/?tab=guardian" />
+        <InfoRow label="수령인" value={guardian.name || "이름 미입력"} actionLabel="주소록관리 >" href="/?tab=guardian#guardian-info" />
         <InfoRow label="주소" value={formatFullAddress(guardian.address, guardian.address_detail)} />
         <InfoRow
           label="안심번호 운영"
@@ -286,7 +278,7 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
       <div className="my-page-section">
         <div className="my-section-heading">
           <h3>대상자 정보</h3>
-          <Link href="/?tab=subjects">정보 수정 &gt;</Link>
+          <Link href="/?tab=subjects#subjects-info">정보 수정 &gt;</Link>
         </div>
         {primarySubject ? (
           <>
@@ -361,6 +353,25 @@ function PersonIcon() {
   );
 }
 
+function AlertIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M10.3 4.3 2.8 17.2A2 2 0 0 0 4.5 20h15a2 2 0 0 0 1.7-2.8L13.7 4.3a2 2 0 0 0-3.4 0Z" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+      <path d="M12 9v4" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+      <path d="M12 17h.01" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2.5" />
+    </svg>
+  );
+}
+
+function BagIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M6 8h12l1 12H5L6 8Z" fill="none" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" />
+      <path d="M9 8a3 3 0 0 1 6 0" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+    </svg>
+  );
+}
+
 function InfoRow({ label, value, actionLabel = "", href = "" }) {
   return (
     <div className="my-info-row">
@@ -395,67 +406,73 @@ function SubjectsInfoTab({ subjects, emptySlots, registeredSubject }) {
   );
 }
 
-function StatusDashboard({ guardian, subjects }) {
-  const slots = Array.from({ length: 4 }, (_, index) => subjects[index] || null);
+function StatusDashboard({ subjects }) {
+  const pageSize = 3;
+  const maxSubjects = 4;
+  const subjectPages = [];
+  for (let index = 0; index < subjects.length; index += pageSize) {
+    subjectPages.push(subjects.slice(index, index + pageSize));
+  }
+  if (subjectPages.length === 0) subjectPages.push([]);
 
   return (
     <section className="status-dashboard" aria-label="관리대상 현재 상태">
       <div className="status-phone">
         <div className="status-phone-top">
-          <span className="bell-icon" aria-hidden="true">!</span>
           <h2>현재 상태</h2>
+          <span className="status-subject-count">등록 대상 {subjects.length}명</span>
         </div>
-        <div className="managed-list">
-          {slots.map((subject, index) =>
-            subject ? (
-              <article className="managed-card" key={subject.id}>
-                <div className="managed-photo">
-                  {subjectPhotoSrc(subject) ? (
-                    <img src={subjectPhotoSrc(subject)} alt={`${subject.name} 사진`} />
-                  ) : (
-                    <span aria-hidden="true" />
-                  )}
-                </div>
-                <div className="managed-info">
-                  <strong>{subject.name}</strong>
-                  <span>{formatDate(subject.birth_date)}</span>
-                  {subject.qr_code && <span>QR: {subject.qr_code}</span>}
-                  {subject.ad_status && <span>광고: {adStatusLabel(subject.ad_status)}</span>}
-                </div>
-                <div className="managed-actions">
-                  <span className={`status-badge ${statusClass(subject.status)}`}>
-                    {statusLabel(subject.status)}
-                  </span>
-                  <Link className="managed-ad-button" href={`/?tab=dashboard&adSubject=${encodeURIComponent(subject.id)}`}>
-                    광고
-                  </Link>
-                </div>
-              </article>
-            ) : (
-              <article className="managed-card empty-managed" key={`empty-${index}`}>
-                <div className="managed-photo">
-                  <span aria-hidden="true" />
-                </div>
-                <div className="managed-info">
-                  <strong>미등록</strong>
-                  <span>관리대상을 추가하세요</span>
-                </div>
-                <span className="status-badge neutral">빈 슬롯</span>
-              </article>
-            )
-          )}
+        <div className="managed-carousel" aria-label="관리대상 목록, 한 화면에 3명씩 표시">
+          <div className="managed-pages">
+            {subjectPages.map((pageSubjects, pageIndex) => (
+              <div className="managed-page" key={`managed-page-${pageIndex}`}>
+                {pageSubjects.map((subject) => (
+                  <article className="managed-card" key={subject.id}>
+                    <div className="managed-photo">
+                      {subjectPhotoSrc(subject) ? (
+                        <img src={subjectPhotoSrc(subject)} alt={`${subject.name} 사진`} />
+                      ) : (
+                        <span aria-hidden="true" />
+                      )}
+                    </div>
+                    <div className="managed-info">
+                      <strong>{subject.name}</strong>
+                      <span>{formatDate(subject.birth_date)}</span>
+                      {subject.qr_code && <span>QR: {subject.qr_code}</span>}
+                      {subject.ad_status && <span>광고: {adStatusLabel(subject.ad_status)}</span>}
+                    </div>
+                    <div className="managed-actions">
+                      <span className={`status-badge ${statusClass(subject.status)}`}>
+                        {statusLabel(subject.status)}
+                      </span>
+                      <Link className="managed-ad-button" href={`/?tab=dashboard&adSubject=${encodeURIComponent(subject.id)}`}>
+                        광고
+                      </Link>
+                    </div>
+                  </article>
+                ))}
+                {pageIndex === subjectPages.length - 1 && subjects.length < maxSubjects && (
+                  <div className="managed-add-row">
+                    <Link className="managed-add-button" href="/?tab=subjects#subjects-info" aria-label="관리대상 추가" title="관리대상 추가">
+                      <span aria-hidden="true">+</span>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
         <div className="quick-actions">
           <Link href="/missing-report">
-            <span aria-hidden="true">!</span>
+            <AlertIcon />
             실종신고
           </Link>
           <Link href="/shop">
-            <span aria-hidden="true">B</span>
+            <BagIcon />
             상품 구매
           </Link>
           <Link href="/?tab=dashboard&panel=my">
-            <span aria-hidden="true">M</span>
+            <PersonIcon />
             내 정보
           </Link>
         </div>

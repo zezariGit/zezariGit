@@ -7736,3 +7736,58 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Time Spent
 - Metadata inspection, service/code mapping, architecture and access-register authoring, and security review: about 35 minutes.
+
+## 2026-08-19 KST - Black Dashboard Style Preview
+
+### User Requirement
+- Review `reference/제자리 서비스_와이어프레임 (최신).pdf` and prepare a black-themed dashboard preview before changing the live application CSS.
+- Keep the preview separate so layout, spacing, colors, and responsive behavior can be reviewed first.
+
+### Reflected Work
+- Rendered and visually reviewed the complete one-page wireframe and isolated the dashboard information structure.
+- Created an independent static preview with the wireframe's guardian greeting, primary tabs, subject status list, and three main actions.
+- Replaced the former purple primary color with black, white, and neutral gray while preserving green, amber, and red only for status meaning.
+- Added PC and 390px mobile comparison views, responsive behavior, tab selection, and subject row selection.
+
+### Verification
+- Desktop browser render completed with 18 interactive buttons and no console warnings or errors.
+- Mobile 390px render completed with no horizontal overflow (`bodyScrollWidth = bodyClientWidth = 390`).
+- Tab switching and selected-subject state were verified.
+
+### Deliverables
+- `deliverables/previews/BLACK_DASHBOARD_STYLE_PREVIEW.html`
+- `deliverables/previews/BLACK_DASHBOARD_STYLE_PREVIEW.png`
+- `deliverables/previews/BLACK_DASHBOARD_STYLE_PREVIEW_MOBILE.png`
+
+### Scope and Time Spent
+- Reference review, preview authoring, desktop/mobile render checks, and interaction verification: about 25 minutes.
+- Preview only. No production application source, GitHub branch, or Vercel deployment was changed.
+
+## 2026-08-19 KST - Production Black Theme and Guardian Dashboard Navigation
+
+### User Requirement
+- Apply the approved black CSS preview to the live application.
+- Remove the visible dashboard, guardian information, and subject information tabs.
+- Show three subjects per current-status page and expose later subjects by horizontal swipe.
+- Add a plus button after the last subject that opens the hidden subject-information route.
+- Keep guardian editing accessible from the My Page information-edit link.
+
+### Reflected Work
+- Replaced the shared gov-style primary, information, background, border, focus, browser-theme, and PWA-theme colors with black and neutral gray tokens.
+- Added a black user app bar with brand, notification, and My Page controls.
+- Removed the visible three-tab menu while preserving guardian and subject edit routes.
+- Added dashboard-return navigation to hidden edit screens.
+- Grouped subjects in pages of three inside a touch-friendly `scroll-snap` horizontal carousel.
+- Added the subject `+` action only below the final group and only while fewer than four subjects are registered.
+- Updated My Page guardian, address, and subject edit links to the preserved edit anchors.
+- Removed the redundant dashboard subject-summary panel.
+
+### Verification
+- `npm run build`: passed.
+- `npm run security:check`: passed.
+- `git diff --check`: no whitespace errors.
+- Local production browser checks passed at desktop and 390px mobile widths with no console errors or horizontal page overflow.
+
+### Deliverable and Time Spent
+- `deliverables/USER_DASHBOARD_BLACK_THEME.md`
+- Implementation, responsive styling, build/security checks, and browser verification: about 45 minutes.
