@@ -5633,3 +5633,24 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 구형 `zezari.vercel.app` 별칭을 최신 운영 배포에 재연결
 - `zezari.family`, `zezari.vercel.app`, `real-qr-find.vercel.app` HTTP 200 및 보안 헤더 확인
 - 배포 직후 운영 오류 로그 없음
+
+## 2026-08-19 - 운영 구성·서비스·계정 통합대장
+
+### 요구내용
+- Vercel, Turso DB, GitHub와 현재 서비스 구조를 한눈에 확인할 수 있도록 정리
+- 안심번호, 인증번호, Toss 결제, Meta 광고, OAuth, Push 등 외부 연동 관리
+- 계정 로그인·비밀번호 정보의 안전한 인수인계 체계 마련
+
+### 반영내용
+- GitHub → Vercel → Turso와 OAuth·Solapi·Toss·Meta·Bizcall·Push·지도 연결 구조도 작성
+- 운영 도메인, 프로젝트·조직 식별정보, 37개 DB 테이블의 업무영역 정리
+- 서비스별 관리 콘솔, 환경변수 이름, 현재 상태, 코드 위치, 키 교체 영향과 정기점검 주기 작성
+- 계정별 로그인 URL, 확인된 계정 식별자, 권한, 비밀번호 관리자 항목명, MFA·복구수단 확인란 작성
+- 비밀번호·토큰 원문은 문서화하지 않고 Vercel 암호화 변수와 조직용 비밀번호 관리자에서만 관리하도록 기준 확정
+- 로컬 비밀번호 내보내기·자격정보 메모 파일의 Git 제외 규칙 추가
+
+### 산출물 및 반영시간
+- `deliverables/operations/OPERATIONS_ARCHITECTURE.md`
+- `deliverables/operations/SERVICE_CONFIGURATION_REGISTER.md`
+- `deliverables/operations/ACCOUNT_ACCESS_REGISTER.md`
+- 확인·작성·보안검토: 약 35분

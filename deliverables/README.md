@@ -62,6 +62,9 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `USER_MANUAL.md`: Google Docs user manual link, coverage, and maintenance rule.
 - `MAINTENANCE_REQUEST_SHEET.md`: Google Sheets maintenance request template, tester workflow, status definitions, and privacy rules.
 - `SECURITY_HARDENING_REVIEW_2026-08-14.md`: 운영 소스 보안 점검 범위, 취약점 개선 조치, 검증 결과와 잔여 운영 과제.
+- `operations/OPERATIONS_ARCHITECTURE.md`: Vercel·Turso·GitHub 구조, 외부 서비스 연결, 배포·장애 대응·백업 기준을 정리한 운영 총괄 문서.
+- `operations/SERVICE_CONFIGURATION_REGISTER.md`: OAuth, Solapi, Toss Payments, Meta, Bizcall, Push 등 서비스별 환경변수와 운영상태 대장.
+- `operations/ACCOUNT_ACCESS_REGISTER.md`: 로그인 URL, 계정 식별자, MFA·복구·비밀번호 관리자 항목을 관리하는 무비밀 접근대장.
 - Current UI feedback pattern: submit buttons show inline progress bars, and server actions show bottom status messages via `notice` query parameters.
 
 ## Planned Deliverables

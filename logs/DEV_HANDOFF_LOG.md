@@ -7707,3 +7707,32 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Reassigned the legacy `zezari.vercel.app` alias to the current production deployment.
 - `zezari.family`, `zezari.vercel.app`, and `real-qr-find.vercel.app` returned HTTP 200 with CSP, HSTS, and nosniff headers.
 - Production notifications returned unauthenticated HTTP 401 with `Cache-Control: no-store`; no production error logs were found in the post-deploy scan.
+
+## 2026-08-19 KST - Operations Architecture, Service, and Account Register
+
+### User Requirement
+- Summarize and maintain the completed project architecture across Vercel, Turso DB, GitHub, and the local workspace.
+- Include connected services such as Bizcall safe phone, Solapi verification, Toss Payments, Meta advertisements, OAuth, and Push.
+- Manage account login and password information for future operations and handoff.
+
+### Security Decision
+- Did not record plaintext passwords, API keys, access tokens, MFA recovery codes, or environment-variable values in Git, logs, or deliverables.
+- Designed the account register to hold login URLs, known account identifiers, owners, MFA/recovery status, and password-manager item names only.
+- Added Git ignore patterns for local credential notes and password-manager exports.
+
+### Verified Metadata
+- Git remote: `zezariGit/zezariGit`, branch `main`; local Git identity `zezariGit / general@zezari.com`.
+- Vercel Team/Project: `zezari / zezari`, Node.js 24, current Production deployment Ready.
+- Turso host: `zezariturso-zezarigit.aws-ap-northeast-1.turso.io`; URL and token are present without exposing values.
+- Confirmed 37 application tables across members, subjects/QR, commerce, ads, notifications, safe phone, location security, and audit domains.
+- Confirmed encrypted Vercel environment-variable entries for Turso, OAuth, Solapi, Toss, Meta, Bizcall, VAPID, and location encryption.
+- Current verification mode: Solapi SMS enabled; Resend email verification disabled and retained as a fallback.
+
+### Deliverables
+- `deliverables/operations/OPERATIONS_ARCHITECTURE.md`
+- `deliverables/operations/SERVICE_CONFIGURATION_REGISTER.md`
+- `deliverables/operations/ACCOUNT_ACCESS_REGISTER.md`
+- Updated `deliverables/README.md` and `.gitignore`.
+
+### Time Spent
+- Metadata inspection, service/code mapping, architecture and access-register authoring, and security review: about 35 minutes.

@@ -4,6 +4,12 @@
 !.env.example
 env.txt
 
+# Local password-manager exports and credential notes
+private/
+*.credentials.local.*
+*.passwords.local.*
+password-manager-export*
+
 # Legacy site reference dump (contains production credentials and personal data)
 reference/
 
