@@ -534,7 +534,7 @@ function SocialLoginButtonsInner({ enabledProviders = [], variant = "stack", cal
             className={variant === "icons" ? `social-icon-button ${className}` : `action social-action ${className}`}
             type="button"
             key={id}
-            onClick={() => !disabled && signIn(id, callbackUrl ? { callbackUrl } : undefined)}
+            onClick={() => !disabled && signIn(id, { callbackUrl: callbackUrl || "/" })}
             disabled={disabled}
             title={configured ? `${label}로 계속하기` : `${label} 설정 필요`}
             aria-label={configured ? `${label}로 계속하기` : `${label} 설정 필요`}
@@ -554,7 +554,7 @@ export function GoogleLoginButton({ enabledProviders = ["google"] }) {
 
 export function LogoutButton({ className = "action secondary", children = "Log out" } = {}) {
   return (
-    <button className={className} type="button" onClick={() => signOut()}>
+    <button className={className} type="button" onClick={() => signOut({ callbackUrl: "/" })}>
       {children}
     </button>
   );
