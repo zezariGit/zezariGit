@@ -49,3 +49,10 @@
 - `git diff --check`
 - 상품·디자인 이미지 API HTTP 200
 - 운영 배포 후 `/shop` 전환, 상품/디자인 변경, 미리보기, 주문정보 단계 확인
+
+## 2026-08-20 운영 회귀 수정
+
+- 초기 성능 개선용 `getShopPageData()`가 운영 스키마에 없는 `guardians.postal_code`를 조회해 `/shop` 서버 렌더링이 실패하는 문제를 수정했다.
+- 존재하지 않는 컬럼을 제거한 뒤 운영 로그인 세션에서 상품구매 화면과 상품·디자인 선택을 재검증했다.
+- 대시보드에서 상품 화면의 선택 UI가 나타날 때까지 약 0.73초가 걸렸으며 운영 함수 로그의 `/shop` 응답은 HTTP 200이었다.
+- 배포: GitHub `246ee0d`, Vercel `dpl_5KFMofPfVnHzo1XjzJNeR11g6kTE`.

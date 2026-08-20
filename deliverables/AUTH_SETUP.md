@@ -211,3 +211,10 @@ META_APP_SECRET=your-meta-app-secret
 - Keep `env.txt` ignored by Git.
 - Keep `.env.local` ignored by Git.
 - Do not paste OAuth secrets into logs or presentation files.
+
+## OAuth Return Policy
+
+- SNS login buttons always send an explicit internal callback URL. The default is `/`.
+- Logout also returns to `/`, so query-driven overlays such as `?panel=my` do not reopen after the next login.
+- NextAuth accepts relative callback paths and same-origin absolute URLs only. Invalid or external callback URLs fall back to the application root.
+- The service login screen is used instead of the generic NextAuth provider-selection page.

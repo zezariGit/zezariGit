@@ -8008,3 +8008,28 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `git diff --check`: passed before documentation updates.
 - `deliverables/SHOP_LOADING_PERFORMANCE.md`
 - Investigation, implementation, performance probe, build, and route verification: about 35 minutes.
+
+## 2026-08-20 KST - Shop Server Error And Google OAuth Return Fix
+
+### User Requirement
+- Fix the production server-error screen shown after pressing `상품 구매` and verify the signed-in flow on `zezari.family`.
+- Remove the extra-looking login/callback step after a Google session expires.
+
+### Root Cause
+- The lightweight shop query introduced during the performance optimization selected `guardians.postal_code`, but the production guardian schema stores postal text inside `address` and has no `postal_code` column.
+- Social login without an explicit callback reused the current URL. Logging out from `?panel=my` therefore returned Google login to that same query and reopened My Page, which looked like an extra intermediate login screen.
+
+### Reflected Work
+- Removed the nonexistent `postal_code` field from `getShopPageData()`.
+- Set all SNS login and logout callbacks to the application root by default.
+- Added a NextAuth sign-in page override and a server redirect callback that permits only relative paths or the current origin; invalid or external callback URLs return to the root.
+
+### Verification And Publication
+- `npm run build`, `npm run security:check`, and `git diff --check`: passed.
+- GitHub `main` commit `246ee0d` pushed.
+- Vercel deployment `dpl_5KFMofPfVnHzo1XjzJNeR11g6kTE` reached `READY` and was aliased to `zezari.family`.
+- Authenticated production transition to `/shop`: about 0.73 seconds; product, subject, design, quantity, price, and next-step controls rendered.
+- Product/design change to `팔찌&목걸이 / 소` updated the summary correctly.
+- Production function logs showed `/shop` HTTP 200 without the previous LibSQL exception.
+- Google logout returned to `https://zezari.family/`; one Google button click plus account selection returned directly to the root dashboard with no reopened My Page or second application login button.
+- Investigation, correction, deployment, and production browser verification: about 25 minutes.
