@@ -4,7 +4,7 @@ import StatusToast from "../status-toast";
 import ShopCheckoutClient from "../shop-checkout-client";
 import { isAdminSession } from "../../lib/admin";
 import { authOptions } from "../../lib/auth";
-import { getDashboardData, getGuardianCoupons, getProducts } from "../../lib/db";
+import { getShopPageData, getShopProducts } from "../../lib/db";
 
 export default async function ShopPage({ searchParams }) {
   const session = await getServerSession(authOptions);
@@ -14,18 +14,12 @@ export default async function ShopPage({ searchParams }) {
   const notice = params?.notice || "";
   const noticeType = params?.noticeType || "success";
   const requestedProductId = params?.product || "";
-  const [{ guardian, subjects }, productRows, couponData] = await Promise.all([
-    getDashboardData(session, {
-      includeSubjectDetails: false,
-      includeSubscription: false,
-      includeSubscriptionPlans: false,
-      includeAdDailyRate: false,
-    }),
-    getProducts(),
-    getGuardianCoupons(session),
+  const [{ guardian, subjects, coupons }, productRows] = await Promise.all([
+    getShopPageData(session),
+    getShopProducts(),
   ]);
   const products = sortShopProducts(productRows);
-  const availableCoupons = couponData.coupons.filter((coupon) => coupon.status === "available");
+  const availableCoupons = coupons.filter((coupon) => coupon.status === "available");
   const initialProduct = products.find(
     (product) => product.id === requestedProductId || product.slug === requestedProductId
   ) || products[0] || null;

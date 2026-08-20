@@ -9696,6 +9696,67 @@ button:disabled:hover {
   padding: var(--space-lg);
 }
 
+.shop-loading-panel {
+  min-height: min(720px, calc(100dvh - 32px));
+}
+
+.shop-loading-stack {
+  display: grid;
+  gap: 12px;
+  padding: 22px 18px;
+}
+
+.shop-loading-line,
+.shop-loading-preview {
+  display: block;
+  overflow: hidden;
+  position: relative;
+  background: #edf2f6;
+}
+
+.shop-loading-line::after,
+.shop-loading-preview::after {
+  animation: shop-loading-sheen 1.15s ease-in-out infinite;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+  content: "";
+  inset: 0;
+  position: absolute;
+  transform: translateX(-100%);
+}
+
+.shop-loading-line {
+  border-radius: 6px;
+  height: 48px;
+  width: 72%;
+}
+
+.shop-loading-line.wide {
+  width: 100%;
+}
+
+.shop-loading-line.short {
+  height: 42px;
+  width: 45%;
+}
+
+.shop-loading-preview {
+  aspect-ratio: 16 / 10;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.shop-loading-message {
+  color: #52606d;
+  margin: auto 18px 24px;
+  text-align: center;
+}
+
+@keyframes shop-loading-sheen {
+  to {
+    transform: translateX(100%);
+  }
+}
+
 .shop-topbar {
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr) 42px;

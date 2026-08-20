@@ -68,6 +68,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `operations/ACCOUNT_ACCESS_REGISTER.md`: 로그인 URL, 계정 식별자, MFA·복구·비밀번호 관리자 항목을 관리하는 무비밀 접근대장.
 - `USER_DASHBOARD_BLACK_THEME.md`: 검정색 공통 테마, 상단 탭 제거, 3명 단위 가로 스와이프와 관리대상 추가 진입 구조.
 - `IMAGE_UPLOAD_MANAGEMENT.md`: 보호자·관리대상 사진의 DB 기반 용량 제한, 관리자 설정, 서버 검증, 사용자 초과파일 알림과 팝업 성능 개선.
+- `SHOP_LOADING_PERFORMANCE.md`: 상품구매 진입의 중복 DB 조회 제거, Base64 이미지 지연 로드, 전용 이미지 캐시 경로와 성능 계측 결과.
 - Current UI feedback pattern: submit buttons show inline progress bars, and server actions show bottom status messages via `notice` query parameters.
 
 ## Planned Deliverables

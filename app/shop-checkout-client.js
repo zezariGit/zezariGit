@@ -660,7 +660,11 @@ function OrderInformation({
 }
 
 function ProductVisual({ product, design = null }) {
-  const image = design?.option_image_data_url || product.image_data_url;
+  const image = Number(design?.has_option_image || 0) === 1
+    ? productDesignImageUrl(design)
+    : Number(product?.has_image || 0) === 1
+      ? productImageUrl(product)
+      : "";
   if (image) {
     return <img src={image} alt="" />;
   }
@@ -670,7 +674,9 @@ function ProductVisual({ product, design = null }) {
 function ProductDetailVisual({ product }) {
   const image = Number(product?.has_detail_image || 0) === 1
     ? productDetailImageUrl(product)
-    : product?.image_data_url;
+    : Number(product?.has_image || 0) === 1
+      ? productImageUrl(product)
+      : "";
   if (image) {
     return <img src={image} alt="" />;
   }
@@ -678,7 +684,13 @@ function ProductDetailVisual({ product }) {
 }
 
 function DesignDetailVisual({ product, design }) {
-  const image = design?.detail_image_data_url || design?.option_image_data_url || product?.image_data_url;
+  const image = Number(design?.has_detail_image || 0) === 1
+    ? productDesignDetailImageUrl(design)
+    : Number(design?.has_option_image || 0) === 1
+      ? productDesignImageUrl(design)
+      : Number(product?.has_image || 0) === 1
+        ? productImageUrl(product)
+        : "";
   if (image) {
     return <img src={image} alt="" />;
   }
@@ -699,6 +711,21 @@ function formatProductDesignName(product, design = null) {
 function productDetailImageUrl(product) {
   const version = encodeURIComponent(String(product?.updated_at || ""));
   return `/api/products/${encodeURIComponent(product.id)}/detail?v=${version}`;
+}
+
+function productImageUrl(product) {
+  const version = encodeURIComponent(String(product?.updated_at || ""));
+  return `/api/products/${encodeURIComponent(product.id)}/image?v=${version}`;
+}
+
+function productDesignImageUrl(design) {
+  const version = encodeURIComponent(String(design?.updated_at || ""));
+  return `/api/products/designs/${encodeURIComponent(design.id)}/image?v=${version}`;
+}
+
+function productDesignDetailImageUrl(design) {
+  const version = encodeURIComponent(String(design?.updated_at || ""));
+  return `/api/products/designs/${encodeURIComponent(design.id)}/detail?v=${version}`;
 }
 
 function isCouponApplicableToOrder(coupon, mode, productSlug, subtotalAmount) {

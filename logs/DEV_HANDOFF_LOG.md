@@ -7979,3 +7979,32 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Deliverable And Time Spent
 - `deliverables/IMAGE_UPLOAD_MANAGEMENT.md`
 - DB/UI analysis, implementation, build, schema test, and responsive inspection: about 50 minutes.
+
+## 2026-08-20 KST - Shop Entry Performance Optimization
+
+### User Requirement
+- Determine why opening the product-purchase screen takes about three to five seconds.
+- Improve the transition without changing product selection, coupon, order, or payment behavior.
+
+### Existing State Found
+- `/shop` loaded every active product and design Base64 image into the initial server-component payload.
+- Production data contained about 3.3MB of inline catalog image text.
+- Direct production Turso probes took about 1.1 seconds for products and 1.4 seconds for designs containing those images.
+- `getGuardianCoupons()` called `getDashboardData()` internally while the shop page already called it separately, duplicating guardian and common-setting reads.
+- The dynamic route had no route-level loading UI.
+
+### Reflected Work
+- Added `getShopProducts()` with lightweight image flags and a single Turso metadata batch.
+- Added `getShopPageData()` to batch the minimal guardian, subject, and coupon records without duplicate dashboard reads.
+- Added cached image routes for product thumbnails and design thumbnails/details.
+- Changed the shop client to construct versioned image URLs instead of receiving Base64 source strings.
+- Added an immediate `/shop` loading skeleton while preserving all existing selection, coupon, Toss, and administrator payment-pass logic.
+
+### Verification And Deliverable
+- Production Turso metadata probe returned 7 products and 101 designs in about 0.44 seconds with a 33KB JSON payload.
+- Local product and design image routes returned HTTP 200 with their expected image MIME types.
+- `npm run build`: passed with all three new image routes and `/shop`.
+- `npm run security:check`: passed.
+- `git diff --check`: passed before documentation updates.
+- `deliverables/SHOP_LOADING_PERFORMANCE.md`
+- Investigation, implementation, performance probe, build, and route verification: about 35 minutes.
