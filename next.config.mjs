@@ -6,6 +6,18 @@ const nextConfig = {
       bodySizeLimit: "8mb",
     },
   },
+  async redirects() {
+    return [
+      "zezari.vercel.app",
+      "real-qr-find.vercel.app",
+      "zezari-zezari.vercel.app",
+    ].map((host) => ({
+      source: "/:path*",
+      has: [{ type: "host", value: host }],
+      destination: "https://zezari.family/:path*",
+      permanent: true,
+    }));
+  },
   async headers() {
     return [
       {

@@ -1,5 +1,6 @@
 import "../css/gov-style.css";
 import "./globals.css";
+import SessionKeepAlive from "./session-keep-alive";
 
 export const metadata = {
   metadataBase: new URL("https://zezari.family"),
@@ -27,7 +28,10 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        <SessionKeepAlive />
+        {children}
+      </body>
     </html>
   );
 }
