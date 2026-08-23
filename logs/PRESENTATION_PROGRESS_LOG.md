@@ -5912,3 +5912,25 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 운영 `/shop` 함수 요청 HTTP 200 확인
 - 로그아웃 후 Google 버튼 1회 클릭과 계정 선택만으로 루트 대시보드 복귀, 추가 앱 로그인 버튼 및 내정보 팝업 재등장 없음
 - 분석·수정·배포·운영 검증: 약 25분
+
+## 2026-08-23 - Google 로그인 속도 및 세션 유지 개선
+
+### 요구내용
+- Google 로그인 지연 원인 파악 및 개선
+- 로그인 후 짧은 시간 안에 다시 로그인해야 하는 현상 개선
+
+### 원인 및 반영내용
+- 미국 Vercel 함수와 도쿄 Turso DB 사이 장거리 통신을 확인하고 함수 실행 지역을 도쿄 `hnd1`로 변경
+- 운영 기준 도메인을 `zezari.family`로 통일하고 기존 Vercel 주소는 자동 이동 처리
+- JWT/세션 유지 기간을 활동 기준 90일로 설정
+- 앱 실행, 6시간 주기, 장시간 후 화면 복귀·온라인 복귀 시 세션을 가볍게 갱신
+- 명시적 로그아웃과 장기 미사용 만료는 그대로 유지
+
+### 검증 및 배포
+- 대시보드 표시 약 2.865초에서 약 0.568초로 개선
+- Google 계정 선택 후 약 3.436초 내 대시보드 직접 복귀, 중간 앱 로그인 화면 없음
+- 상품 화면 왕복 후 로그인 유지 확인
+- 기존 `zezari.vercel.app` 접근 시 `zezari.family` 이동 및 로그인 유지 확인
+- GitHub 기능 커밋 `327b7ab`, Vercel 배포 `dpl_8WbNSVKiNcvvdmvE1aVwcFxuVE9y` READY
+- `deliverables/AUTH_SESSION_PERFORMANCE.md` 생성
+- 분석·구현·배포·운영 검증: 약 40분

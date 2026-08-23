@@ -11,6 +11,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `image_prompts/IMAGE_PROMPTS.md`: cumulative prompt archive for diagrams and generated visuals.
 - `INTEGRATION_SETUP.md`: Vercel and Turso integration status and setup guide.
 - `AUTH_SETUP.md`: Google login/signup setup requirements and environment variable plan.
+- `AUTH_SESSION_PERFORMANCE.md`: canonical-domain login policy, 90-day active session refresh, Vercel/Turso region correction, and production timing evidence.
 - `AUTH_PHONE_VERIFICATION.md`: active Solapi SMS verification for signup and guardian phone changes, one-time token rules, DB schema, and operations.
 - `AUTH_EMAIL_VERIFICATION.md`: disabled Resend email-code fallback retained for controlled rollback.
 - `PWA_SETUP.md`: installable web app setup for desktop and mobile.

@@ -75,6 +75,8 @@ Project: REAL_QR_FIND
 
 ### Authorized JavaScript Origins
 - Production:
+  - `https://zezari.family`
+- Legacy production entry (redirects to the canonical domain):
   - `https://zezari.vercel.app`
 - Local development:
   - `http://localhost:3000`
@@ -83,7 +85,7 @@ Project: REAL_QR_FIND
 
 ### Authorized Redirect URIs
 - Production:
-  - `https://zezari.vercel.app/api/auth/callback/google`
+  - `https://zezari.family/api/auth/callback/google`
 - Local development:
   - `http://localhost:3000/api/auth/callback/google`
 - Future custom domain:
@@ -119,25 +121,25 @@ META_APP_SECRET=your-meta-app-secret
 
 ### Google
 - Production:
-  - `https://zezari.vercel.app/api/auth/callback/google`
+  - `https://zezari.family/api/auth/callback/google`
 - Local development:
   - `http://localhost:3000/api/auth/callback/google`
 
 ### Kakao
 - Production:
-  - `https://zezari.vercel.app/api/auth/callback/kakao`
+  - `https://zezari.family/api/auth/callback/kakao`
 - Local development:
   - `http://localhost:3000/api/auth/callback/kakao`
 
 ### Naver
 - Production:
-  - `https://zezari.vercel.app/api/auth/callback/naver`
+  - `https://zezari.family/api/auth/callback/naver`
 - Local development:
   - `http://localhost:3000/api/auth/callback/naver`
 
 ### Facebook
 - Production:
-  - `https://zezari.vercel.app/api/auth/callback/facebook`
+  - `https://zezari.family/api/auth/callback/facebook`
 - Local development:
   - `http://localhost:3000/api/auth/callback/facebook`
 - Meta Developer Center notes:
@@ -166,7 +168,9 @@ META_APP_SECRET=your-meta-app-secret
   - `NAVER_CLIENT_SECRET`
   - `FACEBOOK_CLIENT_ID` / `FACEBOOK_CLIENT_SECRET` or `META_APP_ID` / `META_APP_SECRET`
   - `NEXTAUTH_SECRET`
-  - `NEXTAUTH_URL=https://zezari.vercel.app`
+  - `NEXTAUTH_URL=https://zezari.family`
+  - `PUBLIC_APP_URL=https://zezari.family`
+  - `AUTH_SESSION_MAX_AGE_DAYS=90`
 - Vercel Development:
   - `GOOGLE_CLIENT_ID`
   - `GOOGLE_CLIENT_SECRET`
@@ -218,3 +222,12 @@ META_APP_SECRET=your-meta-app-secret
 - Logout also returns to `/`, so query-driven overlays such as `?panel=my` do not reopen after the next login.
 - NextAuth accepts relative callback paths and same-origin absolute URLs only. Invalid or external callback URLs fall back to the application root.
 - The service login screen is used instead of the generic NextAuth provider-selection page.
+
+## Canonical Domain And Active Session Policy
+
+- `https://zezari.family` is the only canonical application and OAuth origin.
+- Legacy Vercel domains are attached to the current production deployment and permanently redirect to the canonical domain before authentication begins.
+- NextAuth JWT and session maximum age is 90 days by default. Production explicitly sets `AUTH_SESSION_MAX_AGE_DAYS=90`.
+- A lightweight client keep-alive reads `/api/auth/session` when the app opens, every six hours while it remains open, and after returning online or focusing a long-idle tab. Successful reads rotate the active session expiry.
+- Users who do not use the service for the configured maximum age must authenticate again. Explicit logout still ends the session immediately.
+- Vercel functions run in `hnd1` so authentication callbacks and dashboard queries are close to the Turso `aws-ap-northeast-1` database.

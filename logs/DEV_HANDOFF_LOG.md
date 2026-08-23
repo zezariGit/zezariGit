@@ -8033,3 +8033,32 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Production function logs showed `/shop` HTTP 200 without the previous LibSQL exception.
 - Google logout returned to `https://zezari.family/`; one Google button click plus account selection returned directly to the root dashboard with no reopened My Page or second application login button.
 - Investigation, correction, deployment, and production browser verification: about 25 minutes.
+
+## 2026-08-23 KST - Google Login Performance And Active Session Retention
+
+### User Requirement
+- Determine why Google login takes a long time.
+- Keep signed-in users logged in instead of asking them to authenticate again shortly afterward.
+
+### Root Cause
+- Vercel Functions ran in `iad1` while Turso ran in `aws-ap-northeast-1`; the OAuth callback immediately loaded dashboard data over a long-distance server-to-database path.
+- The application used the default JWT session duration and did not refresh an active session in the browser.
+- The canonical and legacy domains had independent host cookies, so switching hosts could appear to end a valid login.
+
+### Reflected Work
+- Configured production functions for `hnd1` and confirmed deployed function outputs in that region.
+- Set production `NEXTAUTH_URL` and `PUBLIC_APP_URL` to `https://zezari.family`.
+- Added an explicit configurable 90-day JWT/session maximum age.
+- Added a non-blocking session refresh on app open, every six hours, and on meaningful focus/online returns.
+- Added permanent legacy-host redirects and reassigned `zezari.vercel.app` to the latest production deployment.
+
+### Verification And Publication
+- `npm run build`, `npm run security:check`, and `git diff --check`: passed before documentation updates.
+- GitHub `main` feature commit `327b7ab` pushed.
+- Vercel production deployment `dpl_8WbNSVKiNcvvdmvE1aVwcFxuVE9y` reached `READY`.
+- Dashboard visible time improved from about 2,865ms to about 568ms.
+- Google chooser opened in about 2,135ms; existing-account selection returned directly to the dashboard in about 3,436ms without a second app login screen.
+- `/shop` and dashboard navigation retained the authenticated session.
+- `zezari.vercel.app/shop` redirected to `zezari.family/shop` and retained login.
+- `deliverables/AUTH_SESSION_PERFORMANCE.md` created and `deliverables/AUTH_SETUP.md` updated.
+- Investigation, implementation, deployment, and production verification: about 40 minutes.
