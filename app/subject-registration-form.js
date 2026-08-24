@@ -35,7 +35,7 @@ export default function SubjectRegistrationForm({ children, hasExistingPhoto = f
   function closeValidationDialog() {
     const firstMissing = missingFields[0];
     const selector = firstMissing === "사진"
-      ? "input[name='photo']"
+      ? ".subject-photo-trigger"
       : REQUIRED_FIELDS.find((field) => field.label === firstMissing)?.selector;
     setMissingFields([]);
     window.setTimeout(() => formRef.current?.querySelector(selector)?.focus(), 0);

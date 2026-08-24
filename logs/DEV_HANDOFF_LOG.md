@@ -8251,3 +8251,21 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `npm run security:check` passed.
 - `git diff --check` passed.
 - Implementation and verification: about 15 minutes.
+
+## 2026-08-25 KST - Subject Photo Upload Source Menu
+
+### User Requirement
+- When selecting a subject photo, provide three explicit options: camera app, album app, and file app.
+
+### Implementation
+- Replaced the single transparent file input with an accessible photo-source action sheet.
+- Added dedicated mobile inputs for direct camera capture, image-library selection, and image-file selection.
+- Only the input that actually receives a file is submitted as the existing `photo` server field, so the database and upload validation contract remain unchanged.
+- Preserved immediate preview, replacement wording, administrator-configured size limits, and required-photo validation.
+- Updated missing-photo focus handling to return the user to the visible photo selection button.
+
+### Verification
+- `npm run build` passed.
+- `npm run security:check` passed.
+- `git diff --check` passed.
+- Implementation and verification: about 15 minutes.

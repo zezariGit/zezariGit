@@ -10,7 +10,12 @@ export default function SubjectPhotoInput({
 }) {
   const limitBytes = Math.max(1, Number(maxBytes) || 1024 * 1024);
   const [previewSrc, setPreviewSrc] = useState(existingSrc);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [activeSource, setActiveSource] = useState("");
   const objectUrlRef = useRef("");
+  const cameraInputRef = useRef(null);
+  const albumInputRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => () => revokeObjectUrl(), []);
 
@@ -20,12 +25,10 @@ export default function SubjectPhotoInput({
     objectUrlRef.current = "";
   }
 
-  function handleFileChange(event) {
+  function handleFileChange(event, source) {
     const input = event.currentTarget;
     const file = input.files?.[0];
     if (!file) {
-      revokeObjectUrl();
-      setPreviewSrc(existingSrc);
       return;
     }
 
@@ -37,32 +40,98 @@ export default function SubjectPhotoInput({
       return;
     }
 
+    setActiveSource(source);
     revokeObjectUrl();
     objectUrlRef.current = URL.createObjectURL(file);
     setPreviewSrc(objectUrlRef.current);
   }
 
+  function openPicker(inputRef) {
+    setPickerOpen(false);
+    window.setTimeout(() => inputRef.current?.click(), 0);
+  }
+
   return (
-    <label className={`subject-avatar-picker${previewSrc ? " has-preview" : ""}`}>
-      <span className="subject-avatar-preview">
+    <div className={`subject-avatar-picker${previewSrc ? " has-preview" : ""}`}>
+      <button
+        type="button"
+        className="subject-photo-trigger"
+        onClick={() => setPickerOpen(true)}
+        aria-haspopup="dialog"
+        aria-expanded={pickerOpen}
+        aria-required={required}
+        aria-label={previewSrc ? `${label} 변경하기` : `${label} 등록하기`}
+      >
+        <span className="subject-avatar-preview">
         {previewSrc ? (
           <img src={previewSrc} alt={`${label} 미리보기`} />
         ) : (
           <span aria-hidden="true" />
         )}
-      </span>
-      <span className="camera-chip" aria-hidden="true">사진</span>
+        </span>
+        <span className="camera-chip" aria-hidden="true">사진</span>
+      </button>
       <input
-        name="photo"
+        ref={cameraInputRef}
+        className="subject-photo-native-input"
+        name={activeSource === "camera" ? "photo" : undefined}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={(event) => handleFileChange(event, "camera")}
+        aria-label={`${label} 사진 촬영`}
+      />
+      <input
+        ref={albumInputRef}
+        className="subject-photo-native-input"
+        name={activeSource === "album" ? "photo" : undefined}
         type="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
-        onChange={handleFileChange}
-        required={required}
-        aria-label={previewSrc ? `${label} 변경하기` : `${label} 등록하기`}
+        onChange={(event) => handleFileChange(event, "album")}
+        aria-label={`${label} 앨범에서 선택`}
+      />
+      <input
+        ref={fileInputRef}
+        className="subject-photo-native-input"
+        name={activeSource === "file" ? "photo" : undefined}
+        type="file"
+        accept=".jpg,.jpeg,.png,.webp,.gif"
+        onChange={(event) => handleFileChange(event, "file")}
+        aria-label={`${label} 파일에서 선택`}
       />
       <strong className="subject-photo-action">{previewSrc ? "변경하기" : "사진 등록하기"}</strong>
       <small className="subject-photo-limit">{formatMegabytes(limitBytes)}MB 이하</small>
-    </label>
+      {pickerOpen && (
+        <div
+          className="subject-photo-picker-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setPickerOpen(false);
+          }}
+        >
+          <section
+            className="subject-photo-picker-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="subject-photo-picker-title"
+          >
+            <h2 id="subject-photo-picker-title">사진 업로드 방법</h2>
+            <button type="button" onClick={() => openPicker(cameraInputRef)}>
+              사진 촬영 앱
+            </button>
+            <button type="button" onClick={() => openPicker(albumInputRef)}>
+              앨범 앱
+            </button>
+            <button type="button" onClick={() => openPicker(fileInputRef)}>
+              파일 앱
+            </button>
+            <button type="button" className="subject-photo-picker-cancel" onClick={() => setPickerOpen(false)}>
+              취소
+            </button>
+          </section>
+        </div>
+      )}
+    </div>
   );
 }
 

@@ -8854,18 +8854,37 @@ button:disabled:hover {
   justify-items: center;
   align-content: start;
   gap: 3px;
+}
+
+.subject-photo-trigger {
+  position: relative;
+  z-index: 1;
+  width: 104px;
+  height: 104px;
+  min-height: 104px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
   cursor: pointer;
 }
 
-.subject-avatar-picker input {
-  position: absolute;
-  top: 0;
-  left: 4px;
-  z-index: 2;
-  width: 104px;
-  height: 104px;
+.subject-photo-trigger:focus-visible {
+  outline: 3px solid rgba(17, 24, 39, 0.25);
+  outline-offset: 4px;
+}
+
+.subject-photo-native-input {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
   opacity: 0;
-  cursor: pointer;
+  pointer-events: none;
 }
 
 .subject-avatar-preview {
@@ -8898,7 +8917,7 @@ button:disabled:hover {
   position: absolute;
   top: 76px;
   right: 0;
-  z-index: 3;
+  z-index: 2;
   border: 1px solid var(--c-border-strong);
   border-radius: 999px;
   padding: 3px 6px;
@@ -8921,6 +8940,58 @@ button:disabled:hover {
   color: var(--c-text-muted);
   font-size: 10px;
   line-height: 1.2;
+}
+
+.subject-photo-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: end center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.48);
+}
+
+.subject-photo-picker-dialog {
+  width: min(100%, 420px);
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.24);
+}
+
+.subject-photo-picker-dialog h2 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 17px;
+  text-align: center;
+}
+
+.subject-photo-picker-dialog button {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.subject-photo-picker-dialog button:hover,
+.subject-photo-picker-dialog button:focus-visible {
+  border-color: #111827;
+  background: #f8fafc;
+}
+
+.subject-photo-picker-dialog .subject-photo-picker-cancel {
+  margin-top: 4px;
+  border-color: transparent;
+  background: #f1f5f9;
+  color: var(--c-text-muted);
 }
 
 .target-field-stack {
