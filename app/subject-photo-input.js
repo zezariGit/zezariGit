@@ -25,16 +25,10 @@ export default function SubjectPhotoInput({
     objectUrlRef.current = "";
   }
 
-  function handleFileChange(event, source) {
-    const input = event.currentTarget;
-    const file = input.files?.[0];
-    if (!file) {
-      return;
-    }
-
+  function applySelectedFile(file, source, input) {
     if (file.size > limitBytes) {
       window.alert(`${label}은(는) ${formatMegabytes(limitBytes)}MB 이하의 이미지 파일만 업로드할 수 있습니다.`);
-      input.value = "";
+      if (input) input.value = "";
       revokeObjectUrl();
       setPreviewSrc(existingSrc);
       return;
@@ -46,9 +40,51 @@ export default function SubjectPhotoInput({
     setPreviewSrc(objectUrlRef.current);
   }
 
+  function handleFileChange(event, source) {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    if (!file) return;
+    applySelectedFile(file, source, input);
+  }
+
   function openPicker(inputRef) {
     setPickerOpen(false);
     inputRef.current?.click();
+  }
+
+  async function openFileApp() {
+    setPickerOpen(false);
+
+    if (typeof window.showOpenFilePicker !== "function") {
+      fileInputRef.current?.click();
+      return;
+    }
+
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        id: "subject-photo-file",
+        multiple: false,
+        startIn: "pictures",
+        excludeAcceptAllOption: true,
+        types: [
+          {
+            description: "이미지 파일",
+            accept: {
+              "image/*": [".jpg", ".jpeg", ".png", ".webp", ".gif"],
+            },
+          },
+        ],
+      });
+      const file = await handle.getFile();
+      const input = fileInputRef.current;
+      if (!input) return;
+      const transfer = new DataTransfer();
+      transfer.items.add(file);
+      input.files = transfer.files;
+      applySelectedFile(file, "file", input);
+    } catch (error) {
+      if (error?.name !== "AbortError") fileInputRef.current?.click();
+    }
   }
 
   return (
@@ -87,7 +123,7 @@ export default function SubjectPhotoInput({
         className="subject-photo-native-input"
         name={activeSource === "album" ? "photo" : undefined}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif"
+        accept="image/*"
         onChange={(event) => handleFileChange(event, "album")}
         aria-hidden="true"
         tabIndex={-1}
@@ -125,7 +161,7 @@ export default function SubjectPhotoInput({
             <button type="button" onClick={() => openPicker(albumInputRef)}>
               앨범 앱
             </button>
-            <button type="button" onClick={() => openPicker(fileInputRef)}>
+            <button type="button" onClick={openFileApp}>
               파일 앱
             </button>
             <button type="button" className="subject-photo-picker-cancel" onClick={() => setPickerOpen(false)}>

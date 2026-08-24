@@ -8252,6 +8252,25 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `git diff --check` passed.
 - Implementation and verification: about 15 minutes.
 
+## 2026-08-25 KST - Mobile Album And File Picker Separation
+
+### User Requirement
+- Android should open the gallery/photo picker for the album option instead of showing camera, camcorder, and file choices again.
+- The file option should open the device file picker, with the closest equivalent behavior on iPhone.
+
+### Implementation
+- Simplified the album input to one `image/*` accept type so supported Android Chrome versions can select the dedicated media/photo picker path.
+- Added `showOpenFilePicker()` as the preferred document-picker path for the file option, limited to supported image formats.
+- Kept the standard image-file input as a compatibility fallback for browsers without File System Access support, including iOS Safari.
+- Reused the existing preview, upload-size validation, and form submission field after files are returned from either picker.
+- Preserved direct rear-camera capture as a separate path.
+
+### Verification
+- `npm run build` passed.
+- `npm run security:check` passed.
+- `git diff --check` passed.
+- Implementation and verification: about 15 minutes.
+
 ## 2026-08-25 KST - Subject Photo Upload Source Menu
 
 ### User Requirement
