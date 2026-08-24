@@ -10,6 +10,8 @@ pwsh -ExecutionPolicy Bypass -File C:\REAL_QR_FIND\tools\dev-profile-switcher\In
 
 설치 후 새 터미널을 열고 `dev`를 실행하면 GUI가 열린다. 바탕화면의 `개발환경 전환기` 바로가기도 사용할 수 있다.
 
+설치기는 Microsoft Store 앱 내부 실행파일 대신 일반 터미널에서 실행 가능한 공식 `@openai/codex` CLI를 확인하고, 없으면 자동 설치한다.
+
 ## 가장 쉬운 사용법
 
 ```powershell
@@ -20,6 +22,8 @@ dev zezari
 선택한 프로젝트의 계정 묶음을 새 창에 적용하고 Codex CLI를 실행한다. 현재 열려 있는 다른 프로젝트 창의 환경은 변경하지 않는다.
 
 분리 계정의 GitHub 저장소는 해당 창의 GitHub CLI 인증만 사용한다. 상위 터미널에 남은 DB/API 환경변수는 제거하여 프로젝트의 `.env.local`이 우선하도록 한다.
+
+처음 STOCK처럼 분리된 프로필을 열면 Codex 로그인 선택 화면이 표시된다. `Sign in with ChatGPT`를 선택한 뒤 해당 프로젝트용 계정으로 한 번 로그인하면 이후 실행부터 재사용한다.
 
 ## 기존 프로젝트
 

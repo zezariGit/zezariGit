@@ -10,6 +10,7 @@ Windows에서 프로젝트별 GitHub, Vercel, DB, Codex 개발환경을 분리 �
 - 명령 실행기: `%LOCALAPPDATA%\Microsoft\WindowsApps\dev.cmd`
 - 바탕화면 바로가기: `개발환경 전환기`
 - 사용자 프로필 저장소: `%LOCALAPPDATA%\DevProfileSwitcher`
+- 독립 Codex CLI: `@openai/codex` 전역 설치, 2026-08-24 확인 버전 `0.149.1`
 
 ## 2. 가장 쉬운 사용법
 
@@ -77,6 +78,8 @@ STOCK에는 기존 커밋 기록을 기준으로 `soonsuboy <soonsuboy10@gmail.c
 dev login stock-personal all
 ```
 
+`Codex로 개발 시작`을 먼저 누른 경우에도 Codex 로그인 선택 화면에서 `1. Sign in with ChatGPT`를 선택하여 STOCK 개인 계정을 연결할 수 있다. ZEZARI의 `C:\Users\user1\.codex`와 STOCK의 `%LOCALAPPDATA%\DevProfileSwitcher\accounts\stock-personal\codex`는 서로 다른 로그인 저장소다.
+
 ## 5. 명령어
 
 ```powershell
@@ -128,3 +131,12 @@ flowchart LR
 - GitHub credential helper 분리 검증 통과
 - STOCK 저장소 로컬 Git 작성자 적용 확인
 - GUI에 ZEZARI와 STOCK 카드 및 실행·연결 버튼 표시 확인
+
+## 9. 2026-08-24 실행 오류 보완
+
+- 최초 실행에서 Git credential helper가 누적되어 `has multiple values` 오류가 발생했다.
+- 실행 때 기존 저장소 로컬 helper 값을 모두 제거한 뒤 빈 reset helper와 `gh auth git-credential`을 한 번씩만 설정하도록 수정했다.
+- Microsoft Store Codex 앱 내부 `codex.exe`는 일반 PowerShell에서 실행 권한 오류 코드 5가 발생하므로 외부 실행 대상으로 사용하지 않는다.
+- 공식 `npm install -g @openai/codex` 방식의 독립 CLI를 설치하고 설치기에서도 누락 시 자동 설치하도록 변경했다.
+- 상위 Codex 앱에서 전달된 `TERM=dumb` 값을 새 개발창에서 제거하여 Windows Terminal 대화형 UI가 바로 표시되도록 수정했다.
+- 실제 `dev stock` 실행으로 계정별 경로 표시와 Codex ChatGPT 로그인 선택 화면 진입을 확인했다.

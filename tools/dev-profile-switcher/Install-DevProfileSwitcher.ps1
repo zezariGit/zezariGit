@@ -10,6 +10,15 @@ if ($PSVersionTable.PSVersion.Major -lt 7) {
     throw 'PowerShell 7 이상에서 설치하세요.'
 }
 
+$codexCliLauncher = Join-Path $env:APPDATA 'npm\codex.cmd'
+if (-not (Test-Path -LiteralPath $codexCliLauncher)) {
+    Write-Host '독립 실행용 Codex CLI를 설치합니다...' -ForegroundColor Cyan
+    & npm.cmd install -g '@openai/codex'
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $codexCliLauncher)) {
+        throw 'Codex CLI 설치에 실패했습니다. npm 연결 상태를 확인하세요.'
+    }
+}
+
 $installHome = Join-Path $env:LOCALAPPDATA 'DevProfileSwitcher'
 $appDirectory = Join-Path $installHome 'app'
 $windowsApps = Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps'

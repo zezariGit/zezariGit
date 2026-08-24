@@ -492,6 +492,19 @@ function Get-DpsBrowserExecutable {
     return ''
 }
 
+function Get-DpsCodexExecutable {
+    $npmLauncher = Join-Path $env:APPDATA 'npm\codex.cmd'
+    if (Test-Path -LiteralPath $npmLauncher) { return $npmLauncher }
+
+    $commands = Get-Command codex -All -ErrorAction SilentlyContinue |
+        Where-Object { $_.Source -and $_.Source -notmatch '\\Program Files\\WindowsApps\\' }
+    foreach ($command in $commands) {
+        if (Test-Path -LiteralPath $command.Source) { return $command.Source }
+    }
+
+    return ''
+}
+
 function New-DpsBrowserLauncher {
     param([Parameter(Mandatory)]$Account)
 
@@ -544,14 +557,16 @@ function Get-DpsLaunchScript {
     $projectNameLiteral = ConvertTo-DpsPowerShellLiteral $Project.displayName
     $accountIdLiteral = ConvertTo-DpsPowerShellLiteral $Account.id
     $accountNameLiteral = ConvertTo-DpsPowerShellLiteral $Account.displayName
+    $codexExecutable = Get-DpsCodexExecutable
     $lines = [System.Collections.Generic.List[string]]::new()
     $lines.Add("`$ErrorActionPreference = 'Continue'")
     $lines.Add("`$env:DEV_PROFILE_PROJECT = $projectIdLiteral")
     $lines.Add("`$env:DEV_PROFILE_ACCOUNT = $accountIdLiteral")
+    $lines.Add("`$env:CODEX_HOME = $(ConvertTo-DpsPowerShellLiteral $Account.codexHome)")
+    $lines.Add("`$env:GH_CONFIG_DIR = $(ConvertTo-DpsPowerShellLiteral $Account.githubConfigDir)")
+    $lines.Add("if (`$env:TERM -eq 'dumb') { Remove-Item -LiteralPath 'Env:TERM' -ErrorAction SilentlyContinue }")
 
     if ($Account.mode -eq 'isolated') {
-        $lines.Add("`$env:CODEX_HOME = $(ConvertTo-DpsPowerShellLiteral $Account.codexHome)")
-        $lines.Add("`$env:GH_CONFIG_DIR = $(ConvertTo-DpsPowerShellLiteral $Account.githubConfigDir)")
         $lines.Add("`$env:DEV_PROFILE_VERCEL_CONFIG = $(ConvertTo-DpsPowerShellLiteral $Account.vercelConfigDir)")
         $browserLauncher = New-DpsBrowserLauncher -Account $Account
         if ($browserLauncher) {
@@ -577,9 +592,10 @@ function Get-DpsLaunchScript {
         $lines.Add("& git.exe config --local user.email $(ConvertTo-DpsPowerShellLiteral $Account.gitEmail)")
     }
     if ($Account.mode -eq 'isolated' -and $Project.git.remoteUrl -match 'github\.com') {
-        $lines.Add("& git.exe config --local credential.https://github.com.helper ''")
+        $lines.Add("& git.exe config --local --unset-all credential.https://github.com.helper 2>`$null")
+        $lines.Add("& git.exe config --local --add credential.https://github.com.helper ''")
         $lines.Add("& git.exe config --local --add credential.https://github.com.helper '!gh auth git-credential'")
-        $lines.Add("& git.exe config --local credential.https://github.com.useHttpPath true")
+        $lines.Add("& git.exe config --local --replace-all credential.https://github.com.useHttpPath true")
     }
 
     $lines.Add("`$Host.UI.RawUI.WindowTitle = 'DEV - ' + $projectNameLiteral")
@@ -587,11 +603,20 @@ function Get-DpsLaunchScript {
     $lines.Add("Write-Host ('프로젝트: ' + $projectNameLiteral) -ForegroundColor Cyan")
     $lines.Add("Write-Host ('계정 묶음: ' + $accountNameLiteral) -ForegroundColor Cyan")
     $lines.Add("Write-Host ('경로: ' + $workspaceLiteral)")
+    $lines.Add("Write-Host ('Codex HOME: ' + `$env:CODEX_HOME)")
+    if ($Account.mode -eq 'isolated') {
+        $lines.Add("Write-Host ('GitHub CLI: ' + `$env:GH_CONFIG_DIR)")
+        $lines.Add("Write-Host ('Vercel CLI: ' + `$env:DEV_PROFILE_VERCEL_CONFIG)")
+    }
     $lines.Add("Write-Host '현재 창에만 계정 설정이 적용되었습니다.' -ForegroundColor DarkGray")
     $lines.Add("Write-Host ''")
 
     if (-not $NoCodex) {
-        $lines.Add("if (Get-Command codex -ErrorAction SilentlyContinue) { & codex } else { Write-Warning 'Codex CLI를 찾을 수 없습니다.' }")
+        if ($codexExecutable) {
+            $lines.Add("try { & $(ConvertTo-DpsPowerShellLiteral $codexExecutable) } catch { Write-Warning ('Codex CLI 실행 실패: ' + `$_.Exception.Message) }")
+        } else {
+            $lines.Add("if (Get-Command codex -ErrorAction SilentlyContinue) { & codex } else { Write-Warning 'Codex CLI를 찾을 수 없습니다.' }")
+        }
     }
 
     Set-Content -LiteralPath $scriptPath -Value $lines -Encoding utf8
@@ -636,6 +661,7 @@ function Start-DpsAccountLogin {
     [System.IO.Directory]::CreateDirectory($runtimeDirectory) | Out-Null
     $scriptPath = Join-Path $runtimeDirectory 'login.ps1'
     $browserLauncher = New-DpsBrowserLauncher -Account $account
+    $codexExecutable = Get-DpsCodexExecutable
     $lines = [System.Collections.Generic.List[string]]::new()
     $lines.Add("`$Host.UI.RawUI.WindowTitle = '계정 연결 - $($account.displayName -replace "'", "''")'")
     $lines.Add("`$env:CODEX_HOME = $(ConvertTo-DpsPowerShellLiteral $account.codexHome)")
@@ -654,7 +680,11 @@ function Start-DpsAccountLogin {
     }
     if ($Service -in @('all', 'codex')) {
         $lines.Add("Write-Host ''; Write-Host '[3] Codex/OpenAI 연결' -ForegroundColor Yellow")
-        $lines.Add("if (Get-Command codex -ErrorAction SilentlyContinue) { & codex login } else { Write-Warning 'Codex CLI가 없습니다.' }")
+        if ($codexExecutable) {
+            $lines.Add("try { & $(ConvertTo-DpsPowerShellLiteral $codexExecutable) login } catch { Write-Warning ('Codex 로그인 실행 실패: ' + `$_.Exception.Message) }")
+        } else {
+            $lines.Add("if (Get-Command codex -ErrorAction SilentlyContinue) { & codex login } else { Write-Warning 'Codex CLI가 없습니다.' }")
+        }
     }
     $lines.Add("Write-Host ''; Write-Host '계정 연결 창을 닫아도 됩니다.' -ForegroundColor Green")
     $lines.Add('Read-Host ''Enter를 누르면 종료합니다''')

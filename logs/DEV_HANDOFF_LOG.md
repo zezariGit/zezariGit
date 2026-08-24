@@ -8127,3 +8127,28 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `tools/dev-profile-switcher/`
 - `deliverables/operations/DEVELOPMENT_PROFILE_SWITCHER_IMPLEMENTATION.md`
 - Implementation, installation, profile migration and verification: about 45 minutes.
+
+## 2026-08-24 KST - Profile Switcher Launch Error Correction
+
+### User Report
+- After pressing `Codex로 개발 시작` for STOCK, the terminal showed a Git credential helper multiple-value error and reported that Codex CLI could not be found.
+- Asked whether the account environment had actually changed.
+
+### Root Cause
+- The project path, account ID, Codex home, GitHub config and Vercel config had changed correctly, but Git helper values were appended on every launch.
+- Only the Microsoft Store Codex app's internal executable was discoverable in the Codex-hosted process. A normal Windows terminal did not have an independent Codex CLI, and direct execution of the Store resource failed with OS error code 5.
+- The Codex-hosted parent process could also pass `TERM=dumb`, which disables the interactive TUI in the new terminal.
+
+### Correction
+- Clear repository-local GitHub credential helper values before installing exactly one reset helper and one profile-scoped `gh auth git-credential` helper.
+- Installed official `@openai/codex` CLI `0.149.1` globally and changed the switcher to prefer `%APPDATA%\npm\codex.cmd`.
+- Updated the installer to install the independent official CLI automatically when absent.
+- Removed inherited `TERM=dumb` in the child development terminal.
+- Added visible Codex, GitHub and Vercel profile paths to the launch banner.
+
+### Verification
+- ZEZARI `CODEX_HOME` reports `Logged in using ChatGPT`.
+- STOCK isolated `CODEX_HOME` reports `Not logged in`, as expected before first personal-account login.
+- Actual `dev stock` launch reached the Codex `Sign in with ChatGPT` selection screen without the previous Git or executable errors.
+- Git helper count stabilized at two intentional entries and no longer grows across launches.
+- Correction, installation and actual terminal verification: about 20 minutes.

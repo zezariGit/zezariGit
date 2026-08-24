@@ -35,7 +35,9 @@ try {
     if ($launchContents -notmatch 'GH_CONFIG_DIR') { throw 'GitHub profile injection failed.' }
     if ($launchContents -notmatch 'DEV_PROFILE_VERCEL_CONFIG') { throw 'Vercel profile injection failed.' }
     if ($launchContents -notmatch 'gh auth git-credential') { throw 'GitHub credential isolation failed.' }
+    if ($launchContents -notmatch '--unset-all credential\.https://github\.com\.helper') { throw 'GitHub credential cleanup failed.' }
     if ($launchContents -notmatch 'Env:TURSO_AUTH_TOKEN') { throw 'Parent environment sanitization failed.' }
+    if ($launchContents -notmatch "TERM -eq 'dumb'") { throw 'Interactive terminal normalization failed.' }
 
     $project = Set-DpsProjectAccount -ProjectId 'stock' -AccountId $current.id
     if ($project.accountId -ne 'current-test') { throw 'Account switching failed.' }

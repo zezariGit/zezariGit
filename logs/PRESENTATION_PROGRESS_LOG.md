@@ -5992,3 +5992,21 @@ This file is the cumulative presentation-ready project log. It is written so the
 - `tools/dev-profile-switcher/`
 - `deliverables/operations/DEVELOPMENT_PROFILE_SWITCHER_IMPLEMENTATION.md`
 - 구현·설치·프로필 이관·검증: 약 45분
+
+## 2026-08-24 - 개발환경 전환기 실제 실행 오류 보완
+
+### 확인된 문제
+- STOCK 실행 시 Git 인증 helper 중복 오류
+- 일반 Windows Terminal에서 Microsoft Store Codex 내부 실행파일 탐색·실행 불가
+
+### 개선내용
+- Git helper를 실행마다 초기화하고 STOCK GitHub CLI 인증만 사용하도록 고정
+- 공식 독립 Codex CLI `@openai/codex` 설치 및 설치기 자동 확인 추가
+- 프로젝트별 Codex·GitHub·Vercel 경로를 시작 화면에 명시
+- 대화형 화면을 막는 상위 `TERM=dumb` 환경값 제거
+
+### 검증결과
+- ZEZARI Codex 기존 로그인 유지
+- STOCK Codex 별도 미로그인 상태 확인
+- `dev stock` 실행 시 오류 없이 ChatGPT 계정 로그인 선택 화면 진입
+- 분석·보완·실행 검증: 약 20분
