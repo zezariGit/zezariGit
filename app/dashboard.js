@@ -5,7 +5,6 @@ import {
   pauseSubjectAdAction,
   resumeSubjectAdAction,
   saveGuardianAction,
-  saveSubjectAction,
 } from "./actions";
 import AdCampaignModal from "./ad-campaign-modal";
 import FormSubmitButton from "./form-submit-button";
@@ -21,11 +20,13 @@ import QRCode from "qrcode";
 import Link from "next/link";
 import SocialSignupCompletion from "./social-signup-completion";
 import SubjectVoiceRecorder from "./subject-voice-recorder";
+import SubjectBirthDateSelect from "./subject-birth-date-select";
+import SubjectPhotoInput from "./subject-photo-input";
+import SubjectRegistrationForm from "./subject-registration-form";
 import { isAdminSession } from "../lib/admin";
 import { formatDateOnly } from "../lib/date-format";
 
-const genders = ["남성", "여성", "기타"];
-const statuses = ["상품구매필요", "QR활성화필요", "안전", "찾는중"];
+const genders = ["남성", "여성"];
 
 export default async function GuardianDashboard({
   guardian,
@@ -598,12 +599,14 @@ function GuardianForm({ guardian, session, imageUploadSettings }) {
 
 function SubjectForm({ subject, imageUploadSettings }) {
   const isExisting = Boolean(subject?.id);
+  const photoSrc = subjectPhotoSrc(subject);
 
   return (
     <article className="subject-edit-card">
-      <form action={saveSubjectAction} className="subject-registration-form">
+      <SubjectRegistrationForm hasExistingPhoto={Boolean(photoSrc)}>
         <input type="hidden" name="subjectId" defaultValue={subject?.id || ""} />
         <input type="hidden" name="existingPhotoName" defaultValue={subject?.photo_name || ""} />
+        <input type="hidden" name="status" defaultValue={statusLabel(subject?.status || "상품구매필요")} />
 
         {isExisting && (
           <div className="subject-form-top">
@@ -611,32 +614,24 @@ function SubjectForm({ subject, imageUploadSettings }) {
           </div>
         )}
 
-        <label className="subject-avatar-picker">
-          <span className="subject-avatar-preview">
-            {subjectPhotoSrc(subject) ? (
-              <img src={subjectPhotoSrc(subject)} alt={`${subject.name} 사진`} />
-            ) : (
-              <span aria-hidden="true" />
-            )}
-          </span>
-          <span className="camera-chip" aria-hidden="true">사진</span>
-          <ImageFileInput
-            name="photo"
-            label="관리대상 사진"
-            maxBytes={imageUploadSettings?.subjectPhotoMaxBytes || 1024 * 1024}
-          />
-          <small className="subject-photo-limit">{formatUploadLimit(imageUploadSettings?.subjectPhotoMaxBytes)}MB 이하</small>
-        </label>
-
         <div className="target-field-stack">
-          <label className="target-field">
-            <span>이름</span>
-            <input name="subjectName" defaultValue={subject?.name || ""} required />
-          </label>
-          <label className="target-field">
-            <span>생년월일</span>
-            <input name="birthDate" type="date" defaultValue={subject?.birth_date || ""} required />
-          </label>
+          <div className="subject-primary-fields">
+            <SubjectPhotoInput
+              existingSrc={photoSrc}
+              maxBytes={imageUploadSettings?.subjectPhotoMaxBytes || 1024 * 1024}
+              required={!photoSrc}
+            />
+            <label className="target-field subject-primary-name">
+              <span>이름</span>
+              <input
+                name="subjectName"
+                defaultValue={subject?.name || ""}
+                placeholder="이름을 입력해주세요."
+                required
+              />
+            </label>
+          </div>
+          <SubjectBirthDateSelect value={subject?.birth_date || ""} />
           <fieldset className="target-gender-field">
             <legend>성별</legend>
             {genders.map((gender) => (
@@ -652,29 +647,20 @@ function SubjectForm({ subject, imageUploadSettings }) {
               </label>
             ))}
           </fieldset>
-          <label className="target-field">
-            <span>현재 상태</span>
-            <select name="status" defaultValue={statusLabel(subject?.status || "상품구매필요")} required>
-              {statuses.map((status) => (
-                <option value={status} key={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          </label>
           <label className="target-field target-message-field">
             <span>보호자 메시지</span>
-            <small>대상자를 찾은 사람이 QR 페이지에서 볼 수 있는 안내 메시지입니다.</small>
+            <small>QR을 스캔한 발견자에게 보여지는 메시지로, 대상자를 돕는 데 필요한 내용을 적어주세요.</small>
             <textarea
               name="guardianMessage"
               defaultValue={subject?.guardian_message || ""}
-              placeholder="저희 삼촌을 찾고 있어요. 대화가 어려울 수 있으니 연락 부탁드립니다."
+              placeholder="저희 아이는 대화가 조금 어려울 수 있어요. 보호자 음성을 들려주시고, 안전한 곳에서 함께 기다려주세요."
               rows={4}
+              required
             />
           </label>
           <div className="target-voice-field">
             <strong>보호자 음성 사전 녹음 (선택)</strong>
-            <small>대상자를 찾았을 때 QR 페이지에서 재생할 수 있습니다.</small>
+            <small>QR을 스캔한 발견자가 대상자를 안심시킬 수 있도록 재생하는 음성입니다.</small>
             <SubjectVoiceRecorder
               existingVoice={subject?.voice_data_url || ""}
               existingName={subject?.voice_name || ""}
@@ -700,7 +686,7 @@ function SubjectForm({ subject, imageUploadSettings }) {
         <FormSubmitButton className="login-submit target-submit-button" pendingText={isExisting ? "수정중" : "저장중"}>
           {isExisting ? "수정 저장" : "다음"}
         </FormSubmitButton>
-      </form>
+      </SubjectRegistrationForm>
 
       {isExisting && (
         <form action={deleteSubjectAction}>

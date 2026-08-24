@@ -8208,3 +8208,25 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Verification
 - `npm run build` passed.
 - Implementation and verification: about 10 minutes.
+
+## 2026-08-24 KST - Subject Registration Form Usability And Required Fields
+
+### User Requirement
+- Remove the other gender option and the visible current-status selector.
+- Replace the guardian message and voice-recording guidance.
+- Require photo, name, birth date, gender, and guardian message, with an alert listing every missing field.
+- Show an immediate photo preview and switch the upload wording between `사진 등록하기` and `변경하기`.
+- Place the photo beside the name field, prevent label overlap, normalize iOS field widths, and split birth date into year/month/day selectors.
+
+### Implementation
+- Limited gender choices to male and female; subject status is now preserved through a hidden value and defaults internally for new registrations.
+- Added client-side aggregate missing-field alerts and matching server-side validation, including mandatory photo and guardian message checks.
+- Added dedicated client components for the registration form validator, photo preview input, and year/month/day birth-date selection.
+- Updated layout and responsive input sizing so controls use stable full widths on iOS, Android, and desktop browsers.
+- Updated the guardian message example and QR voice guidance exactly as requested.
+
+### Verification
+- `npm run build` passed.
+- `npm run security:check` passed.
+- `git diff --check` passed.
+- Implementation and verification: about 25 minutes.

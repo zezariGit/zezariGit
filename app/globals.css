@@ -8847,23 +8847,30 @@ button:disabled:hover {
 
 .subject-avatar-picker {
   position: relative;
-  width: 78px;
-  height: 96px;
-  justify-self: center;
-  display: block;
+  width: 112px;
+  min-height: 148px;
+  justify-self: start;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 3px;
   cursor: pointer;
 }
 
 .subject-avatar-picker input {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 4px;
+  z-index: 2;
+  width: 104px;
+  height: 104px;
   opacity: 0;
   cursor: pointer;
 }
 
 .subject-avatar-preview {
-  width: 70px;
-  height: 70px;
+  width: 104px;
+  height: 104px;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -8889,8 +8896,9 @@ button:disabled:hover {
 
 .camera-chip {
   position: absolute;
-  right: -2px;
-  bottom: 6px;
+  top: 76px;
+  right: 0;
+  z-index: 3;
   border: 1px solid var(--c-border-strong);
   border-radius: 999px;
   padding: 3px 6px;
@@ -8900,17 +8908,33 @@ button:disabled:hover {
   font-weight: 800;
 }
 
+.subject-photo-action {
+  margin-top: 6px;
+  color: #111827;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
 .subject-photo-limit {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
+  position: static;
   width: max-content;
-  transform: translateX(-50%);
+  color: var(--c-text-muted);
+  font-size: 10px;
+  line-height: 1.2;
 }
 
 .target-field-stack {
   display: grid;
-  gap: 8px;
+  gap: 18px;
+}
+
+.subject-primary-fields {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--c-border);
 }
 
 .target-field {
@@ -8934,12 +8958,57 @@ button:disabled:hover {
 .target-field input,
 .target-field select,
 .target-field textarea {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   min-height: 39px;
   border: 1.5px solid #111827;
   border-radius: 13px;
   color: #111827;
   font-size: 14px;
   line-height: 1.35;
+}
+
+.subject-primary-name {
+  align-self: center;
+}
+
+.subject-primary-name input,
+.subject-birth-date-selects select {
+  font-size: 16px;
+}
+
+.subject-birth-date-field {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.subject-birth-date-field > span {
+  color: #111827;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.subject-birth-date-selects {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.subject-birth-date-selects select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  border: 1.5px solid #111827;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #111827;
 }
 
 .target-field textarea {
@@ -8956,6 +9025,8 @@ button:disabled:hover {
   padding: 0;
   border: 0;
   color: #111827;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--c-border);
 }
 
 .target-gender-field legend {
