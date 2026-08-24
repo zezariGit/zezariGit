@@ -102,7 +102,9 @@ export default async function GuardianDashboard({
                 대시보드로 돌아가기
               </Link>
             )}
-            <p className="intro-kicker">{guardianComplete ? "보호자 대시보드" : "정보 입력"}</p>
+            {!isSubjectsTab && (
+              <p className="intro-kicker">{guardianComplete ? "보호자 대시보드" : "정보 입력"}</p>
+            )}
             <h1 className="dashboard-title">
               {isDashboard
                 ? guardianComplete
@@ -111,7 +113,9 @@ export default async function GuardianDashboard({
                 : isGuardianTab
                   ? "보호자정보"
                   : isSubjectsTab
-                    ? "관리대상정보"
+                    ? selectedEditSubject
+                      ? "대상자 정보 수정"
+                      : "대상자 정보 등록"
                     : "보호자 대시보드"}
             </h1>
             <p className="dashboard-subtitle">
@@ -122,7 +126,13 @@ export default async function GuardianDashboard({
                 : isGuardianTab
                   ? "보호자 연락처, 주소, 안심번호 등 기본 정보를 입력하고 수정합니다."
                   : isSubjectsTab
-                    ? "관리대상 등록, 보호자 메시지, 음성 안내, QR 배정 정보를 관리합니다."
+                    ? selectedEditSubject
+                      ? `${selectedEditSubject.name} 대상자의 정보를 수정해 주세요.`
+                      : <>
+                          보호가 필요한 대상자의 정보를 등록해주세요.
+                          <br />
+                          등록한 정보는 QR 스캔 시 발견자에게 필요한 정보를 안내하는 데 사용됩니다.
+                        </>
                     : "로그인한 보호자에게 등록된 관리대상과 현재 상태를 확인할 수 있습니다."}
             </p>
           </div>
@@ -415,14 +425,7 @@ function SubjectsInfoTab({ selectedSubject, registeredSubject, registeredQrClaim
 
   return (
     <section className="subjects-workspace">
-      <div className="panel-heading subjects-heading">
-        <div>
-          <h2 id="subjects-info">{editing ? "대상자 수정" : "대상자 등록"}</h2>
-          <p>{editing ? `${selectedSubject.name} 대상자의 정보를 수정합니다.` : "새 관리대상 한 명의 정보를 입력해 주세요."}</p>
-        </div>
-        <span>{editing ? selectedSubject.name : "신규"}</span>
-      </div>
-      <div className="subject-list">
+      <div className="subject-list" id="subjects-info">
         {hasQrSignupClaim && !editing && (
           <div className="qr-claim-registration-banner" role="status">
             <strong>스캔한 미배정 QR 연결 대기 중</strong>
@@ -602,10 +605,11 @@ function SubjectForm({ subject, imageUploadSettings }) {
         <input type="hidden" name="subjectId" defaultValue={subject?.id || ""} />
         <input type="hidden" name="existingPhotoName" defaultValue={subject?.photo_name || ""} />
 
-        <div className="subject-form-top">
-          <h2>{isExisting ? "대상자 수정" : "대상자 등록"}</h2>
-          {isExisting && <em>수정 저장 시 QR 완료 화면은 표시되지 않습니다.</em>}
-        </div>
+        {isExisting && (
+          <div className="subject-form-top">
+            <em>수정 저장 시 QR 완료 화면은 표시되지 않습니다.</em>
+          </div>
+        )}
 
         <label className="subject-avatar-picker">
           <span className="subject-avatar-preview">

@@ -8192,3 +8192,19 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Confirmed Vercel CLI user `zezarigit`, Codex ChatGPT login `soonsuboy10@gmail.com`, and Turso environment metadata.
 - Confirmed GitHub remote HEAD access succeeds.
 - Login verification and GitHub CLI reconnection: about 5 minutes.
+
+## 2026-08-24 KST - Subject Registration Header Simplification
+
+### User Requirement
+- Remove the existing dashboard, management, panel heading, helper text, and new-item badge from the new subject registration view.
+- Replace them with one clear title and two-line explanation based on the supplied reference layout.
+
+### Implementation
+- New registration now displays `대상자 정보 등록` as the single page title.
+- Added the requested explanation about registering a protected subject and using the information after a QR scan.
+- Removed the duplicated `대상자 등록` headings, `신규` badge, and legacy management description from the registration flow.
+- Kept the edit flow distinct with `대상자 정보 수정` and its existing edit-only guidance.
+
+### Verification
+- `npm run build` passed.
+- Implementation and verification: about 10 minutes.

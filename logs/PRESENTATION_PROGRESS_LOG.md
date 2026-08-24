@@ -6041,3 +6041,15 @@ This file is the cumulative presentation-ready project log. It is written so the
 - Vercel `zezarigit`, Codex `soonsuboy10@gmail.com`, Turso 연결정보 확인
 - GitHub 원격 저장소 접근 성공 확인
 - 확인·재연결: 약 5분
+
+## 2026-08-24 - 대상자 정보 등록 화면 문구 정리
+
+### 요구내용
+- 대상자 신규 등록 화면의 기존 중복 제목과 안내 문구를 제거하고 제공된 문구로 교체
+
+### 반영내용
+- 제목을 `대상자 정보 등록`으로 통일
+- 보호 대상 정보 등록 목적과 QR 스캔 시 활용 목적을 두 줄로 안내
+- `보호자 대시보드`, `관리대상정보`, `대상자 등록`, `신규` 등 중복 표현 제거
+- 수정 화면은 `대상자 정보 수정`으로 구분
+- 구현·검증: 약 10분
