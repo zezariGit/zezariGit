@@ -1,5 +1,7 @@
 # 개발 계정 통합 전환 프로그램 설계
 
+> 구현 상태: 2026-08-24 PowerShell 7 GUI, `dev` 명령, Windows EXE 런처로 1차 구현 완료. 실제 구현과 사용법은 `DEVELOPMENT_PROFILE_SWITCHER_IMPLEMENTATION.md`를 참고한다.
+
 ## 1. 목적
 
 제자리와 새로운 프로젝트의 개발 계정을 섞지 않고, 프로젝트 하나를 선택하면 그 프로젝트 전용 GitHub, Vercel, Codex, VS Code, 브라우저와 환경변수 작업공간을 한 번에 여는 Windows 프로그램을 만든다.

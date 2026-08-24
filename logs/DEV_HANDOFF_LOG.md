@@ -8095,3 +8095,35 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Deliverable And Time Spent
 - `deliverables/operations/DEVELOPMENT_PROFILE_SWITCHER_DESIGN.md`
 - Research, local tool inspection, architecture and documentation: about 25 minutes.
+
+## 2026-08-24 KST - Development Environment Account Switcher Implementation
+
+### User Requirement
+- Build the account-switching program rather than stopping at the design.
+- Existing projects must retain their current development environment.
+- New projects must select an existing development account bundle or create an isolated new bundle.
+- Keep daily usage as simple as possible for a Codex CLI workflow.
+
+### Reflected Work
+- Added a PowerShell 7 WinForms GUI, a compiled Windows EXE launcher, a desktop shortcut and the `dev` command.
+- Separated project profiles from reusable account bundles.
+- Added existing-project scanning for GitHub remotes, Git identity, Vercel links, environment variable names and DB providers without reading secret values into profile storage.
+- Added new-project folder/profile creation and existing/new account selection.
+- Added per-account Codex `CODEX_HOME`, GitHub `GH_CONFIG_DIR`, Vercel global config and isolated browser data directories.
+- Added project-only Git identity, GitHub credential-helper isolation, parent environment sanitization and project `.env.local` precedence.
+- Added local connection diagnostics and secret-free JSONL audit logs.
+- Installed the program under `%LOCALAPPDATA%\DevProfileSwitcher`, created `dev.cmd`, `DevProfileSwitcher.exe` and the desktop shortcut.
+
+### Actual Profiles
+- Registered `zezari` at `C:\REAL_QR_FIND` with the current development account bundle.
+- Registered `stock` at `C:\soonsuboy_dev_project\stock` with isolated `stock-personal` storage.
+- Recovered the STOCK Git identity from its commit history and applied `soonsuboy <soonsuboy10@gmail.com>` locally.
+- STOCK Turso variables were detected; STOCK GitHub CLI, Vercel and Codex require one-time login through `dev login stock-personal all`.
+
+### Verification And Deliverables
+- Automated profile-store, import, new-project, secret-filtering, launch-isolation and switching tests passed.
+- GUI launch and ZEZARI/STOCK project rendering verified.
+- ZEZARI Codex, Vercel and Turso detection passed; STOCK isolated login-required states were reported without hanging.
+- `tools/dev-profile-switcher/`
+- `deliverables/operations/DEVELOPMENT_PROFILE_SWITCHER_IMPLEMENTATION.md`
+- Implementation, installation, profile migration and verification: about 45 minutes.

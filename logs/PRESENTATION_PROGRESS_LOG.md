@@ -5966,3 +5966,29 @@ This file is the cumulative presentation-ready project log. It is written so the
 - `deliverables/operations/DEVELOPMENT_PROFILE_SWITCHER_DESIGN.md`
 - 이번 단계는 설계만 수행하고 실행 프로그램은 아직 구현하지 않음
 - 조사·설계·문서화: 약 25분
+
+## 2026-08-24 - 개발환경 계정 전환 프로그램 구현
+
+### 요구내용
+- 기존 개발 프로젝트는 기존 계정을 유지하고 새 프로젝트는 기존 계정 선택 또는 새 계정 생성
+- Codex CLI 중심으로 최대한 간단하게 프로젝트 전환
+
+### 반영내용
+- 바탕화면 GUI, Windows EXE, `dev` 명령 설치
+- 프로젝트와 재사용 가능한 계정 묶음 분리
+- Codex, GitHub CLI, Git Push, Vercel, 브라우저 계정을 프로젝트 창별로 격리
+- DB와 API는 프로젝트 `.env.local`을 우선하고 다른 터미널의 환경변수 혼입 차단
+- 기존 프로젝트 자동 분석과 새 프로젝트/새 계정 묶음 생성 지원
+- 비밀번호·토큰·환경변수 값을 프로필과 로그에 저장하지 않도록 처리
+
+### 실제 적용
+- `dev zezari`: 현재 ZEZARI 개발환경으로 실행
+- `dev stock`: STOCK 전용 개인 개발환경으로 실행
+- STOCK Git 작성자 `soonsuboy <soonsuboy10@gmail.com>` 로컬 적용
+- STOCK GitHub·Vercel·Codex는 `선택 계정 연결`에서 최초 로그인 후 계속 재사용
+
+### 검증 및 산출물
+- 자동 회귀 테스트, EXE/GUI 실행, 프로필 분리, 비밀값 미저장 검증 통과
+- `tools/dev-profile-switcher/`
+- `deliverables/operations/DEVELOPMENT_PROFILE_SWITCHER_IMPLEMENTATION.md`
+- 구현·설치·프로필 이관·검증: 약 45분
