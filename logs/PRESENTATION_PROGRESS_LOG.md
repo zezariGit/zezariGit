@@ -6010,3 +6010,21 @@ This file is the cumulative presentation-ready project log. It is written so the
 - STOCK Codex 별도 미로그인 상태 확인
 - `dev stock` 실행 시 오류 없이 ChatGPT 계정 로그인 선택 화면 진입
 - 분석·보완·실행 검증: 약 20분
+
+## 2026-08-24 - STOCK 자식 프로세스 계정 완전 분리
+
+### 요구내용
+- STOCK Codex에서 제자리 Git·Vercel 계정이 표시되는 원인 확인 및 분리
+
+### 반영내용
+- STOCK 저장소의 실제 Git 작성자와 커밋 기록이 `soonsuboy <soonsuboy10@gmail.com>`임을 확인
+- 계정별 전역 Git 설정 파일을 추가하여 `git config --global`도 STOCK 계정으로 표시
+- Codex 내부에서 실행되는 Vercel 명령에도 STOCK 전용 인증만 전달
+- STOCK Vercel 미로그인 상태에서 `zezarigit` 계정으로 fallback하는 경로 차단
+- 실행할 때 프로젝트 진단정보를 자동 갱신하도록 개선
+
+### 검증결과
+- STOCK 전역·유효 Git 작성자 모두 개인계정으로 확인
+- STOCK Codex 개인계정 로그인 유지 확인
+- GitHub·Vercel은 최초 로그인 필요 상태로 분리되어 제자리 계정을 사용하지 않음
+- 구현·설치·검증: 약 25분

@@ -70,9 +70,9 @@ dev stock
 | 프로젝트 | 경로 | 계정 묶음 | 현재 상태 |
 |---|---|---|---|
 | ZEZARI | `C:\REAL_QR_FIND` | `current` | 기존 Codex, Vercel, Turso와 Git 작성자 사용 |
-| STOCK | `C:\soonsuboy_dev_project\stock` | `stock-personal` | Git 작성자와 Turso 감지, 분리 로그인 준비 |
+| STOCK | `C:\soonsuboy_dev_project\stock` | `stock-personal` | Git·Codex 개인계정 분리 완료, GitHub·Vercel 최초 로그인 필요 |
 
-STOCK에는 기존 커밋 기록을 기준으로 `soonsuboy <soonsuboy10@gmail.com>`을 저장소 로컬 Git 작성자로 설정했다. STOCK의 GitHub CLI, Vercel, Codex는 분리 저장소가 새로 만들어졌으므로 다음 명령 또는 GUI의 `선택 계정 연결`로 최초 한 번 로그인한다.
+STOCK에는 기존 커밋 기록을 기준으로 `soonsuboy <soonsuboy10@gmail.com>`을 저장소 로컬 및 격리 전역 Git 작성자로 설정했다. STOCK Codex는 개인 ChatGPT 계정으로 연결되었고, GitHub CLI와 Vercel은 다음 명령 또는 GUI의 `선택 계정 연결`로 최초 한 번 로그인한다.
 
 ```powershell
 dev login stock-personal all
@@ -105,7 +105,7 @@ dev import stock C:\soonsuboy_dev_project\stock -Account stock-personal
 - `.env.local`의 값은 읽어 프로필에 복사하지 않고 변수 이름만 기록한다.
 - 전환 환경은 새 자식 프로세스에만 적용한다.
 - 분리 GitHub 프로필은 기존 Windows Git 자격증명으로 fallback하지 않는다.
-- Vercel 토큰은 Vercel CLI가 Windows 자격 증명 저장소에 보관한다.
+- Vercel 토큰은 Vercel CLI의 계정별 인증 저장소에 보관하고 실행 중인 자식 프로세스에만 전달한다.
 - 활동 로그에는 프로젝트 ID, 계정 ID, 결과와 시간만 기록한다.
 
 ## 7. 구조
@@ -140,3 +140,12 @@ flowchart LR
 - 공식 `npm install -g @openai/codex` 방식의 독립 CLI를 설치하고 설치기에서도 누락 시 자동 설치하도록 변경했다.
 - 상위 Codex 앱에서 전달된 `TERM=dumb` 값을 새 개발창에서 제거하여 Windows Terminal 대화형 UI가 바로 표시되도록 수정했다.
 - 실제 `dev stock` 실행으로 계정별 경로 표시와 Codex ChatGPT 로그인 선택 화면 진입을 확인했다.
+
+## 10. 2026-08-24 자식 프로세스 계정 격리 보완
+
+- STOCK 저장소의 실제 로컬 Git 작성자는 이미 `soonsuboy <soonsuboy10@gmail.com>`이었지만, `git config --global` 조회에는 PC 기본값인 ZEZARI 계정이 표시되었다.
+- 격리 계정마다 별도 `gitconfig`를 만들고 `GIT_CONFIG_GLOBAL`을 자식 Codex 프로세스까지 전달하여 전역·유효 Git 작성자가 모두 STOCK 계정으로 표시되게 했다.
+- 부모 PowerShell의 `vercel` 함수는 Codex 내부 셸에 상속되지 않으므로, 격리된 Vercel 인증 토큰을 `VERCEL_TOKEN`으로 자식 프로세스에 전달하도록 변경했다.
+- STOCK Vercel 로그인 전에는 PC 기본 Vercel 계정 `zezarigit`으로 fallback하지 않고 명시적으로 실패하도록 보호값을 주입한다.
+- 실행·상태 확인 시 프로젝트의 Git, Vercel, 환경변수 메타데이터를 다시 읽어 오래된 진단값을 자동 갱신한다.
+- 실제 검증 결과 STOCK 전역·유효 Git 작성자는 모두 `soonsuboy <soonsuboy10@gmail.com>`, Codex는 STOCK 전용 `CODEX_HOME`에서 ChatGPT 로그인 상태이며 Vercel은 `로그인 필요`로 안전하게 분리되었다.

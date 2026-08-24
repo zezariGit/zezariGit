@@ -34,10 +34,18 @@ try {
     if ($launchContents -notmatch 'CODEX_HOME') { throw 'Codex profile injection failed.' }
     if ($launchContents -notmatch 'GH_CONFIG_DIR') { throw 'GitHub profile injection failed.' }
     if ($launchContents -notmatch 'DEV_PROFILE_VERCEL_CONFIG') { throw 'Vercel profile injection failed.' }
+    if ($launchContents -notmatch 'GIT_CONFIG_GLOBAL') { throw 'Git global identity isolation failed.' }
+    if ($launchContents -notmatch 'DEV_PROFILE_VERCEL_CONNECTED') { throw 'Vercel child-process isolation failed.' }
+    if ($launchContents -notmatch 'dev-profile-login-required') { throw 'Vercel fallback protection failed.' }
     if ($launchContents -notmatch 'gh auth git-credential') { throw 'GitHub credential isolation failed.' }
     if ($launchContents -notmatch '--unset-all credential\.https://github\.com\.helper') { throw 'GitHub credential cleanup failed.' }
     if ($launchContents -notmatch 'Env:TURSO_AUTH_TOKEN') { throw 'Parent environment sanitization failed.' }
     if ($launchContents -notmatch "TERM -eq 'dumb'") { throw 'Interactive terminal normalization failed.' }
+
+    $isolatedGitConfig = Join-Path $storeRoot 'accounts\personal\gitconfig'
+    if (-not (Test-Path -LiteralPath $isolatedGitConfig)) { throw 'Isolated Git config was not created.' }
+    if ((& git.exe config --file $isolatedGitConfig --get user.name) -ne 'tester') { throw 'Isolated Git name was not saved.' }
+    if ((& git.exe config --file $isolatedGitConfig --get user.email) -ne 'tester@example.com') { throw 'Isolated Git email was not saved.' }
 
     $project = Set-DpsProjectAccount -ProjectId 'stock' -AccountId $current.id
     if ($project.accountId -ne 'current-test') { throw 'Account switching failed.' }

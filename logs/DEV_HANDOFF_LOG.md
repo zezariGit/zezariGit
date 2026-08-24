@@ -8152,3 +8152,30 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Actual `dev stock` launch reached the Codex `Sign in with ChatGPT` selection screen without the previous Git or executable errors.
 - Git helper count stabilized at two intentional entries and no longer grows across launches.
 - Correction, installation and actual terminal verification: about 20 minutes.
+
+## 2026-08-24 KST - STOCK Child-Process Account Isolation Correction
+
+### User Report
+- A Codex session opened for the STOCK project still reported the global Git identity as `zezariGit <general@zezari.com>` and the Vercel CLI account as `zezarigit`.
+- Asked whether the ZEZARI environment was still leaking into STOCK.
+
+### Findings
+- STOCK repository-local Git identity and all recent commit authors were already `soonsuboy <soonsuboy10@gmail.com>`; only the PC-global diagnostic still showed ZEZARI.
+- STOCK Codex used the isolated `CODEX_HOME` and was signed in with `soonsuboy10@gmail.com`.
+- STOCK GitHub CLI and Vercel isolated stores had not completed their one-time logins.
+- A parent-shell PowerShell `vercel` function is not inherited by the subprocesses that Codex opens, so direct child `npx vercel` commands could see the PC default Vercel login.
+- Missing `ADMIN_EMAILS` is an application authorization setting, not evidence of development-account leakage.
+
+### Correction
+- Added one Git global config file per isolated account and injected it through `GIT_CONFIG_GLOBAL`.
+- Propagated only the isolated Vercel token to child Codex processes through `VERCEL_TOKEN`.
+- Added a login-required protection value so an unconnected profile cannot fall back to another Vercel account.
+- Added visible Git/Vercel connection state to the launch banner.
+- Added project metadata synchronization before launch and status checks.
+
+### Verification
+- STOCK global and effective Git name/email both resolve to `soonsuboy <soonsuboy10@gmail.com>`.
+- STOCK Codex login is active in its isolated home.
+- STOCK GitHub and Vercel report login required and do not reuse ZEZARI credentials.
+- PowerShell parser and automated profile-switcher regression tests passed.
+- Analysis, correction, installation and verification: about 25 minutes.

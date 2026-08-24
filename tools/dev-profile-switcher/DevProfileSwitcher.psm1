@@ -108,6 +108,38 @@ function Get-DpsDefaultGitHubConfigDir {
     return Join-Path $env:APPDATA 'GitHub CLI'
 }
 
+function Get-DpsAccountGitConfigPath {
+    param([Parameter(Mandatory)]$Account)
+
+    if ($Account.mode -ne 'isolated') { return '' }
+    $home = Initialize-DpsStore
+    return Join-Path $home "accounts\$($Account.id)\gitconfig"
+}
+
+function Initialize-DpsAccountGitConfig {
+    param([Parameter(Mandatory)]$Account)
+
+    $path = Get-DpsAccountGitConfigPath -Account $Account
+    if (-not $path) { return '' }
+
+    $directory = Split-Path -Parent $path
+    [System.IO.Directory]::CreateDirectory($directory) | Out-Null
+    if (-not (Test-Path -LiteralPath $path)) {
+        New-Item -ItemType File -Path $path -Force | Out-Null
+    }
+
+    & git.exe config --file $path --unset-all user.name 2>$null
+    & git.exe config --file $path --unset-all user.email 2>$null
+    if ($Account.gitName) {
+        & git.exe config --file $path --add user.name ([string]$Account.gitName)
+    }
+    if ($Account.gitEmail) {
+        & git.exe config --file $path --add user.email ([string]$Account.gitEmail)
+    }
+
+    return $path
+}
+
 function New-DpsAccount {
     [CmdletBinding()]
     param(
@@ -167,6 +199,9 @@ function New-DpsAccount {
     }
 
     Write-DpsJson -Path $profilePath -Value $account
+    if ($mode -eq 'isolated') {
+        Initialize-DpsAccountGitConfig -Account ([pscustomobject]$account) | Out-Null
+    }
     Write-DpsAuditLog -Action 'account.create' -AccountId $Id
     return [pscustomobject]$account
 }
@@ -204,6 +239,9 @@ function Set-DpsAccountIdentity {
     $account.updatedAt = Get-DpsIsoTimestamp
     $home = Initialize-DpsStore
     Write-DpsJson -Path (Join-Path $home "accounts\$Id\account.json") -Value $account
+    if ($account.mode -eq 'isolated') {
+        Initialize-DpsAccountGitConfig -Account $account | Out-Null
+    }
     Write-DpsAuditLog -Action 'account.identity.update' -AccountId $Id
     return $account
 }
@@ -456,6 +494,19 @@ function Get-DpsProject {
     return Read-DpsJson -Path $path
 }
 
+function Sync-DpsProjectMetadata {
+    param([Parameter(Mandatory)][string]$Id)
+
+    $project = Get-DpsProject -Id $Id
+    $metadata = Get-DpsProjectMetadata -Workspace $project.workspace
+    $project.git = $metadata.git
+    $project.vercel = $metadata.vercel
+    $project.environment = $metadata.environment
+    $project.updatedAt = Get-DpsIsoTimestamp
+    Save-DpsProject -Project $project
+    return $project
+}
+
 function Remove-DpsProject {
     param([Parameter(Mandatory)][string]$Id)
     $home = Initialize-DpsStore
@@ -558,6 +609,7 @@ function Get-DpsLaunchScript {
     $accountIdLiteral = ConvertTo-DpsPowerShellLiteral $Account.id
     $accountNameLiteral = ConvertTo-DpsPowerShellLiteral $Account.displayName
     $codexExecutable = Get-DpsCodexExecutable
+    $gitConfigPath = Initialize-DpsAccountGitConfig -Account $Account
     $lines = [System.Collections.Generic.List[string]]::new()
     $lines.Add("`$ErrorActionPreference = 'Continue'")
     $lines.Add("`$env:DEV_PROFILE_PROJECT = $projectIdLiteral")
@@ -567,7 +619,18 @@ function Get-DpsLaunchScript {
     $lines.Add("if (`$env:TERM -eq 'dumb') { Remove-Item -LiteralPath 'Env:TERM' -ErrorAction SilentlyContinue }")
 
     if ($Account.mode -eq 'isolated') {
+        $lines.Add("`$env:GIT_CONFIG_GLOBAL = $(ConvertTo-DpsPowerShellLiteral $gitConfigPath)")
         $lines.Add("`$env:DEV_PROFILE_VERCEL_CONFIG = $(ConvertTo-DpsPowerShellLiteral $Account.vercelConfigDir)")
+        $lines.Add("Remove-Item -LiteralPath 'Env:VERCEL_TOKEN' -ErrorAction SilentlyContinue")
+        $lines.Add("`$env:DEV_PROFILE_VERCEL_CONNECTED = 'false'")
+        $lines.Add("`$vercelAuthPath = Join-Path `$env:DEV_PROFILE_VERCEL_CONFIG 'auth.json'")
+        $lines.Add("if (Test-Path -LiteralPath `$vercelAuthPath) {")
+        $lines.Add("    try {")
+        $lines.Add("        `$vercelAuth = Get-Content -LiteralPath `$vercelAuthPath -Raw | ConvertFrom-Json")
+        $lines.Add("        if (`$vercelAuth.token) { `$env:VERCEL_TOKEN = [string]`$vercelAuth.token; `$env:DEV_PROFILE_VERCEL_CONNECTED = 'true' }")
+        $lines.Add("    } catch { Write-Warning '격리된 Vercel 인증 파일을 읽지 못했습니다.' }")
+        $lines.Add("}")
+        $lines.Add("if (-not `$env:VERCEL_TOKEN) { `$env:VERCEL_TOKEN = 'dev-profile-login-required' }")
         $browserLauncher = New-DpsBrowserLauncher -Account $Account
         if ($browserLauncher) {
             $lines.Add("`$env:BROWSER = $(ConvertTo-DpsPowerShellLiteral $browserLauncher)")
@@ -605,8 +668,10 @@ function Get-DpsLaunchScript {
     $lines.Add("Write-Host ('경로: ' + $workspaceLiteral)")
     $lines.Add("Write-Host ('Codex HOME: ' + `$env:CODEX_HOME)")
     if ($Account.mode -eq 'isolated') {
+        $lines.Add("Write-Host ('Git 전역 프로필: ' + `$env:GIT_CONFIG_GLOBAL)")
         $lines.Add("Write-Host ('GitHub CLI: ' + `$env:GH_CONFIG_DIR)")
         $lines.Add("Write-Host ('Vercel CLI: ' + `$env:DEV_PROFILE_VERCEL_CONFIG)")
+        $lines.Add("if (`$env:DEV_PROFILE_VERCEL_CONNECTED -eq 'true') { Write-Host 'Vercel 인증: 연결됨' -ForegroundColor Green } else { Write-Host 'Vercel 인증: 로그인 필요' -ForegroundColor Yellow }")
     }
     $lines.Add("Write-Host '현재 창에만 계정 설정이 적용되었습니다.' -ForegroundColor DarkGray")
     $lines.Add("Write-Host ''")
@@ -631,7 +696,7 @@ function Start-DpsProject {
         [switch]$Wait
     )
 
-    $project = Get-DpsProject -Id $ProjectId
+    $project = Sync-DpsProjectMetadata -Id $ProjectId
     $account = Get-DpsAccount -Id $project.accountId
     if (-not (Test-Path -LiteralPath $project.workspace -PathType Container)) {
         throw "프로젝트 폴더를 찾을 수 없습니다: $($project.workspace)"
@@ -666,6 +731,7 @@ function Start-DpsAccountLogin {
     $lines.Add("`$Host.UI.RawUI.WindowTitle = '계정 연결 - $($account.displayName -replace "'", "''")'")
     $lines.Add("`$env:CODEX_HOME = $(ConvertTo-DpsPowerShellLiteral $account.codexHome)")
     $lines.Add("`$env:GH_CONFIG_DIR = $(ConvertTo-DpsPowerShellLiteral $account.githubConfigDir)")
+    $lines.Add("Remove-Item -LiteralPath 'Env:VERCEL_TOKEN' -ErrorAction SilentlyContinue")
     if ($browserLauncher) { $lines.Add("`$env:BROWSER = $(ConvertTo-DpsPowerShellLiteral $browserLauncher)") }
     $lines.Add("Write-Host '계정 묶음: $($account.displayName -replace "'", "''")' -ForegroundColor Cyan")
     $lines.Add("Write-Host '비밀번호와 인증번호는 이 프로그램에 저장되지 않습니다.' -ForegroundColor DarkGray")
@@ -725,10 +791,48 @@ try {
     }
 }
 
+function Get-DpsCodexIdentity {
+    param([Parameter(Mandatory)]$Account)
+
+    $authPath = Join-Path $Account.codexHome 'auth.json'
+    if (-not (Test-Path -LiteralPath $authPath)) { return '' }
+
+    try {
+        $auth = Read-DpsJson -Path $authPath
+        $idToken = [string]$auth.tokens.id_token
+        if (-not $idToken) { return '' }
+        $parts = $idToken.Split('.')
+        if ($parts.Count -lt 2) { return '' }
+        $payload = $parts[1].Replace('-', '+').Replace('_', '/')
+        while ($payload.Length % 4) { $payload += '=' }
+        $claimsJson = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($payload))
+        $claims = $claimsJson | ConvertFrom-Json
+        return [string]$claims.email
+    } catch {
+        return ''
+    }
+}
+
+function Get-DpsGitHubIdentity {
+    param([Parameter(Mandatory)]$Account)
+
+    $hostsPath = Join-Path $Account.githubConfigDir 'hosts.yml'
+    if (-not (Test-Path -LiteralPath $hostsPath)) { return '' }
+
+    try {
+        $content = Get-Content -LiteralPath $hostsPath -Raw
+        $matches = [regex]::Matches($content, '(?m)^\s*user:\s*(?<value>[^\r\n#]+)')
+        if ($matches.Count -eq 0) { return '' }
+        return $matches[$matches.Count - 1].Groups['value'].Value.Trim(" '`"")
+    } catch {
+        return ''
+    }
+}
+
 function Get-DpsProjectStatus {
     param([Parameter(Mandatory)][string]$ProjectId)
 
-    $project = Get-DpsProject -Id $ProjectId
+    $project = Sync-DpsProjectMetadata -Id $ProjectId
     $account = Get-DpsAccount -Id $project.accountId
     $metadata = Get-DpsProjectMetadata -Workspace $project.workspace
     $checks = [System.Collections.Generic.List[object]]::new()
@@ -752,21 +856,23 @@ function Get-DpsProjectStatus {
     })
 
     $codexAuth = Join-Path $account.codexHome 'auth.json'
+    $codexIdentity = Get-DpsCodexIdentity -Account $account
     $checks.Add([pscustomobject]@{
         Name = 'Codex/OpenAI'
         Status = if (Test-Path -LiteralPath $codexAuth) { '연결됨' } else { '로그인 필요' }
-        Detail = $account.codexHome
+        Detail = if ($codexIdentity) { $codexIdentity } else { $account.codexHome }
     })
 
     $githubHosts = Join-Path $account.githubConfigDir 'hosts.yml'
+    $githubIdentity = Get-DpsGitHubIdentity -Account $account
     $checks.Add([pscustomobject]@{
         Name = 'GitHub CLI'
         Status = if (Test-Path -LiteralPath $githubHosts) { '연결됨' } else { '로그인 필요' }
-        Detail = $account.githubConfigDir
+        Detail = if ($githubIdentity) { $githubIdentity } else { $account.githubConfigDir }
     })
 
     $vercelConnected = Test-DpsVercelCredentials -Account $account
-    $vercelDetail = if ($vercelConnected) { 'Windows 자격 증명에 안전하게 저장됨' } else { '로그인 필요' }
+    $vercelDetail = if ($vercelConnected) { '계정별 인증 저장소에 연결됨' } else { '로그인 필요' }
     $checks.Add([pscustomobject]@{
         Name = 'Vercel CLI'
         Status = if ($vercelConnected) { '연결됨' } else { '로그인 필요' }
@@ -823,6 +929,7 @@ Export-ModuleMember -Function @(
     'New-DpsProject',
     'Get-DpsProjects',
     'Get-DpsProject',
+    'Sync-DpsProjectMetadata',
     'Remove-DpsProject',
     'Set-DpsProjectAccount',
     'Start-DpsProject',
