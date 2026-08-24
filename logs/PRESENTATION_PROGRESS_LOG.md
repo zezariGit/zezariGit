@@ -5947,3 +5947,22 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 비밀번호·API 키·토큰·MFA 복구코드는 문서와 로그에서 제외
 - `deliverables/operations/ACCOUNT_ACCESS_REGISTER.md` 점검 요약 갱신
 - 점검·문서화: 약 10분
+
+## 2026-08-24 - 개발 계정 통합 전환 프로그램 설계
+
+### 요구내용
+- 제자리 종료 후 다른 프로젝트를 개발할 때 GitHub, Vercel, DB, Google, Codex 등 개발 계정을 한 번에 전환
+- 구현 전 구조를 설계하고 쉽게 설명
+
+### 설계내용
+- 프로젝트마다 인증 저장소가 분리된 `개발 프로젝트 서랍` 방식 채택
+- Codex `CODEX_HOME`, GitHub `GH_CONFIG_DIR`, Vercel global config, VS Code user-data와 브라우저 프로필을 프로젝트별 분리
+- 최초 가입·MFA만 사용자가 진행하고 이후에는 `전환 후 열기` 한 번으로 개발환경 실행
+- 토큰·쿠키 복사와 Windows 전역 환경변수 변경 금지
+- GitHub 저장소, Vercel Project, 운영 DB가 다른 경우 Push·배포 차단
+- PowerShell MVP 검증 후 .NET 8 WPF 단일 실행파일로 완성하는 단계 제안
+
+### 산출물
+- `deliverables/operations/DEVELOPMENT_PROFILE_SWITCHER_DESIGN.md`
+- 이번 단계는 설계만 수행하고 실행 프로그램은 아직 구현하지 않음
+- 조사·설계·문서화: 약 25분

@@ -8075,3 +8075,23 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Kept passwords, API keys, tokens, MFA secrets, and recovery codes out of Git and logs; unknown provider login IDs remain marked for verification in the password manager.
 - Updated `deliverables/operations/ACCOUNT_ACCESS_REGISTER.md` with the 2026-08-24 audit summary.
 - Review and documentation: about 10 minutes.
+
+## 2026-08-24 KST - Development Profile Switcher Design
+
+### User Requirement
+- Design an easy executable that switches all development accounts together when moving from ZEZARI to another project.
+- Include Codex/OpenAI, GitHub, Vercel, database, Google and other provider-console access.
+- Explain the design before implementation.
+
+### Review And Decisions
+- Confirmed Codex, Git, GitHub CLI, Vercel CLI and VS Code are installed; Turso CLI and gcloud are not installed.
+- Confirmed supported isolation controls: Codex `CODEX_HOME` and profiles, GitHub CLI `GH_CONFIG_DIR`, Vercel `--global-config`, and VS Code user-data/profile directories.
+- Chose isolated child-process workspaces instead of changing global Windows accounts or copying browser cookies and tokens.
+- Defined a one-time interactive login followed by one-click project launch model.
+- Recommended a PowerShell/JSON MVP followed by a .NET 8 WPF single-EXE application.
+- Added security gates for Git identity, remote owner, Vercel scope/project and production DB mismatch.
+- No executable or source implementation was performed in this design-only step.
+
+### Deliverable And Time Spent
+- `deliverables/operations/DEVELOPMENT_PROFILE_SWITCHER_DESIGN.md`
+- Research, local tool inspection, architecture and documentation: about 25 minutes.

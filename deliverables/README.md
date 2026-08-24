@@ -67,6 +67,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `operations/OPERATIONS_ARCHITECTURE.md`: Vercel·Turso·GitHub 구조, 외부 서비스 연결, 배포·장애 대응·백업 기준을 정리한 운영 총괄 문서.
 - `operations/SERVICE_CONFIGURATION_REGISTER.md`: OAuth, Solapi, Toss Payments, Meta, Bizcall, Push 등 서비스별 환경변수와 운영상태 대장.
 - `operations/ACCOUNT_ACCESS_REGISTER.md`: 로그인 URL, 계정 식별자, MFA·복구·비밀번호 관리자 항목을 관리하는 무비밀 접근대장.
+- `operations/DEVELOPMENT_PROFILE_SWITCHER_DESIGN.md`: 프로젝트별 GitHub·Vercel·DB·Codex·VS Code·브라우저 계정을 한 번에 분리 실행하는 Windows 전환 프로그램 설계.
 - `USER_DASHBOARD_BLACK_THEME.md`: 검정색 공통 테마, 상단 탭 제거, 3명 단위 가로 스와이프와 관리대상 추가 진입 구조.
 - `IMAGE_UPLOAD_MANAGEMENT.md`: 보호자·관리대상 사진의 DB 기반 용량 제한, 관리자 설정, 서버 검증, 사용자 초과파일 알림과 팝업 성능 개선.
 - `SHOP_LOADING_PERFORMANCE.md`: 상품구매 진입의 중복 DB 조회 제거, Base64 이미지 지연 로드, 전용 이미지 캐시 경로와 성능 계측 결과.
