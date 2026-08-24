@@ -8230,3 +8230,24 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `npm run security:check` passed.
 - `git diff --check` passed.
 - Implementation and verification: about 25 minutes.
+
+## 2026-08-25 KST - Subject Registration Completion QR Protection
+
+### User Requirement
+- Do not expose the actual assigned QR image or QR code value on the subject registration completion screen.
+- Replace the QR with a non-scannable visual icon and simplify the completion screen to match the supplied reference.
+- Remove the legacy dashboard labels, description, and back link from this completion state, and update the completion wording.
+
+### Implementation
+- Removed newly registered subjects from the completion-screen QR image generation set.
+- Removed all completion-screen rendering of `qr_image`, `qr_code`, subject name, and QR destination data.
+- Added a fixed CSS-only QR placeholder icon that contains no encoded URL or subject data.
+- Added a centered `대상자 등록 완료` title between the notification and my-page controls.
+- Hid the standard registration header, back link, and app-install area only while the completion screen is active.
+- Updated the heading and product-purchase guidance and added familiar product/home icons to the two actions.
+
+### Verification
+- `npm run build` passed.
+- `npm run security:check` passed.
+- `git diff --check` passed.
+- Implementation and verification: about 15 minutes.

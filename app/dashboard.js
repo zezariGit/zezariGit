@@ -44,7 +44,7 @@ export default async function GuardianDashboard({
   registeredQrClaim = false,
   hasQrSignupClaim = false,
 }) {
-  const qrImageSubjectIds = new Set([adSubjectId, editSubjectId, registeredSubjectId].filter(Boolean));
+  const qrImageSubjectIds = new Set([adSubjectId, editSubjectId].filter(Boolean));
   const subjectsWithQr = await withSubjectQrImages(subjects, qrImageSubjectIds);
   const selectedAdSubject = subjectsWithQr.find((subject) => subject.id === adSubjectId) || null;
   const selectedEditSubject = subjectsWithQr.find((subject) => subject.id === editSubjectId) || null;
@@ -74,6 +74,7 @@ export default async function GuardianDashboard({
         {guardianComplete && guardianActive && (
           <div className="dashboard-corner-bar" aria-label="사용자 빠른 메뉴">
             <NotificationBell />
+            {registeredSubject && <strong className="subject-complete-page-title">대상자 등록 완료</strong>}
             <OpenMyPageButton
               className="corner-icon-button my-page-corner-link"
               title="마이페이지"
@@ -95,7 +96,7 @@ export default async function GuardianDashboard({
           </MyPageOverlay>
         )}
         <div className="dashboard-content">
-        <header className="dashboard-header">
+        {!registeredSubject && <header className="dashboard-header">
           <div>
             {guardianComplete && !isDashboard && (
               <Link className="dashboard-back-link" href="/?tab=dashboard">
@@ -137,7 +138,7 @@ export default async function GuardianDashboard({
                     : "로그인한 보호자에게 등록된 관리대상과 현재 상태를 확인할 수 있습니다."}
             </p>
           </div>
-        </header>
+        </header>}
 
         {!guardianActive ? (
           <section className="dashboard-panel setup-panel">
@@ -178,9 +179,11 @@ export default async function GuardianDashboard({
           />
         )}
 
-        <div className="install-area dashboard-install">
-          <PwaInstallPrompt />
-        </div>
+        {!registeredSubject && (
+          <div className="install-area dashboard-install">
+            <PwaInstallPrompt />
+          </div>
+        )}
           </>
         )}
           </>
@@ -417,9 +420,9 @@ function InfoRow({ label, value, actionLabel = "", href = "" }) {
   );
 }
 
-function SubjectsInfoTab({ selectedSubject, registeredSubject, registeredQrClaim = false, hasQrSignupClaim = false, imageUploadSettings }) {
+function SubjectsInfoTab({ selectedSubject, registeredSubject, hasQrSignupClaim = false, imageUploadSettings }) {
   if (registeredSubject) {
-    return <SubjectRegistrationComplete subject={registeredSubject} qrClaimed={registeredQrClaim} />;
+    return <SubjectRegistrationComplete />;
   }
 
   const editing = Boolean(selectedSubject);
@@ -700,36 +703,46 @@ function SubjectForm({ subject, imageUploadSettings }) {
   );
 }
 
-function SubjectRegistrationComplete({ subject, qrClaimed = false }) {
+function SubjectRegistrationComplete() {
   return (
-    <section className="subject-complete-phone" aria-label="관리대상 등록 완료">
-      <div className="phone-notch" aria-hidden="true" />
-      <Link className="signup-back-button subject-complete-back" href="/?tab=subjects">
-        <span aria-hidden="true">‹</span>
-        <span className="visually-hidden">관리대상정보로 돌아가기</span>
-      </Link>
+    <section className="subject-complete-phone" aria-label="대상자 등록 완료">
       <div className="subject-complete-content">
-        <div className="complete-qr-mark">
-          {subject.qr_image ? (
-            <img src={subject.qr_image} alt={`${subject.name} 전용 QR 코드`} />
-          ) : (
-            <span aria-hidden="true">QR</span>
-          )}
-        </div>
-        <h2>등록이 완료되었습니다.</h2>
-        <p>
-          <strong>{subject.name}</strong> 대상자 전용 QR코드가 {qrClaimed ? "연결되었어요." : "생성되었어요."}
-          {qrClaimed ? " 방금 스캔한 상품의 QR을 그대로 사용할 수 있습니다." : " QR코드는 상품 구매 단계에서 확인하실 수 있습니다."}
-        </p>
-        {subject.qr_code && <em>{subject.qr_code}</em>}
+        <QrPlaceholderIcon />
+        <h2>대상자 등록이 완료되었습니다</h2>
+        <p>이제 대상자 전용 QR이 적용된 상품을 구매할 수 있어요.</p>
         <Link className="login-submit subject-complete-action" href="/shop">
+          <BagIcon />
           상품 구매하기
         </Link>
         <Link className="outline-login-button subject-complete-action" href="/?tab=dashboard">
+          <HomeIcon />
           대시보드 이동하기
         </Link>
       </div>
     </section>
+  );
+}
+
+function QrPlaceholderIcon() {
+  return (
+    <span className="qr-placeholder-icon" aria-hidden="true">
+      <i className="qr-corner top-left" />
+      <i className="qr-corner top-right" />
+      <i className="qr-corner bottom-left" />
+      <i className="qr-block block-one" />
+      <i className="qr-block block-two" />
+      <i className="qr-block block-three" />
+      <i className="qr-block block-four" />
+      <i className="qr-block block-five" />
+    </span>
+  );
+}
+
+function HomeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 11.2 12 4l9 7.2v8.3a.5.5 0 0 1-.5.5h-5.2v-6.1H8.7V20H3.5a.5.5 0 0 1-.5-.5z" />
+    </svg>
   );
 }
 
