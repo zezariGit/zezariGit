@@ -8062,3 +8062,16 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `zezari.vercel.app/shop` redirected to `zezari.family/shop` and retained login.
 - `deliverables/AUTH_SESSION_PERFORMANCE.md` created and `deliverables/AUTH_SETUP.md` updated.
 - Investigation, implementation, deployment, and production verification: about 40 minutes.
+
+## 2026-08-24 KST - Development And Operations Account Inventory Review
+
+### User Requirement
+- Enumerate every external login required to develop and operate ZEZARI, including Google, Kakao, Facebook, GitHub, and Vercel.
+
+### Review Result
+- Rechecked the operations architecture, service configuration register, account access register, and active Git remote.
+- Classified accounts into source/hosting/database/domain, SNS OAuth, and messaging/payment/advertising/safe-phone/email providers.
+- Confirmed GitHub `zezariGit`, Vercel `zezari / zezari` with user `zezarigit`, Turso organization `zezarigit`, and the `zezariGit/zezariGit` Git remote.
+- Kept passwords, API keys, tokens, MFA secrets, and recovery codes out of Git and logs; unknown provider login IDs remain marked for verification in the password manager.
+- Updated `deliverables/operations/ACCOUNT_ACCESS_REGISTER.md` with the 2026-08-24 audit summary.
+- Review and documentation: about 10 minutes.

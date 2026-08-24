@@ -15,6 +15,14 @@
 - Turso 조직 식별자: `zezarigit`
 - 애플리케이션 관리자 계정 목록: Vercel `ADMIN_EMAILS`와 DB `guardians.is_admin`에서 관리
 
+## 2026-08-24 운영 계정 점검 요약
+
+- 확인된 계정 식별자: GitHub `zezariGit`, Vercel Team/Project `zezari / zezari`, Vercel 사용자 `zezarigit`, Turso 조직 `zezarigit`.
+- 확인된 운영 도메인: `zezari.family`; 도메인과 DNS는 Vercel Team `zezari`에서 관리한다.
+- 공급자 콘솔에서 직접 확인해야 하는 로그인 ID: Google Cloud, Kakao Developers, Naver Developers, Meta, Toss Payments, Solapi, Bizcall, Resend.
+- 위 공급자 로그인 ID·비밀번호·MFA·복구수단은 Git 문서가 아니라 `ZEZARI 운영` 비밀번호 관리자에 기록한다.
+- NextAuth, Web Push, 위치정보 암호화, 지도 검색은 별도 사람이 로그인하는 서비스 계정이 아니라 Vercel 환경변수 또는 공개 API 정책으로 운영한다.
+
 ## 계정 접근대장
 
 | 서비스 | 로그인·관리 URL | 계정 식별자 | 권한/용도 | 비밀번호 관리자 항목명 | MFA | 복구수단 | 최종 확인 |

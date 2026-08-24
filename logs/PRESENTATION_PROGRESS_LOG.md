@@ -5934,3 +5934,16 @@ This file is the cumulative presentation-ready project log. It is written so the
 - GitHub 기능 커밋 `327b7ab`, Vercel 배포 `dpl_8WbNSVKiNcvvdmvE1aVwcFxuVE9y` READY
 - `deliverables/AUTH_SESSION_PERFORMANCE.md` 생성
 - 분석·구현·배포·운영 검증: 약 40분
+
+## 2026-08-24 - 개발·운영 계정 목록 점검
+
+### 요구내용
+- Google, Kakao, Facebook, GitHub, Vercel 등 제자리 개발과 운영에 필요한 로그인 정보 전체 나열
+
+### 확인내용
+- GitHub·Vercel·Turso·도메인, SNS OAuth 4종, 문자·결제·광고·안심번호·이메일 서비스 계정을 분류
+- GitHub `zezariGit`, Vercel `zezari / zezari`, Turso 조직 `zezarigit` 등 확인된 식별자 재점검
+- 공급자별 로그인 URL, 용도, 권한, 비밀번호 관리자 항목명을 계정 접근 대장에서 확인
+- 비밀번호·API 키·토큰·MFA 복구코드는 문서와 로그에서 제외
+- `deliverables/operations/ACCOUNT_ACCESS_REGISTER.md` 점검 요약 갱신
+- 점검·문서화: 약 10분
