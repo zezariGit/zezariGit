@@ -48,7 +48,7 @@ export default function SubjectPhotoInput({
 
   function openPicker(inputRef) {
     setPickerOpen(false);
-    window.setTimeout(() => inputRef.current?.click(), 0);
+    inputRef.current?.click();
   }
 
   return (
@@ -79,7 +79,8 @@ export default function SubjectPhotoInput({
         accept="image/*"
         capture="environment"
         onChange={(event) => handleFileChange(event, "camera")}
-        aria-label={`${label} 사진 촬영`}
+        aria-hidden="true"
+        tabIndex={-1}
       />
       <input
         ref={albumInputRef}
@@ -88,7 +89,8 @@ export default function SubjectPhotoInput({
         type="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
         onChange={(event) => handleFileChange(event, "album")}
-        aria-label={`${label} 앨범에서 선택`}
+        aria-hidden="true"
+        tabIndex={-1}
       />
       <input
         ref={fileInputRef}
@@ -97,7 +99,8 @@ export default function SubjectPhotoInput({
         type="file"
         accept=".jpg,.jpeg,.png,.webp,.gif"
         onChange={(event) => handleFileChange(event, "file")}
-        aria-label={`${label} 파일에서 선택`}
+        aria-hidden="true"
+        tabIndex={-1}
       />
       <strong className="subject-photo-action">{previewSrc ? "변경하기" : "사진 등록하기"}</strong>
       <small className="subject-photo-limit">{formatMegabytes(limitBytes)}MB 이하</small>
