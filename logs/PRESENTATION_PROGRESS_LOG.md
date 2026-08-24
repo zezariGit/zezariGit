@@ -6028,3 +6028,16 @@ This file is the cumulative presentation-ready project log. It is written so the
 - STOCK Codex 개인계정 로그인 유지 확인
 - GitHub·Vercel은 최초 로그인 필요 상태로 분리되어 제자리 계정을 사용하지 않음
 - 구현·설치·검증: 약 25분
+
+## 2026-08-24 - ZEZARI 개발계정 로그인 재확인
+
+### 요구내용
+- 현재 개발환경이 STOCK이 아닌 제자리 계정으로 연결되어 있는지 확인
+
+### 확인 및 반영
+- 작업 폴더와 GitHub 저장소가 ZEZARI 프로젝트임을 확인
+- Git 작성자 `zezariGit <general@zezari.com>` 확인
+- GitHub CLI를 `zezariGit`으로 재로그인
+- Vercel `zezarigit`, Codex `soonsuboy10@gmail.com`, Turso 연결정보 확인
+- GitHub 원격 저장소 접근 성공 확인
+- 확인·재연결: 약 5분

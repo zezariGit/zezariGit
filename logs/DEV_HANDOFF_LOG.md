@@ -8179,3 +8179,16 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - STOCK GitHub and Vercel report login required and do not reuse ZEZARI credentials.
 - PowerShell parser and automated profile-switcher regression tests passed.
 - Analysis, correction, installation and verification: about 25 minutes.
+
+## 2026-08-24 KST - ZEZARI Development Account Login Verification
+
+### User Requirement
+- Confirm that the active development environment is logged in with the ZEZARI accounts rather than the STOCK accounts.
+
+### Verification And Action
+- Confirmed workspace `C:\REAL_QR_FIND` and Git remote `https://github.com/zezariGit/zezariGit.git`.
+- Confirmed global/effective Git author `zezariGit <general@zezari.com>`.
+- Reconnected GitHub CLI through device authorization and verified the authenticated user `zezariGit`.
+- Confirmed Vercel CLI user `zezarigit`, Codex ChatGPT login `soonsuboy10@gmail.com`, and Turso environment metadata.
+- Confirmed GitHub remote HEAD access succeeds.
+- Login verification and GitHub CLI reconnection: about 5 minutes.
