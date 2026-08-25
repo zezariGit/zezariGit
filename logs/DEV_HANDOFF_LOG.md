@@ -8470,7 +8470,12 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Added `deliverables/SHOP_CHECKOUT_COMPLETION_AND_QR_PRIVACY.md`.
 
 ### Verification
-- Build, security, whitespace, authenticated production flow, GitHub push, and Vercel deployment are recorded after release verification.
+- `npm run build`, `npm run security:check`, and `git diff --check` passed.
+- Confirmed in the authenticated production shop that `다음` opens the delivery, coupon, and payment screen directly and the product-preview screen is no longer rendered.
+- Confirmed the guardian subject-edit screen retains the voice section while the QR panel, QR download, QR code value, and public target URL are absent.
+- Confirmed the production order-completion screen renders the heading, all four supplied step images, activation notice, and dashboard action without overlap.
+- GitHub commit `9be2f79` was pushed and Vercel production deployment `dpl_DRtBnjYMucfYQQkHZ9jcTm3i9tem` reached `READY`, aliased to `https://zezari.family`.
+- Implementation, deployment, and production verification: about 35 minutes.
 
 
 ## 2026-08-25 KST - Shop Picker Thumbnail And Combination Product Sizing
