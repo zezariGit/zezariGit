@@ -8449,5 +8449,8 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Verification
 - `npm run build`, `npm run security:check`, and `git diff --check` passed.
-- Production mobile-width interaction, GitHub push, and Vercel deployment are recorded after release verification.
-- Implementation and initial verification: about 25 minutes.
+- Confirmed in the authenticated production checkout that the base-address field is read-only while the detail-address field remains editable and the Kakao postcode dialog opens normally.
+- Confirmed the coupon row shows the usable owned count, the picker opens over checkout, and a 3,000 KRW coupon updates both the order summary and Toss widget amount from 5,000 KRW to 2,000 KRW.
+- Confirmed both picker-header back and browser/system-equivalent back close the picker, retain the selected coupon, and remain on `/shop` checkout.
+- GitHub commit `b987c85` was pushed and Vercel production deployment `dpl_EzQLzjJxx4d5jec4HNgwKmc9F45j` reached `READY`, aliased to `https://zezari.family`.
+- Implementation, deployment, and production verification: about 35 minutes.
