@@ -8319,4 +8319,10 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `npm run test:qr-claim` passed.
 - `git diff --check` passed with line-ending notices only.
 - Local browser check passed: page content rendered, no framework error overlay, and no browser console warnings/errors.
+- Production browser check on `https://zezari.family` confirmed all eight rendered subject cards have exactly one state badge and no QR/advertisement text.
+- Confirmed the guardian preview renders profile, message, optional voice, and an edit link whose form is populated with the selected subject's existing data.
+- Confirmed My Page has no subject section/add button, notification refresh is icon-only with an accessible label, and the public QR page has no edit action.
+- The first production screenshot exposed left-aligned text in the preview confirmation link; corrected it with explicit flex centering and redeployed.
+- Git commits: `a893efd`, `d932db9`.
+- Final Vercel production deployment: `dpl_6fkdFj4BUuvQ2rk7FvYZLmb11QkM`, aliased to `https://zezari.family`.
 - Implementation, documentation, and verification: about 30 minutes.
