@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import ModalScrollLock from "./modal-scroll-lock";
 
 const OPEN_EVENT = "zezari:open-my-page";
@@ -22,6 +23,7 @@ export function OpenMyPageButton({ className = "", title = "마이페이지", ch
 
 export default function MyPageOverlay({ initialOpen = false, closeHref = "/?tab=dashboard", children }) {
   const [open, setOpen] = useState(initialOpen);
+  const router = useRouter();
 
   const openModal = useCallback(() => {
     setOpen(true);
@@ -74,7 +76,12 @@ export default function MyPageOverlay({ initialOpen = false, closeHref = "/?tab=
       }}
       onClick={(event) => {
         if (event.target.closest?.("[data-my-page-close]")) closeModal();
-        if (event.target.closest?.("[data-my-page-navigate]")) setOpen(false);
+        const navigationLink = event.target.closest?.("[data-my-page-navigate]");
+        if (navigationLink) {
+          event.preventDefault();
+          setOpen(false);
+          router.push(navigationLink.getAttribute("href") || closeHref);
+        }
       }}
     >
       <ModalScrollLock />
