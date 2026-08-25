@@ -26,6 +26,7 @@ export default async function HomePage({ searchParams }) {
         : "dashboard";
   const showMyPage = resolvedSearchParams?.panel === "my" || requestedTab === "my";
   const adSubjectId = resolvedSearchParams?.adSubject || "";
+  const previewSubjectId = resolvedSearchParams?.previewSubject || "";
   const editSubjectId = resolvedSearchParams?.editSubject || "";
   const registeredSubjectId = resolvedSearchParams?.registered || "";
   const registeredQrClaim = resolvedSearchParams?.qrClaimed === "1";
@@ -40,7 +41,8 @@ export default async function HomePage({ searchParams }) {
   if (session) {
     const dashboardData = await getDashboardData(session, {
       includeSubjects: true,
-      includeSubjectDetails: activeTab === "subjects" || Boolean(adSubjectId),
+      includeSubjectDetails:
+        activeTab === "subjects" || Boolean(adSubjectId) || Boolean(previewSubjectId),
       includeSubscription: true,
       includeSubscriptionPlans: false,
       includeAdDailyRate: activeTab === "dashboard" && Boolean(adSubjectId),
@@ -63,6 +65,7 @@ export default async function HomePage({ searchParams }) {
           activeTab={activeTab}
           showMyPage={showMyPage}
           adSubjectId={adSubjectId}
+          previewSubjectId={previewSubjectId}
           editSubjectId={editSubjectId}
           registeredSubjectId={registeredSubjectId}
           registeredQrClaim={registeredQrClaim}

@@ -8288,3 +8288,35 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `npm run security:check` passed.
 - `git diff --check` passed.
 - Implementation and verification: about 15 minutes.
+
+## 2026-08-25 KST - Dashboard Canonical Subject State And Guardian Preview
+
+### User Requirement
+- Replace the top-right My Page person icon with a gear icon.
+- Show exactly one subject state among product purchase required, QR activation required, safe, and searching.
+- Remove QR code and advertisement status text from dashboard subject cards.
+- Make the dashboard subject card the only entry to a guardian-only preview, then enter editing through its `수정하기` action.
+- Remove subject list/add/edit controls from My Page and replace notification refresh text with an icon.
+
+### Existing Workflow Review
+- The `subjects.status` field already supports the four requested workflow values.
+- Product payment moves the subject to `QR활성화필요`, QR activation moves it to `안전`, and the missing workflow uses `찾는중`.
+- The duplicate appearance came from rendering a state badge and a separate advertisement button together, not from two stored subject states.
+
+### Implementation
+- Added a canonical dashboard resolver with priority `찾는중` > active QR `안전` > paid purchase/activation waiting `QR활성화필요` > `상품구매필요`.
+- Added a paid product-order existence flag to the dashboard subject query to reduce stale-state ambiguity.
+- Converted dashboard subject cards into accessible links and limited visible card data to name, birth date, and one state badge.
+- Added authenticated guardian preview routing with profile, guardian message, optional voice, edit, and confirm actions.
+- Kept `/find/{publicKey}` unchanged as the public finder view without an edit action.
+- Successful edits now return to the guardian preview; My Page subject controls were removed.
+- Added gear and icon-only refresh controls with accessible labels and responsive layout styling.
+- Added `deliverables/USER_DASHBOARD_SUBJECT_PREVIEW.md`.
+
+### Verification
+- `npm run build` passed.
+- `npm run security:check` passed.
+- `npm run test:qr-claim` passed.
+- `git diff --check` passed with line-ending notices only.
+- Local browser check passed: page content rendered, no framework error overlay, and no browser console warnings/errors.
+- Implementation, documentation, and verification: about 30 minutes.

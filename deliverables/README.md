@@ -70,6 +70,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `operations/DEVELOPMENT_PROFILE_SWITCHER_DESIGN.md`: 프로젝트별 GitHub·Vercel·DB·Codex·VS Code·브라우저 계정을 한 번에 분리 실행하는 Windows 전환 프로그램 설계.
 - `operations/DEVELOPMENT_PROFILE_SWITCHER_IMPLEMENTATION.md`: PowerShell GUI, Windows EXE, `dev` 명령, 기존/신규 프로젝트 등록, 계정 분리와 실제 ZEZARI·STOCK 설정 사용 설명서.
 - `USER_DASHBOARD_BLACK_THEME.md`: 검정색 공통 테마, 상단 탭 제거, 3명 단위 가로 스와이프와 관리대상 추가 진입 구조.
+- `USER_DASHBOARD_SUBJECT_PREVIEW.md`: 대시보드 단일 상태 판정, 보호자 전용 대상자 미리보기·수정 경로, 마이페이지 대상자 메뉴 제거와 아이콘 개편.
 - `IMAGE_UPLOAD_MANAGEMENT.md`: 보호자·관리대상 사진의 DB 기반 용량 제한, 관리자 설정, 서버 검증, 사용자 초과파일 알림과 팝업 성능 개선.
 - `SHOP_LOADING_PERFORMANCE.md`: 상품구매 진입의 중복 DB 조회 제거, Base64 이미지 지연 로드, 전용 이미지 캐시 경로와 성능 계측 결과.
 - Current UI feedback pattern: submit buttons show inline progress bars, and server actions show bottom status messages via `notice` query parameters.

@@ -39,6 +39,7 @@ export default async function GuardianDashboard({
   activeTab = "dashboard",
   showMyPage = false,
   adSubjectId = "",
+  previewSubjectId = "",
   editSubjectId = "",
   registeredSubjectId = "",
   registeredQrClaim = false,
@@ -47,6 +48,7 @@ export default async function GuardianDashboard({
   const qrImageSubjectIds = new Set([adSubjectId, editSubjectId].filter(Boolean));
   const subjectsWithQr = await withSubjectQrImages(subjects, qrImageSubjectIds);
   const selectedAdSubject = subjectsWithQr.find((subject) => subject.id === adSubjectId) || null;
+  const selectedPreviewSubject = subjectsWithQr.find((subject) => subject.id === previewSubjectId) || null;
   const selectedEditSubject = subjectsWithQr.find((subject) => subject.id === editSubjectId) || null;
   const registeredSubject = subjectsWithQr.find((subject) => subject.id === registeredSubjectId) || null;
   const admin = isAdminSession(session) || Number(guardian.is_admin || 0) === 1;
@@ -79,7 +81,7 @@ export default async function GuardianDashboard({
               className="corner-icon-button my-page-corner-link"
               title="마이페이지"
             >
-              <PersonIcon />
+              <GearIcon />
             </OpenMyPageButton>
           </div>
         )}
@@ -87,7 +89,6 @@ export default async function GuardianDashboard({
           <MyPageOverlay initialOpen={showMyPage} closeHref={closeMyPageHref}>
             <MyPageTab
               guardian={guardian}
-              subjects={subjectsWithQr}
               subscription={subscription}
               session={session}
               admin={admin}
@@ -96,7 +97,7 @@ export default async function GuardianDashboard({
           </MyPageOverlay>
         )}
         <div className="dashboard-content">
-        {!registeredSubject && <header className="dashboard-header">
+        {!registeredSubject && !selectedPreviewSubject && <header className="dashboard-header">
           <div>
             {guardianComplete && !isDashboard && (
               <Link className="dashboard-back-link" href="/?tab=dashboard">
@@ -166,6 +167,7 @@ export default async function GuardianDashboard({
             subscriptionPlans={subscriptionPlans}
             adPricing={adPricing}
             selectedAdSubject={selectedAdSubject}
+            selectedPreviewSubject={selectedPreviewSubject}
           />
         ) : isGuardianTab ? (
           <GuardianInfoTab guardian={guardian} session={session} imageUploadSettings={imageUploadSettings} />
@@ -202,6 +204,7 @@ function DashboardTab({
   subscriptionPlans,
   adPricing,
   selectedAdSubject,
+  selectedPreviewSubject,
 }) {
   if (!guardianComplete) {
     return (
@@ -217,7 +220,11 @@ function DashboardTab({
 
   return (
     <>
-      <StatusDashboard subjects={subjects} />
+      {selectedPreviewSubject ? (
+        <SubjectPreviewPage subject={selectedPreviewSubject} />
+      ) : (
+        <StatusDashboard subjects={subjects} />
+      )}
       {selectedAdSubject && (
         <AdCampaignModal
           subject={selectedAdSubject}
@@ -241,7 +248,7 @@ function GuardianInfoTab({ guardian, session, imageUploadSettings }) {
   );
 }
 
-function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref = "" }) {
+function MyPageTab({ guardian, subscription, session, admin, closeHref = "" }) {
   const subscriptionLabel = subscription?.status === "active"
     ? "이용중"
     : subscription?.status === "paused"
@@ -287,49 +294,6 @@ function MyPageTab({ guardian, subjects, subscription, session, admin, closeHref
           label="안심번호 운영"
           value="QR 접근 시 24시간 자동 배정"
         />
-      </div>
-
-      <div className="my-page-section">
-        <div className="my-section-heading">
-          <h3>대상자 정보</h3>
-          <span>총 {subjects.length}명</span>
-        </div>
-        {subjects.length > 0 ? (
-          <div className="my-subject-list">
-            {subjects.map((subject) => (
-              <Link
-                className="my-subject-row"
-                href={`/?tab=subjects&editSubject=${encodeURIComponent(subject.id)}#subjects-info`}
-                aria-label={`${subject.name} 정보 수정`}
-                key={subject.id}
-              >
-                <span className="my-subject-photo" aria-hidden={!subjectPhotoSrc(subject)}>
-                  {subjectPhotoSrc(subject) ? (
-                    <img src={subjectPhotoSrc(subject)} alt="" />
-                  ) : (
-                    <span aria-hidden="true" />
-                  )}
-                </span>
-                <span className="my-subject-summary">
-                  <span className="my-subject-name-line">
-                    <strong>{subject.name || "이름 미입력"}</strong>
-                    <em className={`status-badge ${statusClass(subject.status)}`}>
-                      {statusLabel(subject.status)}
-                    </em>
-                  </span>
-                  <small>{shortGender(subject.gender)} · {formatDate(subject.birth_date)}</small>
-                </span>
-                <span className="my-subject-chevron" aria-hidden="true">›</span>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <p className="my-empty-text">등록된 관리대상이 없습니다.</p>
-        )}
-        <Link className="my-subject-add-button" href="/?tab=subjects&mode=new#subjects-info">
-          <span aria-hidden="true">+</span>
-          대상자 추가
-        </Link>
       </div>
 
       <div className="my-page-section">
@@ -391,6 +355,22 @@ function PersonIcon() {
   );
 }
 
+function GearIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M9.6 3.4 10.3 2h3.4l.7 1.4 1.7.7 1.5-.5 2.4 2.4-.5 1.5.7 1.7 1.4.7v3.4l-1.4.7-.7 1.7.5 1.5-2.4 2.4-1.5-.5-1.7.7-.7 1.4h-3.4l-.7-1.4-1.7-.7-1.5.5-2.4-2.4.5-1.5-.7-1.7-1.4-.7V9.9l1.4-.7.7-1.7-.5-1.5 2.4-2.4 1.5.5 1.7-.7Z"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.7"
+      />
+      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.7" />
+    </svg>
+  );
+}
+
 function AlertIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -442,6 +422,84 @@ function SubjectsInfoTab({ selectedSubject, registeredSubject, hasQrSignupClaim 
   );
 }
 
+function SubjectPreviewPage({ subject }) {
+  const photoSrc = subjectPhotoSrc(subject);
+  const displayStatus = resolveSubjectStatus(subject);
+  const age = calculateAge(subject.birth_date);
+
+  return (
+    <section className="guardian-subject-preview" aria-label={`${subject.name} 대상자 정보 미리보기`}>
+      <Link className="subject-preview-back" href="/?tab=dashboard" aria-label="대시보드로 돌아가기">
+        <span aria-hidden="true">‹</span>
+      </Link>
+      <header className="subject-preview-heading">
+        <h1>대상자 정보 미리보기</h1>
+        <p>입력한 내용을 확인해 주세요.</p>
+      </header>
+
+      <div className="subject-preview-profile">
+        <div className="subject-preview-photo">
+          {photoSrc ? <img src={photoSrc} alt={`${subject.name} 사진`} /> : <span aria-hidden="true" />}
+        </div>
+        <div className="subject-preview-summary">
+          <strong>{subject.name || "이름 미입력"}</strong>
+          <span>{shortGender(subject.gender)}{age !== null ? `, ${age}세` : ""} ({formatDate(subject.birth_date)})</span>
+          <dl>
+            <div>
+              <dt>성별</dt>
+              <dd>{shortGender(subject.gender)}</dd>
+            </div>
+            <div>
+              <dt>나이</dt>
+              <dd>{age !== null ? `${age}세` : "-"}</dd>
+            </div>
+          </dl>
+        </div>
+        <span className={`status-badge subject-preview-status ${statusClass(displayStatus)}`}>
+          {displayStatus}
+        </span>
+      </div>
+
+      <section className="subject-preview-message">
+        <h2>보호자가 전하고픈 말</h2>
+        <p>{subject.guardian_message || "등록된 보호자 메시지가 없습니다."}</p>
+      </section>
+
+      {subject.voice_data_url && (
+        <section className="subject-preview-voice">
+          <h2>보호자 음성 안내</h2>
+          <audio controls preload="metadata" src={subject.voice_data_url}>
+            브라우저에서 음성 재생을 지원하지 않습니다.
+          </audio>
+        </section>
+      )}
+
+      <Link
+        className="subject-preview-edit"
+        href={`/?tab=subjects&editSubject=${encodeURIComponent(subject.id)}#subjects-info`}
+      >
+        <EditIcon />
+        <span>
+          <strong>수정하기</strong>
+          <small>대상자 정보를 수정하고 싶을 때 선택해 주세요.</small>
+        </span>
+      </Link>
+      <Link className="login-submit subject-preview-confirm" href="/?tab=dashboard">
+        확인
+      </Link>
+    </section>
+  );
+}
+
+function EditIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M4 20h4L19 9l-4-4L4 16v4Z" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+      <path d="m13.5 6.5 4 4" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
 function StatusDashboard({ subjects }) {
   const pageSize = 3;
   const subjectPages = [];
@@ -461,8 +519,15 @@ function StatusDashboard({ subjects }) {
           <div className="managed-pages">
             {subjectPages.map((pageSubjects, pageIndex) => (
               <div className="managed-page" key={`managed-page-${pageIndex}`}>
-                {pageSubjects.map((subject) => (
-                  <article className="managed-card" key={subject.id}>
+                {pageSubjects.map((subject) => {
+                  const displayStatus = resolveSubjectStatus(subject);
+                  return (
+                  <Link
+                    className="managed-card"
+                    href={`/?tab=dashboard&previewSubject=${encodeURIComponent(subject.id)}`}
+                    aria-label={`${subject.name} 대상자 정보 미리보기`}
+                    key={subject.id}
+                  >
                     <div className="managed-photo">
                       {subjectPhotoSrc(subject) ? (
                         <img src={subjectPhotoSrc(subject)} alt={`${subject.name} 사진`} />
@@ -473,19 +538,15 @@ function StatusDashboard({ subjects }) {
                     <div className="managed-info">
                       <strong>{subject.name}</strong>
                       <span>{formatDate(subject.birth_date)}</span>
-                      {subject.qr_code && <span>QR: {subject.qr_code}</span>}
-                      {subject.ad_status && <span>광고: {adStatusLabel(subject.ad_status)}</span>}
                     </div>
                     <div className="managed-actions">
-                      <span className={`status-badge ${statusClass(subject.status)}`}>
-                        {statusLabel(subject.status)}
+                      <span className={`status-badge ${statusClass(displayStatus)}`}>
+                        {displayStatus}
                       </span>
-                      <Link className="managed-ad-button" href={`/?tab=dashboard&adSubject=${encodeURIComponent(subject.id)}`}>
-                        광고
-                      </Link>
                     </div>
-                  </article>
-                ))}
+                  </Link>
+                  );
+                })}
                 {pageIndex === subjectPages.length - 1 && (
                   <div className="managed-add-row">
                     <Link className="managed-add-button" href="/?tab=subjects&mode=new#subjects-info" aria-label="관리대상 추가" title="관리대상 추가">
@@ -796,12 +857,34 @@ function statusLabel(status) {
   return "상품구매필요";
 }
 
-function adStatusLabel(status) {
-  if (status === "active") return "광고중";
-  if (status === "paused") return "일시정지";
-  if (status === "ready") return "준비중";
-  if (status === "ended") return "종료";
-  return "연동 대기";
+function resolveSubjectStatus(subject) {
+  const storedStatus = statusLabel(subject?.status);
+  if (storedStatus === "찾는중") return "찾는중";
+
+  const qrEnabled = Number(subject?.qr_is_active || 0) === 1;
+  const qrActivated = Boolean(subject?.qr_activated_at);
+  if (qrEnabled && qrActivated) return "안전";
+
+  if (
+    Number(subject?.has_product_purchase || 0) === 1
+    || storedStatus === "QR활성화필요"
+    || storedStatus === "안전"
+    || qrActivated
+  ) {
+    return "QR활성화필요";
+  }
+  return "상품구매필요";
+}
+
+function calculateAge(value) {
+  const birth = new Date(`${String(value || "").slice(0, 10)}T00:00:00`);
+  if (Number.isNaN(birth.getTime())) return null;
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const beforeBirthday = today.getMonth() < birth.getMonth()
+    || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate());
+  if (beforeBirthday) age -= 1;
+  return age >= 0 ? age : null;
 }
 
 async function withSubjectQrImages(subjects, subjectIds = new Set()) {

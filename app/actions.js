@@ -76,7 +76,7 @@ export async function saveSubjectAction(formData) {
       : "관리대상 등록이 완료되었습니다.";
     redirect(withNotice(`/?tab=subjects&registered=${encodeURIComponent(result.subjectId)}${claimQuery}`, message));
   }
-  redirect(withNotice(`/?tab=subjects&editSubject=${encodeURIComponent(result.subjectId)}`, "관리대상 정보가 수정되었습니다."));
+  redirect(withNotice(`/?tab=dashboard&previewSubject=${encodeURIComponent(result.subjectId)}`, "관리대상 정보가 수정되었습니다."));
 }
 
 export async function deleteSubjectAction(formData) {
@@ -92,7 +92,7 @@ export async function deleteSubjectAction(formData) {
       : "/?tab=dashboard&panel=my";
     redirect(withNotice(returnTo, error.message || "삭제하지 못했습니다.", "error"));
   }
-  redirect(withNotice("/?tab=dashboard&panel=my", "관리대상 정보가 삭제되었습니다."));
+  redirect(withNotice("/?tab=dashboard", "관리대상 정보가 삭제되었습니다."));
 }
 
 export async function createSubjectAdAction(formData) {

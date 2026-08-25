@@ -169,8 +169,15 @@ export default function NotificationBell() {
         <div className="notification-popover" role="dialog" aria-label="푸시 알림 메시지">
           <div className="notification-popover-header">
             <strong>알림</strong>
-            <button type="button" onClick={loadNotifications} disabled={loading}>
-              {loading ? "조회중" : "새로고침"}
+            <button
+              className={`notification-refresh-button${loading ? " loading" : ""}`}
+              type="button"
+              onClick={loadNotifications}
+              disabled={loading}
+              aria-label={loading ? "알림 조회 중" : "알림 새로고침"}
+              title={loading ? "조회 중" : "새로고침"}
+            >
+              <RefreshIcon />
             </button>
           </div>
 
@@ -363,6 +370,29 @@ function BellIcon() {
         stroke="currentColor"
         strokeLinecap="round"
         strokeWidth="2"
+      />
+    </svg>
+  );
+}
+
+function RefreshIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M20 6v5h-5"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.3"
+      />
+      <path
+        d="M18.4 15.6A7.5 7.5 0 1 1 19.6 8L20 11"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.3"
       />
     </svg>
   );
