@@ -8467,7 +8467,11 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Preserved the four-column zodiac picker and all product selection identifiers and prices.
 
 ### Verification
-- Build, security, whitespace, production visual verification, GitHub push, and Vercel deployment are recorded after release verification.
+- `npm run build`, `npm run security:check`, and `git diff --check` passed.
+- Confirmed in the authenticated production shop that the selected product trigger shows only the icon and live product name, without the embedded image label.
+- Confirmed the product picker renders four single products on the first row and three wider combination products on the second row without clipping or overlap.
+- GitHub commit `4392872` was pushed and Vercel production deployment `dpl_3PtszqdRrUUDtV6pNYCRYPUQgLWE` reached `READY`, aliased to `https://zezari.family`.
+- Implementation, deployment, and production verification: about 20 minutes.
 
 ## 2026-08-25 KST - Shop Product And Zodiac Image Pickers
 
