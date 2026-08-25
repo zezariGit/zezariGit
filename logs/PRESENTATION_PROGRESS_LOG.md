@@ -6302,3 +6302,5 @@ This file is the cumulative presentation-ready project log. It is written so the
 - SNS 연결 한 번이 문자 발송 횟수 한 번만 소비하도록 개선
 - 기존 회원 확인 세 번 후에도 문자 발송·인증·계정 연결이 완료되는 회귀 테스트 통과
 - QR 가입·보안 검사·운영 빌드 통과, 구현 및 로컬 검증 약 25분
+- GitHub 커밋 `ee8a842` 및 Vercel 배포 `dpl_SfDZFDtphbCQfqbDgbLVw8X4S3Aq` 운영 반영, `zezari.family` HTTP 200 확인
+- 전체 구현·배포·검증 약 35분

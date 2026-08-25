@@ -8565,4 +8565,6 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### 검증
 - 기존 회원 확인을 세 번 수행한 뒤 계정 연결용 SMS 발송과 인증·연결이 완료되는 격리 회귀 테스트 통과
 - QR 가입 회귀, 보안 회귀, Next.js 운영 빌드, 공백 검사 통과
-- 구현 및 로컬 검증 약 25분, 운영 반영 결과는 배포 후 기록
+- GitHub 커밋 `ee8a842`를 `main`에 푸시하고 Vercel 운영 배포 `dpl_SfDZFDtphbCQfqbDgbLVw8X4S3Aq`의 `READY` 상태와 `zezari.family` HTTP 200을 확인했다.
+- 실제 문자를 추가 발송하지 않고 격리 회귀 테스트와 운영 배포 상태로 검증했다.
+- 구현·배포·검증 약 35분.
