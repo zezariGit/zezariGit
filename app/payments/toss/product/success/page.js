@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../../lib/auth";
 import { getProductOrderForGuardian, markProductOrderPaid } from "../../../../../lib/db";
 import { confirmWidgetPayment } from "../../../../../lib/toss-payments";
+import ShopComplete from "../../shop-order-complete";
 
 export const dynamic = "force-dynamic";
 
@@ -86,27 +87,4 @@ export default async function TossProductSuccessPage({ searchParams }) {
   } catch (error) {
     return <ShopComplete title="상품 결제 처리에 실패했습니다" message={error.message || "잠시 후 다시 시도해 주세요."} />;
   }
-}
-
-function ShopComplete({ title, message, order = null }) {
-  return (
-    <main className="shop-complete-page">
-      <section className="shop-complete-panel">
-        <div className="complete-mark" aria-hidden="true">✓</div>
-        <h1>{title}</h1>
-        <p>{message}</p>
-        {order && (
-          <div className="shop-activation-guide">
-            <span>상품 수령</span>
-            <span>QR 코드 스캔</span>
-            <span>대상자 확인</span>
-            <span>활성화 완료</span>
-          </div>
-        )}
-        <a className="shop-next-button" href="/?tab=dashboard">
-          대시보드 이동
-        </a>
-      </section>
-    </main>
-  );
 }

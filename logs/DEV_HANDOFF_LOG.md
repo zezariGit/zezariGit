@@ -8455,6 +8455,24 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - GitHub commit `b987c85` was pushed and Vercel production deployment `dpl_EzQLzjJxx4d5jec4HNgwKmc9F45j` reached `READY`, aliased to `https://zezari.family`.
 - Implementation, deployment, and production verification: about 35 minutes.
 
+## 2026-08-25 KST - Direct Checkout, Subject QR Privacy, And Order Completion UI
+
+### User Requirement
+- Skip the product preview and open checkout directly after product and design selection.
+- Remove the QR image, QR code value, and public URL from the guardian subject-edit page.
+- Rebuild the product order-completion screen with the four supplied activation-step images and the attached layout.
+
+### Implementation
+- Simplified checkout history and rendering from `configure → preview → order` to `configure → order` while retaining validation and browser-back behavior.
+- Removed the complete subject QR panel from the guardian edit form without changing administrator QR management or public QR operation.
+- Added one shared order-completion component for both Toss product success routes.
+- Registered the supplied product receipt, QR scan, subject check, and activation complete images under stable public asset paths.
+- Added `deliverables/SHOP_CHECKOUT_COMPLETION_AND_QR_PRIVACY.md`.
+
+### Verification
+- Build, security, whitespace, authenticated production flow, GitHub push, and Vercel deployment are recorded after release verification.
+
+
 ## 2026-08-25 KST - Shop Picker Thumbnail And Combination Product Sizing
 
 ### User Requirement

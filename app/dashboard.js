@@ -716,21 +716,6 @@ function SubjectForm({ subject, imageUploadSettings }) {
           </div>
         </div>
 
-        {subject?.qr_code && (
-          <div className="subject-qr-panel">
-            <a href={subject.qr_image} download={`${subject.qr_code}.png`} title={`${subject.qr_code} QR 이미지 다운로드`}>
-              <img src={subject.qr_image} alt={`${subject.name} QR 코드`} />
-            </a>
-            <div>
-              <strong>{subject.qr_code}</strong>
-              <span>{subject.qr_is_active ? (subject.qr_activated_at ? "사용자 활성화 완료" : "상품 수령 후 활성화 대기") : "관리자 비활성 QR"}</span>
-              <a href={subject.qr_target_url} target="_blank" rel="noreferrer">
-                {subject.qr_target_url}
-              </a>
-            </div>
-          </div>
-        )}
-
         <FormSubmitButton className="login-submit target-submit-button" pendingText={isExisting ? "수정중" : "저장중"}>
           {isExisting ? "수정 저장" : "다음"}
         </FormSubmitButton>
