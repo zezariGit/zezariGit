@@ -15222,9 +15222,15 @@ button:disabled:hover {
   object-fit: contain;
 }
 
-.quick-action-label {
+.quick-actions .quick-action-label {
+  width: auto;
+  height: auto;
+  display: block;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--c-text);
-  font-size: 15px;
+  font-size: 27px;
   font-weight: 800;
   line-height: 1.25;
   white-space: nowrap;
@@ -15390,8 +15396,8 @@ button:disabled:hover {
     height: clamp(64px, 20vw, 82px);
   }
 
-  .quick-action-label {
-    font-size: 14px;
+  .quick-actions .quick-action-label {
+    font-size: 25px;
   }
 
   .notification-popover {

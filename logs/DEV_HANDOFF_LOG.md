@@ -8393,3 +8393,19 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Verification
 - Build, whitespace, authenticated production rendering, GitHub push, and Vercel deployment are recorded after release verification.
 - Implementation and initial verification: about 10 minutes.
+
+## 2026-08-25 KST - Dashboard Quick Action Label Cleanup
+
+### User Requirement
+- Remove the circular colored background behind each dashboard quick-action label.
+- Use the exact visible labels `실종신고`, `상품구매`, and `고객지원`.
+- Increase the label size to about 1.8 times the previous size.
+
+### Implementation
+- Overrode the legacy `.quick-actions span` icon rule for `.quick-action-label`, removing fixed dimensions, border, radius, and background.
+- Changed the product label to `상품구매` and increased desktop/mobile label sizes from 15/14px to 27/25px.
+- Preserved all action destinations and accessible link names.
+
+### Verification
+- Build, security, whitespace, production rendering, GitHub push, and Vercel deployment are recorded after release verification.
+- Implementation and initial verification: about 5 minutes.

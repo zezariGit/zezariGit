@@ -542,9 +542,9 @@ function StatusDashboard({ subjects }) {
             <img className="quick-action-image" src="/assets/dashboard-action-missing.png" alt="" />
             <span className="quick-action-label">실종신고</span>
           </Link>
-          <Link href="/shop" aria-label="상품 구매">
+          <Link href="/shop" aria-label="상품구매">
             <img className="quick-action-image" src="/assets/dashboard-action-shop.png" alt="" />
-            <span className="quick-action-label">상품 구매</span>
+            <span className="quick-action-label">상품구매</span>
           </Link>
           <a
             href="http://pf.kakao.com/_xmuiln/chat"
