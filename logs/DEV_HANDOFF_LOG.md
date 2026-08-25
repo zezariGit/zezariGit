@@ -8538,4 +8538,10 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### 검증
 - 격리 DB에서 Google 기존 계정과 Naver 신규 접근 계정 연결 회귀 테스트 통과
 - QR 선점 가입 회귀, 보안 회귀, Next.js 운영 빌드, 공백 검사 통과
-- 로컬 구현 및 검증 약 45분, GitHub·Vercel 운영 반영 결과는 배포 후 이 항목에 추가한다.
+- GitHub 기능 커밋 `db9eea6`과 이동 보완 커밋 `90d0e14`를 `main`에 푸시했다.
+- Vercel 운영 배포 `dpl_7pA6mZaGfpu6ZHFxDZR8U3XpjEvF`가 `READY` 상태로 `https://zezari.family`에 연결됐다.
+- 운영에서 마이페이지 `정보 수정` 클릭 시 팝업이 닫히고 `/?tab=guardian#guardian-info`로 이동하는 것, 보호자 사진 업로드와 PWA 상태 문구가 없는 것, 브라우저 오류가 없는 것을 확인했다.
+- 운영 Turso에서 스키마 버전 42, `guardian_social_accounts` 테이블, 기존 SNS 식별자 매핑 13건을 확인했다.
+- `zezari.family`, `zezari.vercel.app` 응답 HTTP 200을 확인했다.
+- 실제 계정 연결은 운영 회원 데이터가 변경되므로 격리 회귀 테스트로 검증했으며, 실제 대표번호 문자 수신은 통제된 신규 계정으로 별도 확인이 필요하다.
+- 구현·배포·운영 검증 약 60분.

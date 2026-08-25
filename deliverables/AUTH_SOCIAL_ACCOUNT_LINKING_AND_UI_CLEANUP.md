@@ -45,6 +45,9 @@ Project: REAL_QR_FIND
 - `npm run security:check`: security regression passed.
 - `npm run build`: Next.js production build passed.
 - `git diff --check`: passed.
+- Vercel deployment `dpl_7pA6mZaGfpu6ZHFxDZR8U3XpjEvF` reached `READY` and was aliased to `https://zezari.family`.
+- Production UI confirmed that `정보 수정` closes My Page and opens `/?tab=guardian#guardian-info`, with no guardian photo upload, installed-mode wording, or browser console error.
+- Production Turso confirmed schema version 42, the social-account table, and 13 migrated identity mappings.
 
 ## Operations
 - Keep `SOLAPI_SENDER_NUMBER=16681290` in local and Vercel environments.
