@@ -8662,3 +8662,9 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### 소요시간
 - 구현·회귀 검증: 약 15분
+
+### 운영 반영
+- GitHub 기능 커밋 `4c4b6d8`을 `main`에 푸시했다.
+- Vercel 운영 배포 `dpl_93CuTh7PhkhdbecV8oJUVfzfDqWu`가 `READY` 상태로 `https://zezari.family`에 연결됐다.
+- 운영 일반 웹의 관리대상 신규 등록 화면에서 사진 선택 메뉴에 `사진 촬영 앱`, `파일 앱`, `취소`만 표시되고 `앨범 앱`은 렌더링되지 않는 것을 확인했다.
+- iOS 3개 옵션은 실제 iPhone/iPad 사용자 에이전트에서 활성화되는 분기 코드와 터치 iPadOS 예외 처리를 확인했다. 최종 네이티브 앱 전환은 실제 iOS 기기에서 1회 추가 확인이 필요하다.

@@ -6335,4 +6335,6 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 등록과 수정 화면이 공유하는 사진 컴포넌트에 한 번에 적용
 - 사진 제한 용량·미리보기·필수값 검증은 기존 동작 유지
 - 운영 빌드·보안·QR 선점 가입 회귀 검사 통과
-- 구현·검증 약 15분
+- GitHub 커밋 `4c4b6d8` 푸시 및 Vercel 배포 `dpl_93CuTh7PhkhdbecV8oJUVfzfDqWu` 운영 반영 완료
+- 운영 일반 웹에서 촬영·파일 두 옵션만 표시되고 앨범 옵션이 제거된 것을 확인
+- 구현·배포·운영 검증 약 25분
