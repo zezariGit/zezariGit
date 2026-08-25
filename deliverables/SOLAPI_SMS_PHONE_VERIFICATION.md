@@ -41,3 +41,11 @@
 - Check the Solapi message log when users report delivery failures.
 - Rotate the API key and update Vercel immediately if exposure is suspected.
 - Official Node.js reference: https://solapi.com/developers/sdk/nodejs-sendingexample
+
+### Sender Number Incident And Recovery (2026-08-25)
+- Solapi status code `1062` means the requested sender number is not registered.
+- The representative number cannot be used until the Solapi account completes business verification and the number appears as active under `발신번호`.
+- Production temporarily uses the already registered sender number so verification remains available.
+- `lib/sms.js` now treats provider registration failures as failed sends even when Solapi successfully creates a message group.
+- Provider code and message-group ID are recorded in server logs without logging the recipient number or verification code.
+- After the representative number is approved, update only `SOLAPI_SENDER_NUMBER` in local and Vercel Production, then redeploy and verify one controlled SMS.

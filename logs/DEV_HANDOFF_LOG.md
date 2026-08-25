@@ -8568,3 +8568,35 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - GitHub 커밋 `ee8a842`를 `main`에 푸시하고 Vercel 운영 배포 `dpl_SfDZFDtphbCQfqbDgbLVw8X4S3Aq`의 `READY` 상태와 `zezari.family` HTTP 200을 확인했다.
 - 실제 문자를 추가 발송하지 않고 격리 회귀 테스트와 운영 배포 상태로 검증했다.
 - 구현·배포·검증 약 35분.
+
+## 2026-08-25 KST - SOLAPI 발신번호 미등록 장애 진단 및 임시 복구
+
+### 요구내용
+- 일일 발송 한도가 남아 있는데 신규 번호 인증문자가 실패하는 원인을 정확히 확인하고 개선
+
+### 확인된 원인
+- Vercel 운영 로그에서 `/api/signup/phone/send`가 HTTP 400으로 실패한 요청을 확인했다.
+- SOLAPI 메시지 로그에서 22:30, 22:41, 22:46 요청이 모두 실패 1건, 성공 0건으로 처리된 것을 확인했다.
+- 실패 상세 상태는 `1062 발신번호 미등록`이었으며 요청 발신번호는 대표번호 `1668-1290`이었다.
+- SOLAPI 발신번호 목록에는 기존 휴대폰 번호 한 개만 활성 등록되어 있고 대표번호는 등록되어 있지 않았다.
+- 대표번호 등록에는 SOLAPI 사업자 인증과 사업자등록증 또는 고유번호증 제출이 선행되어야 한다.
+- 따라서 일일 한도 49건 잔여 여부와 무관한 발신번호 등록 문제였다.
+
+### 반영내용
+- 대표번호 승인 전까지 인증 기능을 복구하기 위해 로컬 및 운영 발신번호를 SOLAPI에 이미 등록된 번호로 임시 전환했다.
+- `lib/sms.js`에서 `failedMessageList`, `registeredFailed`, `registeredSuccess`를 검사하도록 보강했다.
+- SOLAPI 상태코드 `1062`를 `unregistered_sender`로 분류하고 사용자에게 발신번호 등록 문제를 구체적으로 안내한다.
+- 실패한 인증 레코드에도 메시지 그룹 ID를 저장하며, 수신번호와 인증번호를 제외한 공급자 코드·사유·그룹 ID만 Vercel 로그에 기록한다.
+- `scripts/sms-provider-regression.mjs`와 `test:sms-provider` 스크립트를 추가했다.
+- 대표번호가 SOLAPI에서 활성화되면 `SOLAPI_SENDER_NUMBER`만 대표번호로 다시 변경하고 재배포하면 된다.
+
+### 검증
+- `npm run test:sms-provider`: 통과
+- `npm run test:social-link`: 통과
+- `npm run test:qr-claim`: 통과
+- `npm run security:check`: 통과
+- `npm run build`: 통과
+- `git diff --check`: 통과
+
+### 소요시간
+- 운영 로그·SOLAPI 상세 진단, 발신번호 확인, 코드 보강, 회귀 테스트 및 배포 준비: 약 35분

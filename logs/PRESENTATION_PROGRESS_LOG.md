@@ -6304,3 +6304,11 @@ This file is the cumulative presentation-ready project log. It is written so the
 - QR 가입·보안 검사·운영 빌드 통과, 구현 및 로컬 검증 약 25분
 - GitHub 커밋 `ee8a842` 및 Vercel 배포 `dpl_SfDZFDtphbCQfqbDgbLVw8X4S3Aq` 운영 반영, `zezari.family` HTTP 200 확인
 - 전체 구현·배포·검증 약 35분
+
+## 2026-08-25 - SOLAPI 인증문자 장애 개선
+- 요구: 잔여 발송 한도가 있는데 신규 번호 인증문자가 실패하는 원인 분석 및 개선
+- 원인: 대표번호 `1668-1290`이 SOLAPI 발신번호로 등록되지 않아 상태코드 `1062`로 접수 실패
+- 확인: 동일 시간대 SOLAPI 발송 이력 3건 모두 실패, 기존 등록 발신번호는 한 개만 활성 상태
+- 조치: 대표번호 승인 전까지 등록된 발신번호로 임시 복구하고 공급자 실패코드 판별·안전한 운영 로그·구체적인 오류 안내 추가
+- 검증: SMS 공급자, SNS 연결, QR 가입, 보안 회귀 테스트와 Next.js 운영 빌드 통과
+- 소요시간: 약 35분
