@@ -42,7 +42,7 @@ Project: REAL_QR_FIND / zezari
 - Android/Desktop Chrome:
   - Shows an `앱 설치` button when the browser fires `beforeinstallprompt`.
 - Installed mode:
-  - Shows `앱으로 실행 중입니다.`
+  - Installed mode stays visually quiet and does not render a separate status sentence.
 - iOS:
   - Shows Safari home-screen guidance because iOS install cannot be triggered by JavaScript.
 

@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "security:check": "node scripts/security-regression-check.mjs",
-    "test:qr-claim": "node scripts/qr-signup-claim-regression.mjs"
+    "test:qr-claim": "node scripts/qr-signup-claim-regression.mjs",
+    "test:social-link": "tsx scripts/social-account-link-regression.mjs"
   },
   "dependencies": {
     "@libsql/client": "^0.17.3",
@@ -20,5 +21,8 @@
     "resend": "^6.18.1",
     "solapi": "^6.0.1",
     "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.12"
   }
 }

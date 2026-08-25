@@ -17,6 +17,7 @@ export default function SocialSignupCompletion({ guardian, session, qrClaim = fa
   const [codeInput, setCodeInput] = useState(["", "", "", "", "", ""]);
   const [verifiedPhone, setVerifiedPhone] = useState("");
   const [phoneVerificationToken, setPhoneVerificationToken] = useState("");
+  const [accountLinkPending, setAccountLinkPending] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,6 +36,7 @@ export default function SocialSignupCompletion({ guardian, session, qrClaim = fa
     if (key === "phone") {
       setVerifiedPhone("");
       setPhoneVerificationToken("");
+      setAccountLinkPending(false);
       setCodeInput(["", "", "", "", "", ""]);
     }
   };
@@ -50,12 +52,28 @@ export default function SocialSignupCompletion({ guardian, session, qrClaim = fa
     setMessage("");
 
     try {
-      const response = await fetch("/api/signup/phone/send", {
+      let response = await fetch("/api/signup/phone/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone, purpose: "signup" }),
       });
-      const data = await response.json();
+      let data = await response.json();
+      if (data.accountLinkRequired) {
+        const existingLabel = providerListLabel(data.existingProviders);
+        const confirmed = window.confirm(
+          `이 휴대폰 번호는 ${existingLabel}로 이미 가입되어 있습니다.\n\n${providerLabel}로도 로그인할 수 있게 계정을 연결하시겠습니까?`
+        );
+        if (!confirmed) {
+          setMessage("계정 연결을 취소했습니다. 기존 로그인 방식으로 로그인해 주세요.");
+          return;
+        }
+        response = await fetch("/api/signup/phone/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone, purpose: "signup", accountLinkConfirmed: true }),
+        });
+        data = await response.json();
+      }
       if (!response.ok || !data.ok) {
         setMessage(data.message || "인증번호 발송에 실패했습니다.");
         setPhoneVerificationLoading(false);
@@ -65,6 +83,7 @@ export default function SocialSignupCompletion({ guardian, session, qrClaim = fa
       setCodeInput(["", "", "", "", "", ""]);
       setVerifiedPhone("");
       setPhoneVerificationToken("");
+      setAccountLinkPending(Boolean(data.accountLinkPending));
       setSeconds(data.expiresInSeconds || 180);
       setMessage("인증번호를 발송했습니다. 문자로 받은 6자리 번호를 입력해 주세요.");
     } catch {
@@ -100,7 +119,11 @@ export default function SocialSignupCompletion({ guardian, session, qrClaim = fa
       const response = await fetch("/api/signup/phone/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: form.phone, code, purpose: "signup" }),
+        body: JSON.stringify({
+          phone: form.phone,
+          code,
+          purpose: accountLinkPending ? "social_account_link" : "signup",
+        }),
       });
       const data = await response.json();
       if (!response.ok || !data.ok) {
@@ -109,8 +132,26 @@ export default function SocialSignupCompletion({ guardian, session, qrClaim = fa
         return;
       }
 
-      setVerifiedPhone(data.phone || form.phone);
-      setPhoneVerificationToken(data.phoneVerificationToken || "");
+      const verified = data.phone || form.phone;
+      const token = data.phoneVerificationToken || "";
+      if (accountLinkPending) {
+        const linkResponse = await fetch("/api/signup/social/link", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: verified, phoneVerificationToken: token }),
+        });
+        const linkData = await linkResponse.json();
+        if (!linkResponse.ok || !linkData.ok) {
+          setMessage(linkData.message || "SNS 계정 연결에 실패했습니다.");
+          return;
+        }
+        window.alert(`${providerLabel} 계정이 기존 제자리 회원 계정과 연결되었습니다.`);
+        window.location.assign("/");
+        return;
+      }
+
+      setVerifiedPhone(verified);
+      setPhoneVerificationToken(token);
       setStep("profile");
       setMessage("휴대폰 인증이 완료되었습니다.");
     } catch {
@@ -235,7 +276,7 @@ export default function SocialSignupCompletion({ guardian, session, qrClaim = fa
             </div>
             <label className="signup-field">
               <span>이름</span>
-              <input value={form.name} onChange={(event) => update("name", event.target.value)} required />
+              <input value={form.name} onChange={(event) => update("name", event.target.value)} placeholder="제자리" required />
             </label>
             <label className="signup-field">
               <span>생년월일</span>
@@ -246,7 +287,7 @@ export default function SocialSignupCompletion({ guardian, session, qrClaim = fa
               <input
                 value={form.email}
                 onChange={(event) => update("email", event.target.value)}
-                placeholder="name@example.com"
+                placeholder="zezari@zeazri.com"
                 type="email"
                 autoComplete="email"
                 required
@@ -309,9 +350,15 @@ function formatTimer(seconds) {
 }
 
 function socialProviderLabel(provider) {
+  if (provider === "credentials") return "아이디";
   if (provider === "naver") return "네이버";
   if (provider === "kakao") return "카카오";
-  if (provider === "google") return "Google";
-  if (provider === "facebook") return "Facebook";
+  if (provider === "google") return "구글";
+  if (provider === "facebook") return "페이스북";
   return "SNS";
+}
+
+function providerListLabel(providers = []) {
+  const labels = providers.map(socialProviderLabel).filter((label) => label !== "SNS");
+  return labels.length > 0 ? labels.join("·") : "기존 계정";
 }

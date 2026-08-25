@@ -37,6 +37,7 @@
 
 ## Operating Notes
 - Keep the Solapi sender number verified and funded.
+- The production sender is the registered ZEZARI representative number `1668-1290`.
 - Check the Solapi message log when users report delivery failures.
 - Rotate the API key and update Vercel immediately if exposure is suspected.
 - Official Node.js reference: https://solapi.com/developers/sdk/nodejs-sendingexample

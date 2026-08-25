@@ -74,6 +74,7 @@ export default function MyPageOverlay({ initialOpen = false, closeHref = "/?tab=
       }}
       onClick={(event) => {
         if (event.target.closest?.("[data-my-page-close]")) closeModal();
+        if (event.target.closest?.("[data-my-page-navigate]")) setOpen(false);
       }}
     >
       <ModalScrollLock />

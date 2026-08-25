@@ -339,7 +339,7 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
 
             <label className="signup-field">
               <span>이름</span>
-              <input value={signup.name} onChange={(event) => updateSignup("name", event.target.value)} placeholder="홍길동" required />
+              <input value={signup.name} onChange={(event) => updateSignup("name", event.target.value)} placeholder="제자리" required />
             </label>
             <label className="signup-field">
               <span>생년월일</span>
@@ -350,7 +350,7 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
               <input
                 value={signup.email}
                 onChange={(event) => updateSignup("email", event.target.value)}
-                placeholder="name@example.com"
+                placeholder="zezari@zeazri.com"
                 type="email"
                 autoComplete="email"
                 required
@@ -366,7 +366,7 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
               <input
                 value={signup.loginId}
                 onChange={(event) => updateSignup("loginId", event.target.value)}
-                placeholder="zezari_mom"
+                placeholder="zezari"
                 autoComplete="username"
                 required
               />
@@ -603,7 +603,7 @@ export function PwaInstallPrompt() {
   };
 
   if (installed) {
-    return <p className="install-note">앱으로 실행 중입니다.</p>;
+    return null;
   }
 
   if (installEvent) {

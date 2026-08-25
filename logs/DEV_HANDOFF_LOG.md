@@ -8515,3 +8515,27 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Selected `키링` and `호랑이` and confirmed the trigger, order summary, quantity, 5,000 KRW price, and product preview all retained the selected values.
 - GitHub commit `5d88b99` was pushed and Vercel production deployment `dpl_Fb4i7DxRDjhfuZqir6bzTjumMK1c` reached `READY`, aliased to `https://zezari.family`.
 - Implementation, deployment, and production verification: about 35 minutes.
+
+## 2026-08-25 KST - SNS 계정 통합, 대표번호, 가입 UI 정리
+
+### 요구내용
+- 마이페이지에서 `정보 수정`을 누르면 설정 팝업 닫기
+- 가입 및 보호자 수정 화면에서 보호자 사진 업로드 숨김
+- 전체 화면의 `앱으로 실행 중입니다.` 문구 삭제
+- 인증문자 발신번호를 개인번호에서 대표번호 `1668-1290`으로 변경
+- 회원가입 이름·이메일·아이디 예시 문구 변경
+- 기존 가입자가 다른 SNS로 접근하면 휴대폰 인증 후 같은 보호자 계정으로 연결
+
+### 반영내용
+- 마이페이지 내부 이동 링크에 팝업 닫기 동작을 추가하고 보호자 수정 화면의 사진 업로드 UI를 제거했다.
+- 설치형 PWA 안내 문구를 렌더링하지 않도록 정리하고 요청한 가입 예시를 적용했다.
+- Solapi 대표 발신번호를 로컬 환경에 반영하고 운영 환경 동기화 대상으로 지정했다.
+- `guardian_social_accounts` 테이블을 추가하고 기존 Google·Kakao·Naver·Facebook 식별자를 마이그레이션하도록 DB 스키마를 42로 올렸다.
+- 새 SNS 최초 접근 시 휴대폰 중복을 감지하고, 사용자 확인 후 `social_account_link` 목적의 SMS 인증과 1회용 토큰 검증을 거쳐 기존 보호자에 연결한다.
+- 이메일만으로 계정을 자동 병합하지 않으며, 이미 사용 중인 두 개의 완성 계정은 자동 병합을 거부하도록 보호했다.
+- 산출물 `deliverables/AUTH_SOCIAL_ACCOUNT_LINKING_AND_UI_CLEANUP.md`를 추가했다.
+
+### 검증
+- 격리 DB에서 Google 기존 계정과 Naver 신규 접근 계정 연결 회귀 테스트 통과
+- QR 선점 가입 회귀, 보안 회귀, Next.js 운영 빌드, 공백 검사 통과
+- 로컬 구현 및 검증 약 45분, GitHub·Vercel 운영 반영 결과는 배포 후 이 항목에 추가한다.

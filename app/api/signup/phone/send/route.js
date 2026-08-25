@@ -19,11 +19,15 @@ export async function POST(request) {
     const payload = await request.json();
     const result = await requestSignupPhoneVerification(payload, session, getRequestSecurityMeta(request));
     return NextResponse.json({
-      ok: true,
+      ok: !result.accountLinkRequired,
       phone: result.phone,
       expiresInSeconds: result.expiresInSeconds,
       devMode: result.devMode,
-    }, { headers: NO_STORE_HEADERS });
+      accountLinkRequired: Boolean(result.accountLinkRequired),
+      accountLinkPending: Boolean(result.accountLinkPending),
+      requestedProvider: result.requestedProvider || "",
+      existingProviders: result.existingProviders || [],
+    }, { status: result.accountLinkRequired ? 409 : 200, headers: NO_STORE_HEADERS });
   } catch (error) {
     const status = String(error?.message || "").includes("너무 많습니다") ? 429 : 400;
     return NextResponse.json(

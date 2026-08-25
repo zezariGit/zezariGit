@@ -9,7 +9,6 @@ import {
 import AdCampaignModal from "./ad-campaign-modal";
 import FormSubmitButton from "./form-submit-button";
 import GuardianPhoneVerification from "./guardian-phone-verification";
-import ImageFileInput from "./image-file-input";
 import KakaoPostcodeAddress from "./kakao-postcode-address";
 import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
 import ManagedSubjectCarousel from "./managed-subject-carousel";
@@ -170,7 +169,7 @@ export default async function GuardianDashboard({
             selectedPreviewSubject={selectedPreviewSubject}
           />
         ) : isGuardianTab ? (
-          <GuardianInfoTab guardian={guardian} session={session} imageUploadSettings={imageUploadSettings} />
+          <GuardianInfoTab guardian={guardian} session={session} />
         ) : (
           <SubjectsInfoTab
             selectedSubject={selectedEditSubject}
@@ -239,11 +238,11 @@ function DashboardTab({
   );
 }
 
-function GuardianInfoTab({ guardian, session, imageUploadSettings }) {
+function GuardianInfoTab({ guardian, session }) {
   return (
     <section className="dashboard-panel info-panel guardian-info-panel">
       <h2 id="guardian-info">보호자 정보</h2>
-      <GuardianForm guardian={guardian} session={session} imageUploadSettings={imageUploadSettings} />
+      <GuardianForm guardian={guardian} session={session} />
     </section>
   );
 }
@@ -280,7 +279,7 @@ function MyPageTab({ guardian, subscription, session, admin, closeHref = "" }) {
       <div className="my-page-section">
         <div className="my-section-heading">
           <h3>보호자 정보</h3>
-          <Link href="/?tab=guardian#guardian-info">정보 수정 &gt;</Link>
+          <Link href="/?tab=guardian#guardian-info" data-my-page-navigate>정보 수정 &gt;</Link>
         </div>
         <InfoRow label="이름" value={guardian.name || "이름 미입력"} />
         <InfoRow
@@ -561,27 +560,11 @@ function StatusDashboard({ subjects }) {
   );
 }
 
-function GuardianForm({ guardian, session, imageUploadSettings }) {
+function GuardianForm({ guardian, session }) {
   const socialAccount = isSocialAccount(session);
 
   return (
     <form action={saveGuardianAction} className="form-grid">
-              <label className="full-field guardian-photo-upload">
-                <span>보호자 사진</span>
-                <span className="guardian-photo-upload-row">
-                  <span className="guardian-photo-preview" aria-hidden={!guardian.photo_url}>
-                    {guardian.photo_url ? <img src={guardian.photo_url} alt="" /> : <span />}
-                  </span>
-                  <span className="guardian-photo-upload-control">
-                    <ImageFileInput
-                      name="guardianPhoto"
-                      label="보호자 사진"
-                      maxBytes={imageUploadSettings?.guardianPhotoMaxBytes || 1024 * 1024}
-                    />
-                    <small>{formatUploadLimit(imageUploadSettings?.guardianPhotoMaxBytes)}MB 이하 JPEG, PNG, WebP, GIF</small>
-                  </span>
-                </span>
-              </label>
               <label>
                 이름
                 <input name="guardianName" defaultValue={guardian.name || ""} required />
