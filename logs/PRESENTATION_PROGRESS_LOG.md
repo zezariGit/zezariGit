@@ -6327,3 +6327,12 @@ This file is the cumulative presentation-ready project log. It is written so the
 - GitHub 커밋 `0a95abc` 푸시 및 Vercel 배포 `dpl_F5feL3JFSnKLiKLtevNr7wgRRri1` 운영 반영 완료
 - 운영에서 QR 상태 단일 표기와 대상자 세로형 활성화 카드 확인, 두 운영 도메인 HTTP 200 확인
 - 구현·배포·운영 검증 약 35분
+
+## 2026-08-26 - 관리대상 사진 업로드 플랫폼별 옵션 개선
+- iOS: 사진 촬영 앱·앨범 앱·파일 앱 3개 옵션 제공
+- Android·웹: 동작하지 않는 앨범 앱을 제거하고 사진 촬영 앱·파일 앱 2개 옵션 제공
+- iPadOS 데스크톱 모드도 터치 여부를 확인해 iOS 흐름으로 처리
+- 등록과 수정 화면이 공유하는 사진 컴포넌트에 한 번에 적용
+- 사진 제한 용량·미리보기·필수값 검증은 기존 동작 유지
+- 운영 빌드·보안·QR 선점 가입 회귀 검사 통과
+- 구현·검증 약 15분

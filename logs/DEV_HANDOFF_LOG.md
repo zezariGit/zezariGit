@@ -8640,3 +8640,25 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - 운영 관리자 QR 화면에서 활성화상태 필터·열·상세 배지가 제거되고 사용중·미사용·스토어 선점 상태가 단일 배지로 표시되는 것을 확인했다.
 - 운영 보호자 계정의 미활성 QR에서 대상자 사진 위, 이름·생년월일·확인 문구 아래의 세로형 활성화 카드가 표시되는 것을 확인했다.
 - `https://zezari.family`, `https://real-qr-find.vercel.app` 응답 HTTP 200을 확인했다.
+
+## 2026-08-26 KST - 관리대상 사진 선택 메뉴 플랫폼 분리
+
+### 요구내용
+- 관리대상 등록·수정 사진 업로드에서 Android의 동작하지 않는 앨범 선택 제거
+- iOS는 촬영·앨범·파일 3개, Android와 웹은 촬영·파일 2개 옵션 표시
+
+### 반영내용
+- 공용 `SubjectPhotoInput`에서 iPhone·iPad·iPod 및 터치 기반 iPadOS 데스크톱 모드를 판별한다.
+- iOS 계열에서만 앨범 버튼과 앨범용 파일 입력을 렌더링한다.
+- Android와 일반 웹에서는 앨범 UI와 숨은 입력을 모두 제외하고 촬영·파일 옵션만 유지한다.
+- 기존 사진 크기 제한, 미리보기, 사진 필수 검증, 후면 카메라 요청과 파일 앱 선택 로직은 유지했다.
+- 산출물 `deliverables/SUBJECT_PHOTO_PICKER_PLATFORM_RULES.md`를 추가했다.
+
+### 검증
+- `npm run build`: 통과
+- `npm run security:check`: 통과
+- `npm run test:qr-claim`: 통과
+- `git diff --check`: 통과
+
+### 소요시간
+- 구현·회귀 검증: 약 15분

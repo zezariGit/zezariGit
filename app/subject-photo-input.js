@@ -12,12 +12,19 @@ export default function SubjectPhotoInput({
   const [previewSrc, setPreviewSrc] = useState(existingSrc);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [activeSource, setActiveSource] = useState("");
+  const [isIOS, setIsIOS] = useState(false);
   const objectUrlRef = useRef("");
   const cameraInputRef = useRef(null);
   const albumInputRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  useEffect(() => () => revokeObjectUrl(), []);
+  useEffect(() => {
+    const userAgent = window.navigator.userAgent || "";
+    const isTouchIPad = window.navigator.platform === "MacIntel" && window.navigator.maxTouchPoints > 1;
+    setIsIOS(/iPad|iPhone|iPod/i.test(userAgent) || isTouchIPad);
+
+    return () => revokeObjectUrl();
+  }, []);
 
   function revokeObjectUrl() {
     if (!objectUrlRef.current) return;
@@ -118,16 +125,18 @@ export default function SubjectPhotoInput({
         aria-hidden="true"
         tabIndex={-1}
       />
-      <input
-        ref={albumInputRef}
-        className="subject-photo-native-input"
-        name={activeSource === "album" ? "photo" : undefined}
-        type="file"
-        accept="image/*"
-        onChange={(event) => handleFileChange(event, "album")}
-        aria-hidden="true"
-        tabIndex={-1}
-      />
+      {isIOS && (
+        <input
+          ref={albumInputRef}
+          className="subject-photo-native-input"
+          name={activeSource === "album" ? "photo" : undefined}
+          type="file"
+          accept="image/*"
+          onChange={(event) => handleFileChange(event, "album")}
+          aria-hidden="true"
+          tabIndex={-1}
+        />
+      )}
       <input
         ref={fileInputRef}
         className="subject-photo-native-input"
@@ -158,9 +167,11 @@ export default function SubjectPhotoInput({
             <button type="button" onClick={() => openPicker(cameraInputRef)}>
               사진 촬영 앱
             </button>
-            <button type="button" onClick={() => openPicker(albumInputRef)}>
-              앨범 앱
-            </button>
+            {isIOS && (
+              <button type="button" onClick={() => openPicker(albumInputRef)}>
+                앨범 앱
+              </button>
+            )}
             <button type="button" onClick={openFileApp}>
               파일 앱
             </button>
