@@ -27,6 +27,13 @@ Project: REAL_QR_FIND
 - Provider identity uses the unique provider account ID, not display name or email.
 - Provider keys, secrets, access tokens, and SMS verification codes are excluded from this document and Git.
 
+## Request Limits
+- Member lookup and actual SMS sending use separate counters.
+- Member lookup: 10 requests per browser/IP identity in five minutes and 30 per hour.
+- Actual SMS sending: three sends per browser/IP identity in five minutes and 10 per hour.
+- Same phone and purpose: five actual sends per hour.
+- The initial existing-member lookup does not consume an SMS send allowance; after account-link confirmation, only the Solapi send request increments it.
+
 ## Database
 - Schema version: 42.
 - New table: `guardian_social_accounts`.
@@ -41,6 +48,7 @@ Project: REAL_QR_FIND
 
 ## Verification
 - `npm run test:social-link`: isolated Google-to-Naver linking regression passed.
+- The regression performs three existing-member lookups before the confirmed SMS send, proving lookup requests do not exhaust the send allowance.
 - `npm run test:qr-claim`: QR signup claim regression passed.
 - `npm run security:check`: security regression passed.
 - `npm run build`: Next.js production build passed.

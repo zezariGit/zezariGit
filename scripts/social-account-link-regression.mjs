@@ -62,6 +62,11 @@ const inspection = await requestSignupPhoneVerification({ phone, purpose: "signu
 assert.equal(inspection.accountLinkRequired, true);
 assert.ok(inspection.existingProviders.includes("google"));
 
+for (let attempt = 0; attempt < 2; attempt += 1) {
+  const repeatedInspection = await requestSignupPhoneVerification({ phone, purpose: "signup" }, naverSession);
+  assert.equal(repeatedInspection.accountLinkRequired, true);
+}
+
 const sendResult = await requestSignupPhoneVerification(
   { phone, purpose: "signup", accountLinkConfirmed: true },
   naverSession
