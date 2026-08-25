@@ -8409,3 +8409,21 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Verification
 - Build, security, whitespace, production rendering, GitHub push, and Vercel deployment are recorded after release verification.
 - Implementation and initial verification: about 5 minutes.
+
+## 2026-08-25 KST - Kakao Login New Account Production Setup
+
+### User Requirement
+- Configure the newly signed-in Kakao Developers account so Kakao login works on `zezari.family`.
+- Create and configure all required application settings and deploy the new credentials.
+
+### Implementation
+- Created a dedicated Kakao Developers application named `ZEZARI` under the new account.
+- Enabled Kakao Login and registered `https://zezari.family/api/auth/callback/kakao` on the default REST API key.
+- Kept the generated client secret active and configured `profile_nickname` as a required consent item.
+- Replaced `KAKAO_CLIENT_ID` locally and in Vercel Production/Development, and added `KAKAO_CLIENT_SECRET` to the same environments.
+- Kept all credential values out of Git, handoff logs, and presentation artifacts.
+- Updated `deliverables/AUTH_SETUP.md` with the non-sensitive operational configuration.
+
+### Verification
+- Build, provider route, Kakao authorization redirect, callback behavior, GitHub push, and Vercel deployment are recorded after release verification.
+- Configuration and initial verification: about 25 minutes.

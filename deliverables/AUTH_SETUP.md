@@ -231,3 +231,13 @@ META_APP_SECRET=your-meta-app-secret
 - A lightweight client keep-alive reads `/api/auth/session` when the app opens, every six hours while it remains open, and after returning online or focusing a long-idle tab. Successful reads rotate the active session expiry.
 - Users who do not use the service for the configured maximum age must authenticate again. Explicit logout still ends the session immediately.
 - Vercel functions run in `hnd1` so authentication callbacks and dashboard queries are close to the Turso `aws-ap-northeast-1` database.
+
+## Kakao Login Production Setup
+
+- A dedicated `ZEZARI` Kakao Developers application is active for the current Kakao account.
+- Kakao Login is enabled.
+- The REST API key has an active client secret.
+- Registered login redirect URI: `https://zezari.family/api/auth/callback/kakao`
+- `profile_nickname` is configured as a required consent item for initial guardian-name prefilling.
+- `KAKAO_CLIENT_ID`, `KAKAO_CLIENT_SECRET`, and `KAKAO_SCOPE=profile_nickname` are configured locally and in Vercel Production/Development environments.
+- Key values are intentionally excluded from this document and all Git-tracked files.

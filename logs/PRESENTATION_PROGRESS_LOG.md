@@ -6188,3 +6188,17 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 라벨의 원형 크기, 배경색, 테두리를 제거하고 실제 텍스트만 표시
 - 데스크톱 27px, 모바일 25px로 확대하고 기존 링크 기능 유지
 - 구현·초기 검증 약 5분
+
+## 2026-08-25 - 신규 카카오 계정 로그인 연동
+
+### 요구내용
+- 새로운 카카오 개발자 계정에서 제자리 운영 서비스의 카카오 로그인을 전체 설정
+- `zezari.family`에서 카카오 가입·로그인이 가능하도록 키와 콜백을 배포
+
+### 반영내용
+- 새 카카오 개발자 앱 `ZEZARI` 생성 및 카카오 로그인 활성화
+- 운영 콜백 `https://zezari.family/api/auth/callback/kakao` 등록
+- 닉네임 필수 동의와 Client Secret 활성 상태 구성
+- 새 REST API 키와 Client Secret을 로컬 및 Vercel 운영·개발 환경에 안전하게 교체
+- 비밀값은 Git과 산출물에서 제외하고 비민감 설정만 인증 산출물에 기록
+- 설정·초기 검증 약 25분
