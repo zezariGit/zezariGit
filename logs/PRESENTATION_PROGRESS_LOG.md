@@ -6201,4 +6201,6 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 닉네임 필수 동의와 Client Secret 활성 상태 구성
 - 새 REST API 키와 Client Secret을 로컬 및 Vercel 운영·개발 환경에 안전하게 교체
 - 비밀값은 Git과 산출물에서 제외하고 비민감 설정만 인증 산출물에 기록
-- 설정·초기 검증 약 25분
+- 운영 로그인 화면에서 실제 카카오 동의와 콜백을 완료하고 SNS 신규가입 휴대폰 인증 화면 진입 확인
+- 빌드·보안 검사 통과, GitHub 푸시 및 `zezari.family` 운영 배포 완료
+- 설정·배포·운영 검증 약 35분

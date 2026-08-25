@@ -8425,5 +8425,9 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Updated `deliverables/AUTH_SETUP.md` with the non-sensitive operational configuration.
 
 ### Verification
-- Build, provider route, Kakao authorization redirect, callback behavior, GitHub push, and Vercel deployment are recorded after release verification.
-- Configuration and initial verification: about 25 minutes.
+- `npm run build`, `npm run security:check`, and `git diff --check` passed.
+- The production provider endpoint returned `kakao`, and the generated OAuth request used `kauth.kakao.com`, the expected callback, and `profile_nickname` scope.
+- Completed the real Kakao consent and callback flow in the production UI; the new Kakao account reached the SNS signup phone-verification screen without a callback error.
+- Restored the existing Google administrator session after the isolated login test.
+- GitHub commit `e785f5b` was pushed and Vercel production deployment `dpl_F6JEd5Dwpfa4LYD92h95XmAE29vL` reached `READY`, aliased to `https://zezari.family`.
+- Configuration, deployment, and end-to-end verification: about 35 minutes.
