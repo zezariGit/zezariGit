@@ -6311,4 +6311,6 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 확인: 동일 시간대 SOLAPI 발송 이력 3건 모두 실패, 기존 등록 발신번호는 한 개만 활성 상태
 - 조치: 대표번호 승인 전까지 등록된 발신번호로 임시 복구하고 공급자 실패코드 판별·안전한 운영 로그·구체적인 오류 안내 추가
 - 검증: SMS 공급자, SNS 연결, QR 가입, 보안 회귀 테스트와 Next.js 운영 빌드 통과
-- 소요시간: 약 35분
+- 운영 확인: 배포 `dpl_BDRETYBCfp6Tx6wQKVwGkofbiTyB` READY, 운영 API 성공, SOLAPI 성공 1·실패 0 확인
+- 일일 발송 한도 상향 500건 반영 확인
+- 소요시간: 약 45분

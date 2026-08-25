@@ -8597,6 +8597,12 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `npm run security:check`: 통과
 - `npm run build`: 통과
 - `git diff --check`: 통과
+- Vercel 운영 발신번호 환경변수 임시 복구 완료
+- GitHub 커밋 `e075783` 푸시 완료
+- Vercel 운영 배포 `dpl_BDRETYBCfp6Tx6wQKVwGkofbiTyB`가 `READY` 상태로 `zezari.family`에 연결됨
+- 직전 실패 신규 번호로 운영 API를 재호출해 `ok: true`, 180초 만료 응답 확인
+- 동일 요청이 SOLAPI 로그에 `SMS`, 성공 1건, 실패 0건으로 기록된 것을 확인
+- 일일 발송 한도 상향이 500건으로 반영된 것을 확인
 
 ### 소요시간
-- 운영 로그·SOLAPI 상세 진단, 발신번호 확인, 코드 보강, 회귀 테스트 및 배포 준비: 약 35분
+- 운영 로그·SOLAPI 상세 진단, 발신번호 확인, 코드 보강, 회귀 테스트, 배포 및 실제 문자 검증: 약 45분

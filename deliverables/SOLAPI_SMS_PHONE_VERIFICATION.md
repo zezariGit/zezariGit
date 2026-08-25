@@ -49,3 +49,5 @@
 - `lib/sms.js` now treats provider registration failures as failed sends even when Solapi successfully creates a message group.
 - Provider code and message-group ID are recorded in server logs without logging the recipient number or verification code.
 - After the representative number is approved, update only `SOLAPI_SENDER_NUMBER` in local and Vercel Production, then redeploy and verify one controlled SMS.
+- Recovery deployment `dpl_BDRETYBCfp6Tx6wQKVwGkofbiTyB` reached `READY`, and a controlled production request returned `ok: true`.
+- The matching Solapi log showed `SMS`, success 1, failure 0; the approved daily quota was shown as 500.
