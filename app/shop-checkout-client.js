@@ -15,6 +15,12 @@ const PRODUCT_PICKER_IMAGES = {
   "necklace-keyring": "/assets/shop-icons/product-necklace-keyring.png",
   "bracelet-necklace-keyring": "/assets/shop-icons/product-bracelet-necklace-keyring.png",
 };
+
+const WIDE_PRODUCT_PICKER_SLUGS = new Set([
+  "bracelet-necklace",
+  "necklace-keyring",
+  "bracelet-necklace-keyring",
+]);
 const ZODIAC_PICKER_IMAGES = {
   쥐: "/assets/shop-icons/zodiac-rat.png",
   소: "/assets/shop-icons/zodiac-ox.png",
@@ -662,7 +668,7 @@ function ShopImagePicker({
       <label id={`${id}-label`} htmlFor={`${id}-trigger`}>{label}</label>
       <button
         id={`${id}-trigger`}
-        className="shop-image-picker-trigger"
+        className={`shop-image-picker-trigger ${variant}`}
         type="button"
         aria-labelledby={`${id}-label ${id}-value`}
         aria-haspopup="listbox"
@@ -692,10 +698,11 @@ function ShopImagePicker({
             {options.map((option) => {
               const image = imageForOption(option);
               const selected = option.id === selectedId;
+              const wideProduct = variant === "product" && WIDE_PRODUCT_PICKER_SLUGS.has(String(option.slug || ""));
               return (
                 <button
                   type="button"
-                  className={selected ? "selected" : ""}
+                  className={`${selected ? "selected" : ""} ${wideProduct ? "wide-product" : ""}`.trim()}
                   role="option"
                   aria-selected={selected}
                   aria-label={`${option.name} 선택`}

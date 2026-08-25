@@ -8455,6 +8455,20 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - GitHub commit `b987c85` was pushed and Vercel production deployment `dpl_EzQLzjJxx4d5jec4HNgwKmc9F45j` reached `READY`, aliased to `https://zezari.family`.
 - Implementation, deployment, and production verification: about 35 minutes.
 
+## 2026-08-25 KST - Shop Picker Thumbnail And Combination Product Sizing
+
+### User Requirement
+- Hide the small embedded label visible below the selected product icon.
+- Make the three combination-product images wider so their multiple icons remain legible.
+
+### Implementation
+- Added a product-only selected-thumbnail crop that hides the embedded source-image label while retaining the live product name beside it.
+- Changed the product picker to a twelve-track grid: four single products use three tracks each and three combination products use four tracks each.
+- Preserved the four-column zodiac picker and all product selection identifiers and prices.
+
+### Verification
+- Build, security, whitespace, production visual verification, GitHub push, and Vercel deployment are recorded after release verification.
+
 ## 2026-08-25 KST - Shop Product And Zodiac Image Pickers
 
 ### User Requirement

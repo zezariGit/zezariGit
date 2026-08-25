@@ -10301,6 +10301,10 @@ button:disabled:hover {
   cursor: pointer;
 }
 
+.shop-image-picker-trigger.product {
+  grid-template-columns: 64px minmax(0, 1fr) 24px;
+}
+
 .shop-image-picker-field.open .shop-image-picker-trigger,
 .shop-image-picker-trigger:hover,
 .shop-image-picker-trigger:focus-visible {
@@ -10319,6 +10323,21 @@ button:disabled:hover {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+}
+
+.shop-image-picker-trigger.product .shop-image-picker-thumb {
+  width: 64px;
+  height: 40px;
+}
+
+.shop-image-picker-trigger.product .shop-image-picker-thumb img {
+  width: 58px;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  align-self: start;
+  object-fit: initial;
+  clip-path: inset(0 0 25% 0);
 }
 
 .shop-image-picker-thumb b {
@@ -10408,6 +10427,18 @@ button:disabled:hover {
 
 .shop-image-picker-grid.product > button {
   min-height: 88px;
+}
+
+.shop-image-picker-grid.product {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.shop-image-picker-grid.product > button {
+  grid-column: span 3;
+}
+
+.shop-image-picker-grid.product > button.wide-product {
+  grid-column: span 4;
 }
 
 .shop-image-picker-grid > button:hover,
