@@ -8431,3 +8431,23 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Restored the existing Google administrator session after the isolated login test.
 - GitHub commit `e785f5b` was pushed and Vercel production deployment `dpl_F6JEd5Dwpfa4LYD92h95XmAE29vL` reached `READY`, aliased to `https://zezari.family`.
 - Configuration, deployment, and end-to-end verification: about 35 minutes.
+
+## 2026-08-25 KST - Shop Checkout Address, Coupon UI, And Back Navigation
+
+### User Requirement
+- Make the checkout base-address field non-editable and populate it only through the Kakao postcode search popup while retaining a separate detail-address field.
+- Match the supplied coupon row with an owned-count label and a clear empty/selected state.
+- Prevent coupon selection and mobile/browser back actions from unexpectedly leaving the checkout flow.
+
+### Implementation
+- Added checkout-only read-only behavior to the shared postcode component without changing guardian information editing behavior.
+- Kept the selected base address in the existing order state and left the detail address directly editable.
+- Replaced the inline native coupon select with an owned-count summary, a stable selector row, and an accessible coupon picker dialog.
+- Added same-URL history states for configure, preview, order, and coupon-picker views so top and system back actions return one checkout step at a time.
+- Kept coupon discount validation and final order amount calculation on the server.
+- Added `deliverables/SHOP_CHECKOUT_ADDRESS_COUPON.md`.
+
+### Verification
+- `npm run build`, `npm run security:check`, and `git diff --check` passed.
+- Production mobile-width interaction, GitHub push, and Vercel deployment are recorded after release verification.
+- Implementation and initial verification: about 25 minutes.

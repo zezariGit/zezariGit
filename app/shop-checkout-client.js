@@ -29,6 +29,7 @@ export default function ShopCheckoutClient({
   const [designIndex, setDesignIndex] = useState(0);
   const [designId, setDesignId] = useState(initialDesigns[0]?.id || "");
   const [couponId, setCouponId] = useState("");
+  const [couponPickerOpen, setCouponPickerOpen] = useState(false);
   const [shippingAddress, setShippingAddress] = useState(guardian?.address || "");
   const [shippingAddressDetail, setShippingAddressDetail] = useState(guardian?.address_detail || "");
   const [sdkReady, setSdkReady] = useState(false);
@@ -38,6 +39,34 @@ export default function ShopCheckoutClient({
   const widgetRef = useRef(null);
   const latestPaymentAmountRef = useRef(0);
   const widgetAmountRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    window.history.replaceState(
+      {
+        ...(window.history.state || {}),
+        zezariShopCheckout: true,
+        shopStep: "configure",
+        couponPickerOpen: false,
+      },
+      "",
+      window.location.href
+    );
+
+    const handlePopState = (event) => {
+      if (!event.state?.zezariShopCheckout) return;
+      const nextStep = ["configure", "preview", "order"].includes(event.state.shopStep)
+        ? event.state.shopStep
+        : "configure";
+      setStep(nextStep);
+      setCouponPickerOpen(nextStep === "order" && Boolean(event.state.couponPickerOpen));
+      setMessage("");
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   const product = useMemo(
     () => products.find((item) => item.id === productId) || products[0] || null,
@@ -208,11 +237,45 @@ export default function ShopCheckoutClient({
     if (!validateSelection()) return;
     setMessage("");
     setStep("preview");
+    pushCheckoutHistory("preview");
   };
 
   const goOrder = () => {
     setMessage("");
     setStep("order");
+    pushCheckoutHistory("order");
+  };
+
+  const pushCheckoutHistory = (nextStep, nextCouponPickerOpen = false) => {
+    if (typeof window === "undefined") return;
+    window.history.pushState(
+      {
+        ...(window.history.state || {}),
+        zezariShopCheckout: true,
+        shopStep: nextStep,
+        couponPickerOpen: nextCouponPickerOpen,
+      },
+      "",
+      window.location.href
+    );
+  };
+
+  const openCouponPicker = () => {
+    setCouponPickerOpen(true);
+    pushCheckoutHistory("order", true);
+  };
+
+  const closeCouponPicker = () => {
+    if (window.history.state?.zezariShopCheckout && window.history.state?.couponPickerOpen) {
+      window.history.back();
+      return;
+    }
+    setCouponPickerOpen(false);
+  };
+
+  const chooseCoupon = (nextCouponId) => {
+    setCouponId(nextCouponId);
+    closeCouponPicker();
   };
 
   const startProductServicePurchase = async (adminPass = false) => {
@@ -307,14 +370,9 @@ export default function ShopCheckoutClient({
     <section className="shop-phone-panel">
       <header className="shop-topbar">
         <a className="shop-back-link" href={step === "configure" ? "/?tab=dashboard" : "#back"} onClick={(event) => {
-          if (step === "preview") {
-            event.preventDefault();
-            setStep("configure");
-          }
-          if (step === "order") {
-            event.preventDefault();
-            setStep("preview");
-          }
+          if (step === "configure") return;
+          event.preventDefault();
+          window.history.back();
         }} aria-label="이전으로 돌아가기">‹</a>
         <h1>{step === "configure" ? "상품 구매" : step === "order" ? "결제" : product.name}</h1>
         <span className="shop-help-mark" aria-hidden="true">?</span>
@@ -370,8 +428,11 @@ export default function ShopCheckoutClient({
             setShippingAddressDetail={setShippingAddressDetail}
             coupons={applicableCoupons}
             couponId={couponId}
-            setCouponId={setCouponId}
             selectedCoupon={selectedCoupon}
+            couponPickerOpen={couponPickerOpen}
+            openCouponPicker={openCouponPicker}
+            closeCouponPicker={closeCouponPicker}
+            chooseCoupon={chooseCoupon}
             widgetStatus={widgetStatus}
             subtotalAmount={subtotalAmount}
             discountAmount={discountAmount}
@@ -567,8 +628,11 @@ function OrderInformation({
   setShippingAddressDetail,
   coupons,
   couponId,
-  setCouponId,
   selectedCoupon,
+  couponPickerOpen,
+  openCouponPicker,
+  closeCouponPicker,
+  chooseCoupon,
   widgetStatus,
   subtotalAmount,
   discountAmount,
@@ -599,6 +663,7 @@ function OrderInformation({
             defaultDetailValue={shippingAddressDetail}
             addressName="shippingAddress"
             detailName="shippingAddressDetail"
+            addressReadOnly
             onAddressChange={setShippingAddress}
             onDetailChange={setShippingAddressDetail}
           />
@@ -608,21 +673,20 @@ function OrderInformation({
       <section className="order-section">
         <h2>3. 쿠폰 선택</h2>
         <div className="coupon-select-box">
-          <label>
-            쿠폰 선택
-            {coupons.length > 0 ? (
-              <select value={couponId} onChange={(event) => setCouponId(event.target.value)}>
-                <option value="">쿠폰 사용 안함</option>
-                {coupons.map((coupon) => (
-                  <option value={coupon.id} key={coupon.id}>
-                    {couponOptionLabel(coupon)}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <a href="/account/coupons">사용 가능한 쿠폰이 없습니다. 쿠폰함에서 등록해 주세요.</a>
-            )}
-          </label>
+          <div className="coupon-select-summary">
+            <strong>할인쿠폰</strong>
+            <span>{coupons.length}개 보유</span>
+          </div>
+          <button className="coupon-select-trigger" type="button" onClick={openCouponPicker}>
+            <span>
+              {selectedCoupon
+                ? couponOptionLabel(selectedCoupon)
+                : coupons.length > 0
+                  ? "쿠폰을 선택해 주세요"
+                  : "사용 가능한 쿠폰이 없어요"}
+            </span>
+            <b aria-hidden="true">›</b>
+          </button>
           {selectedCoupon && (
             <p>
               {selectedCoupon.name} 적용: {formatCurrency(discountAmount)} 할인
@@ -630,6 +694,56 @@ function OrderInformation({
           )}
         </div>
       </section>
+
+      {couponPickerOpen && (
+        <div
+          className="coupon-picker-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-label="쿠폰 선택"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeCouponPicker();
+          }}
+        >
+          <section className="coupon-picker-panel">
+            <header>
+              <button type="button" onClick={closeCouponPicker} aria-label="결제 화면으로 돌아가기">‹</button>
+              <h3>쿠폰 선택</h3>
+              <span aria-hidden="true" />
+            </header>
+            <div className="coupon-picker-list">
+              <button
+                type="button"
+                className={!couponId ? "selected" : ""}
+                onClick={() => chooseCoupon("")}
+              >
+                <span>
+                  <strong>쿠폰 사용 안함</strong>
+                  <small>할인 없이 결제를 진행합니다.</small>
+                </span>
+                <b aria-hidden="true">{!couponId ? "✓" : ""}</b>
+              </button>
+              {coupons.map((coupon) => (
+                <button
+                  type="button"
+                  className={coupon.id === couponId ? "selected" : ""}
+                  onClick={() => chooseCoupon(coupon.id)}
+                  key={coupon.id}
+                >
+                  <span>
+                    <strong>{coupon.name || coupon.code}</strong>
+                    <small>{couponOptionLabel(coupon)}</small>
+                  </span>
+                  <b aria-hidden="true">{coupon.id === couponId ? "✓" : ""}</b>
+                </button>
+              ))}
+              {coupons.length === 0 && (
+                <p className="coupon-picker-empty">현재 이 상품에 사용할 수 있는 쿠폰이 없습니다.</p>
+              )}
+            </div>
+          </section>
+        </div>
+      )}
 
       <section className="order-section">
         <h2>4. 주문 요약</h2>

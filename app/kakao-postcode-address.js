@@ -80,6 +80,7 @@ export default function KakaoPostcodeAddress({
   defaultDetailValue = "",
   addressName = "address",
   detailName = "addressDetail",
+  addressReadOnly = false,
   onAddressChange,
   onDetailChange,
 }) {
@@ -165,9 +166,12 @@ export default function KakaoPostcodeAddress({
         <input
           name={addressName}
           value={address}
-          onChange={(event) => changeAddress(event.target.value)}
+          onChange={addressReadOnly ? undefined : (event) => changeAddress(event.target.value)}
           placeholder="주소를 검색해 주세요"
           autoComplete="address-line1"
+          readOnly={addressReadOnly}
+          aria-readonly={addressReadOnly}
+          tabIndex={addressReadOnly ? -1 : undefined}
           required
         />
         <button className="action secondary postcode-search-button" type="button" onClick={openPostcode} disabled={loading}>
