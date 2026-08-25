@@ -8470,5 +8470,7 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Verification
 - `npm run build`, `npm run security:check`, and `git diff --check` passed.
-- Production visual and selection verification, GitHub push, and Vercel deployment are recorded after release verification.
-- Implementation and initial verification: about 25 minutes.
+- Confirmed in the authenticated production shop that all seven product images and all twelve zodiac images render in four-column pickers with the selected check state.
+- Selected `키링` and `호랑이` and confirmed the trigger, order summary, quantity, 5,000 KRW price, and product preview all retained the selected values.
+- GitHub commit `5d88b99` was pushed and Vercel production deployment `dpl_Fb4i7DxRDjhfuZqir6bzTjumMK1c` reached `READY`, aliased to `https://zezari.family`.
+- Implementation, deployment, and production verification: about 35 minutes.
