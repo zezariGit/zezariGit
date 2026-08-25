@@ -8454,3 +8454,21 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Confirmed both picker-header back and browser/system-equivalent back close the picker, retain the selected coupon, and remain on `/shop` checkout.
 - GitHub commit `b987c85` was pushed and Vercel production deployment `dpl_EzQLzjJxx4d5jec4HNgwKmc9F45j` reached `READY`, aliased to `https://zezari.family`.
 - Implementation, deployment, and production verification: about 35 minutes.
+
+## 2026-08-25 KST - Shop Product And Zodiac Image Pickers
+
+### User Requirement
+- Replace the product and design text select boxes in the shop with image-based choices.
+- Use the supplied product and zodiac images from `reference/icon` and follow the attached four-column picker layout.
+
+### Implementation
+- Copied seven product and twelve zodiac source images into stable public asset paths under `public/assets/shop-icons`.
+- Added a reusable accessible image picker with a selected-item trigger, four-column image grid, selected check indicator, close button, outside-click close, and Escape close.
+- Mapped product images by existing product slug and zodiac images by existing design name.
+- Preserved the existing product ID, design ID, design index, administrator-managed price, detail-page, quantity, coupon, and payment flows.
+- Added `deliverables/SHOP_IMAGE_PICKERS.md`.
+
+### Verification
+- `npm run build`, `npm run security:check`, and `git diff --check` passed.
+- Production visual and selection verification, GitHub push, and Vercel deployment are recorded after release verification.
+- Implementation and initial verification: about 25 minutes.

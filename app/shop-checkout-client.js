@@ -6,6 +6,29 @@ import { formatDateOnly } from "../lib/date-format";
 
 const TOSS_SDK_URL = "https://js.tosspayments.com/v2/standard";
 const ZODIAC_DESIGN_ORDER = ["쥐", "소", "호랑이", "토끼", "용", "뱀", "말", "양", "원숭이", "닭", "개", "돼지"];
+const PRODUCT_PICKER_IMAGES = {
+  sticker: "/assets/shop-icons/product-sticker.png",
+  bracelet: "/assets/shop-icons/product-bracelet.png",
+  necklace: "/assets/shop-icons/product-necklace.png",
+  keyring: "/assets/shop-icons/product-keyring.png",
+  "bracelet-necklace": "/assets/shop-icons/product-bracelet-necklace.png",
+  "necklace-keyring": "/assets/shop-icons/product-necklace-keyring.png",
+  "bracelet-necklace-keyring": "/assets/shop-icons/product-bracelet-necklace-keyring.png",
+};
+const ZODIAC_PICKER_IMAGES = {
+  쥐: "/assets/shop-icons/zodiac-rat.png",
+  소: "/assets/shop-icons/zodiac-ox.png",
+  호랑이: "/assets/shop-icons/zodiac-tiger.png",
+  토끼: "/assets/shop-icons/zodiac-rabbit.png",
+  용: "/assets/shop-icons/zodiac-dragon.png",
+  뱀: "/assets/shop-icons/zodiac-snake.png",
+  말: "/assets/shop-icons/zodiac-horse.png",
+  양: "/assets/shop-icons/zodiac-sheep.png",
+  원숭이: "/assets/shop-icons/zodiac-monkey.png",
+  닭: "/assets/shop-icons/zodiac-rooster.png",
+  개: "/assets/shop-icons/zodiac-dog.png",
+  돼지: "/assets/shop-icons/zodiac-pig.png",
+};
 
 export default function ShopCheckoutClient({
   products = [],
@@ -488,9 +511,42 @@ function ProductConfiguration({
   productUnitPrice,
   productAmount,
 }) {
+  const [productPickerOpen, setProductPickerOpen] = useState(false);
+  const [designPickerOpen, setDesignPickerOpen] = useState(false);
+  const pickerAreaRef = useRef(null);
+
+  useEffect(() => {
+    const closePickers = (event) => {
+      if (event.type === "keydown" && event.key !== "Escape") return;
+      if (event.type === "pointerdown" && pickerAreaRef.current?.contains(event.target)) return;
+      setProductPickerOpen(false);
+      setDesignPickerOpen(false);
+    };
+
+    document.addEventListener("pointerdown", closePickers);
+    document.addEventListener("keydown", closePickers);
+    return () => {
+      document.removeEventListener("pointerdown", closePickers);
+      document.removeEventListener("keydown", closePickers);
+    };
+  }, []);
+
+  const selectProduct = (nextProduct) => {
+    setProductId(nextProduct.id);
+    setProductPickerOpen(false);
+    setDesignPickerOpen(false);
+  };
+
+  const selectDesign = (nextDesign) => {
+    const index = designs.findIndex((design) => design.id === nextDesign.id);
+    setDesignIndex(Math.max(0, index));
+    setDesignId(nextDesign.id);
+    setDesignPickerOpen(false);
+  };
+
   return (
     <>
-      <div className="shop-selection-fields">
+      <div className="shop-selection-fields" ref={pickerAreaRef}>
         <div className="shop-field">
           <label htmlFor="shop-subject-select">나의 관리대상</label>
           {subjects.length > 0 ? (
@@ -508,36 +564,46 @@ function ProductConfiguration({
           )}
         </div>
 
-        <div className="shop-field">
-          <label htmlFor="shop-product-select">상품</label>
-          <select id="shop-product-select" className="subject-pick-select" value={productId} onChange={(event) => setProductId(event.target.value)}>
-            {products.map((item) => (
-              <option value={item.id} key={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <ShopImagePicker
+          id="shop-product-picker"
+          label="상품"
+          prompt="상품을 선택해주세요"
+          options={products}
+          selectedId={productId}
+          imageForOption={productPickerImage}
+          open={productPickerOpen}
+          onToggle={() => {
+            setProductPickerOpen((current) => !current);
+            setDesignPickerOpen(false);
+          }}
+          onClose={() => setProductPickerOpen(false)}
+          onSelect={selectProduct}
+          variant="product"
+        />
 
-        <div className="shop-field">
-          <label htmlFor="shop-design-select">디자인</label>
+        <div className="shop-field shop-design-picker-field">
           {designs.length > 0 ? (
-            <select
-              id="shop-design-select"
-              className="subject-pick-select"
-              value={selectedDesign?.id || designId}
-              onChange={(event) => {
-                const index = designs.findIndex((design) => design.id === event.target.value);
-                setDesignIndex(Math.max(0, index));
-                setDesignId(event.target.value);
+            <ShopImagePicker
+              id="shop-design-picker"
+              label="디자인"
+              prompt="디자인을 선택해주세요"
+              options={designs}
+              selectedId={selectedDesign?.id || designId}
+              imageForOption={designPickerImage}
+              open={designPickerOpen}
+              onToggle={() => {
+                setDesignPickerOpen((current) => !current);
+                setProductPickerOpen(false);
               }}
-            >
-              {designs.map((design) => (
-                <option value={design.id} key={design.id}>{design.name}</option>
-              ))}
-            </select>
+              onClose={() => setDesignPickerOpen(false)}
+              onSelect={selectDesign}
+              variant="design"
+            />
           ) : (
-            <p className="shop-note">등록된 12간지 디자인이 없습니다.</p>
+            <>
+              <label>디자인</label>
+              <p className="shop-note">등록된 12간지 디자인이 없습니다.</p>
+            </>
           )}
         </div>
       </div>
@@ -572,6 +638,79 @@ function ProductConfiguration({
         <p className="shop-note">상품을 구매하고 QR을 활성화하면 관리대상 QR 안심 서비스를 계속 이용할 수 있습니다.</p>
       </div>
     </>
+  );
+}
+
+function ShopImagePicker({
+  id,
+  label,
+  prompt,
+  options,
+  selectedId,
+  imageForOption,
+  open,
+  onToggle,
+  onClose,
+  onSelect,
+  variant,
+}) {
+  const selectedOption = options.find((option) => option.id === selectedId) || options[0] || null;
+  const selectedImage = selectedOption ? imageForOption(selectedOption) : "";
+
+  return (
+    <div className={`shop-field shop-image-picker-field ${open ? "open" : ""}`}>
+      <label id={`${id}-label`} htmlFor={`${id}-trigger`}>{label}</label>
+      <button
+        id={`${id}-trigger`}
+        className="shop-image-picker-trigger"
+        type="button"
+        aria-labelledby={`${id}-label ${id}-value`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={`${id}-options`}
+        onClick={onToggle}
+      >
+        <span className="shop-image-picker-thumb" aria-hidden="true">
+          {selectedImage ? <img src={selectedImage} alt="" /> : <b>{label.slice(0, 1)}</b>}
+        </span>
+        <strong id={`${id}-value`}>{selectedOption?.name || prompt}</strong>
+        <b className="shop-image-picker-chevron" aria-hidden="true">⌄</b>
+      </button>
+
+      {open && (
+        <section className="shop-image-picker-menu" aria-label={`${label} 선택`}>
+          <header>
+            <strong>{prompt}</strong>
+            <button type="button" onClick={onClose} aria-label={`${label} 선택 닫기`}>×</button>
+          </header>
+          <div
+            id={`${id}-options`}
+            className={`shop-image-picker-grid ${variant}`}
+            role="listbox"
+            aria-labelledby={`${id}-label`}
+          >
+            {options.map((option) => {
+              const image = imageForOption(option);
+              const selected = option.id === selectedId;
+              return (
+                <button
+                  type="button"
+                  className={selected ? "selected" : ""}
+                  role="option"
+                  aria-selected={selected}
+                  aria-label={`${option.name} 선택`}
+                  onClick={() => onSelect(option)}
+                  key={option.id}
+                >
+                  {image ? <img src={image} alt={option.name} /> : <span>{option.name}</span>}
+                  {selected && <b className="shop-image-picker-check" aria-hidden="true">✓</b>}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+    </div>
   );
 }
 
@@ -881,6 +1020,14 @@ function couponOptionLabel(coupon) {
   const minOrderAmount = Math.max(0, Number(coupon.min_order_amount || 0));
   const minText = minOrderAmount > 0 ? ` · ${formatCurrency(minOrderAmount)} 이상` : "";
   return `${coupon.name || coupon.code} (${label}${minText})`;
+}
+
+function productPickerImage(product) {
+  return PRODUCT_PICKER_IMAGES[String(product?.slug || "").trim()] || "";
+}
+
+function designPickerImage(design) {
+  return ZODIAC_PICKER_IMAGES[String(design?.name || "").trim()] || "";
 }
 
 function clearTossWidgetContainers() {
