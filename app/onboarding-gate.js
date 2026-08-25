@@ -148,7 +148,7 @@ function SlideArt({ kind }) {
         <circle cx="146" cy="113" r="6" fill="#ffffff" />
         <rect x="96" y="66" width="28" height="24" rx="4" fill="#ffffff" />
         <path d="M100 79h20M110 69v20" stroke="#176b5b" strokeWidth="4" strokeLinecap="round" />
-        <path d="M140 55l12-14 14 14" fill="none" stroke="#6b4acb" strokeWidth="6" strokeLinecap="round" />
+        <path d="M140 55l12-14 14 14" fill="none" stroke="#26963f" strokeWidth="6" strokeLinecap="round" />
         <circle cx="166" cy="39" r="10" fill="#f7c948" />
       </svg>
     );
@@ -160,7 +160,7 @@ function SlideArt({ kind }) {
         <rect x="58" y="28" width="60" height="94" rx="10" fill="#ffffff" stroke="#17202a" strokeWidth="5" />
         <rect x="72" y="42" width="32" height="32" rx="5" fill="#e7f1ee" />
         <path d="M78 58h20M88 48v20" stroke="#176b5b" strokeWidth="4" strokeLinecap="round" />
-        <rect x="75" y="84" width="28" height="4" rx="2" fill="#6b4acb" />
+        <rect x="75" y="84" width="28" height="4" rx="2" fill="#26963f" />
         <rect x="72" y="94" width="34" height="4" rx="2" fill="#d8e0dc" />
         <circle cx="146" cy="78" r="24" fill="#e7f1ee" />
         <path d="M134 78l9 9 19-22" fill="none" stroke="#176b5b" strokeWidth="7" strokeLinecap="round" />
@@ -173,7 +173,7 @@ function SlideArt({ kind }) {
       <rect x="82" y="25" width="58" height="92" rx="10" fill="#ffffff" stroke="#17202a" strokeWidth="5" />
       <rect x="96" y="51" width="30" height="30" fill="#f6f8f7" stroke="#17202a" strokeWidth="3" />
       <path d="M101 56h8v8h-8zM115 56h6v6h-6zM101 70h6v6h-6zM114 68h8v8h-8z" fill="#17202a" />
-      <circle cx="60" cy="79" r="17" fill="#6b4acb" />
+      <circle cx="60" cy="79" r="17" fill="#26963f" />
       <rect x="45" y="95" width="32" height="34" rx="8" fill="#2d4f6f" />
       <circle cx="162" cy="79" r="17" fill="#f7c948" />
       <rect x="146" y="95" width="34" height="34" rx="8" fill="#f1f5f3" />

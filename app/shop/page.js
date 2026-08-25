@@ -14,6 +14,7 @@ export default async function ShopPage({ searchParams }) {
   const notice = params?.notice || "";
   const noticeType = params?.noticeType || "success";
   const requestedProductId = params?.product || "";
+  const requestedSubjectId = params?.subject || "";
   const [{ guardian, subjects, coupons }, productRows] = await Promise.all([
     getShopPageData(session),
     getShopProducts(),
@@ -31,6 +32,7 @@ export default async function ShopPage({ searchParams }) {
         <ShopCheckoutClient
           products={products}
           initialProductId={initialProduct.id}
+          initialSubjectId={requestedSubjectId}
           subjects={subjects}
           guardian={guardian}
           coupons={availableCoupons}

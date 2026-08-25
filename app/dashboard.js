@@ -332,25 +332,12 @@ function MyPageTab({ guardian, subscription, session, admin, closeHref = "" }) {
   );
 }
 
-function PersonIcon() {
+function SupportIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path
-        d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      />
-      <path
-        d="M4.5 20a7.5 7.5 0 0 1 15 0"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      />
+      <path d="M4 13v-2a8 8 0 0 1 16 0v2" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+      <path d="M4 12h2a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a1 1 0 0 1-1-1v-6Zm16 0h-2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1a1 1 0 0 0 1-1v-6Z" fill="none" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" />
+      <path d="M16 19c-.8 1.2-2.1 1.8-4 1.8" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
     </svg>
   );
 }
@@ -521,30 +508,45 @@ function StatusDashboard({ subjects }) {
               <div className="managed-page" key={`managed-page-${pageIndex}`}>
                 {pageSubjects.map((subject) => {
                   const displayStatus = resolveSubjectStatus(subject);
+                  const actionHref = subjectStatusActionHref(subject, displayStatus);
                   return (
-                  <Link
+                  <article
                     className="managed-card"
-                    href={`/?tab=dashboard&previewSubject=${encodeURIComponent(subject.id)}`}
-                    aria-label={`${subject.name} 대상자 정보 미리보기`}
                     key={subject.id}
                   >
-                    <div className="managed-photo">
-                      {subjectPhotoSrc(subject) ? (
-                        <img src={subjectPhotoSrc(subject)} alt={`${subject.name} 사진`} />
+                    <Link
+                      className="managed-card-preview-link"
+                      href={`/?tab=dashboard&previewSubject=${encodeURIComponent(subject.id)}`}
+                      aria-label={`${subject.name} 대상자 정보 미리보기`}
+                    >
+                      <div className="managed-photo">
+                        {subjectPhotoSrc(subject) ? (
+                          <img src={subjectPhotoSrc(subject)} alt={`${subject.name} 사진`} />
+                        ) : (
+                          <span aria-hidden="true" />
+                        )}
+                      </div>
+                      <div className="managed-info">
+                        <strong>{subject.name}</strong>
+                        <span>{formatDate(subject.birth_date)}</span>
+                      </div>
+                    </Link>
+                    <div className="managed-actions">
+                      {actionHref ? (
+                        <Link
+                          className={`status-badge managed-status-action ${statusClass(displayStatus)}`}
+                          href={actionHref}
+                          aria-label={`${subject.name} ${displayStatus} 진행`}
+                        >
+                          {displayStatus}
+                        </Link>
                       ) : (
-                        <span aria-hidden="true" />
+                        <span className={`status-badge ${statusClass(displayStatus)}`}>
+                          {displayStatus}
+                        </span>
                       )}
                     </div>
-                    <div className="managed-info">
-                      <strong>{subject.name}</strong>
-                      <span>{formatDate(subject.birth_date)}</span>
-                    </div>
-                    <div className="managed-actions">
-                      <span className={`status-badge ${statusClass(displayStatus)}`}>
-                        {displayStatus}
-                      </span>
-                    </div>
-                  </Link>
+                  </article>
                   );
                 })}
                 {pageIndex === subjectPages.length - 1 && (
@@ -567,10 +569,15 @@ function StatusDashboard({ subjects }) {
             <BagIcon />
             상품 구매
           </Link>
-          <OpenMyPageButton title="내 정보">
-            <PersonIcon />
-            내 정보
-          </OpenMyPageButton>
+          <a
+            href="http://pf.kakao.com/_xmuiln/chat"
+            target="_blank"
+            rel="noreferrer noopener"
+            aria-label="카카오톡 고객지원 새 창에서 열기"
+          >
+            <SupportIcon />
+            고객지원
+          </a>
         </div>
       </div>
     </section>
@@ -874,6 +881,16 @@ function resolveSubjectStatus(subject) {
     return "QR활성화필요";
   }
   return "상품구매필요";
+}
+
+function subjectStatusActionHref(subject, status) {
+  if (status === "상품구매필요") {
+    return `/shop?subject=${encodeURIComponent(subject.id)}`;
+  }
+  if (status === "QR활성화필요") {
+    return subject.qr_target_url || `/shop?subject=${encodeURIComponent(subject.id)}`;
+  }
+  return "";
 }
 
 function calculateAge(value) {

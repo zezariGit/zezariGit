@@ -10,6 +10,7 @@ const ZODIAC_DESIGN_ORDER = ["쥐", "소", "호랑이", "토끼", "용", "뱀", 
 export default function ShopCheckoutClient({
   products = [],
   initialProductId = "",
+  initialSubjectId = "",
   subjects = [],
   guardian = null,
   coupons = [],
@@ -20,7 +21,11 @@ export default function ShopCheckoutClient({
   const [step, setStep] = useState("configure");
   const [productId, setProductId] = useState(initialProduct?.id || "");
   const [quantity, setQuantity] = useState(1);
-  const [subjectId, setSubjectId] = useState(subjects[0]?.id || "");
+  const [subjectId, setSubjectId] = useState(
+    subjects.some((subject) => subject.id === initialSubjectId)
+      ? initialSubjectId
+      : subjects[0]?.id || ""
+  );
   const [designIndex, setDesignIndex] = useState(0);
   const [designId, setDesignId] = useState(initialDesigns[0]?.id || "");
   const [couponId, setCouponId] = useState("");

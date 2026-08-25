@@ -208,7 +208,6 @@ function SwipeNotificationItem({ notification, onDelete }) {
   const [offset, setOffset] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const actionUrl = safeNotificationUrl(notification.url);
 
   const updateOffset = (value) => {
     const limited = Math.max(-132, Math.min(132, value));
@@ -271,35 +270,10 @@ function SwipeNotificationItem({ notification, onDelete }) {
       >
         <strong>{notification.title || "REAL_QR_FIND 알림"}</strong>
         {notification.body && <span>{renderLinkedText(notification.body)}</span>}
-        {actionUrl && (
-          <a
-            className="notification-action-link"
-            href={actionUrl}
-            target={isExternalUrl(actionUrl) ? "_blank" : undefined}
-            rel={isExternalUrl(actionUrl) ? "noreferrer" : undefined}
-            onPointerDown={(event) => event.stopPropagation()}
-            onPointerMove={(event) => event.stopPropagation()}
-            onClick={(event) => event.stopPropagation()}
-          >
-            {notificationActionLabel(actionUrl)}
-          </a>
-        )}
         <time dateTime={notification.created_at}>{formatNotificationTime(notification.created_at)}</time>
       </div>
     </li>
   );
-}
-
-function safeNotificationUrl(value) {
-  const text = String(value || "").trim();
-  if (text.startsWith("/") && !text.startsWith("//") && !text.includes("\\")) return text;
-
-  try {
-    const url = new URL(text);
-    return url.protocol === "https:" && !url.username && !url.password ? url.toString() : "";
-  } catch {
-    return "";
-  }
 }
 
 function renderLinkedText(text) {
@@ -332,25 +306,6 @@ function linkLabel(url) {
   if (url.includes("map.kakao.com")) return "카카오맵";
   if (url.includes("map.naver.com")) return "네이버 지도";
   return url;
-}
-
-function isMapUrl(url) {
-  return /map\.(naver|kakao)\.com/.test(String(url || ""));
-}
-
-function notificationActionLabel(url) {
-  const text = String(url || "");
-  if (text.includes("map.kakao.com")) return "카카오맵 열기";
-  if (text.includes("map.naver.com")) return "네이버 지도 열기";
-  return isMapUrl(text) ? "지도 열기" : "관련 화면 열기";
-}
-
-function isExternalUrl(url) {
-  try {
-    return new URL(url, window.location.origin).origin !== window.location.origin;
-  } catch {
-    return false;
-  }
 }
 
 function BellIcon() {

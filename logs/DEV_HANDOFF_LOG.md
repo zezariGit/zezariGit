@@ -8326,3 +8326,27 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Git commits: `a893efd`, `d932db9`.
 - Final Vercel production deployment: `dpl_6fkdFj4BUuvQ2rk7FvYZLmb11QkM`, aliased to `https://zezari.family`.
 - Implementation, documentation, and verification: about 30 minutes.
+
+## 2026-08-25 KST - Green Theme And Dashboard Action Links
+
+### User Requirement
+- Replace the black/white user interface emphasis with a green-centered design system.
+- Keep the top-right My Page gear and replace the duplicate bottom `내 정보` action with a KakaoTalk `고객지원` action.
+- Make `상품구매필요` and `QR활성화필요` dashboard badges open their corresponding action screens while keeping `안전` and `찾는중` informational.
+- Remove the generic `관련 화면 열기` button from in-app notification details.
+
+### Implementation
+- Replaced the common `--c-*` palette with accessible green, mint, white, and charcoal tokens and synchronized the PWA theme color.
+- Updated remaining primary login, voice-recording, onboarding, and active administrator-menu accents to the shared green token.
+- Replaced the bottom My Page duplicate with an external KakaoTalk channel support link and headset icon.
+- Split each subject card into a guardian-preview link and an independent status action, avoiding nested interactive elements.
+- Product-required actions open `/shop?subject={subjectId}` and the shop now preselects that subject.
+- QR-required actions open the assigned subject QR page, where the existing guardian activation form is rendered.
+- Removed the generic in-app notification action button and its client routing helpers while retaining explicit body links and push destination data.
+- Added `deliverables/USER_GREEN_THEME_INTERACTIONS.md`.
+
+### Verification
+- `npm run build` passed.
+- `npm run security:check` passed.
+- `git diff --check` passed with line-ending notices only.
+- Implementation and initial verification: about 25 minutes.

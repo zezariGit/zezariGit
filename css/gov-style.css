@@ -1,28 +1,28 @@
 /* ============================================================
    gov-style.css
-   제자리 / 뉴트럴 미니멀 - 블랙 테마
+   제자리 / 뉴트럴 미니멀 - 그린 테마
    반응형 웹사이트용 공통 CSS
    ============================================================ */
 
 /* ── 1. CSS 변수 (Design Tokens) ─────────────────────────── */
 :root {
-  /* 주요 색상 - 검정 및 중성 회색 */
-  --c-primary:       #111111;
-  --c-primary-dark:  #000000;
-  --c-primary-light: #eeeeee;
-  --c-primary-border:#b8b8b8;
-  --c-accent-light:  #f3f3f3;
+  /* 주요 색상 - 제자리 그린 */
+  --c-primary:       #26963f;
+  --c-primary-dark:  #176b2c;
+  --c-primary-light: #eef9f0;
+  --c-primary-border:#9dcea8;
+  --c-accent-light:  #f4fbf5;
 
   /* 중립 색상 */
-  --c-bg:            #eceeef;   /* 페이지 배경 */
+  --c-bg:            #f5f8f5;   /* 페이지 배경 */
   --c-surface:       #ffffff;   /* 카드/컴포넌트 배경 */
-  --c-border:        #d5d5d5;
-  --c-border-strong: #9e9e9e;
+  --c-border:        #d9e5dc;
+  --c-border-strong: #a7beac;
 
   /* 텍스트 */
-  --c-text:          #111111;
-  --c-text-muted:    #666666;
-  --c-text-light:    #929292;
+  --c-text:          #17231a;
+  --c-text-muted:    #5d6d61;
+  --c-text-light:    #89968c;
 
   /* 시맨틱 상태 색상 */
   --c-success:       #15803d;
@@ -34,9 +34,9 @@
   --c-danger:        #b91c1c;
   --c-danger-bg:     #fef2f2;
   --c-danger-border: #f09595;
-  --c-info:          #2d2d2d;
-  --c-info-bg:       #ededed;
-  --c-info-border:   #b8b8b8;
+  --c-info:          #28663a;
+  --c-info-bg:       #eff7f1;
+  --c-info-border:   #b8d5bf;
 
   /* 레이아웃 */
   --radius-sm:  4px;
