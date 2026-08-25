@@ -14718,8 +14718,7 @@ button:disabled:hover {
   padding: 0 0 10px;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
-  scrollbar-color: var(--c-primary) #e4e4e4;
-  scrollbar-width: thin;
+  scrollbar-width: none;
   overscroll-behavior-inline: contain;
   touch-action: pan-x pan-y;
   -webkit-overflow-scrolling: touch;
@@ -14730,15 +14729,7 @@ button:disabled:hover {
 }
 
 .managed-carousel::-webkit-scrollbar {
-  height: 7px;
-}
-
-.managed-carousel::-webkit-scrollbar-track {
-  background: #e4e4e4;
-}
-
-.managed-carousel::-webkit-scrollbar-thumb {
-  background: var(--c-primary);
+  display: none;
 }
 
 .managed-page-dots {

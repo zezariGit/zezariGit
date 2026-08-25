@@ -8349,4 +8349,11 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `npm run build` passed.
 - `npm run security:check` passed.
 - `git diff --check` passed with line-ending notices only.
+- Production mobile rendering confirmed the green palette, three quick actions, one status per card, and three-page dot navigation without text overflow.
+- Product-required badge verification confirmed `/shop?subject={subjectId}` and the matching subject was selected in the shop combobox.
+- QR-required badge verification confirmed an active purchased QR renders `QR 코드 활성화하기`; an administrator-disabled QR correctly retains the existing unavailable-QR guard.
+- Safe and searching statuses remained non-link informational badges.
+- Notification popover inspection confirmed the generic related-screen action is absent.
+- Hid the native horizontal scrollbar after mobile review; swipe and page-dot navigation remain available.
+- Production deployment: `dpl_Hg1JJEfbtTHs94S4AGd1DyhDtSww`, aliased to `https://zezari.family`.
 - Implementation and initial verification: about 25 minutes.

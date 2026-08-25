@@ -50,6 +50,7 @@ The subject photo/name area remains a separate link to the authenticated guardia
 - `npm run build`
 - `npm run security:check`
 - `git diff --check`
-- Responsive browser verification at desktop and mobile widths
-- Production verification on `https://zezari.family`
-
+- Production desktop and 390 x 844 mobile browser verification passed.
+- Product status action preselected the intended subject in the shop.
+- Active QR status action rendered the guardian QR activation control.
+- Production deployment `dpl_Hg1JJEfbtTHs94S4AGd1DyhDtSww` is aliased to `https://zezari.family`.
