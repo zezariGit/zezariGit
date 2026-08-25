@@ -14694,8 +14694,8 @@ button:disabled:hover {
   justify-content: space-between;
   gap: var(--space-md);
   margin: 0;
-  padding: 0 0 12px;
-  border-bottom: 2px solid var(--c-primary);
+  padding: 0 0 4px;
+  border-bottom: 0;
 }
 
 .status-phone-top h2 {
@@ -14787,17 +14787,18 @@ button:disabled:hover {
   min-height: 112px;
   padding: 14px 16px;
   border: 1px solid var(--c-border);
-  border-left: 4px solid var(--c-primary);
+  border-left: 1px solid var(--c-border);
   border-radius: 6px;
   background: var(--c-surface);
+  box-shadow: none;
   transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
 }
 
 .managed-card:hover,
 .managed-card:focus-within {
   border-color: var(--c-primary);
-  background: var(--c-primary-light);
-  transform: translateY(-1px);
+  background: var(--c-surface);
+  transform: none;
 }
 
 .managed-card-preview-link {
@@ -15185,32 +15186,52 @@ button:disabled:hover {
 }
 
 .quick-actions {
+  width: min(100%, 620px);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
+  margin-inline: auto;
 }
 
 .quick-actions a,
 .quick-actions button {
-  min-height: 76px;
-  flex-direction: row;
-  gap: 9px;
-  border: 1px solid var(--c-primary);
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--c-border);
   border-radius: 6px;
   background: var(--c-surface);
-  color: var(--c-primary);
-  font-weight: 900;
 }
 
 .quick-actions a:hover,
 .quick-actions button:hover {
-  background: var(--c-primary-light);
-  color: var(--c-primary);
+  border-color: var(--c-primary-border);
+  background: var(--c-surface);
   text-decoration: none;
 }
 
-.quick-actions svg {
-  width: 23px;
-  height: 23px;
-  flex: 0 0 auto;
+.quick-action-image {
+  width: 100%;
+  height: clamp(116px, 19vw, 176px);
+  object-fit: contain;
+}
+
+.dashboard-assurance-banner {
+  width: min(100%, 720px);
+  margin-inline: auto;
+  overflow: hidden;
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  background: var(--c-surface);
+}
+
+.dashboard-assurance-banner img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 .my-page-panel,
@@ -15349,16 +15370,12 @@ button:disabled:hover {
   .quick-actions a,
   .quick-actions button {
     min-width: 0;
-    min-height: 72px;
-    flex-direction: column;
-    gap: 5px;
-    padding: 8px 3px;
-    font-size: 0.72rem;
+    min-height: 0;
+    padding: 0;
   }
 
-  .quick-actions svg {
-    width: 21px;
-    height: 21px;
+  .quick-action-image {
+    height: clamp(108px, 29vw, 132px);
   }
 
   .notification-popover {

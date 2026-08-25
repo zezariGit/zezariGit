@@ -25,6 +25,15 @@ The source of truth is `css/gov-style.css`. Existing pages that use the common `
 - `고객지원`: opens the KakaoTalk channel chat in a new external tab.
 - The top-right gear continues to open My Page. The duplicate bottom `내 정보` action was removed.
 
+### Dashboard Image Assets
+
+- `public/assets/dashboard-action-missing.png`: missing-report action image.
+- `public/assets/dashboard-action-shop.png`: product-purchase action image.
+- `public/assets/dashboard-action-support.png`: customer-support action image.
+- `public/assets/dashboard-safety-message.png`: safety-service message between the subject carousel and the quick actions.
+- The three action links use the supplied bitmap artwork directly and retain accessible link names separately.
+- The completed-dashboard explanatory subtitle, current-status underline, subject-card left accent, and card shadow were removed for the flatter reference layout.
+
 ## Subject Status Actions
 
 The dashboard continues to show one canonical status per subject.

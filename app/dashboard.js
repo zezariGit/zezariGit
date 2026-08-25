@@ -121,23 +121,23 @@ export default async function GuardianDashboard({
                       : "대상자 정보 등록"
                     : "보호자 대시보드"}
             </h1>
-            <p className="dashboard-subtitle">
-              {isDashboard
-                ? guardianComplete
-                  ? "로그인한 보호자에게 등록된 관리대상과 현재 상태를 확인할 수 있습니다."
-                  : "SNS 계정에서 확인된 정보는 미리 채워두었습니다. 필수 정보를 입력하면 바로 서비스를 사용할 수 있습니다."
-                : isGuardianTab
-                  ? "보호자 연락처, 주소, 안심번호 등 기본 정보를 입력하고 수정합니다."
-                  : isSubjectsTab
-                    ? selectedEditSubject
-                      ? `${selectedEditSubject.name} 대상자의 정보를 수정해 주세요.`
-                      : <>
-                          보호가 필요한 대상자의 정보를 등록해주세요.
-                          <br />
-                          등록한 정보는 QR 스캔 시 발견자에게 필요한 정보를 안내하는 데 사용됩니다.
-                        </>
-                    : "로그인한 보호자에게 등록된 관리대상과 현재 상태를 확인할 수 있습니다."}
-            </p>
+            {(!isDashboard || !guardianComplete) && (
+              <p className="dashboard-subtitle">
+                {isDashboard
+                  ? "SNS 계정에서 확인된 정보는 미리 채워두었습니다. 필수 정보를 입력하면 바로 서비스를 사용할 수 있습니다."
+                  : isGuardianTab
+                    ? "보호자 연락처, 주소, 안심번호 등 기본 정보를 입력하고 수정합니다."
+                    : isSubjectsTab
+                      ? selectedEditSubject
+                        ? `${selectedEditSubject.name} 대상자의 정보를 수정해 주세요.`
+                        : <>
+                            보호가 필요한 대상자의 정보를 등록해주세요.
+                            <br />
+                            등록한 정보는 QR 스캔 시 발견자에게 필요한 정보를 안내하는 데 사용됩니다.
+                          </>
+                      : null}
+              </p>
+            )}
           </div>
         </header>}
 
@@ -332,16 +332,6 @@ function MyPageTab({ guardian, subscription, session, admin, closeHref = "" }) {
   );
 }
 
-function SupportIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M4 13v-2a8 8 0 0 1 16 0v2" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-      <path d="M4 12h2a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a1 1 0 0 1-1-1v-6Zm16 0h-2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1a1 1 0 0 0 1-1v-6Z" fill="none" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" />
-      <path d="M16 19c-.8 1.2-2.1 1.8-4 1.8" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-    </svg>
-  );
-}
-
 function GearIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -354,25 +344,6 @@ function GearIcon() {
         strokeWidth="1.7"
       />
       <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.7" />
-    </svg>
-  );
-}
-
-function AlertIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M10.3 4.3 2.8 17.2A2 2 0 0 0 4.5 20h15a2 2 0 0 0 1.7-2.8L13.7 4.3a2 2 0 0 0-3.4 0Z" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-      <path d="M12 9v4" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-      <path d="M12 17h.01" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2.5" />
-    </svg>
-  );
-}
-
-function BagIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M6 8h12l1 12H5L6 8Z" fill="none" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" />
-      <path d="M9 8a3 3 0 0 1 6 0" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
     </svg>
   );
 }
@@ -560,14 +531,18 @@ function StatusDashboard({ subjects }) {
             ))}
           </div>
         </ManagedSubjectCarousel>
+        <div className="dashboard-assurance-banner">
+          <img
+            src="/assets/dashboard-safety-message.png"
+            alt="제자리는 소중한 사람의 안전을 지킵니다. 실종 신고, 문자 공유, 음성 재생 등 다양한 기능을 활용할 수 있어요."
+          />
+        </div>
         <div className="quick-actions">
-          <Link href="/missing-report">
-            <AlertIcon />
-            실종신고
+          <Link href="/missing-report" aria-label="실종신고">
+            <img className="quick-action-image" src="/assets/dashboard-action-missing.png" alt="실종신고" />
           </Link>
-          <Link href="/shop">
-            <BagIcon />
-            상품 구매
+          <Link href="/shop" aria-label="상품 구매">
+            <img className="quick-action-image" src="/assets/dashboard-action-shop.png" alt="상품 구매" />
           </Link>
           <a
             href="http://pf.kakao.com/_xmuiln/chat"
@@ -575,8 +550,7 @@ function StatusDashboard({ subjects }) {
             rel="noreferrer noopener"
             aria-label="카카오톡 고객지원 새 창에서 열기"
           >
-            <SupportIcon />
-            고객지원
+            <img className="quick-action-image" src="/assets/dashboard-action-support.png" alt="고객지원" />
           </a>
         </div>
       </div>
@@ -788,6 +762,15 @@ function SubjectRegistrationComplete() {
         </Link>
       </div>
     </section>
+  );
+}
+
+function BagIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M6 8h12l1 12H5L6 8Z" fill="none" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" />
+      <path d="M9 8a3 3 0 0 1 6 0" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+    </svg>
   );
 }
 

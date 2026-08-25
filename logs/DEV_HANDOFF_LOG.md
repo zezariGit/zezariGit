@@ -8357,3 +8357,24 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Hid the native horizontal scrollbar after mobile review; swipe and page-dot navigation remain available.
 - Production deployment: `dpl_Hg1JJEfbtTHs94S4AGd1DyhDtSww`, aliased to `https://zezari.family`.
 - Implementation and initial verification: about 25 minutes.
+
+## 2026-08-25 KST - Dashboard Supplied Image Actions And Safety Banner
+
+### User Requirement
+- Remove the explanatory sentence below the guardian dashboard greeting.
+- Remove the horizontal line below `현재 상태` and the left accent/shadow from each subject card.
+- Use the three supplied images for missing report, product purchase, and customer support actions.
+- Place the supplied safety-service message image between the subject list and the three bottom actions.
+
+### Implementation
+- Suppressed the dashboard subtitle only for guardians with completed profiles; signup and edit-screen guidance remains unchanged.
+- Removed the current-status divider and flattened subject cards by removing the primary left accent and hover shading.
+- Stored the four supplied images under `public/assets/dashboard-*.png` and rendered them at their original aspect ratios.
+- Replaced dashboard quick-action SVG/text composition with the supplied image artwork while preserving accessible names and existing destinations.
+- Added the full-width safety message after carousel pagination and before quick actions.
+- Updated `deliverables/USER_GREEN_THEME_INTERACTIONS.md` with asset ownership and replacement paths.
+
+### Verification
+- `npm run build` passed.
+- `git diff --check` passed with line-ending notices only.
+- Implementation and initial verification: about 15 minutes.
