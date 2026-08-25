@@ -28,6 +28,7 @@ The source of truth is `css/gov-style.css`. Existing pages that use the common `
 ### Dashboard Image Assets
 
 - `public/assets/dashboard-action-missing.png`: missing-report action image.
+- Dashboard quick actions use image-only icon assets. Their labels are rendered as live text for accessibility, consistent sizing, and future copy changes.
 - `public/assets/dashboard-action-shop.png`: product-purchase action image.
 - `public/assets/dashboard-action-support.png`: customer-support action image.
 - `public/assets/dashboard-safety-message.png`: safety-service message between the subject carousel and the quick actions.

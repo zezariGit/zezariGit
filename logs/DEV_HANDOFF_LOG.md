@@ -8378,3 +8378,18 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `npm run build` passed.
 - `git diff --check` passed with line-ending notices only.
 - Implementation and initial verification: about 15 minutes.
+
+## 2026-08-25 KST - Dashboard Quick Action Icon And Text Separation
+
+### User Requirement
+- Replace the three dashboard action assets with newly supplied icon-only images.
+- Render `실종신고`, `상품 구매`, and `고객지원` as actual interface text instead of text embedded in each bitmap.
+
+### Implementation
+- Replaced the existing three action image files while retaining stable public asset paths and destinations.
+- Changed each quick action to an icon plus live text structure and marked the decorative image with an empty alternative description.
+- Added responsive icon, label, spacing, and minimum-height rules so all three actions remain aligned on mobile and desktop.
+
+### Verification
+- Build, whitespace, authenticated production rendering, GitHub push, and Vercel deployment are recorded after release verification.
+- Implementation and initial verification: about 10 minutes.

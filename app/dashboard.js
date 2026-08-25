@@ -539,10 +539,12 @@ function StatusDashboard({ subjects }) {
         </div>
         <div className="quick-actions">
           <Link href="/missing-report" aria-label="실종신고">
-            <img className="quick-action-image" src="/assets/dashboard-action-missing.png" alt="실종신고" />
+            <img className="quick-action-image" src="/assets/dashboard-action-missing.png" alt="" />
+            <span className="quick-action-label">실종신고</span>
           </Link>
           <Link href="/shop" aria-label="상품 구매">
-            <img className="quick-action-image" src="/assets/dashboard-action-shop.png" alt="상품 구매" />
+            <img className="quick-action-image" src="/assets/dashboard-action-shop.png" alt="" />
+            <span className="quick-action-label">상품 구매</span>
           </Link>
           <a
             href="http://pf.kakao.com/_xmuiln/chat"
@@ -550,7 +552,8 @@ function StatusDashboard({ subjects }) {
             rel="noreferrer noopener"
             aria-label="카카오톡 고객지원 새 창에서 열기"
           >
-            <img className="quick-action-image" src="/assets/dashboard-action-support.png" alt="고객지원" />
+            <img className="quick-action-image" src="/assets/dashboard-action-support.png" alt="" />
+            <span className="quick-action-label">고객지원</span>
           </a>
         </div>
       </div>
