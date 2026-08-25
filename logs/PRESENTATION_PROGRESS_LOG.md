@@ -6314,3 +6314,14 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 운영 확인: 배포 `dpl_BDRETYBCfp6Tx6wQKVwGkofbiTyB` READY, 운영 API 성공, SOLAPI 성공 1·실패 0 확인
 - 일일 발송 한도 상향 500건 반영 확인
 - 소요시간: 약 45분
+
+## 2026-08-25 - 온보딩·QR 관리·활성화 UI 단순화
+- 로그인 전 서비스 소개의 이전/다음 버튼을 제거하고 `로그인하기` 버튼 하나로 정리
+- 서비스 소개 3페이지의 스와이프와 페이지 점 탐색은 유지
+- 관리자 QR 관리의 활성/미활성 필터·열·상세 배지를 숨기고 대표 상태를 한 개만 표시
+- 상품 수령 후 활성화 화면을 큰 사진 위, 대상자 정보 아래의 모바일 세로형 카드로 변경
+- 일반 로그인과 스토어 선점 QR 가입 화면에서 Facebook 버튼 제거
+- 기존 Facebook 연결 계정 데이터와 서버 호환 설정은 유지
+- 운영 빌드·보안·QR 선점 가입·SNS 계정 연결 회귀 검사 통과
+- 로컬 브라우저에서 온보딩 단일 버튼과 Kakao·Naver·Google 3개 로그인 버튼 확인
+- 구현·검증 약 25분

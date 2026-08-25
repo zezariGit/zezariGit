@@ -127,7 +127,7 @@ export default async function FindPage({ params, searchParams }) {
           <h1>{owner ? "QR 코드 활성화가 필요합니다" : "아직 활성화되지 않은 QR입니다"}</h1>
           {owner ? (
             <>
-              <div className="find-profile">
+              <div className="find-profile qr-activation-profile">
                 <div className="find-profile-photo">
                   {data.photo_data_url ? <img src={data.photo_data_url} alt={`${data.subject_name} 사진`} /> : <span />}
                 </div>

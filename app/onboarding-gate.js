@@ -42,23 +42,9 @@ export default function OnboardingGate({ enabled, children }) {
 
   if (!enabled || !showOnboarding) return children;
 
-  const isLast = active === slides.length - 1;
-
-  const goNext = () => {
-    if (isLast) {
-      setShowOnboarding(false);
-      return;
-    }
-    setActive((current) => Math.min(current + 1, slides.length - 1));
-  };
-
   const hideForever = () => {
     window.localStorage.setItem(STORAGE_KEY, "true");
     setShowOnboarding(false);
-  };
-
-  const goPrevious = () => {
-    setActive((current) => Math.max(current - 1, 0));
   };
 
   const handleTouchEnd = (event) => {
@@ -119,16 +105,8 @@ export default function OnboardingGate({ enabled, children }) {
         </div>
 
         <div className="onboarding-controls">
-          <button
-            className="ghost-button"
-            type="button"
-            onClick={goPrevious}
-            disabled={active === 0}
-          >
-            이전
-          </button>
-          <button className="primary-button" type="button" onClick={goNext}>
-            {isLast ? "로그인 시작" : "다음"}
+          <button className="primary-button onboarding-login-button" type="button" onClick={() => setShowOnboarding(false)}>
+            로그인하기
           </button>
         </div>
       </section>

@@ -2,13 +2,12 @@
 
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { FacebookLogo, GoogleLogo, KakaoLogo, NaverLogo } from "../../auth-actions";
+import { GoogleLogo, KakaoLogo, NaverLogo } from "../../auth-actions";
 
 const providers = [
   { id: "google", label: "Google", className: "google-action", Logo: GoogleLogo },
   { id: "kakao", label: "카카오", className: "kakao-action", Logo: KakaoLogo },
   { id: "naver", label: "네이버", className: "naver-action", Logo: NaverLogo },
-  { id: "facebook", label: "Facebook", className: "facebook-action", Logo: FacebookLogo },
 ];
 
 export default function QrClaimSignupActions({ publicKey, enabledProviders = [], signedIn = false }) {

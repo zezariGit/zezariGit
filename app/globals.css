@@ -4316,9 +4316,15 @@ select:focus {
 
 .onboarding-controls {
   display: flex;
+  justify-content: center;
   gap: 10px;
   width: 100%;
   margin-top: auto;
+}
+
+.onboarding-controls .onboarding-login-button {
+  flex: 0 1 240px;
+  width: min(100%, 240px);
 }
 
 .ghost-button,
@@ -7518,7 +7524,7 @@ a.inline-scroll-value {
 }
 
 .qr-admin-filter {
-  grid-template-columns: minmax(190px, 1fr) 145px 145px minmax(250px, 1.3fr) auto auto;
+  grid-template-columns: minmax(190px, 1fr) 145px minmax(250px, 1.3fr) auto auto;
 }
 
 .qr-filter-date {
@@ -7569,7 +7575,7 @@ a.inline-scroll-value {
 
 .qr-admin-table.guardian-admin-table .admin-record-header,
 .qr-admin-table.guardian-admin-table .admin-record-row {
-  grid-template-columns: 34px 44px 132px minmax(98px, 1fr) minmax(86px, 0.8fr) 72px 88px 82px 82px 82px 72px;
+  grid-template-columns: 34px 44px 142px minmax(104px, 1fr) minmax(92px, 0.8fr) 82px 86px 86px 86px 76px;
 }
 
 .qr-table-image {
@@ -11252,6 +11258,22 @@ button:disabled:hover {
 
 .qr-activation-shell {
   gap: var(--space-md);
+}
+
+.qr-activation-profile {
+  grid-template-columns: 1fr;
+  align-items: stretch;
+}
+
+.qr-activation-profile .find-profile-photo {
+  width: min(100%, 320px);
+  aspect-ratio: 1;
+  justify-self: center;
+}
+
+.qr-activation-profile .find-profile-info {
+  width: min(100%, 320px);
+  justify-self: center;
 }
 
 .qr-activation-form {

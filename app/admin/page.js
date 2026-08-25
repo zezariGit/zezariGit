@@ -4203,7 +4203,6 @@ function QrManagementSection({ qrData, qrItems }) {
             icon="growth"
             title="사용중 QR"
             value={formatCountWithUnit(qrData.inUseCount, "개")}
-            note={`미활성화: ${formatMetricValue(qrData.inactiveCount)}개 / 활성화: ${formatMetricValue(qrData.activeCount)}개`}
             noteTone="positive"
           />
           <GuardianStatCard
@@ -4231,14 +4230,6 @@ function QrManagementSection({ qrData, qrItems }) {
               <option value="in_use">사용중</option>
               <option value="unused">미사용</option>
               <option value="discarded">폐기</option>
-            </select>
-          </label>
-          <label>
-            활성화 상태
-            <select name="active" defaultValue={qrData.filters.active}>
-              <option value="all">전체</option>
-              <option value="active">활성</option>
-              <option value="inactive">미활성</option>
             </select>
           </label>
           <fieldset className="guardian-filter-date qr-filter-date">
@@ -4273,7 +4264,6 @@ function QrManagementSection({ qrData, qrItems }) {
                 <span role="columnheader">대상자명</span>
                 <span role="columnheader">보호자명</span>
                 <span role="columnheader">상태</span>
-                <span role="columnheader">활성화상태</span>
                 <span role="columnheader">생성일</span>
                 <span role="columnheader">활성화일</span>
                 <span role="columnheader">만료일</span>
@@ -4292,7 +4282,6 @@ function QrManagementSection({ qrData, qrItems }) {
                   <span role="cell">{formatQrSubjectLabel(qr)}</span>
                   <span role="cell">{qr.guardian_name || "미배정"}</span>
                   <em role="cell" className={`qr-lifecycle-badge ${qrLifecycleClass(qr)}`}>{Number(qr.store_sale_reserved || 0) === 1 ? "스토어 선점" : qrLifecycleLabel(qr.lifecycle_status)}</em>
-                  <em role="cell" className={`qr-activation-badge ${qrActivationClass(qr)}`}>{qrActivationLabel(qr)}</em>
                   <time role="cell">{formatDateOnlyValue(qr.created_at)}</time>
                   <time role="cell">{formatDateOnlyValue(qr.activated_at)}</time>
                   <time role="cell">{formatDateOnlyValue(qr.subscription_ends_at)}</time>
@@ -4301,7 +4290,7 @@ function QrManagementSection({ qrData, qrItems }) {
               ))}
               {qrItems.length > 0 && Array.from({ length: visibleRows }, (_, index) => (
                 <div className="admin-record-row guardian-empty-row" role="row" key={`qr-empty-${index}`}>
-                  {Array.from({ length: 11 }, (_, cellIndex) => <span role="cell" key={`qr-empty-${index}-${cellIndex}`}>&nbsp;</span>)}
+                  {Array.from({ length: 10 }, (_, cellIndex) => <span role="cell" key={`qr-empty-${index}-${cellIndex}`}>&nbsp;</span>)}
                 </div>
               ))}
               {qrItems.length === 0 && (
@@ -4337,9 +4326,7 @@ function QrManagementSection({ qrData, qrItems }) {
                 <div>
                   <h2><span className="inline-scroll-value">{selectedQr.code}</span></h2>
                   <div className="qr-detail-badges">
-                    <em className={`qr-lifecycle-badge ${qrLifecycleClass(selectedQr)}`}>{qrLifecycleLabel(selectedQr.lifecycle_status)}</em>
-                    <em className={`qr-activation-badge ${qrActivationClass(selectedQr)}`}>{qrActivationLabel(selectedQr)}</em>
-                    {Number(selectedQr.store_sale_reserved || 0) === 1 && <em className="qr-store-sale-badge">스토어 판매 선점</em>}
+                    <em className={`qr-lifecycle-badge ${qrLifecycleClass(selectedQr)}`}>{Number(selectedQr.store_sale_reserved || 0) === 1 ? "스토어 선점" : qrLifecycleLabel(selectedQr.lifecycle_status)}</em>
                   </div>
                   <span>{selectedQr.subject_name || "미매칭"}</span>
                   <span>{selectedQr.guardian_name || "보호자 미배정"}</span>
@@ -4400,7 +4387,7 @@ function QrManagementSection({ qrData, qrItems }) {
                     <div className="guardian-tab-section-title">QR 관리</div>
                     <div className="guardian-detail-card-list">
                       <article className="guardian-detail-mini-card">
-                        <div className="guardian-detail-row"><strong>현재 상태</strong><span>{qrLifecycleLabel(selectedQr.lifecycle_status)} / {qrActivationLabel(selectedQr)}</span></div>
+                        <div className="guardian-detail-row"><strong>현재 상태</strong><span>{Number(selectedQr.store_sale_reserved || 0) === 1 ? "스토어 선점" : qrLifecycleLabel(selectedQr.lifecycle_status)}</span></div>
                         <div className="guardian-detail-row"><strong>매칭 대상</strong><span>{formatQrSubjectLabel(selectedQr)}</span></div>
                         <div className="guardian-detail-row"><strong>보호자</strong><span>{selectedQr.guardian_name || "미배정"}</span></div>
                         <div className="guardian-detail-row"><strong>판매 선점</strong><span>{Number(selectedQr.store_sale_reserved || 0) === 1 ? "스토어 판매용" : "미선점"}</span></div>

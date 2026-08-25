@@ -22,12 +22,6 @@ const socialProviders = [
     className: "naver-action",
     Logo: NaverLogo,
   },
-  {
-    id: "facebook",
-    label: "Facebook",
-    className: "facebook-action",
-    Logo: FacebookLogo,
-  },
 ];
 
 export function LoginAuthPanel({ enabledProviders = [], authError = "", initialMode = "login", qrClaim = false }) {
@@ -520,7 +514,7 @@ export function SocialLoginButtons({ enabledProviders = [], variant = "stack", c
 function SocialLoginButtonsInner({ enabledProviders = [], variant = "stack", callbackUrl }) {
   const enabled = new Set(enabledProviders);
   const providers = variant === "icons"
-    ? [socialProviders[1], socialProviders[2], socialProviders[0], socialProviders[3]]
+    ? [socialProviders[1], socialProviders[2], socialProviders[0]]
     : socialProviders;
 
   return (
@@ -670,17 +664,6 @@ export function NaverLogo() {
   return (
     <svg className="social-logo" viewBox="0 0 24 24" aria-hidden="true">
       <path fill="#ffffff" d="M7 6h3.85l3.3 4.78V6H17v12h-3.85l-3.3-4.78V18H7V6z" />
-    </svg>
-  );
-}
-
-export function FacebookLogo() {
-  return (
-    <svg className="social-logo" viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="#ffffff"
-        d="M14.2 8.1V6.7c0-.68.45-.84.77-.84h1.96V2.52L14.23 2.5c-3 0-4.64 1.78-4.64 5.05v2.35H6.95v3.73h2.64V22h3.95v-8.37h3.05l.48-3.73h-3.53V8.83c0-.54.14-.73.66-.73Z"
-      />
     </svg>
   );
 }
