@@ -8633,3 +8633,10 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### 소요시간
 - 구현·회귀·로컬 화면 검증: 약 25분
+
+### 운영 반영
+- GitHub 기능 커밋 `0a95abc`를 `main`에 푸시했다.
+- Vercel 운영 배포 `dpl_F5feL3JFSnKLiKLtevNr7wgRRri1`이 `READY` 상태로 `https://zezari.family`에 연결됐다.
+- 운영 관리자 QR 화면에서 활성화상태 필터·열·상세 배지가 제거되고 사용중·미사용·스토어 선점 상태가 단일 배지로 표시되는 것을 확인했다.
+- 운영 보호자 계정의 미활성 QR에서 대상자 사진 위, 이름·생년월일·확인 문구 아래의 세로형 활성화 카드가 표시되는 것을 확인했다.
+- `https://zezari.family`, `https://real-qr-find.vercel.app` 응답 HTTP 200을 확인했다.

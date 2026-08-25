@@ -6324,4 +6324,6 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 기존 Facebook 연결 계정 데이터와 서버 호환 설정은 유지
 - 운영 빌드·보안·QR 선점 가입·SNS 계정 연결 회귀 검사 통과
 - 로컬 브라우저에서 온보딩 단일 버튼과 Kakao·Naver·Google 3개 로그인 버튼 확인
-- 구현·검증 약 25분
+- GitHub 커밋 `0a95abc` 푸시 및 Vercel 배포 `dpl_F5feL3JFSnKLiKLtevNr7wgRRri1` 운영 반영 완료
+- 운영에서 QR 상태 단일 표기와 대상자 세로형 활성화 카드 확인, 두 운영 도메인 HTTP 200 확인
+- 구현·배포·운영 검증 약 35분
