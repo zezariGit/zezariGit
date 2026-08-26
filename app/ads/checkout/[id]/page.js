@@ -20,6 +20,13 @@ export default async function AdCheckoutPage({ params, searchParams }) {
     redirect(withNotice("/?tab=dashboard", error.message || "광고 결제 정보를 찾을 수 없습니다.", "error"));
   }
 
+  const {
+    meta_budget_amount: _metaBudgetAmount,
+    meta_margin_percent: _metaMarginPercent,
+    meta_budget_version: _metaBudgetVersion,
+    ...guardianVisibleAd
+  } = data.ad;
+
   return (
     <>
       <main className="ad-payment-page">
@@ -30,7 +37,7 @@ export default async function AdCheckoutPage({ params, searchParams }) {
             <span aria-hidden="true" />
           </header>
           <AdPaymentClient
-            ad={data.ad}
+            ad={guardianVisibleAd}
             guardian={data.guardian}
             adminPaymentPassEnabled={isAdminSession(session) || Number(data.guardian?.is_admin || 0) === 1}
           />

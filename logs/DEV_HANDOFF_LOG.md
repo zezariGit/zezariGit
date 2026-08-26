@@ -8668,3 +8668,25 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Vercel 운영 배포 `dpl_93CuTh7PhkhdbecV8oJUVfzfDqWu`가 `READY` 상태로 `https://zezari.family`에 연결됐다.
 - 운영 일반 웹의 관리대상 신규 등록 화면에서 사진 선택 메뉴에 `사진 촬영 앱`, `파일 앱`, `취소`만 표시되고 `앨범 앱`은 렌더링되지 않는 것을 확인했다.
 - iOS 3개 옵션은 실제 iPhone/iPad 사용자 에이전트에서 활성화되는 분기 코드와 터치 iPadOS 예외 처리를 확인했다. 최종 네이티브 앱 전환은 실제 iOS 기기에서 1회 추가 확인이 필요하다.
+
+## 2026-08-26 KST - 온라인 실종 광고 내부 예산 정보 비노출
+
+### 요구내용
+- 보호자가 온라인 실종 광고를 결제하기 전에 표시되는 Meta 집행예산과 서비스 마진 정보를 완전히 제거
+
+### 반영내용
+- 광고 설정 미리보기에서 Meta 예상 집행예산과 서비스 마진 안내를 제거했다.
+- 광고 결제 비용 안내에서 Meta 집행예산, 서비스 마진 금액·비율, 내부 산출 설명을 제거했다.
+- 결제 페이지 서버 컴포넌트에서 Meta 예산·마진 관련 필드를 보호자용 클라이언트 컴포넌트로 전달하지 않도록 분리했다.
+- 기간, 거리, 보호자 최종 결제금액, 예상 노출수, 일반 안내와 결제수단은 유지했다.
+- 서버의 예산 산정, DB 저장, 관리자 조회 및 Meta 광고 자동 발행 로직은 변경하지 않았다.
+- 산출물 `deliverables/AD_PAYMENT_USER_COST_VISIBILITY.md`를 추가했다.
+
+### 검증
+- `npm run build`: 통과
+- `npm run security:check`: 통과
+- `git diff --check`: 통과
+- 운영 결제 화면 검증은 배포 후 진행
+
+### 소요시간
+- 구현 및 로컬 검증: 약 20분

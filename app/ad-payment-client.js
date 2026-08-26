@@ -16,10 +16,6 @@ export default function AdPaymentClient({ ad, guardian, adminPaymentPassEnabled 
   const amount = Number(ad?.amount || 0);
   const paid = Boolean(ad?.paid_at || ad?.payment_key);
   const estimate = useMemo(() => buildAdEstimate(ad), [ad]);
-  const marginPercent = Number.isFinite(Number(ad?.meta_margin_percent))
-    ? Number(ad.meta_margin_percent)
-    : null;
-  const serviceMarginAmount = Math.max(0, amount - Number(ad?.meta_budget_amount || 0));
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -184,22 +180,7 @@ export default function AdPaymentClient({ ad, guardian, adminPaymentPassEnabled 
             <dt>보호자 결제금액</dt>
             <dd>{formatCurrency(amount)}</dd>
           </div>
-          <div>
-            <dt>Meta 집행예산</dt>
-            <dd>{formatCurrency(ad.meta_budget_amount)}</dd>
-          </div>
-          {marginPercent !== null && Number(ad?.meta_budget_version || 1) >= 3 && (
-            <div>
-              <dt>서비스 마진 ({marginPercent}%)</dt>
-              <dd>{formatCurrency(serviceMarginAmount)}</dd>
-            </div>
-          )}
         </dl>
-        <p className="ad-payment-budget-note">
-          {marginPercent !== null && Number(ad?.meta_budget_version || 1) >= 3
-            ? `Meta 집행예산은 보호자 결제금액에서 서비스 마진 ${marginPercent}%를 제외한 금액입니다.`
-            : "이 광고는 기존 지역·반경·기간 예산 방식으로 책정되었습니다."}
-        </p>
       </section>
 
       <section className="ad-payment-reach">

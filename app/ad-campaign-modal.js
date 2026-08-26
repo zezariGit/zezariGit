@@ -5,10 +5,6 @@ import FormSubmitButton from "./form-submit-button";
 import ModalScrollLock from "./modal-scroll-lock";
 import { formatDateOnly } from "../lib/date-format";
 import { sanitizeAdGuardianMessage } from "../lib/ad-creative-text";
-import {
-  calculateMetaBudgetFromPayment,
-  normalizeMetaAdBudgetSettings,
-} from "../lib/meta-ad-budget";
 
 const FALLBACK_DISTANCE_OPTIONS = [
   { id: "location-10", label: "위치 주변", radiusKm: 10, coverageType: "radius", description: "현재 위치 기준 10km 반경", price: 0 },
@@ -44,7 +40,6 @@ export default function AdCampaignModal({
   const today = useMemo(() => getKstDateInputValue(), []);
   const distanceOptions = useMemo(() => normalizeDistanceOptions(pricing?.distanceOptions), [pricing]);
   const durationOptions = useMemo(() => normalizeDurationOptions(pricing?.durationOptions), [pricing]);
-  const metaBudgetSettings = useMemo(() => normalizeMetaAdBudgetSettings(pricing), [pricing]);
   const [step, setStep] = useState("distance");
   const [distanceOptionId, setDistanceOptionId] = useState(distanceOptions[0]?.id || "");
   const [durationOptionId, setDurationOptionId] = useState(durationOptions[0]?.id || "");
@@ -62,11 +57,6 @@ export default function AdCampaignModal({
     ? "대한민국"
     : cleanRegionLabel(location.label);
   const quote = calculateOptionQuote(selectedDistance, selectedDuration);
-  const metaBudget = calculateMetaBudgetFromPayment({
-    paymentAmount: quote.amount,
-    days: quote.days,
-    marginPercent: metaBudgetSettings.marginPercent,
-  });
   const activeAd = ["active", "paused", "ready"].includes(subject?.ad_status || "");
   const canSubmit = Boolean(
     selectedDistance
@@ -251,7 +241,6 @@ export default function AdCampaignModal({
               endDate={endDate}
               regionLabel={regionLabel}
               distance={selectedDistance}
-              metaBudget={metaBudget}
             />
             <div className="ad-preview-actions full-field">
               <button type="button" className="plain-button" onClick={() => setStep("duration")}>다시 선택</button>
@@ -335,7 +324,7 @@ function SummarySubject({ subject }) {
   );
 }
 
-function MissingAdPreview({ subject, quote, startDate, endDate, regionLabel, distance, metaBudget }) {
+function MissingAdPreview({ subject, quote, startDate, endDate, regionLabel, distance }) {
   const photoSrc = subjectPhotoSrc(subject);
   const age = calculateAge(subject?.birth_date);
   const gender = formatGender(subject?.gender);
@@ -360,7 +349,6 @@ function MissingAdPreview({ subject, quote, startDate, endDate, regionLabel, dis
       <div className="ad-preview-meta">
         <span>기간: {formatDate(startDate)} ~ {formatDate(endDate)} / {quote.days}일</span>
         <span>범위: {distance?.coverageType === "country" ? "대한민국 전체" : `${regionLabel} / 반경 ${distance?.radiusKm}km`}</span>
-        <span>Meta 예상 집행예산: {formatCurrency(metaBudget.amount)} / 서비스 마진 {metaBudget.marginPercent}% 반영</span>
         {qrTargetUrl ? <a href={qrTargetUrl} target="_blank" rel="noreferrer">관리대상정보 페이지 열기</a> : <span>관리대상정보 링크는 QR 매칭 후 표시됩니다.</span>}
       </div>
     </section>

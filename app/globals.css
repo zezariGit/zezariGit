@@ -9867,15 +9867,6 @@ button:disabled:hover {
   font-weight: 900;
 }
 
-.ad-payment-budget-note {
-  margin: var(--space-sm) 0 0;
-  padding-top: var(--space-sm);
-  border-top: 0.5px solid var(--c-border);
-  color: var(--c-text-muted);
-  font-size: 0.78rem;
-  line-height: 1.5;
-}
-
 .ad-payment-reach {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
