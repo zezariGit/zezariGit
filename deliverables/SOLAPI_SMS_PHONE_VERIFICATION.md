@@ -51,3 +51,10 @@
 - After the representative number is approved, update only `SOLAPI_SENDER_NUMBER` in local and Vercel Production, then redeploy and verify one controlled SMS.
 - Recovery deployment `dpl_BDRETYBCfp6Tx6wQKVwGkofbiTyB` reached `READY`, and a controlled production request returned `ok: true`.
 - The matching Solapi log showed `SMS`, success 1, failure 0; the approved daily quota was shown as 500.
+
+### Representative Sender Activation (2026-08-26)
+- Solapi sender management shows `1668-1290` with alias `제자리 대표번호`, status `활성화`, verification `완료`, and expiry `2027-08-26`.
+- The previous personal sender number is inactive.
+- Local, Vercel Production, and Vercel Development `SOLAPI_SENDER_NUMBER` values were changed to `16681290`.
+- Signup, SNS account linking, and guardian phone-change verification all share `lib/sms.js`, so the representative sender applies to every verification purpose.
+- The provider response regression, production build, and security regression checks passed before deployment.

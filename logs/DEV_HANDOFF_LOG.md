@@ -8696,3 +8696,29 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - GitHub 기능 커밋 `bbefa50`을 `main`에 푸시했다.
 - Vercel 운영 배포 `dpl_DAykHUd7CKidMxdadKYAAfnNHJDp`가 `READY` 상태로 `https://zezari.family`에 연결됐다.
 - `https://zezari.family` 응답 HTTP 200과 기존 `https://real-qr-find.vercel.app`의 대표 도메인 리디렉션을 확인했다.
+
+## 2026-08-26 KST - SOLAPI 인증문자 대표 발신번호 전환
+
+### 요구내용
+- SOLAPI에 새로 등록된 제자리 대표번호 `1668-1290`을 휴대폰 인증번호 발신번호로 적용
+
+### 확인내용
+- SOLAPI 발신번호 관리에서 `1668-1290`의 별칭은 `제자리 대표번호`, 상태는 `활성화`, 번호인증은 `완료`, 만료일은 `2027-08-26`으로 확인했다.
+- 기존 개인 발신번호는 비활성화 상태임을 확인했다.
+
+### 반영내용
+- 로컬 `.env.local`의 `SOLAPI_SENDER_NUMBER`를 `16681290`으로 변경했다.
+- Vercel Production과 Development의 암호화 환경변수 `SOLAPI_SENDER_NUMBER`를 `16681290`으로 교체했다.
+- 회원가입, SNS 계정 연결, 보호자 연락처 변경 인증은 공용 `lib/sms.js`를 사용하므로 모두 대표번호가 적용된다.
+- API Key와 Secret은 변경하거나 로그에 기록하지 않았다.
+- `deliverables/SOLAPI_SMS_PHONE_VERIFICATION.md`에 승인 및 전환 이력을 추가했다.
+
+### 검증
+- `npm run test:sms-provider`: 통과
+- 로컬 발신번호 정규화 검사: `1668-1290` 확인
+- `npm run build`: 통과
+- `npm run security:check`: 통과
+- 새 환경변수 운영 배포 및 실제 발송 확인 예정
+
+### 소요시간
+- 승인 확인·설정 변경·로컬 검증: 약 20분

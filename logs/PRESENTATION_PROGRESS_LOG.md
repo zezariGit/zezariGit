@@ -6349,3 +6349,11 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 운영 결제 화면에서 내부 예산·마진 비노출과 Toss 결제위젯 정상 로드를 확인
 - 대표 도메인 HTTP 200 및 기존 Vercel 주소의 대표 도메인 리디렉션 확인
 - 구현·배포·운영 검증 약 30분
+
+## 2026-08-26 - SOLAPI 대표 발신번호 전환
+- SOLAPI에서 제자리 대표번호 `1668-1290`의 활성화·번호인증 완료 및 2027-08-26 만료 상태 확인
+- 기존 개인 발신번호는 비활성화 상태 확인
+- 로컬과 Vercel Production·Development 발신번호를 `16681290`으로 교체
+- 회원가입, SNS 계정 연결, 보호자 연락처 변경 인증에 공통 적용
+- SMS 공급자 회귀, Next.js 빌드, 보안 검사 통과
+- 운영 배포 및 실제 발송 확인 예정
