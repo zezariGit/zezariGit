@@ -8686,7 +8686,13 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `npm run build`: 통과
 - `npm run security:check`: 통과
 - `git diff --check`: 통과
-- 운영 결제 화면 검증은 배포 후 진행
+- 운영 광고 결제 화면에서 기간·거리·보호자 결제금액만 표시되고 Meta 집행예산·서비스 마진·내부 산출 설명이 노출되지 않는 것을 확인했다.
+- Toss 결제위젯과 관리자 전용 결제패스 버튼이 정상 로드되는 것을 확인했다.
 
 ### 소요시간
-- 구현 및 로컬 검증: 약 20분
+- 구현·배포·운영 검증: 약 30분
+
+### 운영 반영
+- GitHub 기능 커밋 `bbefa50`을 `main`에 푸시했다.
+- Vercel 운영 배포 `dpl_DAykHUd7CKidMxdadKYAAfnNHJDp`가 `READY` 상태로 `https://zezari.family`에 연결됐다.
+- `https://zezari.family` 응답 HTTP 200과 기존 `https://real-qr-find.vercel.app`의 대표 도메인 리디렉션을 확인했다.

@@ -6344,5 +6344,8 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 보호자에게는 광고 기간, 거리, 최종 결제금액과 예상 노출수만 안내
 - 결제 클라이언트 데이터에서도 내부 예산·마진 필드를 제외해 노출 경계를 강화
 - 관리자·서버의 예산 계산과 Meta 자동 광고 발행 기능은 기존대로 유지
-- Next.js 운영 빌드·보안 회귀·공백 검사 통과, 운영 화면 검증 예정
-- 구현 및 로컬 검증 약 20분
+- Next.js 운영 빌드·보안 회귀·공백 검사 통과
+- GitHub 커밋 `bbefa50` 푸시 및 Vercel 배포 `dpl_DAykHUd7CKidMxdadKYAAfnNHJDp` 운영 반영 완료
+- 운영 결제 화면에서 내부 예산·마진 비노출과 Toss 결제위젯 정상 로드를 확인
+- 대표 도메인 HTTP 200 및 기존 Vercel 주소의 대표 도메인 리디렉션 확인
+- 구현·배포·운영 검증 약 30분
