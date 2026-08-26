@@ -58,3 +58,6 @@
 - Local, Vercel Production, and Vercel Development `SOLAPI_SENDER_NUMBER` values were changed to `16681290`.
 - Signup, SNS account linking, and guardian phone-change verification all share `lib/sms.js`, so the representative sender applies to every verification purpose.
 - The provider response regression, production build, and security regression checks passed before deployment.
+- Production deployment `dpl_6DmvCjd4cGoz95YPpLf5VKGad8PS` reached `READY`, and `zezari.family` was confirmed to resolve to that deployment.
+- The previous `1062` error was produced by the prior deployment snapshot that still used the now-inactive personal sender number.
+- A controlled real SMS from the new deployment should be requested by the user once to confirm handset delivery and the visible sender number.

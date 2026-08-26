@@ -6356,4 +6356,8 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 로컬과 Vercel Production·Development 발신번호를 `16681290`으로 교체
 - 회원가입, SNS 계정 연결, 보호자 연락처 변경 인증에 공통 적용
 - SMS 공급자 회귀, Next.js 빌드, 보안 검사 통과
-- 운영 배포 및 실제 발송 확인 예정
+- GitHub 커밋 `d01f13d` 및 Vercel 배포 `dpl_6DmvCjd4cGoz95YPpLf5VKGad8PS` 운영 반영 완료
+- 기존 오류 원인은 비활성 개인번호를 포함한 이전 배포의 SOLAPI `1062` 응답으로 확인
+- 대표 도메인이 새 배포를 가리키고 인증 API 입력 검증이 정상 동작함을 확인
+- 실제 단말 수신·대표 발신번호 표시는 사용자 재요청으로 최종 확인 예정
+- 승인 확인부터 운영 배포까지 약 35분

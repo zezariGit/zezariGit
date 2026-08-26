@@ -8718,7 +8718,16 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - 로컬 발신번호 정규화 검사: `1668-1290` 확인
 - `npm run build`: 통과
 - `npm run security:check`: 통과
-- 새 환경변수 운영 배포 및 실제 발송 확인 예정
+- GitHub 커밋 `d01f13d` 푸시 완료
+- Vercel 운영 배포 `dpl_6DmvCjd4cGoz95YPpLf5VKGad8PS`: `READY`
+- `https://zezari.family`가 새 배포를 가리키는 것을 확인했다.
+- 운영 인증 API의 잘못된 번호 검증이 HTTP 400으로 정상 동작하는 것을 확인했다.
+- 사용자가 본 `인증문자 발신번호가 등록되지 않았습니다` 오류는 새 배포 전에 비활성화된 개인번호를 사용한 이전 배포 스냅샷에서 발생한 SOLAPI `1062` 오류로 확인했다.
+- 새 대표번호의 실제 단말 수신과 발신번호 표시는 사용자가 인증번호를 한 번 재요청해 최종 확인한다.
 
 ### 소요시간
-- 승인 확인·설정 변경·로컬 검증: 약 20분
+- 승인 확인·설정 변경·배포·검증: 약 35분
+
+### 운영 반영
+- 로컬 및 Vercel Production·Development 발신번호가 `1668-1290`으로 통일됐다.
+- 대표번호는 SOLAPI에서 활성화·인증 완료 상태이며 기존 개인번호는 비활성화 상태다.
