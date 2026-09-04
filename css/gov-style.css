@@ -11,11 +11,19 @@
   --c-primary-dark:  #176b2c;
   --c-primary-light: #eef9f0;
   --c-primary-border:#9dcea8;
+  --c-accent:        var(--c-primary);
+  --c-accent-dark:   var(--c-primary-dark);
+  --c-accent-border: var(--c-primary-border);
   --c-accent-light:  #f4fbf5;
+  --c-on-primary:    #ffffff;
+  --c-focus-ring:    rgba(38, 150, 63, 0.24);
+  --c-sidebar:       #163d25;
 
   /* 중립 색상 */
   --c-bg:            #f5f8f5;   /* 페이지 배경 */
   --c-surface:       #ffffff;   /* 카드/컴포넌트 배경 */
+  --c-surface-muted: #f1f5f2;
+  --c-surface-soft:  var(--c-surface-muted);
   --c-border:        #d9e5dc;
   --c-border-strong: #a7beac;
 
@@ -23,6 +31,8 @@
   --c-text:          #17231a;
   --c-text-muted:    #5d6d61;
   --c-text-light:    #89968c;
+  --c-disabled-bg:   #eef1ef;
+  --c-disabled-text: #718077;
 
   /* 시맨틱 상태 색상 */
   --c-success:       #15803d;
@@ -30,6 +40,7 @@
   --c-success-border:#c0dd97;
   --c-warn:          #b45309;
   --c-warn-bg:       #fffbeb;
+  --c-warning-bg:    var(--c-warn-bg);
   --c-warn-border:   #fac775;
   --c-danger:        #b91c1c;
   --c-danger-bg:     #fef2f2;
@@ -41,8 +52,8 @@
   /* 레이아웃 */
   --radius-sm:  4px;
   --radius-md:  8px;
-  --radius-lg:  12px;
-  --radius-xl:  16px;
+  --radius-lg:  8px;
+  --radius-xl:  8px;
   --radius-full: 9999px;
 
   /* 타이포그래피 */
@@ -56,8 +67,10 @@
   --font-size-2xl:  28px;
 
   /* 그림자 */
-  --shadow-sm:   0 1px 3px rgba(0,0,0,0.06);
-  --shadow-card: 0 1px 4px rgba(0,0,0,0.07);
+  --shadow-sm:   0 1px 2px rgba(23, 35, 26, 0.05);
+  --shadow-card: 0 1px 2px rgba(23, 35, 26, 0.05);
+  --shadow-soft: var(--shadow-card);
+  --shadow-strong: 0 8px 24px rgba(23, 35, 26, 0.16);
 
   /* 간격 */
   --space-xs:  4px;
@@ -78,6 +91,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  letter-spacing: 0;
 }
 
 html {
@@ -112,12 +126,21 @@ a:hover {
 ul, ol { list-style: none; }
 
 button {
-  font-family: var(--font);
+  font: inherit;
   cursor: pointer;
 }
 
 input, select, textarea {
-  font-family: var(--font);
+  font: inherit;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--c-focus-ring);
+  outline-offset: 2px;
 }
 
 
@@ -302,9 +325,9 @@ main {
 .hero-tag {
   font-size: var(--font-size-xs);
   font-weight: 500;
-  letter-spacing: 0.07em;
+  letter-spacing: 0;
   text-transform: uppercase;
-  color: #a8d8f5;
+  color: rgba(255,255,255,0.82);
   margin-bottom: var(--space-sm);
 }
 .hero h1 {
@@ -569,14 +592,14 @@ table {
 }
 
 thead th {
-  background: #f0f7fc;
+  background: var(--c-primary-light);
   color: var(--c-info);
   font-weight: 500;
   text-align: left;
   padding: 10px 16px;
   border-bottom: 0.5px solid var(--c-primary-border);
   font-size: var(--font-size-xs);
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   white-space: nowrap;
 }
 
@@ -587,7 +610,7 @@ tbody td {
   vertical-align: middle;
 }
 tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: #f5fbff; }
+tbody tr:hover td { background: var(--c-accent-light); }
 
 tfoot td {
   padding: 10px 16px;
@@ -640,7 +663,7 @@ th.col-check, td.col-check {
 .form-select:focus,
 .form-textarea:focus {
   border-color: var(--c-primary);
-  box-shadow: 0 0 0 3px rgba(17,17,17,0.12);
+  box-shadow: 0 0 0 3px var(--c-focus-ring);
 }
 .form-input::placeholder { color: var(--c-text-light); }
 .form-input.error { border-color: var(--c-danger); }
@@ -768,7 +791,7 @@ th.col-check, td.col-check {
 .section-label {
   font-size: var(--font-size-xs);
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: var(--c-text-muted);
   margin-bottom: var(--space-sm);

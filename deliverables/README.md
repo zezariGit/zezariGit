@@ -72,6 +72,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `USER_DASHBOARD_BLACK_THEME.md`: 검정색 공통 테마, 상단 탭 제거, 3명 단위 가로 스와이프와 관리대상 추가 진입 구조.
 - `USER_DASHBOARD_SUBJECT_PREVIEW.md`: 대시보드 단일 상태 판정, 보호자 전용 대상자 미리보기·수정 경로, 마이페이지 대상자 메뉴 제거와 아이콘 개편.
 - `USER_GREEN_THEME_INTERACTIONS.md`: 초록색 공통 디자인 토큰, 고객지원 퀵 버튼, 상태 배지별 상품구매·QR 활성화 이동, 알림 상세 범용 이동 버튼 제거 규칙.
+- `GLOBAL_GREEN_DESIGN_SYSTEM.md`: 전 화면에 적용하는 확정 초록·중립·상태 HEX 값, 서체, 포커스, 카드·입력창·버튼과 모바일 검증 기준.
 - `IMAGE_UPLOAD_MANAGEMENT.md`: 보호자·관리대상 사진의 DB 기반 용량 제한, 관리자 설정, 서버 검증, 사용자 초과파일 알림과 팝업 성능 개선.
 - `SHOP_LOADING_PERFORMANCE.md`: 상품구매 진입의 중복 DB 조회 제거, Base64 이미지 지연 로드, 전용 이미지 캐시 경로와 성능 계측 결과.
 - Current UI feedback pattern: submit buttons show inline progress bars, and server actions show bottom status messages via `notice` query parameters.
