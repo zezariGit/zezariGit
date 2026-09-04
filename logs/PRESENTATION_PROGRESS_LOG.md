@@ -6383,4 +6383,7 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 개인화 화면과 API를 서비스 워커 캐시에서 제외하고 최신 워커를 항상 확인하도록 변경
 - 푸시 자동 복구·보안·QR 회귀검사와 Next.js 운영 빌드 통과
 - 운영체제에서 알림 권한을 끄거나 앱·브라우저 데이터를 삭제한 경우에는 사용자가 다시 권한을 허용해야 함
-- 구현·로컬 검증 약 30분, 운영 배포 검증 진행 예정
+- GitHub 기능 커밋 `7dd3070` 푸시 및 Vercel 배포 `dpl_B9DLDcYLT78MibCo3zXsX7epCeme` 운영 반영 완료
+- 운영 로그인 화면에서 톱니바퀴·팝업 제목·닫기 라벨이 모두 `설정`으로 표시되고 브라우저 오류 0건 확인
+- 운영 서비스 워커 `zezari-v17`, 캐시 금지 헤더, 푸시 서버 키 구성 및 대표 도메인 HTTP 200 확인
+- 구현·문서화·배포·운영 검증 약 45분

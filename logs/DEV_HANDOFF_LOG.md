@@ -8811,4 +8811,10 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - If permission and login data remain available, opening or returning to the app now repairs a lost server subscription without another button press.
 
 ### Deployment
-- GitHub and Vercel production deployment verification will be recorded after the feature commit is published.
+- Feature commit `7dd3070` was pushed to GitHub `main`.
+- Vercel production deployment `dpl_B9DLDcYLT78MibCo3zXsX7epCeme` reached `READY`.
+- `https://zezari.family/` returned HTTP 200 from the canonical domain.
+- Production `/sw.js` returned cache version `zezari-v17`, JavaScript content type, `Service-Worker-Allowed: /`, and `Cache-Control: no-cache, no-store, must-revalidate`.
+- Production `/api/push/public-key` reported `configured: true` with a public key present; the key value was not logged.
+- An authenticated production browser reload showed the gear control, dialog, heading, and close control as `설정`.
+- Production browser console error scan returned zero errors, and the Vercel deployment error-log scan returned no retained errors.
