@@ -8767,3 +8767,48 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - GitHub 기능 커밋 `7d91f1b`을 `main`에 푸시했다.
 - Vercel 기능 배포 `dpl_27X4woZSGZfAqoerxLz3jwgPjsir`가 `READY` 상태로 `https://zezari.family`와 `https://real-qr-find.vercel.app`에 연결됐다.
 - 대표 도메인 HTTP 200과 기존 Vercel 주소의 대표 도메인 연결을 확인했다.
+
+## 2026-09-04 KST - Settings Label And Persistent Push Recovery
+
+### User Request
+- Rename the gear-button popup title from `내 정보` to `설정`.
+- Investigate why a connected push device stops receiving notifications after one or two days.
+- Check whether login expiration is responsible and keep push delivery connected automatically.
+
+### Investigation
+- Production `AUTH_SESSION_MAX_AGE_DAYS` is `90`, so a one-to-two-day interruption is not caused by the configured login lifetime.
+- Push delivery uses the subscription rows already linked to a guardian and does not require an open page or active login session at send time.
+- Browser push endpoints can be refreshed or revoked by the browser or operating system.
+- The previous server correctly removed endpoints rejected with HTTP 404/410, but the browser only saved its current endpoint again when the guardian opened the settings popup. A deleted endpoint could therefore remain missing indefinitely.
+- The previous service worker cached all GET responses, including personalized pages and most APIs, which could also preserve stale authenticated UI and worker behavior.
+
+### Reflected Work
+- Renamed the gear tooltip, popup heading, dialog labels, close label, and account-page return label to `설정`.
+- Extracted push registration and server persistence into a shared client module with duplicate-request protection.
+- Mounted a global push synchronizer in the root layout.
+- Added automatic re-sync on app load, visible-page return, network recovery, service-worker replacement, initial connection, and every six hours while the app remains open.
+- Added service-worker `pushsubscriptionchange` handling to persist refreshed browser endpoints immediately when the browser supports the event.
+- Added page-level recovery messaging when background synchronization cannot complete.
+- Changed `/sw.js` response headers to bypass HTTP caches and register with `updateViaCache: none`.
+- Limited service-worker caching to the manifest and app icons; navigations, personalized pages, and API responses now always use the network.
+- Corrected missing push expiration values so browser `null` remains database `null` instead of becoming zero.
+- Added `scripts/push-subscription-regression.mjs` and the `npm run test:push` command.
+- Added `deliverables/PUSH_SUBSCRIPTION_PERSISTENCE.md`.
+
+### Verification
+- `npm run test:push`: passed.
+- `npm run security:check`: passed.
+- `npm run test:qr-claim`: passed.
+- `npm run build`: passed with Next.js 16.3.0.
+- `git diff --check`: passed.
+- Local browser verification: page content rendered, no Next.js error overlay, service worker active with cache version `zezari-v17`.
+- Local `/sw.js` headers: JavaScript content type and `Cache-Control: no-cache, no-store, must-revalidate`.
+- Local cache inspection contained only the manifest and three app icons.
+
+### Operational Boundary
+- The service cannot override an operating-system notification denial, Focus/Do Not Disturb mode, removed Home Screen app, or cleared browser data.
+- iOS/iPadOS web push still requires the app to be installed on the Home Screen.
+- If permission and login data remain available, opening or returning to the app now repairs a lost server subscription without another button press.
+
+### Deployment
+- GitHub and Vercel production deployment verification will be recorded after the feature commit is published.

@@ -1,6 +1,7 @@
 import "../css/gov-style.css";
 import "./globals.css";
 import SessionKeepAlive from "./session-keep-alive";
+import PushSubscriptionSync from "./push-subscription-sync";
 
 export const metadata = {
   metadataBase: new URL("https://zezari.family"),
@@ -30,6 +31,7 @@ export default function RootLayout({ children }) {
     <html lang="ko">
       <body>
         <SessionKeepAlive />
+        <PushSubscriptionSync />
         {children}
       </body>
     </html>

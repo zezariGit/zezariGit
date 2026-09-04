@@ -6,7 +6,7 @@ import ModalScrollLock from "./modal-scroll-lock";
 
 const OPEN_EVENT = "zezari:open-my-page";
 
-export function OpenMyPageButton({ className = "", title = "마이페이지", children }) {
+export function OpenMyPageButton({ className = "", title = "설정", children }) {
   return (
     <button
       className={className || undefined}
@@ -68,7 +68,7 @@ export default function MyPageOverlay({ initialOpen = false, closeHref = "/?tab=
   return (
     <section
       className="modal-backdrop my-page-backdrop"
-      aria-label="마이페이지"
+      aria-label="설정"
       role="dialog"
       aria-modal="true"
       onPointerDown={(event) => {

@@ -78,7 +78,7 @@ export default async function GuardianDashboard({
             {registeredSubject && <strong className="subject-complete-page-title">대상자 등록 완료</strong>}
             <OpenMyPageButton
               className="corner-icon-button my-page-corner-link"
-              title="마이페이지"
+              title="설정"
             >
               <GearIcon />
             </OpenMyPageButton>
@@ -261,13 +261,13 @@ function MyPageTab({ guardian, subscription, session, admin, closeHref = "" }) {
   return (
     <section
       className={`my-page-panel${closeHref ? " my-page-modal" : ""}`}
-      aria-label="마이페이지"
+      aria-label="설정"
       data-modal-surface={closeHref ? "" : undefined}
     >
       <div className="my-page-title-row">
-        <h2>내 정보</h2>
+        <h2>설정</h2>
         {closeHref && (
-          <button className="my-page-close-button" type="button" data-my-page-close aria-label="마이페이지 닫기">
+          <button className="my-page-close-button" type="button" data-my-page-close aria-label="설정 닫기">
             닫기
           </button>
         )}

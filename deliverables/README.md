@@ -26,6 +26,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `ADMIN_PAYMENT_PASS.md`: admin-only product, subscription, and advertisement payment bypass with server authorization and test-revenue isolation.
 - `PREPAID_PASS_PAYMENT.md`: one-time Toss payment, QR-based pass activation, renewal, pause/resume, expiry, and privacy rules.
 - `PUSH_NOTIFICATION_SETUP.md`: guardian browser push registration and QR find-page notification flow.
+- `PUSH_SUBSCRIPTION_PERSISTENCE.md`: browser subscription refresh recovery, global re-sync triggers, login relationship, and device-level limits.
 - `PUBLIC_GUARDIAN_VOICE_PLAYBACK.md`: public QR page guardian voice playback button, states, access conditions, and privacy notes.
 - `BIZCALL_SAFE_PHONE_INTEGRATION.md`: Bizcall 050 issuance/remapping flow, guardian sync states, privacy rules, and server-only environment variables.
 - `BIZCALL_SAFE_PHONE_POOL.md`: call-time Bizcall auto assignment, one-hour expiry, concurrency controls, privacy, administrator history, and real API verification.

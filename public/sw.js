@@ -1,5 +1,10 @@
-const CACHE_NAME = "zezari-v16";
-const APP_SHELL = ["/", "/manifest.webmanifest"];
+const CACHE_NAME = "zezari-v17";
+const APP_SHELL = [
+  "/manifest.webmanifest",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/maskable-512.png",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -19,17 +24,27 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
-  if (url.pathname.startsWith("/api/auth")) return;
+  if (!isCacheableStaticRequest(event.request, url)) return;
 
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+    caches.match(event.request).then(async (cached) => {
+      try {
+        const response = await fetch(event.request);
+        if (response.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(event.request, response.clone());
+        }
         return response;
-      })
-      .catch(() => caches.match(event.request).then((cached) => cached || caches.match("/")))
+      } catch (error) {
+        if (cached) return cached;
+        throw error;
+      }
+    })
   );
+});
+
+self.addEventListener("pushsubscriptionchange", (event) => {
+  event.waitUntil(refreshPushSubscription(event));
 });
 
 self.addEventListener("push", (event) => {
@@ -106,6 +121,85 @@ self.addEventListener("message", (event) => {
     event.waitUntil(closeDisplayedNotification(event.data.notificationId));
   }
 });
+
+function isCacheableStaticRequest(request, url) {
+  if (url.origin !== self.location.origin || request.mode === "navigate") return false;
+  if (url.pathname === "/manifest.webmanifest") return true;
+  return url.pathname.startsWith("/icons/") || url.pathname.startsWith("/assets/");
+}
+
+async function refreshPushSubscription(event) {
+  try {
+    let subscription = event.newSubscription || null;
+    if (!subscription) {
+      const applicationServerKey = await getPushApplicationServerKey();
+      subscription = await self.registration.pushManager.getSubscription();
+
+      if (subscription && !subscriptionKeyMatches(subscription, applicationServerKey)) {
+        await subscription.unsubscribe();
+        subscription = null;
+      }
+      if (!subscription) {
+        subscription = await self.registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey,
+        });
+      }
+    }
+
+    const response = await fetch("/api/push/subscribe", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(subscription),
+    });
+    if (!response.ok) throw new Error(`Push subscription sync failed: ${response.status}`);
+  } catch {
+    await broadcastPushResyncRequired();
+  }
+}
+
+async function getPushApplicationServerKey() {
+  const response = await fetch("/api/push/public-key", {
+    cache: "no-store",
+    credentials: "include",
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.configured || !data.publicKey) {
+    throw new Error("Push public key is unavailable.");
+  }
+  return urlBase64ToUint8Array(data.publicKey);
+}
+
+function subscriptionKeyMatches(subscription, expectedKey) {
+  const storedKey = subscription?.options?.applicationServerKey;
+  if (!storedKey) return true;
+  const storedBytes = new Uint8Array(storedKey);
+  if (storedBytes.length !== expectedKey.length) return false;
+  return storedBytes.every((value, index) => value === expectedKey[index]);
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = self.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let index = 0; index < rawData.length; index += 1) {
+    outputArray[index] = rawData.charCodeAt(index);
+  }
+
+  return outputArray;
+}
+
+async function broadcastPushResyncRequired() {
+  const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+  await Promise.all(
+    clients.map((client) => client.postMessage({ type: "ZEZARI_PUSH_RESYNC_REQUIRED" }))
+  );
+}
 
 function isExternalUrl(value) {
   try {
