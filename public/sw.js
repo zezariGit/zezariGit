@@ -1,9 +1,12 @@
-const CACHE_NAME = "zezari-v17";
+const CACHE_NAME = "zezari-v18";
 const APP_SHELL = [
   "/manifest.webmanifest",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
-  "/icons/maskable-512.png",
+  "/icons/zezari-wordmark-v1-48.png",
+  "/icons/zezari-wordmark-v1-180.png",
+  "/icons/zezari-wordmark-v1-192.png",
+  "/icons/zezari-wordmark-v1-512.png",
+  "/icons/zezari-wordmark-maskable-v1-512.png",
+  "/icons/zezari-wordmark-badge-v1-96.png",
 ];
 
 self.addEventListener("install", (event) => {
@@ -54,11 +57,11 @@ self.addEventListener("push", (event) => {
   } catch {
     data = {};
   }
-  const title = data.title || "REAL_QR_FIND 알림";
+  const title = data.title || "제자리 알림";
   const options = {
     body: data.body || "",
-    icon: "/icons/icon-192.png",
-    badge: "/icons/icon-192.png",
+    icon: "/icons/zezari-wordmark-v1-192.png",
+    badge: "/icons/zezari-wordmark-badge-v1-96.png",
     silent: false,
     vibrate: [180, 80, 180],
     tag: data.notificationId || `zezari-${Date.now()}`,

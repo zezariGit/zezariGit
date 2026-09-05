@@ -114,3 +114,19 @@ Project: REAL_QR_FIND / zezari
   - expose real test delivery
   - log server-side subscription saves and provider failures
   - mark an administrator batch with zero successes as failed instead of showing a false completion message
+
+## 2026-09-05 App And Notification Icon Update
+- Replaced the previous green `Z` symbol with the supplied black `제자리` wordmark on a white square canvas.
+- Added versioned icon URLs so installed PWAs can detect the identity-image change instead of reusing the old cached bitmap.
+- PWA manifest icons:
+  - `192x192` standard icon
+  - `512x512` standard icon
+  - `512x512` maskable icon with the wordmark inside the Android safe area
+- Page metadata icons:
+  - `48x48` shortcut/favicon icon
+  - `180x180` Apple touch icon
+- Push notification assets:
+  - `192x192` full wordmark notification icon
+  - `96x96` transparent monochrome wordmark badge for Android masking
+- The service-worker cache version is `zezari-v18`, so the new icon files are installed separately from the old icon cache.
+- Android notification `icon` and `badge` are controlled by the site where supported. Samsung Internet may still show its own browser application icon as the notification source when Push is subscribed from a normal browser tab. Installing and opening the PWA gives the operating system the strongest available app identity, but the final notification layout remains controlled by the browser and Android skin.

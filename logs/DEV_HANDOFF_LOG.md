@@ -8818,3 +8818,39 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Production `/api/push/public-key` reported `configured: true` with a public key present; the key value was not logged.
 - An authenticated production browser reload showed the gear control, dialog, heading, and close control as `설정`.
 - Production browser console error scan returned zero errors, and the Vercel deployment error-log scan returned no retained errors.
+
+## 2026-09-05 KST - Zezari Wordmark App And Push Notification Icons
+
+### User Request
+- Replace the Android Push notification browser-side icon with the supplied `제자리` wordmark.
+- Use the same supplied wordmark for the installed app icon.
+
+### Platform Finding
+- Web Push can set the notification `icon` and Android `badge` images through `showNotification()`.
+- The leftmost Samsung Internet symbol in the supplied screenshot identifies the browser application that delivered a normal-tab Web Push. A website cannot replace that operating-system-owned browser identity icon.
+- An installed PWA uses the web app manifest for its launcher identity and gives Android the strongest available Zezari app identity, although Android and the browser still control the final notification layout.
+
+### Reflected Work
+- Created square wordmark app-icon assets from the supplied black `제자리` logo on a white background.
+- Kept the complete wordmark inside the Android maskable-icon safe area.
+- Added versioned icon filenames so existing installed PWAs detect an icon URL change instead of retaining the previous green `Z` bitmap.
+- Added app icon sizes `192x192` and `512x512`, maskable `512x512`, Apple touch `180x180`, and shortcut/favicon `48x48`.
+- Added a transparent monochrome `96x96` Android notification badge.
+- Updated the web manifest, Next.js icon metadata, Push notification `icon` and `badge` options, and default Push title.
+- Bumped the service-worker cache from `zezari-v17` to `zezari-v18` and pre-cached only the new versioned identity assets.
+- Extended `npm run test:push` to validate every PNG dimension, badge transparency, manifest metadata, and worker icon references.
+- Added the implementation and platform boundary to `deliverables/PUSH_NOTIFICATION_SETUP.md`.
+
+### Verification
+- `npm run test:push`: passed, including icon dimensions and alpha-channel checks.
+- `npm run security:check`: passed.
+- `npm run test:qr-claim`: passed.
+- `npm run build`: passed with Next.js 16.3.0.
+- `git diff --check`: passed.
+- Local browser: meaningful page content rendered with no Next.js error overlay.
+- Generated head metadata contains the versioned shortcut, standard, and Apple touch icon URLs.
+- Fetched manifest contains the versioned standard and maskable icon URLs.
+- Service worker reports `zezari-v18`, references the new Push icon and transparent badge, and caches all seven expected identity assets.
+
+### Deployment
+- GitHub and Vercel production deployment verification will be recorded after publishing the feature commit.

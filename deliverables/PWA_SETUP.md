@@ -13,9 +13,11 @@ Project: REAL_QR_FIND / zezari
 ## Implemented Files
 - `public/manifest.webmanifest`
 - `public/sw.js`
-- `public/icons/icon-192.png`
-- `public/icons/icon-512.png`
-- `public/icons/maskable-512.png`
+- `public/icons/zezari-wordmark-v1-192.png`
+- `public/icons/zezari-wordmark-v1-512.png`
+- `public/icons/zezari-wordmark-maskable-v1-512.png`
+- `public/icons/zezari-wordmark-v1-180.png`
+- `public/icons/zezari-wordmark-v1-48.png`
 - `app/auth-actions.js`
 - `app/layout.js`
 - `app/page.js`
@@ -26,16 +28,14 @@ Project: REAL_QR_FIND / zezari
 - Short name: `zezari`
 - Display mode: `standalone`
 - Start URL: `/`
-- Theme color: `#176b5b`
-- Background color: `#f6f8f7`
+- Theme color: `#26963f`
+- Background color: `#f5f8f5`
 
 ## Service Worker
-- Current cache name: `zezari-v13`
-- Caches app shell:
-  - `/`
-  - `/manifest.webmanifest`
-- Uses network-first behavior for GET requests.
-- Excludes `/api/auth` routes from service worker handling to avoid interfering with OAuth login.
+- Current cache name: `zezari-v18`
+- Pre-caches only the web manifest and versioned app/notification icons.
+- Uses network-first behavior only for explicit `/icons/`, `/assets/`, and manifest requests.
+- Navigations, personalized pages, and all API routes bypass the service-worker cache.
 - Handles Web Push notifications and opens the app when a notification is clicked.
 
 ## Install UI
@@ -48,9 +48,9 @@ Project: REAL_QR_FIND / zezari
 
 ## Verification Checklist
 - `npm run build` completes successfully.
-- `https://zezari.vercel.app/manifest.webmanifest` returns the manifest.
-- `https://zezari.vercel.app/sw.js` returns the service worker.
-- `https://zezari.vercel.app/icons/icon-192.png` returns the app icon.
-- `https://zezari.vercel.app/icons/icon-512.png` returns the app icon.
+- `https://zezari.family/manifest.webmanifest` returns the manifest.
+- `https://zezari.family/sw.js` returns the service worker.
+- `https://zezari.family/icons/zezari-wordmark-v1-192.png` returns the app icon.
+- `https://zezari.family/icons/zezari-wordmark-v1-512.png` returns the app icon.
 - Home page no longer displays `hellow`.
 - Social login buttons display Google, Kakao, and Naver logos/text.
