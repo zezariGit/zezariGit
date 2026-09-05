@@ -8853,4 +8853,11 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Service worker reports `zezari-v18`, references the new Push icon and transparent badge, and caches all seven expected identity assets.
 
 ### Deployment
-- GitHub and Vercel production deployment verification will be recorded after publishing the feature commit.
+- Feature commit `00c73fe` was pushed to GitHub `main`.
+- Vercel production deployment `dpl_4QXikeF5XT8k7XfeBY9QhRRJMFn5` reached `READY` and owns the `https://zezari.family` alias.
+- Production `/`, `/manifest.webmanifest`, `/sw.js`, and all six versioned icon files returned HTTP 200.
+- Every production PNG dimension and SHA-256 digest matched the committed local asset.
+- Production head metadata exposes the new shortcut, standard, and Apple touch icons.
+- Production manifest exposes the new standard and maskable icons.
+- Production worker reports `zezari-v18`, uses the wordmark Push icon and transparent badge, and returns `Cache-Control: no-cache, no-store, must-revalidate`.
+- Vercel production error-log scan returned no retained errors.
