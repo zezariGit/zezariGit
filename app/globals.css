@@ -5853,6 +5853,7 @@ textarea:focus {
   padding: var(--space-xs) var(--space-sm);
   border-bottom: 0.5px solid var(--c-border);
   color: var(--c-text);
+  cursor: pointer;
   font-size: 13px;
   text-decoration: none;
 }
@@ -5864,6 +5865,11 @@ textarea:focus {
 .admin-record-row:hover {
   background: var(--c-accent-light);
   text-decoration: none;
+}
+
+.admin-record-row:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: -2px;
 }
 
 .admin-record-row.active {
@@ -11390,11 +11396,17 @@ button:disabled:hover {
 
 .product-catalog-table tbody tr {
   background: #ffffff;
+  cursor: pointer;
 }
 
 .product-catalog-table tbody tr:hover,
 .product-catalog-table tbody tr.is-selected {
   background: var(--c-primary-light);
+}
+
+.product-catalog-table tbody tr:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: -2px;
 }
 
 .product-catalog-table tbody tr.is-selected td:first-child {

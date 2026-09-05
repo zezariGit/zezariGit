@@ -65,7 +65,18 @@ export default function ProductAdminWorkspace({ products = [], initialProductId 
               ) : products.map((product) => {
                 const isSelected = mode === "edit" && selectedProduct?.id === product.id;
                 return (
-                  <tr className={isSelected ? "is-selected" : ""} key={product.id}>
+                  <tr
+                    aria-selected={isSelected}
+                    className={isSelected ? "is-selected" : ""}
+                    key={product.id}
+                    onClick={() => selectProduct(product.id)}
+                    onKeyDown={(event) => {
+                      if (event.currentTarget !== event.target || (event.key !== "Enter" && event.key !== " ")) return;
+                      event.preventDefault();
+                      selectProduct(product.id);
+                    }}
+                    tabIndex="0"
+                  >
                     <td>
                       <input
                         aria-label={`${product.name} 선택`}

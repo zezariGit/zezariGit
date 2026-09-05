@@ -10,6 +10,7 @@
     "security:check": "node scripts/security-regression-check.mjs",
     "test:qr-claim": "node scripts/qr-signup-claim-regression.mjs",
     "test:push": "node scripts/push-subscription-regression.mjs",
+    "test:admin-grid": "node scripts/admin-grid-selection-regression.mjs",
     "test:social-link": "tsx scripts/social-account-link-regression.mjs",
     "test:sms-provider": "tsx scripts/sms-provider-regression.mjs"
   },

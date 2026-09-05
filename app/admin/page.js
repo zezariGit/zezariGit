@@ -2669,7 +2669,13 @@ function PaymentManagementSection({ paymentData }) {
               {payments.map((payment) => {
                 const isSelected = selectedPayment?.payment_row_id === payment.payment_row_id;
                 return (
-                  <div className={`admin-record-row ${isSelected ? "selected" : ""}`} role="row" key={payment.payment_row_id}>
+                  <Link
+                    aria-selected={isSelected}
+                    className={`admin-record-row ${isSelected ? "active" : ""}`}
+                    href={buildPaymentListUrl(filters, payment.payment_row_id)}
+                    key={payment.payment_row_id}
+                    role="row"
+                  >
                     <span role="cell" className="admin-row-selector">{isSelected ? "⊙" : "□"}</span>
                     <strong role="cell">{formatPaymentNumber(payment)}</strong>
                     <span role="cell">
@@ -2684,10 +2690,8 @@ function PaymentManagementSection({ paymentData }) {
                     <span role="cell">
                       <b className={`order-state ${paymentStateClass(payment.payment_state)}`}>{paymentStatusLabel(payment.payment_state)}</b>
                     </span>
-                    <Link role="cell" className="admin-row-detail" href={buildPaymentListUrl(filters, payment.payment_row_id)}>
-                      상세보기
-                    </Link>
-                  </div>
+                    <span role="cell" className="admin-row-detail">상세보기</span>
+                  </Link>
                 );
               })}
               {payments.length === 0 && <p className="empty-text">조건에 맞는 결제내역이 없습니다.</p>}
@@ -2924,7 +2928,13 @@ function CouponManagementSection({ couponsData }) {
               {coupons.map((coupon) => {
                 const isSelected = selectedCoupon?.id === coupon.id && !isCreating;
                 return (
-                  <div className={`admin-record-row ${isSelected ? "selected" : ""}`} role="row" key={coupon.id}>
+                  <Link
+                    aria-selected={isSelected}
+                    className={`admin-record-row ${isSelected ? "active" : ""}`}
+                    href={buildCouponListUrl(filters, coupon.id)}
+                    key={coupon.id}
+                    role="row"
+                  >
                     <span role="cell" className="admin-row-selector">{isSelected ? "⊙" : "□"}</span>
                     <strong role="cell">{coupon.coupon_number || formatCouponNumber(coupon)}</strong>
                     <span role="cell">{coupon.code}</span>
@@ -2939,10 +2949,8 @@ function CouponManagementSection({ couponsData }) {
                     <span role="cell">
                       <b className={`coupon-status-chip ${coupon.status}`}>{couponStatusLabel(coupon.status)}</b>
                     </span>
-                    <Link role="cell" className="admin-row-detail" href={buildCouponListUrl(filters, coupon.id)}>
-                      상세보기
-                    </Link>
-                  </div>
+                    <span role="cell" className="admin-row-detail">상세보기</span>
+                  </Link>
                 );
               })}
               {Array.from({ length: visibleRows }).map((_, index) => (
