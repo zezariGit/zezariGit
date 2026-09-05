@@ -8861,3 +8861,33 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Production manifest exposes the new standard and maskable icons.
 - Production worker reports `zezari-v18`, uses the wordmark Push icon and transparent badge, and returns `Cache-Control: no-cache, no-store, must-revalidate`.
 - Vercel production error-log scan returned no retained errors.
+
+## 2026-09-05 KST - Administrator Grid Whole-Row Selection
+
+### User Request
+- Make every administrator grid with a right-side detail panel refresh that detail when any row or cell is clicked.
+- Remove the inconsistent requirement to use only the leading selector or final detail cell.
+
+### Reflected Work
+- Audited all administrator table and grid implementations and separated master-detail grids from read-only summary and audit tables.
+- Converted payment and coupon records from non-clickable rows with a final detail link into whole-row Next.js links.
+- Changed payment and coupon selected styling to the shared `active` row state.
+- Added whole-row click and keyboard selection to the product catalog while retaining its radio control and detail button.
+- Added consistent pointer and keyboard-focus styling to selectable administrator rows.
+- Added `scripts/admin-grid-selection-regression.mjs`, `npm run test:admin-grid`, and `deliverables/ADMIN_GRID_ROW_SELECTION.md`.
+
+### Verification
+- `npm run test:admin-grid`: passed.
+- `npm run security:check`: passed.
+- `npm run test:push`: passed.
+- `npm run build`: passed with Next.js 16.3.0.
+- `git diff --check`: passed.
+- Local `/admin` returned HTTP 200.
+- Authenticated production browser verification confirmed non-final-cell selection and right-detail refresh in payment, coupon, and product grids.
+- Production DOM audit confirmed every populated URL-driven master-detail grid renders its data records as whole-row links; product uses the verified client row handler.
+- Production `/admin` returned HTTP 200, and the Vercel deployment error-log scan returned no retained errors.
+
+### Deployment
+- Feature commit `bbb3e30` was pushed to GitHub `main`.
+- Vercel production deployment `dpl_6MS6zX2UX6c6Mj5FqmVfqRKN9KeU` reached `READY` and owns the `https://zezari.family` alias.
+- No record-changing controls were submitted during production verification.

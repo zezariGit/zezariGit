@@ -62,6 +62,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `ADMIN_COUPON_MANAGEMENT.md`: admin coupon ledger, discount conditions, issue limits, status management, and user coupon registration validation.
 - `ADMIN_NOTIFICATION_MANAGEMENT.md`: admin notification/message grid, right-side compose panel, push delivery action, and delivery result tracking.
 - `ADMIN_MESSAGE_TEMPLATE_MANAGEMENT.md`: admin message template grid, locked automatic templates, push/KakaoTalk channel settings, and template seed data.
+- `ADMIN_GRID_ROW_SELECTION.md`: consistent whole-row selection behavior, keyboard access, and production verification for administrator master-detail grids.
 - `USER_MANUAL.md`: Google Docs user manual link, coverage, and maintenance rule.
 - `MAINTENANCE_REQUEST_SHEET.md`: Google Sheets maintenance request template, tester workflow, status definitions, and privacy rules.
 - `SECURITY_HARDENING_REVIEW_2026-08-14.md`: 운영 소스 보안 점검 범위, 취약점 개선 조치, 검증 결과와 잔여 운영 과제.
