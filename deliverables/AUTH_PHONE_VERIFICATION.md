@@ -7,6 +7,7 @@ Project: REAL_QR_FIND
 - A guardian must verify every newly entered contact phone number before profile storage.
 - Resend email verification remains in source as a disabled fallback and is not shown in the active signup UI.
 - Administrators with an existing completed account are not forced through signup verification merely to sign in.
+- An active administrator may request another signup-screen SMS for the administrator's already registered phone number for controlled testing.
 
 ## User Flows
 
@@ -79,6 +80,10 @@ SIGNUP_EMAIL_VERIFICATION_ENABLED=false
 - Send limit: five requests per phone and purpose per hour.
 - Attempt limit: five incorrect attempts per issued code.
 - Existing guardian phone numbers cannot be reused by another account.
+- The duplicate-phone send exception applies only to an unauthenticated ordinary signup request for an active administrator identified by `guardians.is_admin` or the configured administrator email list.
+- The exception does not apply to regular guardians, guardian phone changes, or SNS account-link flows.
+- A successful administrator test verification still cannot create a duplicate guardian account because final signup repeats the duplicate-phone check.
+- Administrator test sends retain the normal requester and per-phone rate limits; the exception is not an unlimited SMS bypass.
 - Every token is hashed, guardian/purpose scoped, and consumed once.
 
 ## Verification Record
@@ -87,6 +92,7 @@ SIGNUP_EMAIL_VERIFICATION_ENABLED=false
 - Authenticated guardian tests passed for phone-change send/verify/save and unverified save rejection.
 - Mobile signup UI showed all six code inputs on one line.
 - Solapi accepted and completed one real API SMS with one success and zero failures.
+- `npm run test:admin-phone-otp` passed for configured-email administrators, database-role administrators, regular-member rejection, and final duplicate-signup rejection without contacting Solapi.
 
 ## Operations
 - Monitor Solapi balance, sender-number expiry, and message logs.

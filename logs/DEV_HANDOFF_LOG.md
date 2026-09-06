@@ -8891,3 +8891,32 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Feature commit `bbb3e30` was pushed to GitHub `main`.
 - Vercel production deployment `dpl_6MS6zX2UX6c6Mj5FqmVfqRKN9KeU` reached `READY` and owns the `https://zezari.family` alias.
 - No record-changing controls were submitted during production verification.
+
+## 2026-09-06 KST - Administrator Signup SMS Retest Exception
+
+### User Request
+- Keep blocking verification sends for phone numbers that already belong to a registered member.
+- Allow an administrator's registered phone number to receive another code from the signup screen for testing.
+
+### Reflected Work
+- Added a narrowly scoped duplicate-phone exception to the signup SMS request path.
+- The exception requires an active existing guardian who is an administrator through `guardians.is_admin` or the configured administrator email list.
+- Limited the exception to unauthenticated ordinary signup requests so guardian phone changes and SNS account-link behavior remain unchanged.
+- Kept final duplicate-account creation blocked after successful administrator code verification.
+- Kept requester and per-phone SMS rate limits unchanged.
+- Added `scripts/admin-phone-verification-regression.mjs` and `npm run test:admin-phone-otp`.
+
+### Verification
+- `npm run test:admin-phone-otp`: passed without sending an external SMS.
+- `npm run test:social-link`: passed.
+- `npm run test:sms-provider`: passed.
+- `npm run security:check`: passed.
+- `npm run build`: passed with Next.js 16.3.0.
+- `git diff --check`: passed.
+- Production data inspection reported three active administrator-role accounts, including two with a registered phone; no personal data was printed.
+- `https://zezari.family/` returned HTTP 200.
+
+### Deployment
+- Feature commit `f29b0b7` was pushed to GitHub `main`.
+- Vercel production deployment `dpl_4fjNC7MHCbRxDqCkVHhtY1PaTiGY` reached `READY` and owns the `https://zezari.family` alias.
+- No real administrator SMS was triggered during automated deployment verification.
