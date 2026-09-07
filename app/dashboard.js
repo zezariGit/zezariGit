@@ -1,6 +1,5 @@
 import {
   createSubjectAdAction,
-  deleteSubjectAction,
   endSubjectAdAction,
   pauseSubjectAdAction,
   resumeSubjectAdAction,
@@ -22,6 +21,8 @@ import SubjectVoiceRecorder from "./subject-voice-recorder";
 import SubjectBirthDateSelect from "./subject-birth-date-select";
 import SubjectPhotoInput from "./subject-photo-input";
 import SubjectRegistrationForm from "./subject-registration-form";
+import SubjectMessageField from "./subject-message-field";
+import SubjectPreviewVoicePlayer from "./subject-preview-voice-player";
 import SubjectStatusGuide from "./subject-status-guide";
 import { isAdminSession } from "../lib/admin";
 import { formatDateOnly } from "../lib/date-format";
@@ -70,14 +71,14 @@ export default async function GuardianDashboard({
   const isSubjectsTab = activeTab === "subjects";
   const currentTab = isGuardianTab ? "guardian" : isSubjectsTab ? "subjects" : "dashboard";
   const closeMyPageHref = `/?tab=${currentTab}`;
+  const showCornerBar = isDashboard && !selectedPreviewSubject;
 
   return (
     <main className="dashboard-page">
-      <section className={`dashboard-shell${guardianComplete && guardianActive ? " has-corner" : ""}${isDashboard && !selectedPreviewSubject ? " dashboard-home-shell" : ""}`}>
-        {guardianComplete && guardianActive && (
+      <section className={`dashboard-shell${guardianComplete && guardianActive && showCornerBar ? " has-corner" : ""}${isDashboard && !selectedPreviewSubject ? " dashboard-home-shell" : ""}`}>
+        {guardianComplete && guardianActive && showCornerBar && (
           <div className="dashboard-corner-bar" aria-label="사용자 빠른 메뉴">
             <NotificationBell preview={notificationPreview} />
-            {registeredSubject && <strong className="subject-complete-page-title">대상자 등록 완료</strong>}
             <OpenMyPageButton
               className="corner-icon-button my-page-corner-link"
               title="설정"
@@ -98,7 +99,7 @@ export default async function GuardianDashboard({
           </MyPageOverlay>
         )}
         <div className="dashboard-content">
-        {!registeredSubject && !selectedPreviewSubject && <header className="dashboard-header">
+        {!registeredSubject && !selectedPreviewSubject && !isSubjectsTab && <header className="dashboard-header">
           <div>
             {guardianComplete && !isDashboard && (
               <Link className="dashboard-back-link" href="/?tab=dashboard">
@@ -182,7 +183,7 @@ export default async function GuardianDashboard({
           />
         )}
 
-        {!registeredSubject && (
+        {!registeredSubject && !selectedPreviewSubject && !isSubjectsTab && (
           <div className="install-area dashboard-install">
             <PwaInstallPrompt />
           </div>
@@ -367,14 +368,11 @@ function SubjectsInfoTab({ selectedSubject, registeredSubject, hasQrSignupClaim 
 
 function SubjectPreviewPage({ subject }) {
   const photoSrc = subjectPhotoSrc(subject);
-  const displayStatus = resolveSubjectStatus(subject);
   const age = calculateAge(subject.birth_date);
 
   return (
     <section className="guardian-subject-preview" aria-label={`${subject.name} 대상자 정보 미리보기`}>
-      <Link className="subject-preview-back" href="/?tab=dashboard" aria-label="대시보드로 돌아가기">
-        <span aria-hidden="true">‹</span>
-      </Link>
+      <span className="subject-preview-shield" aria-hidden="true"><ShieldCheckIcon /></span>
       <header className="subject-preview-heading">
         <h1>대상자 정보 미리보기</h1>
         <p>입력한 내용을 확인해 주세요.</p>
@@ -386,52 +384,73 @@ function SubjectPreviewPage({ subject }) {
         </div>
         <div className="subject-preview-summary">
           <strong>{subject.name || "이름 미입력"}</strong>
-          <span>{shortGender(subject.gender)}{age !== null ? `, ${age}세` : ""} ({formatDate(subject.birth_date)})</span>
-          <dl>
-            <div>
-              <dt>성별</dt>
-              <dd>{shortGender(subject.gender)}</dd>
-            </div>
-            <div>
-              <dt>나이</dt>
-              <dd>{age !== null ? `${age}세` : "-"}</dd>
-            </div>
-          </dl>
+          <span>{shortGender(subject.gender)} · {age !== null ? `${age}세` : "나이 미입력"} ({formatDate(subject.birth_date)})</span>
         </div>
-        <span className={`status-badge subject-preview-status ${statusClass(displayStatus)}`}>
-          {displayStatus}
-        </span>
       </div>
 
-      <section className="subject-preview-message">
-        <h2>보호자가 전하고픈 말</h2>
-        <p>{subject.guardian_message || "등록된 보호자 메시지가 없습니다."}</p>
-      </section>
+      <button className="subject-preview-contact subject-preview-disabled" type="button" disabled>
+        <PhoneIcon />
+        <span><strong>보호자에게 전화하기</strong><small>안심번호로 연결됩니다</small></span>
+      </button>
+
+      <div className="subject-preview-emergency-grid">
+        <button className="subject-preview-disabled" type="button" disabled>
+          <LocationIcon />
+          <strong>위치 공유</strong>
+          <small>보호자에게<br />현재 위치를 공유해요</small>
+        </button>
+        <button className="subject-preview-disabled" type="button" disabled>
+          <PhoneIcon />
+          <strong>112 신고</strong>
+          <small>관할기관에<br />신고합니다</small>
+        </button>
+      </div>
 
       {subject.voice_data_url && (
         <section className="subject-preview-voice">
-          <h2>보호자 음성 안내</h2>
-          <audio controls preload="metadata" src={subject.voice_data_url}>
-            브라우저에서 음성 재생을 지원하지 않습니다.
-          </audio>
+          <SubjectPreviewVoicePlayer
+            src={subject.voice_data_url}
+            name={subject.voice_name || "보호자 음성"}
+          />
         </section>
       )}
+
+      <section className="subject-preview-message">
+        <h2><MessageIcon /> 보호자가 전하고픈 말</h2>
+        <p>{subject.guardian_message || "등록된 보호자 메시지가 없습니다."}</p>
+        <small>위 메시지는 보호자가 직접 입력한 내용입니다.</small>
+      </section>
 
       <Link
         className="subject-preview-edit"
         href={`/?tab=subjects&editSubject=${encodeURIComponent(subject.id)}#subjects-info`}
       >
         <EditIcon />
-        <span>
-          <strong>수정하기</strong>
-          <small>대상자 정보를 수정하고 싶을 때 선택해 주세요.</small>
-        </span>
-      </Link>
-      <Link className="login-submit subject-preview-confirm" href="/?tab=dashboard">
-        확인
+        <strong>수정하기</strong>
       </Link>
     </section>
   );
+}
+
+function ShieldCheckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" focusable="false">
+      <path d="M12 2.8 20 6v5.8c0 4.7-3.1 8.3-8 9.7-4.9-1.4-8-5-8-9.7V6l8-3.2Z" />
+      <path d="m8.8 12 2.1 2.1 4.5-4.7" />
+    </svg>
+  );
+}
+
+function PhoneIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 3.5 10 7.7 8.2 9.5c1.2 2.5 3.3 4.6 5.8 5.8l1.8-1.8 4.2 2.8-.8 3.4c-.2.8-.9 1.3-1.7 1.3C9.5 20.4 3.6 14.5 3 6.5c-.1-.8.5-1.5 1.3-1.7l2.9-.7Z" /></svg>;
+}
+
+function LocationIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z" /><circle cx="12" cy="9" r="2.3" /></svg>;
+}
+
+function MessageIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18.5 3.5 21l4-1a9 9 0 1 0-2.5-1.5Z" /><circle cx="9" cy="11" r=".7" /><circle cx="12" cy="11" r=".7" /><circle cx="15" cy="11" r=".7" /></svg>;
 }
 
 function EditIcon() {
@@ -607,35 +626,66 @@ function SubjectForm({ subject, imageUploadSettings }) {
   const photoSrc = subjectPhotoSrc(subject);
 
   return (
-    <article className="subject-edit-card">
-      <SubjectRegistrationForm hasExistingPhoto={Boolean(photoSrc)}>
+    <article className={`subject-edit-card ${isExisting ? "is-editing" : "is-registering"}`}>
+      <header className="subject-form-header">
+        <Link
+          className="subject-form-back"
+          href={isExisting ? `/?tab=dashboard&previewSubject=${encodeURIComponent(subject.id)}` : "/?tab=dashboard"}
+          aria-label={isExisting ? "대상자 정보 미리보기로 돌아가기" : "대시보드로 돌아가기"}
+        >
+          <span aria-hidden="true">‹</span>
+        </Link>
+        <h1>{isExisting ? "대상자 정보 수정" : "대상자 정보 등록"}</h1>
+        {isExisting && <p>정확한 정보를 위해 수정해 주세요.</p>}
+      </header>
+
+      <SubjectRegistrationForm hasExistingPhoto={Boolean(photoSrc)} editing={isExisting}>
         <input type="hidden" name="subjectId" defaultValue={subject?.id || ""} />
         <input type="hidden" name="existingPhotoName" defaultValue={subject?.photo_name || ""} />
         <input type="hidden" name="status" defaultValue={statusLabel(subject?.status || "상품구매필요")} />
 
-        {isExisting && (
-          <div className="subject-form-top">
-            <em>수정 저장 시 QR 완료 화면은 표시되지 않습니다.</em>
-          </div>
-        )}
-
         <div className="target-field-stack">
-          <div className="subject-primary-fields">
-            <SubjectPhotoInput
-              existingSrc={photoSrc}
-              maxBytes={imageUploadSettings?.subjectPhotoMaxBytes || 1024 * 1024}
-              required={!photoSrc}
-            />
-            <label className="target-field subject-primary-name">
-              <span>이름</span>
-              <input
-                name="subjectName"
-                defaultValue={subject?.name || ""}
-                placeholder="이름을 입력해주세요."
-                required
+          {isExisting ? (
+            <div className="subject-primary-fields">
+              <SubjectPhotoInput
+                existingSrc={photoSrc}
+                maxBytes={imageUploadSettings?.subjectPhotoMaxBytes || 1024 * 1024}
+                required={!photoSrc}
+                mode="edit"
               />
-            </label>
-          </div>
+              <label className="target-field subject-primary-name">
+                <span>이름</span>
+                <input
+                  name="subjectName"
+                  defaultValue={subject?.name || ""}
+                  placeholder="이름을 입력해 주세요."
+                  maxLength={80}
+                  required
+                />
+              </label>
+            </div>
+          ) : (
+            <>
+              <div className="subject-registration-photo">
+                <SubjectPhotoInput
+                  existingSrc={photoSrc}
+                  maxBytes={imageUploadSettings?.subjectPhotoMaxBytes || 1024 * 1024}
+                  required
+                  mode="create"
+                />
+              </div>
+              <label className="target-field subject-primary-name">
+                <span>이름</span>
+                <input
+                  name="subjectName"
+                  defaultValue=""
+                  placeholder="이름을 입력해 주세요."
+                  maxLength={80}
+                  required
+                />
+              </label>
+            </>
+          )}
           <SubjectBirthDateSelect value={subject?.birth_date || ""} />
           <fieldset className="target-gender-field">
             <legend>성별</legend>
@@ -652,40 +702,22 @@ function SubjectForm({ subject, imageUploadSettings }) {
               </label>
             ))}
           </fieldset>
-          <label className="target-field target-message-field">
-            <span>보호자 메시지</span>
-            <small>QR을 스캔한 발견자에게 보여지는 메시지로, 대상자를 돕는 데 필요한 내용을 적어주세요.</small>
-            <textarea
-              name="guardianMessage"
-              defaultValue={subject?.guardian_message || ""}
-              placeholder="저희 아이는 대화가 조금 어려울 수 있어요. 보호자 음성을 들려주시고, 안전한 곳에서 함께 기다려주세요."
-              rows={4}
-              required
-            />
-          </label>
+          <SubjectMessageField value={subject?.guardian_message || ""} />
           <div className="target-voice-field">
-            <strong>보호자 음성 사전 녹음 (선택)</strong>
-            <small>QR을 스캔한 발견자가 대상자를 안심시킬 수 있도록 재생하는 음성입니다.</small>
+            <strong>보호자 음성 녹음 (선택)</strong>
+            <small>보호자의 음성을 최대 30초까지 녹음할 수 있습니다.</small>
             <SubjectVoiceRecorder
               existingVoice={subject?.voice_data_url || ""}
               existingName={subject?.voice_name || ""}
             />
           </div>
+          {isExisting && (
+            <p className="subject-edit-helper">
+              <InfoIcon /> 보호자 연락처는 [설정] &gt; [보호자 정보]에서 수정 가능합니다.
+            </p>
+          )}
         </div>
-
-        <FormSubmitButton className="login-submit target-submit-button" pendingText={isExisting ? "수정중" : "저장중"}>
-          {isExisting ? "수정 저장" : "다음"}
-        </FormSubmitButton>
       </SubjectRegistrationForm>
-
-      {isExisting && (
-        <form action={deleteSubjectAction}>
-          <input type="hidden" name="subjectId" value={subject.id} />
-          <FormSubmitButton className="danger-button" pendingText="삭제중">
-            삭제
-          </FormSubmitButton>
-        </form>
-      )}
     </article>
   );
 }
@@ -694,15 +726,30 @@ function SubjectRegistrationComplete() {
   return (
     <section className="subject-complete-phone" aria-label="대상자 등록 완료">
       <div className="subject-complete-content">
-        <QrPlaceholderIcon />
-        <h2>대상자 등록이 완료되었습니다</h2>
+        <img
+          className="subject-complete-qr-image"
+          src="/assets/subject-registration/completion-qr.png"
+          alt=""
+          aria-hidden="true"
+        />
+        <h2>대상자 등록이 완료되었습니다.</h2>
         <p>이제 대상자 전용 QR이 적용된 상품을 구매할 수 있어요.</p>
         <Link className="login-submit subject-complete-action" href="/shop">
-          <BagIcon />
+          <img
+            className="subject-complete-button-icon shop"
+            src="/assets/subject-registration/shop-icon.png"
+            alt=""
+            aria-hidden="true"
+          />
           상품 구매하기
         </Link>
         <Link className="outline-login-button subject-complete-action" href="/?tab=dashboard">
-          <HomeIcon />
+          <img
+            className="subject-complete-button-icon"
+            src="/assets/subject-registration/dashboard-icon.png"
+            alt=""
+            aria-hidden="true"
+          />
           대시보드 이동하기
         </Link>
       </div>
@@ -710,36 +757,8 @@ function SubjectRegistrationComplete() {
   );
 }
 
-function BagIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M6 8h12l1 12H5L6 8Z" fill="none" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" />
-      <path d="M9 8a3 3 0 0 1 6 0" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-    </svg>
-  );
-}
-
-function QrPlaceholderIcon() {
-  return (
-    <span className="qr-placeholder-icon" aria-hidden="true">
-      <i className="qr-corner top-left" />
-      <i className="qr-corner top-right" />
-      <i className="qr-corner bottom-left" />
-      <i className="qr-block block-one" />
-      <i className="qr-block block-two" />
-      <i className="qr-block block-three" />
-      <i className="qr-block block-four" />
-      <i className="qr-block block-five" />
-    </span>
-  );
-}
-
-function HomeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3 11.2 12 4l9 7.2v8.3a.5.5 0 0 1-.5.5h-5.2v-6.1H8.7V20H3.5a.5.5 0 0 1-.5-.5z" />
-    </svg>
-  );
+function InfoIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 10v6M12 7.2v.2" /></svg>;
 }
 
 function formatDate(value) {

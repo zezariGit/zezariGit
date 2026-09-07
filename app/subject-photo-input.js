@@ -5,8 +5,9 @@ import { useEffect, useRef, useState } from "react";
 export default function SubjectPhotoInput({
   existingSrc = "",
   maxBytes,
-  label = "관리대상 사진",
+  label = "대상자 사진",
   required = false,
+  mode = "create",
 }) {
   const limitBytes = Math.max(1, Number(maxBytes) || 1024 * 1024);
   const [previewSrc, setPreviewSrc] = useState(existingSrc);
@@ -109,10 +110,15 @@ export default function SubjectPhotoInput({
         {previewSrc ? (
           <img src={previewSrc} alt={`${label} 미리보기`} />
         ) : (
-          <span aria-hidden="true" />
+          <img
+            className="subject-photo-placeholder-image"
+            src="/assets/subject-registration/photo-placeholder.png"
+            alt=""
+            aria-hidden="true"
+          />
         )}
         </span>
-        <span className="camera-chip" aria-hidden="true">사진</span>
+        {previewSrc && <span className="camera-chip" aria-hidden="true"><CameraIcon /></span>}
       </button>
       <input
         ref={cameraInputRef}
@@ -147,8 +153,15 @@ export default function SubjectPhotoInput({
         aria-hidden="true"
         tabIndex={-1}
       />
-      <strong className="subject-photo-action">{previewSrc ? "변경하기" : "사진 등록하기"}</strong>
-      <small className="subject-photo-limit">{formatMegabytes(limitBytes)}MB 이하</small>
+      {mode === "create" && (
+        <span className="subject-photo-copy">
+          <strong className="subject-photo-action">사진 등록</strong>
+          <small className="subject-photo-limit">사진은 1장만 등록할 수 있으며,<br />최대 용량은 {formatMegabytes(limitBytes)}MB입니다.</small>
+        </span>
+      )}
+      {mode === "edit" && (
+        <small className="subject-photo-limit edit-photo-limit">사진은 최대 {formatMegabytes(limitBytes)}MB까지<br />등록할 수 있습니다.</small>
+      )}
       {pickerOpen && (
         <div
           className="subject-photo-picker-backdrop"
@@ -182,6 +195,15 @@ export default function SubjectPhotoInput({
         </div>
       )}
     </div>
+  );
+}
+
+function CameraIcon() {
+  return (
+    <svg viewBox="0 0 24 24" focusable="false">
+      <path d="M8.5 6 10 4h4l1.5 2H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.5Z" />
+      <circle cx="12" cy="12.5" r="3.5" />
+    </svg>
   );
 }
 

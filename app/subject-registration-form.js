@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { saveSubjectAction } from "./actions";
+import FormSubmitButton from "./form-submit-button";
 
 const REQUIRED_FIELDS = [
   { label: "이름", name: "subjectName", selector: "input[name='subjectName']" },
@@ -10,9 +11,48 @@ const REQUIRED_FIELDS = [
   { label: "보호자 메시지", name: "guardianMessage", selector: "textarea[name='guardianMessage']" },
 ];
 
-export default function SubjectRegistrationForm({ children, hasExistingPhoto = false }) {
+export default function SubjectRegistrationForm({
+  children,
+  hasExistingPhoto = false,
+  editing = false,
+}) {
   const formRef = useRef(null);
   const [missingFields, setMissingFields] = useState([]);
+  const [formReady, setFormReady] = useState(false);
+  const [recording, setRecording] = useState(false);
+
+  const updateFormState = useCallback(() => {
+    const form = formRef.current;
+    if (!form) return;
+    const formData = new FormData(form);
+    const photo = formData.get("photo");
+    const hasNewPhoto = photo instanceof File && photo.size > 0;
+    const hasPhotoPreview = Boolean(form.querySelector(".subject-avatar-picker.has-preview"));
+    const hasBirthDate = ["birthYearPart", "birthMonthPart", "birthDayPart"]
+      .every((name) => String(formData.get(name) || "").trim());
+    const message = String(formData.get("guardianMessage") || "").trim();
+    const isRecording = String(formData.get("voiceRecording") || "") === "1";
+
+    setRecording(isRecording);
+    setFormReady(Boolean(
+      (hasExistingPhoto || hasNewPhoto || hasPhotoPreview)
+      && String(formData.get("subjectName") || "").trim()
+      && hasBirthDate
+      && String(formData.get("gender") || "").trim()
+      && message
+      && message.length <= 200
+      && !isRecording
+    ));
+  }, [hasExistingPhoto]);
+
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form) return undefined;
+    const handleRecordingChange = () => window.setTimeout(updateFormState, 0);
+    form.addEventListener("subjectrecordingchange", handleRecordingChange);
+    window.setTimeout(updateFormState, 0);
+    return () => form.removeEventListener("subjectrecordingchange", handleRecordingChange);
+  }, [updateFormState]);
 
   function validateRequiredFields(event) {
     const form = event.currentTarget;
@@ -44,12 +84,21 @@ export default function SubjectRegistrationForm({ children, hasExistingPhoto = f
   return (
     <form
       action={saveSubjectAction}
-      className="subject-registration-form"
+      className={`subject-registration-form ${editing ? "is-editing" : "is-registering"}`}
       noValidate
       onSubmit={validateRequiredFields}
+      onInput={() => window.setTimeout(updateFormState, 0)}
+      onChange={() => window.setTimeout(updateFormState, 0)}
       ref={formRef}
     >
       {children}
+      <FormSubmitButton
+        className="login-submit target-submit-button"
+        pendingText={editing ? "수정 중" : "등록 중"}
+        disabled={!formReady || recording}
+      >
+        {editing ? "수정 완료" : "등록하기"}
+      </FormSubmitButton>
       {missingFields.length > 0 && (
         <div className="subject-validation-backdrop" role="presentation">
           <section
