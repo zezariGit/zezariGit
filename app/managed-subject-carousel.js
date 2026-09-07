@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export default function ManagedSubjectCarousel({ children, pageCount }) {
+export default function ManagedSubjectCarousel({ children, pageCount, showDots = true }) {
   const carouselRef = useRef(null);
   const frameRef = useRef(null);
   const [activePage, setActivePage] = useState(0);
@@ -49,18 +49,20 @@ export default function ManagedSubjectCarousel({ children, pageCount }) {
       >
         {children}
       </div>
-      <div className="managed-page-dots" aria-label={`관리대상 목록 ${totalPages}페이지`}>
-        {Array.from({ length: totalPages }, (_, pageIndex) => (
-          <button
-            className={pageIndex === activePage ? "active" : ""}
-            type="button"
-            aria-label={`${pageIndex + 1}페이지로 이동`}
-            aria-current={pageIndex === activePage ? "page" : undefined}
-            onClick={() => moveToPage(pageIndex)}
-            key={`managed-page-dot-${pageIndex}`}
-          />
-        ))}
-      </div>
+      {showDots && (
+        <div className="managed-page-dots" aria-label={`관리대상 목록 ${totalPages}페이지`}>
+          {Array.from({ length: totalPages }, (_, pageIndex) => (
+            <button
+              className={pageIndex === activePage ? "active" : ""}
+              type="button"
+              aria-label={`${pageIndex + 1}페이지로 이동`}
+              aria-current={pageIndex === activePage ? "page" : undefined}
+              onClick={() => moveToPage(pageIndex)}
+              key={`managed-page-dot-${pageIndex}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

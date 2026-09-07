@@ -157,7 +157,7 @@ export default function NotificationBell() {
         aria-expanded={open}
         title="푸시 알림"
       >
-        <BellIcon />
+        <img className="dashboard-corner-icon" src="/assets/dashboard/notification.png" alt="" />
         {unreadCount > 0 && (
           <span className="notification-count" aria-label={`읽지 않은 알림 ${unreadCount}개`}>
             {unreadCount > 9 ? "9+" : unreadCount}

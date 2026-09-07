@@ -22,6 +22,7 @@ import SubjectVoiceRecorder from "./subject-voice-recorder";
 import SubjectBirthDateSelect from "./subject-birth-date-select";
 import SubjectPhotoInput from "./subject-photo-input";
 import SubjectRegistrationForm from "./subject-registration-form";
+import SubjectStatusGuide from "./subject-status-guide";
 import { isAdminSession } from "../lib/admin";
 import { formatDateOnly } from "../lib/date-format";
 
@@ -71,7 +72,7 @@ export default async function GuardianDashboard({
 
   return (
     <main className="dashboard-page">
-      <section className={`dashboard-shell${guardianComplete && guardianActive ? " has-corner" : ""}`}>
+      <section className={`dashboard-shell${guardianComplete && guardianActive ? " has-corner" : ""}${isDashboard && !selectedPreviewSubject ? " dashboard-home-shell" : ""}`}>
         {guardianComplete && guardianActive && (
           <div className="dashboard-corner-bar" aria-label="사용자 빠른 메뉴">
             <NotificationBell />
@@ -80,7 +81,7 @@ export default async function GuardianDashboard({
               className="corner-icon-button my-page-corner-link"
               title="설정"
             >
-              <GearIcon />
+              <img className="dashboard-corner-icon" src="/assets/dashboard/settings.png" alt="" />
             </OpenMyPageButton>
           </div>
         )}
@@ -104,7 +105,7 @@ export default async function GuardianDashboard({
                 대시보드로 돌아가기
               </Link>
             )}
-            {!isSubjectsTab && (
+            {!isSubjectsTab && !isDashboard && (
               <p className="intro-kicker">{guardianComplete ? "보호자 대시보드" : "정보 입력"}</p>
             )}
             <h1 className="dashboard-title">
@@ -331,22 +332,6 @@ function MyPageTab({ guardian, subscription, session, admin, closeHref = "" }) {
   );
 }
 
-function GearIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path
-        d="M9.6 3.4 10.3 2h3.4l.7 1.4 1.7.7 1.5-.5 2.4 2.4-.5 1.5.7 1.7 1.4.7v3.4l-1.4.7-.7 1.7.5 1.5-2.4 2.4-1.5-.5-1.7.7-.7 1.4h-3.4l-.7-1.4-1.7-.7-1.5.5-2.4-2.4.5-1.5-.7-1.7-1.4-.7V9.9l1.4-.7.7-1.7-.5-1.5 2.4-2.4 1.5.5 1.7-.7Z"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.7"
-      />
-      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.7" />
-    </svg>
-  );
-}
-
 function InfoRow({ label, value, actionLabel = "", href = "" }) {
   return (
     <div className="my-info-row">
@@ -470,25 +455,22 @@ function StatusDashboard({ subjects }) {
       <div className="status-phone">
         <div className="status-phone-top">
           <h2>현재 상태</h2>
-          <span className="status-subject-count">등록 대상 {subjects.length}명</span>
+          <SubjectStatusGuide />
         </div>
-        <ManagedSubjectCarousel pageCount={subjectPages.length}>
+        <ManagedSubjectCarousel pageCount={subjectPages.length} showDots={subjects.length > 0}>
           <div className="managed-pages">
             {subjectPages.map((pageSubjects, pageIndex) => (
               <div className="managed-page" key={`managed-page-${pageIndex}`}>
                 {pageSubjects.map((subject) => {
                   const displayStatus = resolveSubjectStatus(subject);
-                  const actionHref = subjectStatusActionHref(subject, displayStatus);
                   return (
-                  <article
+                  <Link
                     className="managed-card"
+                    href={`/?tab=dashboard&previewSubject=${encodeURIComponent(subject.id)}`}
+                    aria-label={`${subject.name} 대상자 정보 미리보기`}
                     key={subject.id}
                   >
-                    <Link
-                      className="managed-card-preview-link"
-                      href={`/?tab=dashboard&previewSubject=${encodeURIComponent(subject.id)}`}
-                      aria-label={`${subject.name} 대상자 정보 미리보기`}
-                    >
+                    <div className="managed-card-preview-link">
                       <div className="managed-photo">
                         {subjectPhotoSrc(subject) ? (
                           <img src={subjectPhotoSrc(subject)} alt={`${subject.name} 사진`} />
@@ -500,29 +482,22 @@ function StatusDashboard({ subjects }) {
                         <strong>{subject.name}</strong>
                         <span>{formatDate(subject.birth_date)}</span>
                       </div>
-                    </Link>
-                    <div className="managed-actions">
-                      {actionHref ? (
-                        <Link
-                          className={`status-badge managed-status-action ${statusClass(displayStatus)}`}
-                          href={actionHref}
-                          aria-label={`${subject.name} ${displayStatus} 진행`}
-                        >
-                          {displayStatus}
-                        </Link>
-                      ) : (
-                        <span className={`status-badge ${statusClass(displayStatus)}`}>
-                          {displayStatus}
-                        </span>
-                      )}
                     </div>
-                  </article>
+                    <div className="managed-actions">
+                      <span className={`status-badge ${statusClass(displayStatus)}`}>
+                        {subjectStatusDisplayLabel(displayStatus)}
+                      </span>
+                    </div>
+                  </Link>
                   );
                 })}
-                {pageIndex === subjectPages.length - 1 && (
-                  <div className="managed-add-row">
-                    <Link className="managed-add-button" href="/?tab=subjects&mode=new#subjects-info" aria-label="관리대상 추가" title="관리대상 추가">
-                      <span aria-hidden="true">+</span>
+                {pageSubjects.length === 0 && (
+                  <div className="managed-empty-state">
+                    <span className="managed-empty-plus" aria-hidden="true">+</span>
+                    <strong>등록된 대상자가 없습니다.</strong>
+                    <p>대상자를 등록하고 제자리 서비스를 시작해 보세요.</p>
+                    <Link className="managed-empty-add" href="/?tab=subjects&mode=new#subjects-info">
+                      <span aria-hidden="true">+</span> 대상자 추가하기
                     </Link>
                   </div>
                 )}
@@ -530,19 +505,13 @@ function StatusDashboard({ subjects }) {
             ))}
           </div>
         </ManagedSubjectCarousel>
-        <div className="dashboard-assurance-banner">
-          <img
-            src="/assets/dashboard-safety-message.png"
-            alt="제자리는 소중한 사람의 안전을 지킵니다. 실종 신고, 문자 공유, 음성 재생 등 다양한 기능을 활용할 수 있어요."
-          />
-        </div>
         <div className="quick-actions">
           <Link href="/missing-report" aria-label="실종신고">
-            <img className="quick-action-image" src="/assets/dashboard-action-missing.png" alt="" />
+            <img className="quick-action-image" src="/assets/dashboard/missing.png" alt="" />
             <span className="quick-action-label">실종신고</span>
           </Link>
           <Link href="/shop" aria-label="상품구매">
-            <img className="quick-action-image" src="/assets/dashboard-action-shop.png" alt="" />
+            <img className="quick-action-image" src="/assets/dashboard/shop.png" alt="" />
             <span className="quick-action-label">상품구매</span>
           </Link>
           <a
@@ -551,9 +520,13 @@ function StatusDashboard({ subjects }) {
             rel="noreferrer noopener"
             aria-label="카카오톡 고객지원 새 창에서 열기"
           >
-            <img className="quick-action-image" src="/assets/dashboard-action-support.png" alt="" />
+            <img className="quick-action-image" src="/assets/dashboard/support.png" alt="" />
             <span className="quick-action-label">고객지원</span>
           </a>
+        </div>
+        <div className="dashboard-assurance-banner">
+          <img className="dashboard-assurance-icon" src="/assets/dashboard/safety.png" alt="" />
+          <p>제자리는 소중한 사람의 안전을 지킵니다.<br />실종 신고, 보호자 안심번호, 음성 재생 등<br />다양한 기능을 활용할 수 있어요.</p>
         </div>
       </div>
     </section>
@@ -816,6 +789,13 @@ function statusLabel(status) {
   if (status === "문제없음") return "안전";
   if (["상품구매필요", "QR활성화필요", "안전", "찾는중"].includes(status)) return status;
   return "상품구매필요";
+}
+
+function subjectStatusDisplayLabel(status) {
+  if (status === "상품구매필요") return "상품 구매 필요";
+  if (status === "찾는중") return "찾는 중";
+  if (status === "QR활성화필요") return "QR 활성화 필요";
+  return "안전";
 }
 
 function resolveSubjectStatus(subject) {

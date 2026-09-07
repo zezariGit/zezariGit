@@ -37,6 +37,20 @@ export default async function HomePage({ searchParams }) {
   const signupPreviewStep = process.env.NODE_ENV === "development" && resolvedSearchParams?.preview === "signup-complete"
     ? "done"
     : undefined;
+  const dashboardPreview = process.env.NODE_ENV === "development"
+    ? String(resolvedSearchParams?.preview || "")
+    : "";
+  if (dashboardPreview === "dashboard" || dashboardPreview === "dashboard-empty") {
+    return (
+      <GuardianDashboard
+        guardian={{ id: "preview-guardian", name: "보호자", phone: "010-0000-0000", birth_date: "1990-01-01", is_active: 1, login_id: "preview", password_hash: "preview" }}
+        subjects={dashboardPreview === "dashboard-empty" ? [] : previewDashboardSubjects()}
+        subscription={null}
+        session={{ user: { provider: "credentials", email: "" } }}
+        activeTab="dashboard"
+      />
+    );
+  }
   const session = await getServerSession(authOptions);
   const enabledProviders = getConfiguredProviderIds();
   const pendingQrClaim = await resolvePendingQrClaim();
@@ -99,6 +113,14 @@ export default async function HomePage({ searchParams }) {
       <StatusToast message={notice} type={noticeType} />
     </>
   );
+}
+
+function previewDashboardSubjects() {
+  return [
+    { id: "preview-1", name: "김제자리", birth_date: "2019-09-14", status: "안전", qr_is_active: 1, qr_activated_at: "2026-01-01" },
+    { id: "preview-2", name: "박제자리", birth_date: "2017-03-22", status: "찾는중" },
+    { id: "preview-3", name: "이제자리", birth_date: "2021-11-05", status: "상품구매필요" },
+  ];
 }
 
 async function resolvePendingQrClaim() {

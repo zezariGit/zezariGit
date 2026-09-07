@@ -1104,6 +1104,425 @@ a {
   }
 }
 
+/* Mobile dashboard reference layout */
+.dashboard-page:has(.dashboard-home-shell) {
+  padding: 0;
+  background: #ffffff;
+}
+
+.dashboard-home-shell {
+  width: min(100%, 390px);
+  min-height: 100svh;
+  padding-top: 64px;
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.dashboard-home-shell .dashboard-corner-bar {
+  top: 8px;
+  right: 8px;
+  left: 8px;
+}
+
+.dashboard-home-shell .corner-icon-button {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.dashboard-corner-icon {
+  width: 36px;
+  height: 36px;
+  display: block;
+  object-fit: contain;
+}
+
+.dashboard-home-shell .dashboard-content {
+  padding: 0 8px 18px;
+}
+
+.dashboard-home-shell .dashboard-install {
+  display: none;
+}
+
+.dashboard-home-shell .dashboard-header {
+  margin: 0 0 18px;
+}
+
+.dashboard-home-shell .dashboard-title {
+  color: #111820;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+.dashboard-home-shell .status-dashboard {
+  width: 100%;
+}
+
+.dashboard-home-shell .status-phone {
+  gap: 16px;
+}
+
+.dashboard-home-shell .status-phone-top {
+  min-height: 28px;
+  align-items: center;
+  padding: 0;
+}
+
+.dashboard-home-shell .status-phone-top h2 {
+  color: #252b2d;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.subject-status-guide-trigger {
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.subject-status-guide-trigger img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.dashboard-home-shell .managed-carousel {
+  padding-bottom: 8px;
+}
+
+.dashboard-home-shell .managed-page {
+  min-height: 274px;
+  display: block;
+  overflow: hidden;
+  padding: 0 14px;
+  border: 1px solid #e1e5e3;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(23, 45, 34, 0.05);
+}
+
+.dashboard-home-shell .managed-card {
+  width: 100%;
+  min-height: 90px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
+  color: inherit;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+.dashboard-home-shell .managed-card + .managed-card {
+  border-top: 1px solid #e8ebe9;
+}
+
+.dashboard-home-shell .managed-card:hover,
+.dashboard-home-shell .managed-card:focus-visible {
+  border-color: #e8ebe9;
+  background: #ffffff;
+  color: inherit;
+  text-decoration: none;
+  transform: none;
+}
+
+.dashboard-home-shell .managed-card-preview-link {
+  grid-template-columns: 68px minmax(0, 1fr);
+  gap: 14px;
+}
+
+.dashboard-home-shell .managed-photo {
+  width: 66px;
+  height: 66px;
+  border: 0;
+  border-radius: 50%;
+  background: #eef2ef;
+}
+
+.dashboard-home-shell .managed-info {
+  gap: 5px;
+}
+
+.dashboard-home-shell .managed-info strong {
+  color: #151b1d;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.dashboard-home-shell .managed-info span {
+  color: #777d7a;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.dashboard-home-shell .managed-actions {
+  min-width: 72px;
+}
+
+.dashboard-home-shell .managed-actions .status-badge {
+  min-height: 35px;
+  padding: 0 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.dashboard-home-shell .status-badge.safe,
+.subject-status-guide-sheet .status-badge.safe {
+  background: #eef8f1;
+  color: #009b50;
+}
+
+.dashboard-home-shell .status-badge.searching,
+.subject-status-guide-sheet .status-badge.searching {
+  background: #fff0f1;
+  color: #f04444;
+}
+
+.dashboard-home-shell .status-badge.purchase-needed,
+.subject-status-guide-sheet .status-badge.purchase-needed {
+  background: #fff1e9;
+  color: #ff6b35;
+}
+
+.dashboard-home-shell .managed-page-dots {
+  min-height: 20px;
+  gap: 14px;
+  padding-top: 4px;
+}
+
+.dashboard-home-shell .managed-page-dots button {
+  width: 9px;
+  height: 9px;
+  flex-basis: 9px;
+  background: #e2e4e3;
+}
+
+.dashboard-home-shell .managed-page-dots button.active {
+  background: #0aaf5b;
+  transform: none;
+}
+
+.managed-empty-state {
+  min-height: 272px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.managed-empty-plus {
+  width: 75px;
+  height: 75px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  border: 2px solid #009b50;
+  border-radius: 50%;
+  color: #009b50;
+  font-size: 42px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.managed-empty-state strong {
+  color: #22282a;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.managed-empty-state p {
+  margin: 8px 0 20px;
+  color: #777d7a;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.managed-empty-add {
+  min-height: 43px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 16px;
+  border: 2px solid #009b50;
+  border-radius: 8px;
+  color: #009b50;
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.dashboard-home-shell .quick-actions {
+  width: 100%;
+  gap: 10px;
+  margin: 0;
+}
+
+.dashboard-home-shell .quick-actions a {
+  min-height: 112px;
+  gap: 6px;
+  padding: 10px 4px;
+  border: 1px solid #e2e5e3;
+  border-radius: 10px;
+}
+
+.dashboard-home-shell .quick-action-image {
+  width: 58px;
+  height: 58px;
+}
+
+.dashboard-home-shell .quick-actions .quick-action-label {
+  color: #151b1d;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.dashboard-home-shell .dashboard-assurance-banner {
+  width: 100%;
+  min-height: 94px;
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: #f3f8f5;
+}
+
+.dashboard-assurance-icon {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+}
+
+.dashboard-home-shell .dashboard-assurance-banner p {
+  margin: 0;
+  color: #353c39;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.subject-status-guide-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(20, 24, 22, 0.48);
+}
+
+.subject-status-guide-sheet {
+  width: min(100%, 390px);
+  padding: 9px 10px 12px;
+  border-radius: 14px 14px 0 0;
+  background: #ffffff;
+}
+
+.subject-status-guide-handle {
+  width: 38px;
+  height: 4px;
+  display: block;
+  margin: 0 auto 18px;
+  border-radius: 4px;
+  background: #c6c9c7;
+}
+
+.subject-status-guide-sheet h2 {
+  margin: 0 0 14px;
+  color: #202628;
+  font-size: 17px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.subject-status-guide-list {
+  display: grid;
+}
+
+.subject-status-guide-row {
+  min-height: 61px;
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #eceeed;
+}
+
+.subject-status-guide-row .status-badge {
+  min-width: 0;
+  min-height: 34px;
+  padding: 0 8px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+.subject-status-guide-row p {
+  margin: 0;
+  color: #4c5350;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.subject-status-guide-confirm {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 6px;
+  background: #009b50;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+@media (max-width: 389px) {
+  .dashboard-home-shell .dashboard-title {
+    font-size: 22px;
+  }
+
+  .dashboard-home-shell .managed-card-preview-link {
+    grid-template-columns: 62px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .dashboard-home-shell .managed-photo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .dashboard-home-shell .managed-actions {
+    min-width: 66px;
+  }
+
+  .dashboard-home-shell .managed-actions .status-badge {
+    padding-inline: 7px;
+    font-size: 12px;
+  }
+}
+
 /* Signup profile reference layout */
 .signup-card:has(.signup-profile-form) {
   width: min(100%, 390px);
@@ -17434,4 +17853,16 @@ button:disabled:hover {
   .login-card .credentials-login-form .login-password-field input {
     min-height: 54px;
   }
+}
+
+/* Keep the compact home shell above the shared dashboard rules. */
+.dashboard-shell.dashboard-home-shell,
+.dashboard-shell.dashboard-home-shell.has-corner {
+  width: min(100%, 390px);
+  min-height: 100svh;
+  padding-top: 64px;
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
 }

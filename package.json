@@ -11,6 +11,7 @@
     "test:qr-claim": "node scripts/qr-signup-claim-regression.mjs",
     "test:push": "node scripts/push-subscription-regression.mjs",
     "test:admin-grid": "node scripts/admin-grid-selection-regression.mjs",
+    "test:dashboard-ui": "node scripts/dashboard-ui-regression.mjs",
     "test:admin-phone-otp": "tsx scripts/admin-phone-verification-regression.mjs",
     "test:login-ui": "node scripts/login-ui-regression.mjs",
     "test:signup-phone-ui": "node scripts/signup-phone-ui-regression.mjs",
