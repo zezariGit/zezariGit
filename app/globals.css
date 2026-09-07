@@ -1127,8 +1127,8 @@ a {
 }
 
 .dashboard-home-shell .corner-icon-button {
-  width: 30px;
-  height: 30px;
+  width: 42px;
+  height: 42px;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -1136,10 +1136,20 @@ a {
 }
 
 .dashboard-corner-icon {
-  width: 36px;
-  height: 36px;
   display: block;
   object-fit: contain;
+}
+
+.dashboard-home-shell .my-page-corner-link .dashboard-corner-icon {
+  width: 42px;
+  height: 42px;
+  transform: scale(1.12);
+}
+
+.dashboard-home-shell .notification-bell-button .dashboard-corner-icon {
+  width: 42px;
+  height: 42px;
+  transform: scale(1.72);
 }
 
 .dashboard-home-shell .dashboard-content {

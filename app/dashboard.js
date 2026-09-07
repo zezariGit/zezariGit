@@ -111,7 +111,7 @@ export default async function GuardianDashboard({
             <h1 className="dashboard-title">
               {isDashboard
                 ? guardianComplete
-                  ? `안녕하세요, ${guardian.name}님!`
+                  ? "안녕하세요, 보호자님!"
                   : "회원가입 정보를 입력해 주세요"
                 : isGuardianTab
                   ? "보호자정보"
@@ -448,7 +448,7 @@ function StatusDashboard({ subjects }) {
   for (let index = 0; index < subjects.length; index += pageSize) {
     subjectPages.push(subjects.slice(index, index + pageSize));
   }
-  if (subjectPages.length === 0) subjectPages.push([]);
+  subjectPages.push([]);
 
   return (
     <section className="status-dashboard" aria-label="관리대상 현재 상태">
@@ -494,8 +494,8 @@ function StatusDashboard({ subjects }) {
                 {pageSubjects.length === 0 && (
                   <div className="managed-empty-state">
                     <span className="managed-empty-plus" aria-hidden="true">+</span>
-                    <strong>등록된 대상자가 없습니다.</strong>
-                    <p>대상자를 등록하고 제자리 서비스를 시작해 보세요.</p>
+                    <strong>{subjects.length > 0 ? "대상자를 추가해 주세요." : "등록된 대상자가 없습니다."}</strong>
+                    <p>{subjects.length > 0 ? "새로운 대상자를 등록해 주세요." : "대상자를 등록하고 제자리 서비스를 시작해 보세요."}</p>
                     <Link className="managed-empty-add" href="/?tab=subjects&mode=new#subjects-info">
                       <span aria-hidden="true">+</span> 대상자 추가하기
                     </Link>

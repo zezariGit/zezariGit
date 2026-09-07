@@ -11,6 +11,8 @@ const [dashboard, carousel, guide, styles, ...icons] = await Promise.all([
 ]);
 
 assert.match(dashboard, /const pageSize = 3;/, "대상자 목록은 3명 단위여야 합니다.");
+assert.match(dashboard, /subjectPages\.push\(\[\]\);/, "대상자 목록 끝에는 추가 전용 페이지가 있어야 합니다.");
+assert.match(dashboard, /안녕하세요, 보호자님!/);
 assert.match(dashboard, /href=\{`\/\?tab=dashboard&previewSubject=/, "대상자 행 전체가 미리보기 링크여야 합니다.");
 assert.match(dashboard, /등록된 대상자가 없습니다\./);
 assert.match(dashboard, /대상자 추가하기/);
