@@ -157,8 +157,15 @@ export default function OnboardingGate({ enabled, children }) {
 
         {active === slides.length - 1 && (
           <div className="onboarding-controls">
-            <button className="primary-button onboarding-login-button" type="button" onClick={goToLogin}>
-              로그인하기
+            <button className="onboarding-login-button" type="button" onClick={goToLogin} aria-label="로그인하기">
+              <Image
+                className="onboarding-login-button-image"
+                src="/images/onboarding/login-button.png"
+                alt=""
+                width={329}
+                height={73}
+              />
+              <span className="visually-hidden">로그인하기</span>
             </button>
           </div>
         )}

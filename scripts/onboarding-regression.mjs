@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const [component, styles, ...images] = await Promise.all([
+const [component, styles, loginButton, ...images] = await Promise.all([
   readFile(new URL("../app/onboarding-gate.js", import.meta.url), "utf8"),
   readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+  readFile(new URL("../public/images/onboarding/login-button.png", import.meta.url)),
   ...[1, 2, 3].map((number) => (
     readFile(new URL(`../public/images/onboarding/${number}.png`, import.meta.url))
   )),
@@ -45,7 +46,10 @@ assert.match(styles, /\.onboarding-shell \.slide-track \{[\s\S]*?transition: tra
 assert.match(styles, /\.onboarding-shell \.dot\.active \{[\s\S]*?background: #009b50/);
 assert.match(styles, /\.onboarding-shell \.slide-dots \{[\s\S]*?top: 742px;/);
 assert.match(styles, /\.onboarding-shell \.onboarding-controls \{[\s\S]*?top: 780px;/);
+assert.match(styles, /\.onboarding-shell \.onboarding-controls \{[\s\S]*?width: auto;/);
 assert.match(styles, /\.onboarding-shell \.onboarding-controls \.onboarding-login-button/);
+assert.match(component, /src="\/images\/onboarding\/login-button\.png"/);
+assert.equal(loginButton.toString("ascii", 1, 4), "PNG");
 
 for (const [index, image] of images.entries()) {
   assert.equal(image.toString("ascii", 1, 4), "PNG");

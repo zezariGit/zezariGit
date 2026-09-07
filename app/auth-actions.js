@@ -28,15 +28,15 @@ const socialProviders = [
   },
 ];
 
-export function LoginAuthPanel({ enabledProviders = [], authError = "", initialMode = "login", qrClaim = false }) {
+export function LoginAuthPanel({ enabledProviders = [], authError = "", initialMode = "login", initialSignupStep, qrClaim = false }) {
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState(initialMode === "signup" ? "signup" : "login");
+  const [mode, setMode] = useState(initialMode === "signup" || initialSignupStep === "done" ? "signup" : "login");
   const [message, setMessage] = useState(authError ? LOGIN_ERROR_MESSAGE : "");
-  const [signupStep, setSignupStep] = useState("phone");
+  const [signupStep, setSignupStep] = useState(initialSignupStep === "done" ? "done" : "phone");
   const [signup, setSignup] = useState({
     email: "",
     phone: "",
@@ -311,9 +311,8 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
       setSignupLoading(false);
       setLoginId(signup.loginId);
       setPassword("");
-      setMode("login");
-      setSignupStep("phone");
-      setMessage("회원가입이 완료되었습니다. 로그인해 주세요.");
+      setSignupStep("done");
+      setMessage("");
     } catch {
       setMessage("회원가입 처리 중 오류가 발생했습니다.");
       setSignupLoading(false);
@@ -501,6 +500,25 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
               {signupLoading ? "처리중" : "회원가입"}
             </button>
           </form>
+        )}
+
+        {signupStep === "done" && (
+          <div className="signup-step signup-complete signup-complete-reference">
+            <div className="complete-mark" aria-hidden="true"><span /></div>
+            <h1>회원가입이 완료되었습니다!</h1>
+            <p>로그인 후 제자리 서비스를 이용해 주세요.</p>
+            <button
+              className="login-submit"
+              type="button"
+              onClick={() => {
+                setMode("login");
+                setSignupStep("phone");
+                setMessage("");
+              }}
+            >
+              로그인하기
+            </button>
+          </div>
         )}
 
         {message && <p className="login-message" role="status">{message}</p>}

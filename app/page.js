@@ -34,6 +34,9 @@ export default async function HomePage({ searchParams }) {
   const noticeType = resolvedSearchParams?.noticeType || "success";
   const authError = resolvedSearchParams?.error || "";
   const authMode = resolvedSearchParams?.signup === "1" ? "signup" : "login";
+  const signupPreviewStep = process.env.NODE_ENV === "development" && resolvedSearchParams?.preview === "signup-complete"
+    ? "done"
+    : undefined;
   const session = await getServerSession(authOptions);
   const enabledProviders = getConfiguredProviderIds();
   const pendingQrClaim = await resolvePendingQrClaim();
@@ -83,6 +86,7 @@ export default async function HomePage({ searchParams }) {
         enabledProviders={enabledProviders}
         authError={authError}
         initialMode={authMode}
+        initialSignupStep={signupPreviewStep}
         qrClaim={Boolean(pendingQrClaim)}
       />
     </main>

@@ -587,6 +587,75 @@ a {
   line-height: 1.5;
 }
 
+.signup-card:has(.signup-complete-reference) {
+  width: min(100%, 390px);
+  min-height: 100svh;
+  padding: 0 8px;
+}
+
+.signup-complete-reference {
+  min-height: min(100svh, 575px);
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 62px 0 28px;
+  text-align: center;
+}
+
+.signup-complete-reference .complete-mark {
+  position: relative;
+  width: 108px;
+  height: 108px;
+  flex: 0 0 108px;
+  margin: 0 auto 39px;
+  border-radius: 50%;
+  background: #009b50;
+  font-size: 0;
+}
+
+.signup-complete-reference .complete-mark span {
+  position: absolute;
+  top: 29px;
+  left: 28px;
+  width: 57px;
+  height: 32px;
+  border-bottom: 9px solid #ffffff;
+  border-left: 9px solid #ffffff;
+  border-radius: 3px;
+  transform: rotate(-45deg);
+}
+
+.signup-complete-reference h1 {
+  margin: 0;
+  color: #111820;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+.signup-complete-reference p {
+  width: 100%;
+  margin: 18px 0 0;
+  color: #7a7f7d;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.signup-complete-reference .login-submit {
+  width: 100%;
+  min-height: 57px;
+  margin-top: 56px;
+  border-radius: 8px;
+  background: #009b50;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
 .outline-login-button {
   min-height: 46px;
   border: 1px solid var(--c-primary-border);
@@ -17034,19 +17103,27 @@ button:disabled:hover {
   top: 780px;
   right: 20px;
   left: 20px;
+  width: auto;
   margin: 0;
 }
 
 .onboarding-shell .onboarding-controls .onboarding-login-button {
   flex: none;
   width: 100%;
-  min-height: 63px;
+  min-height: 0;
   border: 0;
-  border-radius: 12px;
-  background: #009b50;
-  color: #ffffff;
-  font-size: 19px;
-  font-weight: 800;
+  border-radius: 0;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  cursor: pointer;
+}
+
+.onboarding-login-button-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 @media (max-width: 389px) {
