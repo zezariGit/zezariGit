@@ -44,6 +44,7 @@ export default async function GuardianDashboard({
   registeredSubjectId = "",
   registeredQrClaim = false,
   hasQrSignupClaim = false,
+  notificationPreview = false,
 }) {
   const qrImageSubjectIds = new Set([adSubjectId, editSubjectId].filter(Boolean));
   const subjectsWithQr = await withSubjectQrImages(subjects, qrImageSubjectIds);
@@ -75,7 +76,7 @@ export default async function GuardianDashboard({
       <section className={`dashboard-shell${guardianComplete && guardianActive ? " has-corner" : ""}${isDashboard && !selectedPreviewSubject ? " dashboard-home-shell" : ""}`}>
         {guardianComplete && guardianActive && (
           <div className="dashboard-corner-bar" aria-label="사용자 빠른 메뉴">
-            <NotificationBell />
+            <NotificationBell preview={notificationPreview} />
             {registeredSubject && <strong className="subject-complete-page-title">대상자 등록 완료</strong>}
             <OpenMyPageButton
               className="corner-icon-button my-page-corner-link"

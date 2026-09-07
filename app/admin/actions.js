@@ -13,6 +13,7 @@ import {
   deleteSafePhonePoolNumber,
   generateQrCodes,
   createAdminPaymentRefund,
+  completeAdminPaymentRefund,
   getAdminMessageById,
   getAdminMessageRecipients,
   isDbAdminSession,
@@ -332,6 +333,21 @@ export async function createAdminPaymentRefundAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=payments"), error.message || "취소/환불 처리에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin?section=payments"), "취소/환불이 접수되었습니다."));
+}
+
+export async function completeAdminPaymentRefundAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  try {
+    await completeAdminPaymentRefund(formData);
+    revalidatePath("/admin");
+    revalidatePath("/account/billing");
+    revalidatePath("/account/ads");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=payments"), error.message || "취소/환불 완료 처리에 실패했습니다.", "error"));
+  }
+  redirect(withNotice(getReturnTo(formData, "/admin?section=payments"), "취소/환불을 완료 처리했습니다."));
 }
 
 export async function saveAdminCouponAction(formData) {

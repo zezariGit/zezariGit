@@ -40,7 +40,7 @@ export default async function HomePage({ searchParams }) {
   const dashboardPreview = process.env.NODE_ENV === "development"
     ? String(resolvedSearchParams?.preview || "")
     : "";
-  if (dashboardPreview === "dashboard" || dashboardPreview === "dashboard-empty") {
+  if (["dashboard", "dashboard-empty", "dashboard-notifications"].includes(dashboardPreview)) {
     return (
       <GuardianDashboard
         guardian={{ id: "preview-guardian", name: "보호자", phone: "010-0000-0000", birth_date: "1990-01-01", is_active: 1, login_id: "preview", password_hash: "preview" }}
@@ -48,6 +48,7 @@ export default async function HomePage({ searchParams }) {
         subscription={null}
         session={{ user: { provider: "credentials", email: "" } }}
         activeTab="dashboard"
+        notificationPreview={dashboardPreview === "dashboard-notifications"}
       />
     );
   }

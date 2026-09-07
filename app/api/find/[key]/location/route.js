@@ -43,6 +43,7 @@ export async function POST(request, { params }) {
   const result = await notifyGuardianLocationShared({
     guardianId: share.guardianId,
     subjectName: share.subjectName,
+    locationShareId: share.id,
     kakaoMapUrl: share.kakaoMapUrl,
     naverMapUrl: share.naverMapUrl,
     addressLabel: share.addressLabel,

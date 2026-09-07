@@ -59,6 +59,7 @@ import {
   setAdminSubjectAdMemoAction,
   setAdminSubjectAdStatusAction,
   createAdminPaymentRefundAction,
+  completeAdminPaymentRefundAction,
   saveAdminCouponAction,
   saveAdminMessageAction,
   saveAdminMessageTemplateAction,
@@ -1520,7 +1521,10 @@ function NotificationManagementSection({ messagesData, composeMessage }) {
           <strong>전체 {formatMetricValue(summary.total)}건</strong>
           <span>발송 {formatMetricValue(summary.sent)}건 · 저장 {formatMetricValue(summary.draft)}건</span>
         </div>
-        <Link className="primary-button compact" href={buildAdminMessageUrl(filters, "", true)}>+ 새 메시지</Link>
+        <div className="admin-heading-actions">
+          <Link className="plain-button compact" href="/admin?section=message-templates&template=template-safety-location-shared">자동 알림 설정</Link>
+          <Link className="primary-button compact" href={buildAdminMessageUrl(filters, "", true)}>+ 새 메시지</Link>
+        </div>
       </div>
 
       <div className="admin-master-detail admin-message-layout">
@@ -2780,6 +2784,13 @@ function PaymentManagementSection({ paymentData }) {
                         <strong>{formatCurrency(refund.amount)}</strong>
                         <span>{refund.reason}</span>
                         <time>{formatRecentDateTime(refund.created_at)}</time>
+                        {refund.status === "requested" && (
+                          <form action={completeAdminPaymentRefundAction}>
+                            <input type="hidden" name="refundId" value={refund.id} />
+                            <input type="hidden" name="returnTo" value={selectedPaymentReturnTo} />
+                            <FormSubmitButton className="plain-button compact" pendingText="처리중">환불 완료 처리</FormSubmitButton>
+                          </form>
+                        )}
                       </article>
                     ))}
                   </div>
