@@ -703,6 +703,54 @@ a {
   text-align: center;
 }
 
+.login-message.success {
+  color: var(--c-success);
+}
+
+.password-reset-step {
+  gap: 14px;
+}
+
+.password-reset-step .code-heading .expired {
+  color: var(--c-danger);
+}
+
+.password-check-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 10px;
+  margin: -2px 0 2px;
+  padding: 0;
+  list-style: none;
+  color: var(--c-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.password-check-list li {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.password-check-list li.valid {
+  color: var(--c-success);
+}
+
+.password-match-message {
+  margin: -6px 0 0;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.password-match-message.valid {
+  color: var(--c-success);
+}
+
+.password-match-message.invalid {
+  color: var(--c-danger);
+}
+
 .login-divider {
   display: flex;
   align-items: center;

@@ -2,6 +2,7 @@
 
 import { signIn, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { PasswordResetPanel } from "./password-reset-panel";
 
 const socialProviders = [
   {
@@ -115,6 +116,16 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
   const closeSignup = () => {
     setMode("login");
     setSignupStep("phone");
+    setMessage("");
+  };
+
+  const openPasswordReset = () => {
+    setMode("password-reset");
+    setMessage("");
+  };
+
+  const closePasswordReset = () => {
+    setMode("login");
     setMessage("");
   };
 
@@ -422,6 +433,19 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
     );
   }
 
+  if (mode === "password-reset") {
+    return (
+      <PasswordResetPanel
+        onBack={closePasswordReset}
+        onComplete={({ loginId: recoveredLoginId }) => {
+          if (recoveredLoginId) setLoginId(recoveredLoginId);
+          setMode("login");
+          setMessage("비밀번호가 변경되었습니다. 새 비밀번호로 로그인해 주세요.");
+        }}
+      />
+    );
+  }
+
   return (
     <section className="auth-panel login-card" aria-label="로그인">
       <h1 className="login-title">로그인</h1>
@@ -465,7 +489,7 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
           <button
             className="link-button"
             type="button"
-            onClick={() => setMessage("비밀번호 찾기는 준비중입니다. SNS 로그인 또는 관리자 문의를 이용해 주세요.")}
+            onClick={openPasswordReset}
           >
             비밀번호 찾기
           </button>
@@ -476,7 +500,11 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
         </button>
       </form>
 
-      {message && <p className="login-message" role="status">{message}</p>}
+      {message && (
+        <p className={`login-message ${message.startsWith("비밀번호가 변경되었습니다.") ? "success" : ""}`} role="status">
+          {message}
+        </p>
+      )}
 
       <div className="login-divider">
         <span>또는</span>
