@@ -831,6 +831,209 @@ a {
   font-size: 13px;
 }
 
+/* Signup phone verification reference layout */
+.signup-phone-step {
+  gap: 0;
+  padding-top: 0;
+}
+
+.signup-card:has(.signup-phone-step) {
+  width: min(100%, 390px);
+  min-height: 720px;
+}
+
+.signup-card:has(.signup-phone-step) .signup-back-button {
+  top: 4px;
+  left: -8px;
+  width: 34px;
+  height: 34px;
+  font-size: 39px;
+  font-weight: 500;
+}
+
+.signup-phone-step .login-title {
+  margin: 7px 0 54px;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.signup-phone-step .signup-copy {
+  gap: 11px;
+  margin: 0 0 30px;
+}
+
+.signup-phone-step .signup-copy strong {
+  color: #101418;
+  font-size: 24px;
+  line-height: 1.35;
+}
+
+.signup-phone-step .signup-copy strong em {
+  color: #009b50;
+  font-style: normal;
+}
+
+.signup-phone-step .signup-copy p {
+  color: #464b50;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.signup-phone-step .signup-field {
+  gap: 9px;
+  font-size: 13px;
+}
+
+.signup-phone-step .signup-field input {
+  min-height: 54px;
+  border: 1px solid #cfd5d2;
+  border-radius: 6px;
+  padding: 0 15px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.signup-phone-step .signup-field input:focus,
+.signup-phone-step .signup-field:not(.invalid) input:not(:placeholder-shown) {
+  border-color: #15aa5a;
+  box-shadow: none;
+}
+
+.signup-phone-step .signup-field.invalid input {
+  border-color: #ff4d57;
+}
+
+.signup-field-error,
+.signup-code-error {
+  margin: 0;
+  color: #ff4d57 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1.45;
+}
+
+.signup-phone-step .signup-verification-request {
+  margin-top: 18px;
+}
+
+.signup-phone-step .login-submit {
+  min-height: 52px;
+  border-radius: 6px;
+  background: #009b50;
+  font-size: 16px;
+}
+
+.signup-phone-step .login-submit:disabled {
+  background: #f1f3f4;
+  color: #b5bab7;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.signup-phone-step .signup-separator {
+  margin: 31px 0 30px;
+  background: #e5e9e7;
+}
+
+.signup-phone-step .code-heading {
+  margin-bottom: 13px;
+  font-size: 13px;
+}
+
+.signup-phone-step .code-heading span {
+  color: #00a653;
+  font-size: 14px;
+}
+
+.signup-phone-step .code-heading span.expired {
+  color: #ff4d57;
+}
+
+.signup-phone-step .verification-code-row {
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.signup-phone-step .verification-code-row input {
+  height: 58px;
+  aspect-ratio: auto;
+  border: 1px solid #d7dcda;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111418;
+  font-size: 23px;
+}
+
+.signup-phone-step .verification-code-row.active input {
+  border-color: #15aa5a;
+}
+
+.signup-phone-step .verification-code-row.invalid {
+  margin-bottom: 8px;
+}
+
+.signup-phone-step .verification-code-row.invalid input {
+  border-color: #ff4d57;
+}
+
+.signup-phone-step .signup-code-error {
+  margin: 0 0 14px;
+}
+
+.signup-phone-step .centered-link {
+  margin-top: 22px;
+  color: #15964f;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.signup-phone-step .centered-link:disabled {
+  color: #9aafa2;
+}
+
+.signup-phone-notice {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: 13px;
+  margin-top: 31px;
+  padding: 19px 16px;
+  border-radius: 6px;
+  background: #f5f8f6;
+}
+
+.signup-phone-notice svg {
+  width: 38px;
+  height: 38px;
+  fill: none;
+  stroke: #00a653;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.signup-phone-notice p {
+  margin: 0;
+  color: #343a37;
+  font-size: 11px;
+  line-height: 1.85;
+  word-break: keep-all;
+}
+
+@media (max-width: 389px) {
+  .signup-phone-step .signup-copy strong {
+    font-size: 22px;
+  }
+
+  .signup-phone-step .verification-code-row {
+    gap: 7px;
+  }
+
+  .signup-phone-step .verification-code-row input {
+    height: 54px;
+  }
+}
+
 .signup-link {
   color: #6b5bd1;
   text-decoration: underline;

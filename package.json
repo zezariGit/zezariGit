@@ -13,6 +13,7 @@
     "test:admin-grid": "node scripts/admin-grid-selection-regression.mjs",
     "test:admin-phone-otp": "tsx scripts/admin-phone-verification-regression.mjs",
     "test:login-ui": "node scripts/login-ui-regression.mjs",
+    "test:signup-phone-ui": "node scripts/signup-phone-ui-regression.mjs",
     "test:onboarding": "node scripts/onboarding-regression.mjs",
     "test:password-reset": "tsx scripts/password-reset-regression.mjs",
     "test:social-link": "tsx scripts/social-account-link-regression.mjs",

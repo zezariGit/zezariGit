@@ -54,6 +54,10 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
   const [phoneVerificationLoading, setPhoneVerificationLoading] = useState(false);
   const [signupCredentials, setSignupCredentials] = useState(null);
   const [codeSeconds, setCodeSeconds] = useState(0);
+  const [codeRequested, setCodeRequested] = useState(false);
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  const [signupPhoneError, setSignupPhoneError] = useState("");
+  const [signupCodeError, setSignupCodeError] = useState("");
 
   useEffect(() => {
     const savedLoginId = window.localStorage.getItem("zezari:remember-login-id") || "";
@@ -70,7 +74,13 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
   useEffect(() => {
     if (codeSeconds <= 0) return undefined;
     const timer = window.setInterval(() => {
-      setCodeSeconds((current) => Math.max(0, current - 1));
+      setCodeSeconds((current) => {
+        if (current <= 1) {
+          setSignupCodeError("인증시간이 만료되었습니다. 인증번호를 다시 받아주세요.");
+          return 0;
+        }
+        return current - 1;
+      });
     }, 1000);
     return () => window.clearInterval(timer);
   }, [codeSeconds]);
@@ -112,6 +122,9 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
       setVerifiedPhone("");
       setPhoneVerificationToken("");
       setCodeInput(["", "", "", "", "", ""]);
+      setCodeRequested(false);
+      setCodeSeconds(0);
+      setSignupCodeError("");
     }
   };
 
@@ -119,12 +132,17 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
     setMode("signup");
     setSignupStep("phone");
     setMessage("");
+    setPhoneTouched(false);
+    setSignupPhoneError("");
+    setSignupCodeError("");
   };
 
   const closeSignup = () => {
     setMode("login");
     setSignupStep("phone");
     setMessage("");
+    setSignupPhoneError("");
+    setSignupCodeError("");
   };
 
   const openPasswordReset = () => {
@@ -139,13 +157,16 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
 
   const requestVerificationCode = async () => {
     const phone = signup.phone.replace(/\D/g, "");
-    if (!/^01[016789]\d{7,8}$/.test(phone)) {
-      setMessage("휴대폰 번호를 정확히 입력해 주세요.");
+    setPhoneTouched(true);
+    if (!isValidMobilePhone(phone)) {
+      setSignupPhoneError("휴대전화번호를 정확하게 입력해 주세요.");
       return;
     }
 
     setPhoneVerificationLoading(true);
     setMessage("");
+    setSignupPhoneError("");
+    setSignupCodeError("");
 
     try {
       const response = await fetch("/api/signup/phone/send", {
@@ -155,7 +176,7 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
       });
       const data = await response.json();
       if (!response.ok || !data.ok) {
-        setMessage(data.message || "인증번호 발송에 실패했습니다.");
+        setSignupPhoneError(data.message || "인증번호 발송에 실패했습니다.");
         setPhoneVerificationLoading(false);
         return;
       }
@@ -163,10 +184,10 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
       setCodeInput(["", "", "", "", "", ""]);
       setVerifiedPhone("");
       setPhoneVerificationToken("");
+      setCodeRequested(true);
       setCodeSeconds(data.expiresInSeconds || 180);
-      setMessage("인증번호를 발송했습니다. 문자로 받은 6자리 번호를 입력해 주세요.");
     } catch {
-      setMessage("인증번호 발송 중 오류가 발생했습니다.");
+      setSignupPhoneError("인증번호 발송 중 오류가 발생했습니다.");
     } finally {
       setPhoneVerificationLoading(false);
     }
@@ -175,6 +196,7 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
   const updateCodeInput = (index, value) => {
     const digit = value.replace(/\D/g, "").slice(-1);
     setCodeInput((current) => current.map((item, itemIndex) => (itemIndex === index ? digit : item)));
+    setSignupCodeError("");
     if (digit) {
       const next = document.getElementById(`signup-code-${index + 1}`);
       next?.focus();
@@ -184,16 +206,17 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
   const verifyCode = async () => {
     const code = codeInput.join("");
     if (!code || codeSeconds <= 0) {
-      setMessage("인증코드를 다시 받아 주세요.");
+      setSignupCodeError("인증시간이 만료되었습니다. 인증번호를 다시 받아주세요.");
       return;
     }
     if (!/^\d{6}$/.test(code)) {
-      setMessage("6자리 인증번호를 입력해 주세요.");
+      setSignupCodeError("6자리 인증번호를 입력해 주세요.");
       return;
     }
 
     setPhoneVerificationLoading(true);
     setMessage("");
+    setSignupCodeError("");
 
     try {
       const response = await fetch("/api/signup/phone/verify", {
@@ -203,7 +226,14 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
       });
       const data = await response.json();
       if (!response.ok || !data.ok) {
-        setMessage(data.message || "인증번호가 일치하지 않습니다.");
+        const verificationMessage = data.message || "인증번호가 일치하지 않습니다.";
+        setSignupCodeError(
+          verificationMessage.includes("일치하지")
+            ? "인증번호가 일치하지 않습니다. 다시 확인해 주세요."
+            : verificationMessage.includes("다시 받아")
+              ? "인증시간이 만료되었습니다. 인증번호를 다시 받아주세요."
+              : verificationMessage
+        );
         setPhoneVerificationLoading(false);
         return;
       }
@@ -213,7 +243,7 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
       setSignupStep("profile");
       setMessage("휴대폰 인증이 완료되었습니다.");
     } catch {
-      setMessage("인증번호 확인 중 오류가 발생했습니다.");
+      setSignupCodeError("인증번호 확인 중 오류가 발생했습니다.");
     } finally {
       setPhoneVerificationLoading(false);
     }
@@ -278,6 +308,11 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
   };
 
   if (mode === "signup") {
+    const signupPhoneDigits = signup.phone.replace(/\D/g, "");
+    const signupPhoneValid = isValidMobilePhone(signupPhoneDigits);
+    const completeSignupCode = codeInput.join("");
+    const signupCodeReady = codeRequested && codeSeconds > 0 && /^\d{6}$/.test(completeSignupCode);
+
     return (
       <section className="auth-panel signup-card" aria-label="회원가입">
         {signupStep !== "done" && (
@@ -288,34 +323,50 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
         )}
 
         {signupStep === "phone" && (
-          <div className="signup-step">
+          <div className="signup-step signup-phone-step">
             <h1 className="login-title">회원가입</h1>
             <div className="signup-copy">
-              <strong>휴대폰 번호를 입력해주세요</strong>
-              <p>보호자 알림과 계정 확인을 위해 휴대폰 인증을 진행해 주세요.</p>
+              <strong><em>휴대폰 번호</em>를 입력해 주세요</strong>
+              <p>대상자 발견 시 연락받을 보호자 번호를 인증해 주세요.</p>
             </div>
 
-            <label className="signup-field">
+            <label className={`signup-field ${signupPhoneError || (phoneTouched && !signupPhoneValid) ? "invalid" : ""}`}>
               <span>휴대폰 번호</span>
               <input
                 value={signup.phone}
-                onChange={(event) => updateSignup("phone", event.target.value)}
-                placeholder="010 - 1234 - 5678"
+                onChange={(event) => {
+                  const formattedPhone = formatPhoneNumber(event.target.value);
+                  updateSignup("phone", formattedPhone);
+                  setSignupPhoneError("");
+                  if (phoneTouched && !isValidMobilePhone(formattedPhone)) {
+                    setSignupPhoneError("휴대전화번호를 정확하게 입력해 주세요.");
+                  }
+                }}
+                onBlur={() => {
+                  setPhoneTouched(true);
+                  if (signupPhoneDigits && !signupPhoneValid) {
+                    setSignupPhoneError("휴대전화번호를 정확하게 입력해 주세요.");
+                  }
+                }}
+                placeholder="010-0000-0000"
                 inputMode="tel"
                 autoComplete="tel"
+                maxLength={13}
+                aria-invalid={Boolean(signupPhoneError || (phoneTouched && !signupPhoneValid))}
               />
+              {signupPhoneError && <small className="signup-field-error" role="alert">{signupPhoneError}</small>}
             </label>
-            <button className="login-submit" type="button" onClick={requestVerificationCode} disabled={phoneVerificationLoading}>
-              {phoneVerificationLoading ? "발송 중" : "인증코드 받기"}
+            <button className="login-submit signup-verification-request" type="button" onClick={requestVerificationCode} disabled={phoneVerificationLoading || !signupPhoneValid}>
+              {phoneVerificationLoading ? "발송 중" : codeRequested ? "인증코드 다시 받기" : "인증코드 받기"}
             </button>
 
             <div className="signup-separator" />
 
             <div className="code-heading">
               <strong>인증번호 입력</strong>
-              <span>{formatTimer(codeSeconds)}</span>
+              {codeRequested && <span className={codeSeconds === 0 ? "expired" : ""}>{formatTimer(codeSeconds)}</span>}
             </div>
-            <div className="verification-code-row">
+            <div className={`verification-code-row ${codeRequested ? "active" : ""} ${signupCodeError ? "invalid" : ""}`}>
               {codeInput.map((value, index) => (
                 <input
                   id={`signup-code-${index}`}
@@ -329,16 +380,27 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
                   }}
                   inputMode="numeric"
                   maxLength={1}
+                  disabled={!codeRequested || codeSeconds <= 0}
                   aria-label={`${index + 1}번째 인증번호`}
+                  aria-invalid={Boolean(signupCodeError)}
                 />
               ))}
             </div>
-            <button className="login-submit" type="button" onClick={verifyCode} disabled={phoneVerificationLoading}>
+            {signupCodeError && <p className="signup-code-error" role="alert">{signupCodeError}</p>}
+            <button className="login-submit" type="button" onClick={verifyCode} disabled={phoneVerificationLoading || !signupCodeReady}>
               {phoneVerificationLoading ? "확인 중" : "확인"}
             </button>
-            <button className="signup-link centered-link" type="button" onClick={requestVerificationCode} disabled={phoneVerificationLoading}>
+            <button className="signup-link centered-link" type="button" onClick={requestVerificationCode} disabled={phoneVerificationLoading || !signupPhoneValid}>
               인증번호가 오지 않았나요? 재전송
             </button>
+
+            <div className="signup-phone-notice">
+              <ShieldCheckIcon />
+              <p>
+                입력한 휴대폰 번호는 대상자 발견 시 연락받을 보호자 연락처입니다. 정확한 번호를 입력해 주세요.<br />
+                보호자 연락처는 안심번호로 안전하게 보호됩니다.
+              </p>
+            </div>
           </div>
         )}
 
@@ -591,6 +653,15 @@ function PasswordVisibilityIcon({ visible }) {
   );
 }
 
+function ShieldCheckIcon() {
+  return (
+    <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+      <path d="M24 4 40 10v12c0 10.4-6.4 17.1-16 22-9.6-4.9-16-11.6-16-22V10l16-6Z" />
+      <path d="m17 23 5 5 10-11" />
+    </svg>
+  );
+}
+
 export function SocialLoginButtons({ enabledProviders = [], variant = "stack", callbackUrl }) {
   return <SocialLoginButtonsInner enabledProviders={enabledProviders} variant={variant} callbackUrl={callbackUrl} />;
 }
@@ -708,6 +779,21 @@ function formatTimer(seconds) {
   const minutes = String(Math.floor(safeSeconds / 60)).padStart(2, "0");
   const rest = String(safeSeconds % 60).padStart(2, "0");
   return `${minutes}:${rest}`;
+}
+
+function formatPhoneNumber(value) {
+  const digits = String(value || "").replace(/\D/g, "").slice(0, 11);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  if (digits.length === 10 && !digits.startsWith("010")) {
+    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+}
+
+function isValidMobilePhone(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  return /^010\d{8}$/.test(digits) || /^01[16789]\d{7,8}$/.test(digits);
 }
 
 export function GoogleLogo() {
