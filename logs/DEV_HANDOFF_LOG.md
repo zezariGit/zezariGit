@@ -8920,3 +8920,35 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Feature commit `f29b0b7` was pushed to GitHub `main`.
 - Vercel production deployment `dpl_4fjNC7MHCbRxDqCkVHhtY1PaTiGY` reached `READY` and owns the `https://zezari.family` alias.
 - No real administrator SMS was triggered during automated deployment verification.
+
+## 2026-09-07 KST - Phone Password Reset Flow
+
+### User Request
+- Add a password-recovery phone verification flow with automatic phone formatting, valid-input button states, a three-minute timer, six-digit input, resend invalidation, inline password entry, live password rules, and return to login after completion.
+
+### Reflected Work
+- Replaced the placeholder password-recovery notice with an interactive login-panel flow.
+- Added automatic Korean mobile-number hyphen formatting and validity-based send-button activation.
+- Added six fixed code positions, paste handling, a three-minute countdown, and confirmation activation only after all six digits are present.
+- Added resend behavior that supersedes prior pending, sent, and verified password-reset records before issuing a new code.
+- Added an inline new-password step with live letter, number, special-character, eight-character, and confirmation checks.
+- Added dedicated send, verify, and completion APIs using the `password_reset` purpose.
+- Bound reset records to the active credentials guardian, added a hashed 15-minute one-time token, updated the password through the existing hash function, and cleared failed-login lock records after success.
+- Added `scripts/password-reset-regression.mjs`, `npm run test:password-reset`, and `deliverables/PASSWORD_RESET_FLOW.md`.
+
+### Verification
+- `npm run test:password-reset`: passed.
+- `npm run test:sms-provider`: passed.
+- `npm run test:admin-phone-otp`: passed.
+- `npm run test:social-link`: passed.
+- `npm run security:check`: passed.
+- `npm run build`: passed with Next.js 16.3.0.
+- `git diff --check`: passed.
+- Local 390px browser verification confirmed invalid/valid phone button states, no horizontal overflow, and no framework or console errors.
+- Production browser verification confirmed password-reset entry and button-state behavior without submitting a phone number or sending a real SMS.
+- Production invalid-input API check returned HTTP 400 with the expected phone-format message.
+
+### Deployment
+- Feature commit `38d628f` was pushed to GitHub `main`.
+- Vercel production deployment `dpl_8UXzr7YeUzqa3WCe6mHEVVbZrQ6k` reached `READY` and owns the `https://zezari.family` alias.
+- No real verification SMS or password change was performed during production verification.
