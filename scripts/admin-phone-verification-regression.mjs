@@ -30,6 +30,7 @@ async function createVerifiedGuardian({ phone, email, loginId, requestLabel }) {
   return createGuardianSignup({
     name: "인증 테스트",
     birthDate: "1990-01-01",
+    gender: "남성",
     phone,
     email,
     loginId,
@@ -81,6 +82,7 @@ await assert.rejects(
   createGuardianSignup({
     name: "중복 가입 차단",
     birthDate: "1990-01-01",
+    gender: "남성",
     phone: roleAdminPhone,
     email: "duplicate@example.com",
     loginId: "duplicate_admin",

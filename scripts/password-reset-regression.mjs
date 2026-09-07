@@ -41,6 +41,7 @@ const signupVerification = await verifySignupPhoneCode({
 await createGuardianSignup({
   name: "비밀번호 재설정 테스트",
   birthDate: "1990-01-01",
+  gender: "남성",
   phone,
   email: "password-reset@example.com",
   loginId,
@@ -48,7 +49,18 @@ await createGuardianSignup({
   phoneVerificationToken: signupVerification.phoneVerificationToken,
   privacyAgreed: true,
   serviceAgreed: true,
+  notificationAgreed: true,
 });
+
+const signupProfileRow = await createClient({
+  url: process.env.TURSO_DATABASE_URL,
+  authToken: process.env.TURSO_AUTH_TOKEN,
+}).execute({
+  sql: "SELECT gender, marketing_notifications_agreed_at FROM guardians WHERE login_id = ?",
+  args: [loginId],
+});
+assert.equal(signupProfileRow.rows[0]?.gender, "남성");
+assert.ok(signupProfileRow.rows[0]?.marketing_notifications_agreed_at);
 
 await assert.rejects(
   requestPasswordResetPhoneVerification(

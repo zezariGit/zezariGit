@@ -42,17 +42,23 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
     phone: "",
     name: "",
     birthDate: "",
+    birthYear: "",
+    birthMonth: "",
+    birthDay: "",
+    gender: "",
     loginId: "",
     password: "",
     privacyAgreed: false,
     serviceAgreed: false,
+    notificationAgreed: false,
   });
   const [codeInput, setCodeInput] = useState(["", "", "", "", "", ""]);
   const [verifiedPhone, setVerifiedPhone] = useState("");
   const [phoneVerificationToken, setPhoneVerificationToken] = useState("");
   const [signupLoading, setSignupLoading] = useState(false);
   const [phoneVerificationLoading, setPhoneVerificationLoading] = useState(false);
-  const [signupCredentials, setSignupCredentials] = useState(null);
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
+  const [profileTouched, setProfileTouched] = useState({});
   const [codeSeconds, setCodeSeconds] = useState(0);
   const [codeRequested, setCodeRequested] = useState(false);
   const [phoneTouched, setPhoneTouched] = useState(false);
@@ -128,6 +134,24 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
     }
   };
 
+  const updateSignupBirthPart = (key, value) => {
+    setSignup((current) => {
+      const next = { ...current, [key]: value };
+      if ((key === "birthYear" || key === "birthMonth") && next.birthYear && next.birthMonth && next.birthDay) {
+        const lastDay = new Date(Number(next.birthYear), Number(next.birthMonth), 0).getDate();
+        if (Number(next.birthDay) > lastDay) next.birthDay = "";
+      }
+      const birthDate = next.birthYear && next.birthMonth && next.birthDay
+        ? `${next.birthYear}-${next.birthMonth}-${next.birthDay}`
+        : "";
+      return { ...next, birthDate };
+    });
+  };
+
+  const touchProfileField = (key) => {
+    setProfileTouched((current) => ({ ...current, [key]: true }));
+  };
+
   const openSignup = () => {
     setMode("signup");
     setSignupStep("phone");
@@ -135,6 +159,7 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
     setPhoneTouched(false);
     setSignupPhoneError("");
     setSignupCodeError("");
+    setProfileTouched({});
   };
 
   const closeSignup = () => {
@@ -256,6 +281,11 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
       setMessage("휴대폰 인증을 먼저 완료해 주세요.");
       return;
     }
+    if (!isSignupProfileComplete(signup)) {
+      setProfileTouched({ name: true, gender: true, birthDate: true, loginId: true, password: true, terms: true });
+      setMessage("필수 가입 정보를 확인해 주세요.");
+      return;
+    }
 
     setSignupLoading(true);
     setMessage("");
@@ -278,33 +308,16 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
         return;
       }
 
-      setSignupCredentials({ loginId: signup.loginId, password: signup.password });
       setSignupLoading(false);
-      setSignupStep("done");
-      setMessage("");
+      setLoginId(signup.loginId);
+      setPassword("");
+      setMode("login");
+      setSignupStep("phone");
+      setMessage("회원가입이 완료되었습니다. 로그인해 주세요.");
     } catch {
       setMessage("회원가입 처리 중 오류가 발생했습니다.");
       setSignupLoading(false);
     }
-  };
-
-  const signInAfterSignup = async (destination) => {
-    if (!signupCredentials) return;
-    setSignupLoading(true);
-    const result = await signIn("credentials", {
-      loginId: signupCredentials.loginId,
-      password: signupCredentials.password,
-      redirect: false,
-      callbackUrl: destination,
-    });
-
-    if (result?.ok) {
-      window.location.href = destination;
-      return;
-    }
-
-    setSignupLoading(false);
-    setMessage("가입은 완료되었습니다. 로그인 화면에서 다시 로그인해 주세요.");
   };
 
   if (mode === "signup") {
@@ -312,6 +325,27 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
     const signupPhoneValid = isValidMobilePhone(signupPhoneDigits);
     const completeSignupCode = codeInput.join("");
     const signupCodeReady = codeRequested && codeSeconds > 0 && /^\d{6}$/.test(completeSignupCode);
+    const currentYear = new Date().getFullYear();
+    const signupYears = Array.from({ length: currentYear - 1899 }, (_, index) => String(currentYear - index));
+    const signupMonths = Array.from({ length: 12 }, (_, index) => String(index + 1).padStart(2, "0"));
+    const signupDayCount = signup.birthYear && signup.birthMonth
+      ? new Date(Number(signup.birthYear), Number(signup.birthMonth), 0).getDate()
+      : 31;
+    const signupDays = Array.from({ length: signupDayCount }, (_, index) => String(index + 1).padStart(2, "0"));
+    const signupNameValid = Boolean(signup.name.trim());
+    const signupGenderValid = ["남성", "여성"].includes(signup.gender);
+    const signupBirthValid = isValidSignupBirthDate(signup.birthDate);
+    const signupIdValid = /^[A-Za-z0-9_]{4,20}$/.test(signup.loginId);
+    const signupPasswordValid = isStrongSignupPassword(signup.password);
+    const requiredTermsAgreed = signup.privacyAgreed && signup.serviceAgreed;
+    const allTermsAgreed = requiredTermsAgreed && signup.notificationAgreed;
+    const signupProfileReady = signupNameValid
+      && signupGenderValid
+      && signupBirthValid
+      && Boolean(verifiedPhone && phoneVerificationToken)
+      && signupIdValid
+      && signupPasswordValid
+      && requiredTermsAgreed;
 
     return (
       <section className="auth-panel signup-card" aria-label="회원가입">
@@ -405,97 +439,68 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
         )}
 
         {signupStep === "profile" && (
-          <form className="signup-step compact-signup-form" onSubmit={submitSignup}>
+          <form className="signup-step compact-signup-form signup-profile-form" onSubmit={submitSignup} noValidate>
             <h1 className="login-title">회원가입</h1>
-            <div className="signup-copy">
-              <strong>기본 정보를 입력해주세요</strong>
-              <p>정확한 서비스 이용을 위해 필수 정보를 입력해주세요.</p>
-            </div>
+            <p className="signup-profile-intro">가입 정보를 입력해 주세요.</p>
 
-            <label className="signup-field">
+            <label className={`signup-profile-field ${profileTouched.name && !signupNameValid ? "invalid" : ""}`}>
               <span>이름</span>
-              <input value={signup.name} onChange={(event) => updateSignup("name", event.target.value)} placeholder="제자리" required />
-            </label>
-            <label className="signup-field">
-              <span>생년월일</span>
-              <input value={signup.birthDate} onChange={(event) => updateSignup("birthDate", event.target.value)} type="date" required />
-            </label>
-            <label className="signup-field">
-              <span>이메일</span>
-              <input
-                value={signup.email}
-                onChange={(event) => updateSignup("email", event.target.value)}
-                placeholder="zezari@zeazri.com"
-                type="email"
-                autoComplete="email"
-                required
-              />
-            </label>
-            <label className="signup-field verification-complete-field">
-              <span>휴대폰 번호</span>
-              <input value={verifiedPhone} readOnly />
-              <em>인증완료</em>
-            </label>
-            <label className="signup-field">
-              <span>아이디</span>
-              <input
-                value={signup.loginId}
-                onChange={(event) => updateSignup("loginId", event.target.value)}
-                placeholder="zezari"
-                autoComplete="username"
-                required
-              />
-            </label>
-            <label className="signup-field">
-              <span>비밀번호</span>
-              <input
-                value={signup.password}
-                onChange={(event) => updateSignup("password", event.target.value)}
-                type="password"
-                placeholder="8~16자 영문, 숫자, 특수문자"
-                autoComplete="new-password"
-                required
-              />
-              <small>8~16자, 영문, 숫자, 특수문자 포함</small>
+              <input value={signup.name} onChange={(event) => updateSignup("name", event.target.value)} onBlur={() => touchProfileField("name")} placeholder="이름을 입력해 주세요." aria-invalid={profileTouched.name && !signupNameValid} />
+              {profileTouched.name && !signupNameValid && <small role="alert">이름을 입력해 주세요.</small>}
             </label>
 
-            <div className="terms-box">
-              <strong>필수동의</strong>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={signup.privacyAgreed}
-                  onChange={(event) => updateSignup("privacyAgreed", event.target.checked)}
-                />
-                <span>개인정보 수집 및 이용 동의 (필수)</span>
-                <button type="button">자세히</button>
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={signup.serviceAgreed}
-                  onChange={(event) => updateSignup("serviceAgreed", event.target.checked)}
-                />
-                <span>서비스 이용 약관 동의 (필수)</span>
-                <button type="button">자세히</button>
-              </label>
+            <fieldset className={`signup-profile-gender ${profileTouched.gender && !signupGenderValid ? "invalid" : ""}`} onBlur={() => touchProfileField("gender")}>
+              <legend>성별</legend>
+              <label><input type="radio" name="signupGender" value="남성" checked={signup.gender === "남성"} onChange={(event) => { updateSignup("gender", event.target.value); touchProfileField("gender"); }} /><span>남성</span></label>
+              <label><input type="radio" name="signupGender" value="여성" checked={signup.gender === "여성"} onChange={(event) => { updateSignup("gender", event.target.value); touchProfileField("gender"); }} /><span>여성</span></label>
+              {profileTouched.gender && !signupGenderValid && <small role="alert">성별을 선택해 주세요.</small>}
+            </fieldset>
+
+            <fieldset className={`signup-profile-birth ${profileTouched.birthDate && !signupBirthValid ? "invalid" : ""}`} onBlur={() => touchProfileField("birthDate")}>
+              <legend>생년월일</legend>
+              <div>
+                <select value={signup.birthYear} onChange={(event) => updateSignupBirthPart("birthYear", event.target.value)} aria-label="출생 연도"><option value="">년</option>{signupYears.map((year) => <option key={year} value={year}>{year}</option>)}</select>
+                <select value={signup.birthMonth} onChange={(event) => updateSignupBirthPart("birthMonth", event.target.value)} aria-label="출생 월"><option value="">월</option>{signupMonths.map((month) => <option key={month} value={month}>{month}</option>)}</select>
+                <select value={signup.birthDay} onChange={(event) => updateSignupBirthPart("birthDay", event.target.value)} aria-label="출생 일"><option value="">일</option>{signupDays.map((day) => <option key={day} value={day}>{day}</option>)}</select>
+              </div>
+              {profileTouched.birthDate && !signupBirthValid && <small role="alert">생년월일을 모두 선택해 주세요.</small>}
+            </fieldset>
+
+            <label className="signup-profile-field signup-profile-phone">
+              <span>휴대전화번호</span>
+              <span className="signup-profile-phone-row"><input value={verifiedPhone} readOnly aria-readonly="true" /><em>인증 완료</em></span>
+            </label>
+
+            <label className={`signup-profile-field ${profileTouched.loginId && !signupIdValid ? "invalid" : ""}`}>
+              <span>아이디</span>
+              <input value={signup.loginId} onChange={(event) => updateSignup("loginId", event.target.value)} onBlur={() => touchProfileField("loginId")} placeholder="영문, 숫자 조합 4자 이상" autoComplete="username" aria-invalid={profileTouched.loginId && !signupIdValid} />
+              {profileTouched.loginId && !signupIdValid
+                ? <small role="alert">영문과 숫자를 조합하여 4자 이상 입력해 주세요.</small>
+                : signupIdValid && <small className="valid">사용 가능한 아이디 형식입니다.</small>}
+            </label>
+
+            <label className={`signup-profile-field signup-profile-password ${profileTouched.password && !signupPasswordValid ? "invalid" : ""}`}>
+              <span>비밀번호</span>
+              <span className="signup-profile-password-row">
+                <input value={signup.password} onChange={(event) => updateSignup("password", event.target.value)} onBlur={() => touchProfileField("password")} type={showSignupPassword ? "text" : "password"} placeholder="비밀번호를 입력해 주세요." autoComplete="new-password" maxLength={64} aria-invalid={profileTouched.password && !signupPasswordValid} />
+                <button type="button" onClick={() => setShowSignupPassword((current) => !current)} aria-label={showSignupPassword ? "비밀번호 숨기기" : "비밀번호 표시"}><PasswordVisibilityIcon visible={showSignupPassword} /></button>
+              </span>
+              <small className={signupPasswordValid ? "valid" : ""}>영문, 숫자, 특수문자를 포함하여 8자 이상 입력해 주세요.</small>
+            </label>
+
+            <div className={`signup-profile-terms ${profileTouched.terms && !requiredTermsAgreed ? "invalid" : ""}`} onBlur={() => touchProfileField("terms")}>
+              <strong>약관 동의</strong>
+              <label><input type="checkbox" checked={allTermsAgreed} onChange={(event) => { const checked = event.target.checked; setSignup((current) => ({ ...current, privacyAgreed: checked, serviceAgreed: checked, notificationAgreed: checked })); }} /><span>전체 동의</span></label>
+              <label><input type="checkbox" checked={signup.privacyAgreed} onChange={(event) => updateSignup("privacyAgreed", event.target.checked)} /><span>(필수) 개인정보 수집 및 이용 동의</span><button type="button">자세히</button></label>
+              <label><input type="checkbox" checked={signup.serviceAgreed} onChange={(event) => updateSignup("serviceAgreed", event.target.checked)} /><span>(필수) 서비스 이용 약관 동의</span><button type="button">자세히</button></label>
+              <label><input type="checkbox" checked={signup.notificationAgreed} onChange={(event) => updateSignup("notificationAgreed", event.target.checked)} /><span>(선택) 알림 동의</span><button type="button">자세히</button></label>
+              {profileTouched.terms && !requiredTermsAgreed && <small role="alert">필수 약관에 모두 동의해 주세요.</small>}
             </div>
 
-            <button className="login-submit" type="submit" disabled={signupLoading}>
-              {signupLoading ? "처리중" : "다음"}
+            <button className="login-submit" type="submit" disabled={signupLoading || !signupProfileReady}>
+              {signupLoading ? "처리중" : "회원가입"}
             </button>
           </form>
-        )}
-
-        {signupStep === "done" && (
-          <div className="signup-step signup-complete">
-            <div className="complete-mark" aria-hidden="true">✓</div>
-            <h1>회원가입이 완료되었습니다!</h1>
-            <p>zezari 서비스에 오신 것을 환영합니다. 소중한 가족의 안전을 함께 지켜요.</p>
-            <button className="login-submit" type="button" disabled={signupLoading} onClick={() => signInAfterSignup(qrClaim ? "/?tab=subjects&mode=new&qrClaim=1" : "/?tab=subjects&mode=new")}>
-              대상자 등록하기
-            </button>
-          </div>
         )}
 
         {message && <p className="login-message" role="status">{message}</p>}
@@ -794,6 +799,37 @@ function formatPhoneNumber(value) {
 function isValidMobilePhone(value) {
   const digits = String(value || "").replace(/\D/g, "");
   return /^010\d{8}$/.test(digits) || /^01[16789]\d{7,8}$/.test(digits);
+}
+
+function isValidSignupBirthDate(value) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || ""));
+  if (!match) return false;
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  return date.getFullYear() === Number(match[1])
+    && date.getMonth() === Number(match[2]) - 1
+    && date.getDate() === Number(match[3])
+    && date <= new Date();
+}
+
+function isStrongSignupPassword(value) {
+  const password = String(value || "");
+  return password.length >= 8
+    && password.length <= 64
+    && /[A-Za-z]/.test(password)
+    && /\d/.test(password)
+    && /[^A-Za-z0-9]/.test(password);
+}
+
+function isSignupProfileComplete(signup) {
+  return Boolean(
+    signup?.name?.trim()
+    && ["남성", "여성"].includes(signup?.gender)
+    && isValidSignupBirthDate(signup?.birthDate)
+    && /^[A-Za-z0-9_]{4,20}$/.test(signup?.loginId || "")
+    && isStrongSignupPassword(signup?.password)
+    && signup?.privacyAgreed
+    && signup?.serviceAgreed
+  );
 }
 
 export function GoogleLogo() {

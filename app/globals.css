@@ -1035,6 +1035,263 @@ a {
   }
 }
 
+/* Signup profile reference layout */
+.signup-card:has(.signup-profile-form) {
+  width: min(100%, 390px);
+  min-height: 700px;
+}
+
+.signup-card:has(.signup-profile-form) .signup-back-button {
+  top: -4px;
+  left: -9px;
+  font-size: 44px;
+  font-weight: 400;
+}
+
+.signup-profile-form {
+  gap: 0;
+  padding-top: 0;
+}
+
+.signup-profile-form .login-title {
+  margin: 5px 0 14px;
+  font-size: 21px;
+  line-height: 1.3;
+}
+
+.signup-profile-intro {
+  margin: 0 0 17px;
+  color: #343a3d;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.signup-profile-field,
+.signup-profile-gender,
+.signup-profile-birth {
+  display: grid;
+  gap: 7px;
+  margin: 0 0 14px;
+  padding: 0;
+  border: 0;
+  color: #202528;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.signup-profile-field > input,
+.signup-profile-birth select,
+.signup-profile-phone-row,
+.signup-profile-password-row {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #cfd4d2;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.signup-profile-field > input {
+  padding: 0 13px;
+  color: #202528;
+  font-size: 14px;
+  outline: 0;
+}
+
+.signup-profile-field > input:focus,
+.signup-profile-birth select:focus,
+.signup-profile-password-row:focus-within {
+  border-color: #12a557;
+  outline: 0;
+}
+
+.signup-profile-field.invalid > input,
+.signup-profile-birth.invalid select,
+.signup-profile-password.invalid .signup-profile-password-row {
+  border-color: #ff4d57;
+}
+
+.signup-profile-field small,
+.signup-profile-gender small,
+.signup-profile-birth small,
+.signup-profile-terms small {
+  color: #ff4d57;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.signup-profile-field small.valid {
+  color: #0eaa58;
+}
+
+.signup-profile-gender {
+  grid-template-columns: 80px 80px;
+  row-gap: 8px;
+}
+
+.signup-profile-gender legend,
+.signup-profile-birth legend {
+  grid-column: 1 / -1;
+  padding: 0;
+}
+
+.signup-profile-gender label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.signup-profile-gender input[type="radio"] {
+  width: 19px;
+  height: 19px;
+  margin: 0;
+  accent-color: #009b50;
+}
+
+.signup-profile-gender small {
+  grid-column: 1 / -1;
+}
+
+.signup-profile-birth > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.signup-profile-birth select {
+  padding: 0 10px;
+  color: #34393c;
+  font-size: 14px;
+}
+
+.signup-profile-phone-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  overflow: hidden;
+  background: #f4f5f5;
+}
+
+.signup-profile-phone-row input {
+  min-width: 0;
+  min-height: 42px;
+  border: 0;
+  padding: 0 13px;
+  outline: 0;
+  background: transparent;
+  color: #666d6a;
+  font-size: 14px;
+}
+
+.signup-profile-phone-row em {
+  padding: 0 13px;
+  color: #0eaa58;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.signup-profile-password-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  align-items: center;
+  overflow: hidden;
+}
+
+.signup-profile-password-row input {
+  min-width: 0;
+  min-height: 42px;
+  border: 0;
+  padding: 0 13px;
+  outline: 0;
+  background: transparent;
+  font-size: 14px;
+}
+
+.signup-profile-password-row button {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  background: transparent;
+  color: #43494a;
+  cursor: pointer;
+}
+
+.signup-profile-password-row svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.signup-profile-terms {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 0;
+  color: #252a2d;
+  font-size: 12px;
+}
+
+.signup-profile-terms > strong {
+  font-size: 13px;
+}
+
+.signup-profile-terms label {
+  display: grid;
+  grid-template-columns: 17px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.signup-profile-terms input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #009b50;
+}
+
+.signup-profile-terms button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #0eaa58;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.signup-profile-form > .login-submit {
+  min-height: 46px;
+  margin-top: 13px;
+  border-radius: 6px;
+  background: #009b50;
+  font-size: 17px;
+}
+
+.signup-profile-form > .login-submit:disabled {
+  background: #e9ebeb;
+  color: #ffffff;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+@media (max-width: 389px) {
+  .signup-profile-field,
+  .signup-profile-gender,
+  .signup-profile-birth {
+    margin-bottom: 12px;
+  }
+
+  .signup-profile-form .login-title {
+    margin-bottom: 12px;
+  }
+}
+
 /* Password reset reference layout */
 .page:has(> .password-reset-card) {
   place-items: start center;
