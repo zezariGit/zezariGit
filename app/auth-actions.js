@@ -1,8 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { signIn, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { PasswordResetPanel } from "./password-reset-panel";
+
+const LOGIN_ERROR_MESSAGE = "아이디 또는 비밀번호가 일치하지 않습니다.";
 
 const socialProviders = [
   {
@@ -28,10 +31,11 @@ const socialProviders = [
 export function LoginAuthPanel({ enabledProviders = [], authError = "", initialMode = "login", qrClaim = false }) {
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState(initialMode === "signup" ? "signup" : "login");
-  const [message, setMessage] = useState(authError ? "아이디 또는 비밀번호를 확인해 주세요." : "");
+  const [message, setMessage] = useState(authError ? LOGIN_ERROR_MESSAGE : "");
   const [signupStep, setSignupStep] = useState("phone");
   const [signup, setSignup] = useState({
     email: "",
@@ -58,6 +62,10 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
       setRemember(true);
     }
   }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [mode]);
 
   useEffect(() => {
     if (codeSeconds <= 0) return undefined;
@@ -95,7 +103,7 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
     }
 
     setLoading(false);
-    setMessage("아이디 또는 비밀번호를 확인해 주세요.");
+    setMessage(LOGIN_ERROR_MESSAGE);
   };
 
   const updateSignup = (key, value) => {
@@ -446,8 +454,22 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
     );
   }
 
+  const hasCredentialError = message === LOGIN_ERROR_MESSAGE;
+  const loginReady = Boolean(loginId.trim() && password);
+  const clearCredentialError = () => {
+    if (hasCredentialError) setMessage("");
+  };
+
   return (
     <section className="auth-panel login-card" aria-label="로그인">
+      <Image
+        className="login-wordmark"
+        src="/icons/zezari-wordmark-v1-512.png"
+        alt="제자리"
+        width={512}
+        height={512}
+        priority
+      />
       <h1 className="login-title">로그인</h1>
 
       <form className="credentials-login-form" onSubmit={submitCredentials}>
@@ -456,26 +478,49 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
         </label>
         <input
           id="login-id"
+          className={hasCredentialError ? "login-credential-input invalid" : "login-credential-input"}
           name="loginId"
           value={loginId}
-          onChange={(event) => setLoginId(event.target.value)}
+          onChange={(event) => {
+            setLoginId(event.target.value);
+            clearCredentialError();
+          }}
           placeholder="아이디"
           type="text"
           autoComplete="username"
+          aria-invalid={hasCredentialError}
         />
 
         <label className="visually-hidden" htmlFor="login-password">
           비밀번호
         </label>
-        <input
-          id="login-password"
-          name="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          placeholder="비밀번호"
-          type="password"
-          autoComplete="current-password"
-        />
+        <div className={hasCredentialError ? "login-password-field invalid" : "login-password-field"}>
+          <input
+            id="login-password"
+            name="password"
+            value={password}
+            onChange={(event) => {
+              setPassword(event.target.value);
+              clearCredentialError();
+            }}
+            placeholder="비밀번호"
+            type={showPassword ? "text" : "password"}
+            autoComplete="current-password"
+            aria-invalid={hasCredentialError}
+          />
+          <button
+            className="password-visibility-button"
+            type="button"
+            onClick={() => setShowPassword((current) => !current)}
+            aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 표시"}
+          >
+            <PasswordVisibilityIcon visible={showPassword} />
+          </button>
+        </div>
+
+        {hasCredentialError && (
+          <p className="login-field-error" role="alert">{LOGIN_ERROR_MESSAGE}</p>
+        )}
 
         <div className="login-options">
           <label className="remember-login">
@@ -495,12 +540,12 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
           </button>
         </div>
 
-        <button className="login-submit" type="submit" disabled={loading}>
+        <button className="login-submit" type="submit" disabled={loading || !loginReady}>
           {loading ? "로그인 중" : "로그인"}
         </button>
       </form>
 
-      {message && (
+      {message && !hasCredentialError && (
         <p className={`login-message ${message.startsWith("비밀번호가 변경되었습니다.") ? "success" : ""}`} role="status">
           {message}
         </p>
@@ -528,10 +573,21 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
         </button>
       </div>
 
-      <div className="install-area">
-        <PwaInstallPrompt />
-      </div>
     </section>
+  );
+}
+
+function PasswordVisibilityIcon({ visible }) {
+  return visible ? (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z" />
+      <circle cx="12" cy="12" r="2.4" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M3 3 21 21" />
+      <path d="M10.6 7.1C11.05 7.03 11.52 7 12 7c6 0 9.5 5 9.5 5a15.5 15.5 0 0 1-2.3 2.7M6.2 6.2C3.85 7.68 2.5 12 2.5 12s3.5 5 9.5 5c1.45 0 2.72-.29 3.83-.74M9.9 9.9A3 3 0 0 0 14.1 14.1" />
+    </svg>
   );
 }
 
@@ -684,6 +740,9 @@ export function KakaoLogo() {
         fill="#191919"
         d="M12 4C6.98 4 3 7.14 3 11.02c0 2.47 1.62 4.64 4.05 5.89l-.72 2.65c-.08.31.27.56.53.38l3.16-2.1c.64.13 1.3.2 1.98.2 5.02 0 9-3.14 9-7.02S17.02 4 12 4z"
       />
+      <text x="12" y="12.7" fill="#fee500" fontSize="4.3" fontWeight="900" textAnchor="middle">
+        TALK
+      </text>
     </svg>
   );
 }
