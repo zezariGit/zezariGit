@@ -17,10 +17,13 @@ export function PasswordResetPanel({ onBack, onComplete }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageTone, setMessageTone] = useState("error");
-  const codeInputRefs = useRef([]);
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const codeInputRef = useRef(null);
 
   const phoneDigits = phone.replace(/\D/g, "");
-  const validPhone = /^01[016789]\d{7,8}$/.test(phoneDigits);
+  const validPhone = isValidMobilePhone(phoneDigits);
   const completeCode = codeInput.join("");
   const passwordChecks = useMemo(() => ({
     length: newPassword.length >= 8,
@@ -30,11 +33,22 @@ export function PasswordResetPanel({ onBack, onComplete }) {
     matched: Boolean(newPassword) && newPassword === confirmPassword,
   }), [confirmPassword, newPassword]);
   const validPassword = Object.values(passwordChecks).every(Boolean);
+  const passwordFormatValid = passwordChecks.length
+    && passwordChecks.letter
+    && passwordChecks.number
+    && passwordChecks.special;
 
   useEffect(() => {
     if (codeSeconds <= 0) return undefined;
     const timer = window.setInterval(() => {
-      setCodeSeconds((current) => Math.max(0, current - 1));
+      setCodeSeconds((current) => {
+        if (current <= 1) {
+          setMessage("인증시간이 만료되었습니다. 인증번호를 다시 받아주세요.");
+          setMessageTone("error");
+          return 0;
+        }
+        return current - 1;
+      });
     }, 1000);
     return () => window.clearInterval(timer);
   }, [codeSeconds]);
@@ -55,6 +69,7 @@ export function PasswordResetPanel({ onBack, onComplete }) {
   };
 
   const requestCode = async () => {
+    setPhoneTouched(true);
     if (!validPhone || loading) return;
     setLoading(true);
     setMessage("");
@@ -74,8 +89,8 @@ export function PasswordResetPanel({ onBack, onComplete }) {
       setCodeInput(EMPTY_CODE);
       setCodeSent(true);
       setCodeSeconds(data.expiresInSeconds || 180);
-      showMessage("인증번호를 발송했습니다.", "success");
-      window.setTimeout(() => codeInputRefs.current[0]?.focus(), 0);
+      setMessage("");
+      window.setTimeout(() => codeInputRef.current?.focus(), 0);
     } catch {
       showMessage("인증번호 발송 중 오류가 발생했습니다.");
     } finally {
@@ -83,30 +98,10 @@ export function PasswordResetPanel({ onBack, onComplete }) {
     }
   };
 
-  const updateCode = (index, value) => {
-    const digits = value.replace(/\D/g, "");
-    if (!digits) {
-      setCodeInput((current) => current.map((item, itemIndex) => (itemIndex === index ? "" : item)));
-      return;
-    }
-
-    setCodeInput((current) => {
-      const next = [...current];
-      digits.slice(0, 6 - index).split("").forEach((digit, offset) => {
-        next[index + offset] = digit;
-      });
-      return next;
-    });
-    const nextIndex = Math.min(index + digits.length, 5);
-    window.setTimeout(() => codeInputRefs.current[nextIndex]?.focus(), 0);
-  };
-
-  const pasteCode = (event) => {
-    const digits = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
-    if (!digits) return;
-    event.preventDefault();
+  const updateCode = (value) => {
+    const digits = String(value || "").replace(/\D/g, "").slice(0, 6);
     setCodeInput(EMPTY_CODE.map((_, index) => digits[index] || ""));
-    window.setTimeout(() => codeInputRefs.current[Math.min(digits.length, 6) - 1]?.focus(), 0);
+    if (messageTone === "error") setMessage("");
   };
 
   const verifyCode = async () => {
@@ -122,7 +117,14 @@ export function PasswordResetPanel({ onBack, onComplete }) {
       });
       const data = await response.json();
       if (!response.ok || !data.ok) {
-        showMessage(data.message || "인증번호가 일치하지 않습니다.");
+        const verificationMessage = data.message || "인증번호가 일치하지 않습니다.";
+        showMessage(
+          verificationMessage.includes("일치하지")
+            ? "인증번호가 일치하지 않습니다. 다시 입력해 주세요."
+            : verificationMessage.includes("다시 받아")
+              ? "인증시간이 만료되었습니다. 인증번호를 다시 받아주세요."
+              : verificationMessage
+        );
         return;
       }
 
@@ -130,7 +132,7 @@ export function PasswordResetPanel({ onBack, onComplete }) {
       setPasswordResetToken(data.passwordResetToken || "");
       setCodeSeconds(0);
       setStep("password");
-      showMessage("휴대폰 인증이 완료되었습니다.", "success");
+      showMessage("휴대전화번호 인증이 완료되었습니다.", "success");
     } catch {
       showMessage("인증번호 확인 중 오류가 발생했습니다.");
     } finally {
@@ -178,104 +180,110 @@ export function PasswordResetPanel({ onBack, onComplete }) {
       {step === "verification" ? (
         <div className="signup-step password-reset-step">
           <h1 className="login-title">비밀번호 찾기</h1>
-          <div className="signup-copy">
-            <strong>휴대폰 번호를 인증해주세요</strong>
-            <p>가입할 때 등록한 휴대폰 번호로 인증번호를 보내드립니다.</p>
-          </div>
+          <p className="password-reset-intro">가입 시 등록한 휴대전화번호로<br />본인 인증을 진행해 주세요.</p>
 
-          <label className="signup-field">
-            <span>휴대폰 번호</span>
-            <input
-              value={phone}
-              onChange={(event) => updatePhone(event.target.value)}
-              placeholder="010-1234-5678"
-              inputMode="tel"
-              autoComplete="tel"
-              maxLength={13}
-            />
-          </label>
-          <button className="login-submit" type="button" onClick={requestCode} disabled={!validPhone || loading}>
-            {loading ? "발송 중" : "인증코드 받기"}
-          </button>
-
-          {codeSent && (
+          {!codeSent ? (
             <>
-              <div className="signup-separator" />
-              <div className="code-heading">
-                <strong>인증번호 입력</strong>
-                <span className={codeSeconds === 0 ? "expired" : ""}>{formatTimer(codeSeconds)}</span>
+              <label className={`password-reset-input ${phoneTouched && !validPhone ? "invalid" : ""}`}>
+                <span className="visually-hidden">휴대전화번호</span>
+                <input
+                  value={phone}
+                  onChange={(event) => updatePhone(event.target.value)}
+                  onBlur={() => setPhoneTouched(true)}
+                  placeholder="휴대전화번호"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  maxLength={13}
+                  aria-invalid={phoneTouched && !validPhone}
+                />
+              </label>
+              {phoneTouched && phone && !validPhone && (
+                <p className="password-reset-error" role="alert">휴대전화번호를 정확하게 입력해 주세요.</p>
+              )}
+              <button className="login-submit" type="button" onClick={requestCode} disabled={!validPhone || loading}>
+                {loading ? "발송 중" : "인증번호 받기"}
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="password-reset-phone-row">
+                <span>{maskPhoneNumber(phone)}</span>
+                <button type="button" onClick={requestCode} disabled={loading}>인증번호 재전송</button>
               </div>
-              <div className="verification-code-row" onPaste={pasteCode}>
-                {codeInput.map((value, index) => (
-                  <input
-                    ref={(element) => { codeInputRefs.current[index] = element; }}
-                    key={index}
-                    value={value}
-                    onChange={(event) => updateCode(index, event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Backspace" && !value && index > 0) {
-                        codeInputRefs.current[index - 1]?.focus();
-                      }
-                    }}
-                    inputMode="numeric"
-                    autoComplete={index === 0 ? "one-time-code" : "off"}
-                    maxLength={6}
-                    aria-label={`${index + 1}번째 인증번호`}
-                  />
-                ))}
-              </div>
+              <label className={`password-reset-code-field ${messageTone === "error" && message ? "invalid" : ""}`}>
+                <span className="visually-hidden">인증번호 6자리</span>
+                <input
+                  ref={codeInputRef}
+                  value={completeCode}
+                  onChange={(event) => updateCode(event.target.value)}
+                  placeholder="인증번호 6자리"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  maxLength={6}
+                  aria-invalid={messageTone === "error" && Boolean(message)}
+                />
+                <time className={codeSeconds === 0 ? "expired" : ""}>{formatTimer(codeSeconds)}</time>
+                {messageTone === "error" && message && <ErrorCircleIcon />}
+              </label>
+              {messageTone === "error" && message && (
+                <p className="password-reset-error" role="alert">{message}</p>
+              )}
               <button
                 className="login-submit"
                 type="button"
                 onClick={verifyCode}
                 disabled={completeCode.length !== 6 || codeSeconds <= 0 || loading}
               >
-                {loading ? "확인 중" : "확인"}
-              </button>
-              <button className="signup-link centered-link" type="button" onClick={requestCode} disabled={!validPhone || loading}>
-                인증번호 재전송
+                {loading ? "확인 중" : "인증번호 확인"}
               </button>
             </>
           )}
 
-          {message && <p className={`login-message ${messageTone}`} role="status">{message}</p>}
+          <p className="password-reset-help">인증번호는 6자리이며 유효시간은 3분입니다.</p>
+          {!codeSent && message && <p className={`password-reset-error ${messageTone}`} role="status">{message}</p>}
         </div>
       ) : (
         <form className="signup-step password-reset-step" onSubmit={submitPassword}>
           <h1 className="login-title">비밀번호 찾기</h1>
-          <div className="signup-copy">
-            <strong>새 비밀번호를 입력해주세요</strong>
-            <p>영문, 숫자, 특수문자를 조합해 8자 이상 입력해 주세요.</p>
+          <div className="password-reset-success" role="status">
+            <SuccessCircleIcon />
+            <span>휴대전화번호 인증이 완료되었습니다.</span>
           </div>
 
-          <label className="signup-field">
+          <div className="password-reset-phone-row verified">
+            <span>{maskPhoneNumber(verifiedPhone)}</span>
+            <strong>인증 완료</strong>
+          </div>
+
+          <label className="password-reset-password-field">
             <span>새 비밀번호</span>
             <input
               value={newPassword}
               onChange={(event) => setNewPassword(event.target.value)}
-              type="password"
+              type={showNewPassword ? "text" : "password"}
               autoComplete="new-password"
               maxLength={64}
-              placeholder="새 비밀번호"
             />
+            <button type="button" onClick={() => setShowNewPassword((current) => !current)} aria-label={showNewPassword ? "새 비밀번호 숨기기" : "새 비밀번호 표시"}>
+              <PasswordEyeIcon visible={showNewPassword} />
+            </button>
           </label>
-          <ul className="password-check-list" aria-label="비밀번호 조건">
-            <PasswordCheck valid={passwordChecks.length}>8자 이상</PasswordCheck>
-            <PasswordCheck valid={passwordChecks.letter}>영문 포함</PasswordCheck>
-            <PasswordCheck valid={passwordChecks.number}>숫자 포함</PasswordCheck>
-            <PasswordCheck valid={passwordChecks.special}>특수문자 포함</PasswordCheck>
-          </ul>
-          <label className="signup-field">
+          <label className="password-reset-password-field">
             <span>새 비밀번호 확인</span>
             <input
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               autoComplete="new-password"
               maxLength={64}
-              placeholder="새 비밀번호를 다시 입력해 주세요"
             />
+            <button type="button" onClick={() => setShowConfirmPassword((current) => !current)} aria-label={showConfirmPassword ? "새 비밀번호 확인 숨기기" : "새 비밀번호 확인 표시"}>
+              <PasswordEyeIcon visible={showConfirmPassword} />
+            </button>
           </label>
+          <p className={`password-reset-password-help ${passwordFormatValid ? "valid" : ""}`}>
+            영문, 숫자, 특수문자를 조합하여<br />8자 이상 입력해 주세요.
+          </p>
           {confirmPassword && (
             <p className={`password-match-message ${passwordChecks.matched ? "valid" : "invalid"}`}>
               {passwordChecks.matched ? "비밀번호가 일치합니다." : "비밀번호가 일치하지 않습니다."}
@@ -291,20 +299,25 @@ export function PasswordResetPanel({ onBack, onComplete }) {
   );
 }
 
-function PasswordCheck({ valid, children }) {
-  return (
-    <li className={valid ? "valid" : "pending"}>
-      <span aria-hidden="true">{valid ? "✓" : "○"}</span>
-      {children}
-    </li>
-  );
-}
-
 function formatPhoneInput(value) {
   const digits = String(value || "").replace(/\D/g, "").slice(0, 11);
   if (digits.length <= 3) return digits;
   if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-  return `${digits.slice(0, 3)}-${digits.slice(3, -4)}-${digits.slice(-4)}`;
+  if (digits.length === 10 && !digits.startsWith("010")) {
+    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+}
+
+function isValidMobilePhone(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  return /^010\d{8}$/.test(digits) || /^01[16789]\d{7,8}$/.test(digits);
+}
+
+function maskPhoneNumber(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  if (digits.length < 7) return value;
+  return `${digits.slice(0, 3)}-****-${digits.slice(-4)}`;
 }
 
 function formatTimer(seconds) {
@@ -312,4 +325,32 @@ function formatTimer(seconds) {
   const minutes = Math.floor(safeSeconds / 60);
   const remainder = safeSeconds % 60;
   return `${minutes}:${String(remainder).padStart(2, "0")}`;
+}
+
+function PasswordEyeIcon({ visible }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z" />
+      <circle cx="12" cy="12" r="2.5" />
+      {!visible && <path d="M3 3 21 21" />}
+    </svg>
+  );
+}
+
+function ErrorCircleIcon() {
+  return (
+    <svg className="password-reset-error-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v6M12 17h.01" />
+    </svg>
+  );
+}
+
+function SuccessCircleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <path d="m7.5 12 3 3 6-7" />
+    </svg>
+  );
 }
