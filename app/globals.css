@@ -16238,25 +16238,14 @@ button:disabled:hover {
 }
 
 .onboarding-shell .slide-dots {
-  flex: 0 0 auto;
+  position: absolute;
+  top: 742px;
+  right: 20px;
+  left: 20px;
   display: flex;
   justify-content: center;
   gap: 24px;
-  margin-right: 0;
-  margin-bottom: 0;
-  margin-left: 0;
-}
-
-.onboarding-shell[data-active-slide="1"] .slide-dots {
-  margin-top: 47px;
-}
-
-.onboarding-shell[data-active-slide="2"] .slide-dots {
-  margin-top: 58px;
-}
-
-.onboarding-shell[data-active-slide="3"] .slide-dots {
-  margin-top: 8px;
+  margin: 0;
 }
 
 .onboarding-shell .dot,
@@ -16274,9 +16263,11 @@ button:disabled:hover {
 }
 
 .onboarding-shell .onboarding-controls {
-  flex: 0 0 auto;
-  width: 100%;
-  margin-top: 24px;
+  position: absolute;
+  top: 780px;
+  right: 20px;
+  left: 20px;
+  margin: 0;
 }
 
 .onboarding-shell .onboarding-controls .onboarding-login-button {
@@ -16293,9 +16284,14 @@ button:disabled:hover {
 
 @media (max-width: 389px) {
   .onboarding-shell {
-    min-height: 100svh;
     padding-right: 16px;
     padding-left: 16px;
+  }
+
+  .onboarding-shell .slide-dots,
+  .onboarding-shell .onboarding-controls {
+    right: 16px;
+    left: 16px;
   }
 
   .onboarding-shell[data-active-slide="1"] .slide-window,

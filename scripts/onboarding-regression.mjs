@@ -43,6 +43,8 @@ assert.doesNotMatch(component, />\s*(다음|이전|뒤로가기)\s*</);
 assert.match(styles, /\.onboarding-shell \{[\s\S]*?width: min\(100%, 390px\)/);
 assert.match(styles, /\.onboarding-shell \.slide-track \{[\s\S]*?transition: transform/);
 assert.match(styles, /\.onboarding-shell \.dot\.active \{[\s\S]*?background: #009b50/);
+assert.match(styles, /\.onboarding-shell \.slide-dots \{[\s\S]*?top: 742px;/);
+assert.match(styles, /\.onboarding-shell \.onboarding-controls \{[\s\S]*?top: 780px;/);
 assert.match(styles, /\.onboarding-shell \.onboarding-controls \.onboarding-login-button/);
 
 for (const [index, image] of images.entries()) {
