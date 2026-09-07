@@ -8952,3 +8952,29 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Feature commit `38d628f` was pushed to GitHub `main`.
 - Vercel production deployment `dpl_8UXzr7YeUzqa3WCe6mHEVVbZrQ6k` reached `READY` and owns the `https://zezari.family` alias.
 - No real verification SMS or password change was performed during production verification.
+
+## 2026-09-07 KST - Three-Step Onboarding Redesign
+
+### User Request
+- Rebuild the service introduction from the three supplied reference screens.
+- Use swipe-only movement, synchronized page indicators, login navigation, and persistent `다시 보지 않기` behavior.
+- Keep all three page indicator groups at one consistent position.
+
+### Reflected Work
+- Replaced the former onboarding artwork and copy with the supplied three-screen composition and exact service text.
+- Removed Previous/Next controls and added clamped left/right pointer swipe navigation.
+- Kept three accessible page indicators synchronized with the active slide.
+- Fixed every indicator group at `742px` and placed the final login button at `780px` in the 390x844 reference layout.
+- Kept `로그인하기` non-persistent and stored `zezari:onboarding:hidden=true` only for `다시 보지 않기`.
+- Added `scripts/onboarding-regression.mjs` and `npm run test:onboarding`.
+
+### Verification
+- `npm run test:onboarding`: passed.
+- `npm run security:check`: passed.
+- `npm run build`: passed with Next.js 16.3.0.
+- Local production-mode browser verification confirmed real pointer swipe navigation, 360px horizontal fit, and persistent skip behavior.
+- Production browser verification measured all indicator positions as `[742, 742, 742]`.
+
+### Deployment
+- Feature commits `b469ef8` and `581fd1d` were pushed to GitHub `main`.
+- Vercel production deployment `dpl_C7aV1X4m3kQVz6Cr89AyAiKgMHJA` reached `READY` and owns the `https://zezari.family` alias.
