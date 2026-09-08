@@ -19421,3 +19421,17 @@ button:disabled:hover {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+.guardian-profile-form .profile-field > input,
+.guardian-profile-form .profile-birth-field select {
+  box-sizing: border-box;
+  border: 1px solid #b9b9b9;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.guardian-profile-form .profile-field > input:focus,
+.guardian-profile-form .profile-birth-field select:focus {
+  border-color: #00a548;
+  box-shadow: 0 0 0 2px rgb(0 165 72 / 10%);
+}
