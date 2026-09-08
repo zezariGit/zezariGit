@@ -1104,6 +1104,504 @@ a {
   }
 }
 
+/* Settings and account detail flows */
+.my-page-backdrop {
+  padding: 0;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.my-page-panel.my-page-modal {
+  width: 390px;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 100dvh;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0 16px 16px;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+}
+
+.my-page-panel .my-page-title-row {
+  min-height: 66px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 0;
+}
+
+.my-page-panel .my-page-title-row h2 {
+  color: #111;
+  font-size: 20px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.my-page-panel .my-page-close-button {
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #111;
+  font-size: 38px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.settings-menu-list {
+  display: grid;
+}
+
+.settings-menu-list a {
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 2px;
+  border-bottom: 1px solid #e6e6e6;
+  color: #171717;
+  font-size: 16px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.settings-menu-list a > span:last-child {
+  color: #171717;
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.my-page-panel .my-logout-section {
+  margin-top: auto;
+  padding: 24px 0 4px;
+  border: 0;
+  text-align: center;
+}
+
+.settings-logout-button {
+  padding: 8px 20px;
+  border: 0;
+  background: transparent;
+  color: #9a9a9a;
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+.guardian-profile-page,
+.account-page:has(.coupon-register-form) {
+  padding: 0;
+  background: #fff;
+}
+
+.guardian-profile-panel,
+.account-page:has(.coupon-register-form) .account-panel {
+  width: 390px;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 100dvh;
+  align-content: start;
+  gap: 18px;
+  padding: 0 14px 24px;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+}
+
+.guardian-profile-panel .account-topbar,
+.account-page:has(.coupon-register-form) .account-topbar {
+  min-height: 58px;
+}
+
+.guardian-profile-panel .account-back-link,
+.account-page:has(.coupon-register-form) .account-back-link {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  background: transparent;
+  color: #111;
+  font-size: 36px;
+  font-weight: 400;
+}
+
+.guardian-profile-panel .account-topbar h1,
+.account-page:has(.coupon-register-form) .account-topbar h1 {
+  color: #111;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.guardian-profile-form {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.profile-field,
+.profile-birth-field,
+.profile-gender-field {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.profile-field > strong,
+.profile-birth-field legend,
+.profile-gender-field legend {
+  padding: 0;
+  color: #232323;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.profile-field > input,
+.profile-inline-input,
+.profile-code-row > div,
+.profile-password-input,
+.profile-birth-field select {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 48px;
+  border: 1px solid #b9b9b9;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.profile-field > input,
+.profile-inline-input input,
+.profile-code-row input,
+.profile-password-input input,
+.profile-birth-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: 0 12px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #222;
+  font-size: 15px;
+}
+
+.profile-gender-field {
+  grid-template-columns: 64px auto auto 1fr;
+  align-items: center;
+}
+
+.profile-gender-field label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+}
+
+.profile-gender-field input {
+  width: 20px;
+  height: 20px;
+  accent-color: #00a548;
+}
+
+.profile-birth-field > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.profile-inline-input,
+.profile-code-row > div,
+.profile-password-input {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.profile-inline-input button,
+.profile-code-row button {
+  min-height: 36px;
+  margin-right: 6px;
+  padding: 0 10px;
+  border: 1px solid #00a548;
+  border-radius: 6px;
+  background: #fff;
+  color: #00a548;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.profile-inline-input button:disabled,
+.profile-code-row button:disabled {
+  border-color: #d3d3d3;
+  background: #f5f5f5;
+  color: #aaa;
+}
+
+.profile-verified-label {
+  padding: 0 12px;
+  color: #00a548;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.profile-code-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 58px;
+  gap: 8px;
+}
+
+.profile-code-row > button {
+  height: 48px;
+  margin: 0;
+}
+
+.profile-code-row span {
+  padding-right: 12px;
+  color: #00a548;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.profile-field small,
+.profile-password-fields small {
+  color: #888;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.profile-field small.error,
+.profile-password-fields small.error {
+  color: #ff4747;
+}
+
+.profile-field small.success,
+.profile-password-fields small.success {
+  color: #00a548;
+}
+
+.profile-field.has-error .profile-inline-input,
+.profile-field.has-error .profile-code-row > div {
+  border-color: #ff4747;
+}
+
+.profile-password-section {
+  display: grid;
+  gap: 10px;
+}
+
+.profile-password-toggle {
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  border: 1px solid #00a548;
+  border-radius: 8px;
+  background: #fff;
+  color: #00a548;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.profile-password-fields {
+  display: grid;
+  gap: 10px;
+}
+
+.profile-password-fields label {
+  display: grid;
+  gap: 6px;
+  color: #222;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.profile-password-input button {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  position: relative;
+  border: 0;
+  background: transparent;
+}
+
+.profile-password-input button span {
+  width: 19px;
+  height: 12px;
+  display: block;
+  position: relative;
+  border: 1.5px solid #555;
+  border-radius: 50% / 60%;
+}
+
+.profile-password-input button span::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  position: absolute;
+  top: 2px;
+  left: 5.5px;
+  border-radius: 50%;
+  background: #555;
+}
+
+.profile-submit-button {
+  width: 100%;
+  min-height: 52px;
+  margin-top: 4px;
+  border: 0;
+  border-radius: 8px;
+  background: #009f45;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.profile-submit-button:disabled {
+  background: #ededed;
+  color: #b3b3b3;
+}
+
+.account-page:has(.coupon-register-form) .account-panel {
+  gap: 20px;
+}
+
+.coupon-register-form {
+  gap: 10px;
+  padding: 18px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #f2fbf5;
+}
+
+.coupon-register-form label {
+  color: #222;
+  font-size: 15px;
+}
+
+.coupon-register-form input {
+  min-height: 48px;
+  border: 1px solid #b9b9b9;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.coupon-register-form button {
+  min-width: 68px;
+  min-height: 48px;
+  border: 0;
+  border-radius: 7px;
+  background: #00a548;
+  color: #fff;
+  font-weight: 800;
+}
+
+.coupon-register-form.has-error input {
+  border-color: #ff4747;
+}
+
+.coupon-register-error {
+  margin: 0;
+  color: #ff4747;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.account-page:has(.coupon-register-form) .account-section {
+  gap: 10px;
+  padding-top: 0;
+  border: 0;
+}
+
+.account-page:has(.coupon-register-form) .account-section h2 {
+  color: #222;
+  font-size: 16px;
+}
+
+.coupon-list {
+  gap: 10px;
+}
+
+.coupon-card,
+.coupon-card.used {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #dadada;
+  border-radius: 8px;
+  background: #fff;
+  opacity: 1;
+}
+
+.coupon-card.used {
+  background: #f1f1f1;
+  color: #898989;
+}
+
+.coupon-card header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.coupon-card header > span {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #ddd;
+  color: #777;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.coupon-card dl {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  gap: 6px;
+  margin: 0;
+}
+
+.coupon-card dt,
+.coupon-card dd {
+  margin: 0;
+  color: #777;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.coupon-card dt {
+  font-weight: 800;
+}
+
+.coupon-empty-state {
+  min-height: 126px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #f6f6f6;
+}
+
+.coupon-empty-state p {
+  margin: 0;
+  color: #a0a0a0;
+  font-size: 13px;
+}
+
 /* Mobile dashboard reference layout */
 .dashboard-page:has(.dashboard-home-shell) {
   padding: 0;
@@ -18867,4 +19365,59 @@ button:disabled:hover {
   .subject-complete-content h2 {
     white-space: normal;
   }
+}
+
+.account-page .account-panel.guardian-profile-panel {
+  width: 390px;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 100dvh;
+  align-content: start;
+  gap: 18px;
+  padding: 0 14px 24px;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+}
+
+.guardian-profile-form .profile-inline-input > button {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.guardian-profile-form .profile-inline-input > .profile-phone-action {
+  width: 116px;
+  min-width: 116px;
+  padding-inline: 8px;
+  font-size: 12px;
+}
+
+.guardian-profile-form .profile-inline-input > .profile-login-action {
+  width: 76px;
+  min-width: 76px;
+  padding-inline: 8px;
+  font-size: 12px;
+}
+
+.guardian-profile-form .profile-password-input > button {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: #747b81;
+}
+
+.guardian-profile-form .profile-password-input > button svg {
+  width: 23px;
+  height: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }

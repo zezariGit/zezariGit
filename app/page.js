@@ -65,7 +65,7 @@ export default async function HomePage({ searchParams }) {
       />
     );
   }
-  if (["dashboard", "dashboard-empty", "dashboard-notifications"].includes(dashboardPreview)) {
+  if (["dashboard", "dashboard-empty", "dashboard-notifications", "settings"].includes(dashboardPreview)) {
     return (
       <GuardianDashboard
         guardian={{ id: "preview-guardian", name: "보호자", phone: "010-0000-0000", birth_date: "1990-01-01", is_active: 1, login_id: "preview", password_hash: "preview" }}
@@ -73,6 +73,7 @@ export default async function HomePage({ searchParams }) {
         subscription={null}
         session={{ user: { provider: "credentials", email: "" } }}
         activeTab="dashboard"
+        showMyPage={dashboardPreview === "settings"}
         notificationPreview={dashboardPreview === "dashboard-notifications"}
       />
     );

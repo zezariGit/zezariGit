@@ -13,7 +13,6 @@ import { LogoutButton, PwaInstallPrompt } from "./auth-actions";
 import ManagedSubjectCarousel from "./managed-subject-carousel";
 import MyPageOverlay, { OpenMyPageButton } from "./my-page-overlay";
 import NotificationBell from "./notification-bell";
-import PushNotificationButton from "./push-notification-button";
 import QRCode from "qrcode";
 import Link from "next/link";
 import SocialSignupCompletion from "./social-signup-completion";
@@ -89,13 +88,7 @@ export default async function GuardianDashboard({
         )}
         {guardianComplete && guardianActive && (
           <MyPageOverlay initialOpen={showMyPage} closeHref={closeMyPageHref}>
-            <MyPageTab
-              guardian={guardian}
-              subscription={subscription}
-              session={session}
-              admin={admin}
-              closeHref={closeMyPageHref}
-            />
+            <MyPageTab closeHref={closeMyPageHref} />
           </MyPageOverlay>
         )}
         <div className="dashboard-content">
@@ -250,17 +243,16 @@ function GuardianInfoTab({ guardian, session }) {
   );
 }
 
-function MyPageTab({ guardian, subscription, session, admin, closeHref = "" }) {
-  const subscriptionLabel = subscription?.status === "active"
-    ? "이용중"
-    : subscription?.status === "paused"
-      ? "일시정지"
-      : subscription?.status === "ready"
-        ? "QR 활성화 대기"
-        : subscription?.status === "expired"
-          ? "이용기간 만료"
-          : "미이용";
-
+function MyPageTab({ closeHref = "" }) {
+  const menuItems = [
+    ["보호자 정보", "/account/profile"],
+    ["쿠폰함", "/account/coupons"],
+    ["광고 대시보드", "/account/ads"],
+    ["결제 및 서비스 현황", "/account/billing"],
+    ["제자리 서비스 소개", "/?serviceIntro=1"],
+    ["이용약관", "/privacy#terms"],
+    ["개인정보처리방침", "/privacy"],
+  ];
   return (
     <section
       className={`my-page-panel${closeHref ? " my-page-modal" : ""}`}
@@ -268,79 +260,25 @@ function MyPageTab({ guardian, subscription, session, admin, closeHref = "" }) {
       data-modal-surface={closeHref ? "" : undefined}
     >
       <div className="my-page-title-row">
-        <h2>설정</h2>
         {closeHref && (
           <button className="my-page-close-button" type="button" data-my-page-close aria-label="설정 닫기">
-            닫기
+            <span aria-hidden="true">‹</span>
           </button>
         )}
+        <h2>설정</h2>
+        <span aria-hidden="true" />
       </div>
-      <div className="my-profile-avatar" aria-hidden={!guardian.photo_url}>
-        {guardian.photo_url ? <img src={guardian.photo_url} alt="" /> : <span />}
-      </div>
-
-      <div className="my-page-section">
-        <div className="my-section-heading">
-          <h3>보호자 정보</h3>
-          <Link href="/?tab=guardian#guardian-info" data-my-page-navigate>정보 수정 &gt;</Link>
-        </div>
-        <InfoRow label="이름" value={guardian.name || "이름 미입력"} />
-        <InfoRow
-          label={isSocialAccount(session) ? "로그인 방식" : "비밀번호"}
-          value={isSocialAccount(session) ? `${socialProviderLabel(session?.user?.provider)} 계정` : guardian.password_hash ? "********" : "미설정"}
-        />
-        <InfoRow label="연락처" value={guardian.phone || "연락처 미입력"} />
-        <InfoRow label="수령인" value={guardian.name || "이름 미입력"} actionLabel="주소록관리 >" href="/?tab=guardian#guardian-info" />
-        <InfoRow label="주소" value={formatFullAddress(guardian.address, guardian.address_detail)} />
-        <InfoRow
-          label="안심번호 운영"
-          value="QR 접근 시 24시간 자동 배정"
-        />
-      </div>
-
-      <div className="my-page-section">
-        <h3>부가 정보</h3>
-        <InfoRow label="결제 및 서비스 현황" value={subscriptionLabel} actionLabel="상세보기 >" href="/account/billing" />
-        <InfoRow label="제자리 서비스 소개" value="QR 안심 서비스" />
-        <Link className="my-menu-link" href="/account/coupons">쿠폰함</Link>
-        <Link className="my-menu-link" href="/account/payment-methods">결제수단</Link>
-        <Link className="my-menu-link" href="/account/ads">광고 대시보드</Link>
-        <div className="my-action-row">
-          <span>푸시 알림</span>
-          <PushNotificationButton />
-        </div>
-        {admin && (
-          <Link className="my-menu-link" href="/admin">
-            관리자 페이지
+      <nav className="settings-menu-list" aria-label="설정 메뉴">
+        {menuItems.map(([label, href]) => (
+          <Link key={label} href={href} data-my-page-navigate>
+            <span>{label}</span><span aria-hidden="true">›</span>
           </Link>
-        )}
+        ))}
+      </nav>
+      <div className="my-logout-section">
+        <LogoutButton className="settings-logout-button">로그아웃</LogoutButton>
       </div>
-
-      <div className="my-page-section">
-        <h3>고객 지원</h3>
-        <Link className="my-menu-link" href="/?panel=my">공지사항 및 FAQ</Link>
-        <Link className="my-menu-link" href="/?panel=my">고객센터</Link>
-        <Link className="my-menu-link" href="/?panel=my">의견 남기기</Link>
-        <Link className="my-menu-link" href="/?panel=my">이용약관</Link>
-        <Link className="my-menu-link" href="/?panel=my">개인정보처리방침</Link>
-      </div>
-
-      <div className="my-page-section my-logout-section">
-        <LogoutButton />
-      </div>
-
-      <p className="my-session-email">{session.user?.email || guardian.email || guardian.google_email || ""}</p>
     </section>
-  );
-}
-
-function InfoRow({ label, value, actionLabel = "", href = "" }) {
-  return (
-    <div className="my-info-row">
-      <strong>{label}</strong>
-      <span>{value || "-"}</span>
-      {href && <Link href={href}>{actionLabel}</Link>}
-    </div>
   );
 }
 

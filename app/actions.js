@@ -36,6 +36,19 @@ export async function saveGuardianAction(formData) {
   redirect(withNotice("/?tab=guardian", "보호자 정보가 저장되었습니다. 안심번호는 QR 접근 시 24시간 자동 배정됩니다."));
 }
 
+export async function saveGuardianProfileSettingsAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error("로그인이 필요합니다.");
+  try {
+    await saveGuardianProfile(session, formData);
+    revalidatePath("/");
+    revalidatePath("/account/profile");
+  } catch (error) {
+    redirect(withNotice("/account/profile", error.message || "입력한 정보를 확인해 주세요.", "error"));
+  }
+  redirect(withNotice("/?panel=my", "보호자 정보가 수정되었습니다."));
+}
+
 export async function saveSubjectAction(formData) {
   const session = await getServerSession(authOptions);
   if (!session) throw new Error("로그인이 필요합니다.");
@@ -165,9 +178,19 @@ export async function registerCouponAction(formData) {
     await registerGuardianCoupon(session, formData);
     revalidatePath("/account/coupons");
   } catch (error) {
-    redirect(withNotice("/account/coupons", error.message || "쿠폰을 등록하지 못했습니다.", "error"));
+    redirect(withNotice("/account/coupons", couponErrorMessage(error), "error"));
   }
   redirect(withNotice("/account/coupons", "쿠폰이 등록되었습니다."));
+}
+
+function couponErrorMessage(error) {
+  const message = String(error?.message || "");
+  if (message.includes("이미 등록")) return "이미 등록된 쿠폰입니다.";
+  if (message.includes("유효기간") || message.includes("사용할 수 없는") || message.includes("아직 사용할")) {
+    return "사용기간이 만료된 쿠폰입니다.";
+  }
+  if (message.includes("입력")) return "쿠폰 코드를 입력해 주세요.";
+  return "유효하지 않은 쿠폰 코드입니다.";
 }
 
 export async function savePaymentMethodAction(formData) {
