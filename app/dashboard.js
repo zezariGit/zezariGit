@@ -39,6 +39,7 @@ export default async function GuardianDashboard({
   activeTab = "dashboard",
   showMyPage = false,
   adSubjectId = "",
+  forceNewAd = false,
   previewSubjectId = "",
   editSubjectId = "",
   registeredSubjectId = "",
@@ -224,6 +225,7 @@ function DashboardTab({
         <AdCampaignModal
           subject={selectedAdSubject}
           pricing={adPricing}
+          forceNew={forceNewAd}
           createAction={createSubjectAdAction}
           pauseAction={pauseSubjectAdAction}
           resumeAction={resumeSubjectAdAction}

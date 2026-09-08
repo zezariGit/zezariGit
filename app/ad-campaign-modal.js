@@ -36,6 +36,7 @@ export default function AdCampaignModal({
   pauseAction,
   resumeAction,
   endAction,
+  forceNew = false,
 }) {
   const today = useMemo(() => getKstDateInputValue(), []);
   const distanceOptions = useMemo(() => normalizeDistanceOptions(pricing?.distanceOptions), [pricing]);
@@ -57,7 +58,7 @@ export default function AdCampaignModal({
     ? "대한민국"
     : cleanRegionLabel(location.label);
   const quote = calculateOptionQuote(selectedDistance, selectedDuration);
-  const activeAd = ["active", "paused", "ready"].includes(subject?.ad_status || "");
+  const activeAd = !forceNew && ["active", "paused", "ready"].includes(subject?.ad_status || "");
   const canSubmit = Boolean(
     selectedDistance
       && selectedDuration

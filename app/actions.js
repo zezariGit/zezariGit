@@ -154,7 +154,8 @@ export async function endSubjectAdAction(formData) {
   } catch (error) {
     redirect(withNotice("/?tab=dashboard", error.message || "광고 종료에 실패했습니다.", "error"));
   }
-  redirect(withNotice("/?tab=dashboard", "광고가 종료되었습니다."));
+  const returnTo = String(formData.get("returnTo") || "") === "/account/ads" ? "/account/ads" : "/?tab=dashboard";
+  redirect(withNotice(returnTo, "광고가 종료되었습니다."));
 }
 
 export async function activateQrAction(formData) {
