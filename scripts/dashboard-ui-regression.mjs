@@ -24,7 +24,7 @@ assert.match(dashboard, /대상자 추가하기/);
 assert.match(carousel, /scroll-snap-type|scrollTo\(/, "대상자 페이지는 가로 이동을 지원해야 합니다.");
 assert.match(carousel, /Array\.from\(\{ length: totalPages \}/, "표시점은 페이지 수를 기준으로 만들어야 합니다.");
 assert.match(carousel, /showDots &&/, "빈 대상자 목록에서는 페이지 표시점을 숨겨야 합니다.");
-assert.match(guide, /현재 상태 단계 안내/);
+assert.match(guide, /대상자 현재 상태 안내/);
 assert.match(guide, /상품 구매 필요[\s\S]*안전[\s\S]*찾는 중/);
 assert.match(guide, /role="dialog"/);
 assert.match(styles, /\.dashboard-shell\.dashboard-home-shell/);

@@ -59,7 +59,7 @@ export default function SubjectStatusGuide() {
             onPointerDown={(event) => event.stopPropagation()}
           >
             <span className="subject-status-guide-handle" aria-hidden="true" />
-            <h2 id="subject-status-guide-title">현재 상태 단계 안내</h2>
+            <h2 id="subject-status-guide-title">대상자 현재 상태 안내</h2>
             <div className="subject-status-guide-list">
               {STATUS_ITEMS.map((item) => (
                 <div className="subject-status-guide-row" key={item.label}>
