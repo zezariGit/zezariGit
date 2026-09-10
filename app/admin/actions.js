@@ -29,6 +29,7 @@ import {
   setAdPricingSettings,
   setGuardianActive,
   setGuardianAdminMemo,
+  setGuardianPhoneForAdmin,
   setGuardianAdmin,
   setImageUploadSettings,
   setProductCatalogItem,
@@ -119,6 +120,19 @@ export async function setGuardianAdminMemoAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=guardians"), error.message || "관리 메모 저장에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin?section=guardians"), "관리 메모가 저장되었습니다."));
+}
+
+export async function setGuardianPhoneAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  try {
+    await setGuardianPhoneForAdmin(formData);
+    revalidatePath("/admin");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=guardians"), error.message || "휴대전화번호 수정에 실패했습니다.", "error"));
+  }
+  redirect(withNotice(getReturnTo(formData, "/admin?section=guardians"), "보호자 휴대전화번호가 수정되었습니다."));
 }
 
 export async function addSafePhonePoolNumberAction(formData) {

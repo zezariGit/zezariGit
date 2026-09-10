@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import os from "node:os";
 import path from "node:path";
+import { createClient } from "@libsql/client";
 
 const databasePath = path.join(os.tmpdir(), `zezari-admin-phone-${Date.now()}.db`).replaceAll("\\", "/");
 process.env.TURSO_DATABASE_URL = `file:${databasePath}`;
@@ -16,7 +17,9 @@ const {
   ensureSchema,
   requestSignupPhoneVerification,
   saveGuardianProfile,
+  setGuardianActive,
   setGuardianAdmin,
+  setGuardianPhoneForAdmin,
   verifySignupPhoneCode,
 } = await import("../lib/db.js");
 
@@ -104,7 +107,7 @@ await saveGuardianProfile(
 );
 
 const regularPhone = "010-3333-4444";
-await createVerifiedGuardian({
+const regularGuardian = await createVerifiedGuardian({
   phone: regularPhone,
   email: "regular@example.com",
   loginId: "regular_user",
@@ -126,6 +129,40 @@ await assert.rejects(
   ),
   /이미 가입된 휴대폰 번호입니다/,
 );
+
+const managedPhoneForm = new FormData();
+managedPhoneForm.set("guardianId", regularGuardian.id);
+managedPhoneForm.set("phone", "010-7777-8888");
+await setGuardianPhoneForAdmin(managedPhoneForm);
+
+const duplicateManagedPhoneForm = new FormData();
+duplicateManagedPhoneForm.set("guardianId", regularGuardian.id);
+duplicateManagedPhoneForm.set("phone", changedAdminPhone);
+await assert.rejects(
+  setGuardianPhoneForAdmin(duplicateManagedPhoneForm),
+  /이미 사용 중인 휴대전화번호입니다/,
+);
+
+const withdrawForm = new FormData();
+withdrawForm.set("guardianId", regularGuardian.id);
+withdrawForm.set("active", "0");
+await setGuardianActive(withdrawForm);
+
+const testDb = createClient({ url: process.env.TURSO_DATABASE_URL });
+const withdrawnGuardian = await testDb.execute({
+  sql: "SELECT phone, phone_verified_at, safe_phone, is_active FROM guardians WHERE id = ?",
+  args: [regularGuardian.id],
+});
+assert.equal(withdrawnGuardian.rows[0].phone, null);
+assert.equal(withdrawnGuardian.rows[0].phone_verified_at, null);
+assert.equal(withdrawnGuardian.rows[0].safe_phone, null);
+assert.equal(Number(withdrawnGuardian.rows[0].is_active), 0);
+const withdrawnVerification = await testDb.execute({
+  sql: "SELECT COUNT(*) AS count FROM phone_verifications WHERE phone = ?",
+  args: ["010-7777-8888"],
+});
+assert.equal(Number(withdrawnVerification.rows[0].count), 0);
+testDb.close();
 
 function requestMeta(label) {
   return {

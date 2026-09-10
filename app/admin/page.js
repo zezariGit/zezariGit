@@ -46,6 +46,7 @@ import {
   releaseSafePhonePoolNumberAction,
   setGuardianActiveAction,
   setGuardianAdminMemoAction,
+  setGuardianPhoneAction,
   setGuardianAdminAction,
   setImageUploadSettingsAction,
   setAdPricingAction,
@@ -3684,6 +3685,26 @@ function GuardianManagementSection({ adminData }) {
                       <div><dt>주소</dt><dd>{formatFullAddress(selectedGuardian.address, selectedGuardian.address_detail)}</dd></div>
                       <div><dt>SNS 로그인</dt><dd><GuardianProviderBadges guardian={selectedGuardian} /></dd></div>
                     </dl>
+
+                    <form action={setGuardianPhoneAction} className="guardian-phone-admin-form">
+                      <input type="hidden" name="guardianId" value={selectedGuardian.id} />
+                      <input type="hidden" name="returnTo" value={returnTo} />
+                      <label htmlFor={`guardian-phone-${selectedGuardian.id}`}>휴대전화번호 수정</label>
+                      <div>
+                        <input
+                          id={`guardian-phone-${selectedGuardian.id}`}
+                          name="phone"
+                          type="tel"
+                          inputMode="numeric"
+                          autoComplete="tel"
+                          defaultValue={selectedGuardian.phone || ""}
+                          placeholder="010-0000-0000"
+                          required
+                        />
+                        <FormSubmitButton pendingText="수정중">번호 수정</FormSubmitButton>
+                      </div>
+                      <small>관리자는 별도의 인증번호 확인 없이 보호자 번호를 수정할 수 있습니다.</small>
+                    </form>
 
                     <form action={setGuardianAdminMemoAction} className="guardian-detail-memo-form">
                       <input type="hidden" name="guardianId" value={selectedGuardian.id} />
