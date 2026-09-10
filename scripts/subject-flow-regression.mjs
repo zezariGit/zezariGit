@@ -32,6 +32,11 @@ assert.match(dashboard, /subject-preview-message-v2\.png[\s\S]*subject\.guardian
 assert.match(voicePlayer, /subject-preview-voice\.png/, "음성 재생 영역은 제공된 이미지를 사용해야 합니다.");
 assert.match(dashboard, /대상자 정보 수정/);
 assert.match(dashboard, /대상자 정보 등록/);
+assert.ok(
+  dashboard.indexOf('className="target-voice-field"') < dashboard.indexOf("<SubjectMessageField"),
+  "보호자 음성 녹음은 보호자가 전하고픈 말보다 먼저 표시해야 합니다."
+);
+assert.match(dashboard, /subject-edit-helper[\s\S]*보호자 연락처는 \[설정\]/);
 assert.match(dashboard, /대상자 등록이 완료되었습니다\./);
 assert.match(dashboard, /href="\/shop"/);
 assert.match(dashboard, /href="\/\?tab=dashboard"/);
@@ -40,10 +45,13 @@ assert.match(registrationForm, /voiceRecording/);
 assert.match(registrationForm, /disabled=\{!formReady \|\| recording\}/);
 assert.match(voiceRecorder, /MAX_RECORDING_SECONDS = 30/);
 assert.match(voiceRecorder, /removeVoice/);
+assert.match(voiceRecorder, /iPhone 설정에서 Safari 또는 제자리를 선택한 뒤 마이크 권한을 허용해 주세요/);
+assert.match(dashboard, /<span>\{gender\}<\/span>/, "성별은 남성, 여성으로 표시해야 합니다.");
 assert.match(database, /guardianMessage\.length > 200/);
 assert.match(database, /const removeVoice =/);
 assert.match(styles, /\.subject-preview-emergency-grid/);
 assert.match(styles, /\.voice-recording-panel/);
+assert.match(styles, /\.target-field small,[\s\S]*font-size: 12px;[\s\S]*font-weight: 500;/, "서브 안내 문구 크기와 굵기를 통일해야 합니다.");
 assert.match(styles, /\.subject-complete-qr-wrap/);
 for (const image of subjectImages) {
   assert.equal(image.toString("ascii", 1, 4), "PNG");

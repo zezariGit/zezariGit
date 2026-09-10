@@ -652,11 +652,10 @@ function SubjectForm({ subject, imageUploadSettings }) {
                   defaultChecked={(subject?.gender || "") === gender}
                   required
                 />
-                <span>{gender.replace("성", "")}</span>
+                <span>{gender}</span>
               </label>
             ))}
           </fieldset>
-          <SubjectMessageField value={subject?.guardian_message || ""} />
           <div className="target-voice-field">
             <strong>보호자 음성 녹음 (선택)</strong>
             <small>보호자의 음성을 최대 30초까지 녹음할 수 있습니다.</small>
@@ -665,6 +664,7 @@ function SubjectForm({ subject, imageUploadSettings }) {
               existingName={subject?.voice_name || ""}
             />
           </div>
+          <SubjectMessageField value={subject?.guardian_message || ""} />
           {isExisting && (
             <p className="subject-edit-helper">
               <InfoIcon /> 보호자 연락처는 [설정] &gt; [보호자 정보]에서 수정 가능합니다.

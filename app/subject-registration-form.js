@@ -8,7 +8,7 @@ const REQUIRED_FIELDS = [
   { label: "이름", name: "subjectName", selector: "input[name='subjectName']" },
   { label: "생년월일", name: "birthDate", selector: "select[name='birthYearPart']" },
   { label: "성별", name: "gender", selector: "input[name='gender']" },
-  { label: "보호자 메시지", name: "guardianMessage", selector: "textarea[name='guardianMessage']" },
+  { label: "보호자가 전하고픈 말", name: "guardianMessage", selector: "textarea[name='guardianMessage']" },
 ];
 
 export default function SubjectRegistrationForm({

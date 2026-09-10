@@ -18834,14 +18834,14 @@ button:disabled:hover {
 
 .subject-form-header h1 {
   color: #111820;
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 900;
 }
 
 .subject-form-header p {
   color: #009b50;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .subject-form-back {
@@ -18978,7 +18978,7 @@ button:disabled:hover {
 .target-voice-field strong {
   color: #171c1a;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 800;
 }
 
 .target-field input,
@@ -18992,6 +18992,7 @@ button:disabled:hover {
   background: #ffffff;
   color: #171c1a;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .target-field input:focus,
@@ -19028,13 +19029,14 @@ button:disabled:hover {
   display: grid;
   grid-template-columns: repeat(2, max-content);
   align-items: center;
-  gap: 25px;
+  column-gap: 25px;
+  row-gap: 3px;
 }
 
 .target-gender-field legend {
   grid-column: 1 / -1;
   width: 100%;
-  margin: 0 0 8px;
+  margin: 0;
 }
 
 .target-gender-field label {
@@ -19065,8 +19067,9 @@ button:disabled:hover {
 .target-field small,
 .target-voice-field small {
   color: #747c78;
-  font-size: 11px;
-  line-height: 1.45;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
 }
 
 .subject-message-count {
@@ -19259,24 +19262,30 @@ button:disabled:hover {
 
 .voice-recorder-message {
   color: #f03c43;
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.55;
 }
 
 .subject-edit-helper {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 5px;
   margin: 0;
-  padding: 6px 10px;
+  padding: 6px;
   border-radius: 5px;
   background: #effaf4;
   color: #65706a;
-  font-size: 10px;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
 .subject-edit-helper svg {
-  width: 15px;
-  height: 15px;
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
   fill: none;
   stroke: #009b50;
   stroke-width: 1.7;

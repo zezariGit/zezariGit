@@ -89,8 +89,21 @@ export default function SubjectVoiceRecorder({ existingVoice = "", existingName 
         });
       }, 1000);
       autoStopRef.current = window.setTimeout(finishRecording, MAX_RECORDING_SECONDS * 1000);
-    } catch {
-      setMessage("마이크 권한을 허용해야 녹음할 수 있습니다.");
+    } catch (error) {
+      const userAgent = navigator.userAgent || "";
+      const isTouchIPad = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+      const isIOS = /iPad|iPhone|iPod/i.test(userAgent) || isTouchIPad;
+
+      if (error?.name === "NotAllowedError" || error?.name === "SecurityError") {
+        setMessage(
+          isIOS
+            ? "마이크 권한이 필요합니다. iPhone 설정에서 Safari 또는 제자리를 선택한 뒤 마이크 권한을 허용해 주세요."
+            : "브라우저의 사이트 설정에서 마이크 권한을 허용한 뒤 다시 시도해 주세요."
+        );
+        return;
+      }
+
+      setMessage("마이크를 사용할 수 없습니다. 다른 앱에서 마이크를 사용 중인지 확인한 뒤 다시 시도해 주세요.");
     }
   }
 
@@ -167,7 +180,7 @@ export default function SubjectVoiceRecorder({ existingVoice = "", existingName 
       {playableVoice && (
         <audio ref={audioRef} src={playableVoice} onEnded={() => setPlaying(false)} preload="metadata" />
       )}
-      {message && <small className="voice-recorder-message">{message}</small>}
+      {message && <small className="voice-recorder-message" role="alert">{message}</small>}
     </div>
   );
 }
