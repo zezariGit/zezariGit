@@ -19346,6 +19346,13 @@ button:disabled:hover {
   padding: 0 34px 11px;
 }
 
+.subject-preview-heading > img {
+  width: 174px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 .subject-preview-heading h1 {
   font-size: 21px;
 }
@@ -19419,6 +19426,13 @@ button:disabled:hover {
   text-align: left;
 }
 
+.subject-preview-contact > img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
 .subject-preview-contact > svg {
   width: 50px;
   height: 50px;
@@ -19462,6 +19476,18 @@ button:disabled:hover {
   border-radius: 8px;
 }
 
+.subject-preview-emergency-grid button:has(> img) {
+  padding: 0;
+  overflow: hidden;
+}
+
+.subject-preview-emergency-grid button > img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
 .subject-preview-emergency-grid svg {
   width: 26px;
   height: 26px;
@@ -19486,22 +19512,27 @@ button:disabled:hover {
 
 .subject-preview-voice-player {
   min-height: 64px;
-  display: grid;
-  grid-template-columns: 39px 66px minmax(0, 1fr);
-  align-items: center;
-  gap: 8px;
-  padding: 7px 20px;
+  display: block;
+  padding: 0;
 }
 
 .subject-preview-voice-player > button {
-  width: 37px;
-  height: 37px;
-  display: grid;
-  place-items: center;
-  border: 1.5px solid #009b50;
-  border-radius: 50%;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  display: block;
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  padding: 0;
   background: #ffffff;
-  color: #009b50;
+}
+
+.subject-preview-voice-player > button img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
 }
 
 .subject-preview-voice-player button svg {
@@ -19561,6 +19592,13 @@ button:disabled:hover {
   gap: 5px;
   color: #009b50;
   font-size: 12px;
+}
+
+.subject-preview-message h2 img {
+  width: min(100%, 296px);
+  height: auto;
+  display: block;
+  object-fit: contain;
 }
 
 .subject-preview-message h2 svg {

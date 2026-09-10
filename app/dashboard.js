@@ -315,8 +315,7 @@ function SubjectPreviewPage({ subject }) {
     <section className="guardian-subject-preview" aria-label={`${subject.name} 대상자 정보 미리보기`}>
       <span className="subject-preview-shield" aria-hidden="true"><ShieldCheckIcon /></span>
       <header className="subject-preview-heading">
-        <h1>대상자 정보 미리보기</h1>
-        <p>입력한 내용을 확인해 주세요.</p>
+        <img src="/assets/dashboard/subject-preview-heading.png" alt="대상자 정보 미리보기. 입력한 내용을 확인해 주세요." />
       </header>
 
       <div className="subject-preview-profile">
@@ -330,20 +329,15 @@ function SubjectPreviewPage({ subject }) {
       </div>
 
       <button className="subject-preview-contact subject-preview-disabled" type="button" disabled>
-        <PhoneIcon />
-        <span><strong>보호자에게 전화하기</strong><small>안심번호로 연결됩니다</small></span>
+        <img src="/assets/dashboard/subject-preview-call.png" alt="보호자에게 전화하기. 안심번호로 연결됩니다." />
       </button>
 
       <div className="subject-preview-emergency-grid">
         <button className="subject-preview-disabled" type="button" disabled>
-          <LocationIcon />
-          <strong>위치 공유</strong>
-          <small>보호자에게<br />현재 위치를 공유해요</small>
+          <img src="/assets/dashboard/subject-preview-location.png" alt="위치 공유. 보호자에게 현재 위치를 공유해요." />
         </button>
         <button className="subject-preview-disabled" type="button" disabled>
-          <PhoneIcon />
-          <strong>112 신고</strong>
-          <small>관할기관에<br />신고합니다</small>
+          <img src="/assets/dashboard/subject-preview-emergency.png" alt="112 신고. 관할기관에 신고합니다." />
         </button>
       </div>
 
@@ -357,7 +351,7 @@ function SubjectPreviewPage({ subject }) {
       )}
 
       <section className="subject-preview-message">
-        <h2><MessageIcon /> 보호자가 전하고픈 말</h2>
+        <h2><img src="/assets/dashboard/subject-preview-message.png" alt="보호자가 전하고픈 말" /></h2>
         <p>{subject.guardian_message || "등록된 보호자 메시지가 없습니다."}</p>
         <small>위 메시지는 보호자가 직접 입력한 내용입니다.</small>
       </section>
