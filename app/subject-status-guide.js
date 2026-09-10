@@ -2,24 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-const STATUS_ITEMS = [
-  {
-    className: "purchase-needed",
-    label: "상품 구매 필요",
-    description: "대상자 등록 후 아직 제자리 QR 상품을 구매하지 않은 상태",
-  },
-  {
-    className: "safe",
-    label: "안전",
-    description: "상품 구매 후 실종 신고를 하지 않은 상태",
-  },
-  {
-    className: "searching",
-    label: "찾는 중",
-    description: "온라인 실종 신고가 진행 중인 상태",
-  },
-];
-
 export default function SubjectStatusGuide() {
   const [open, setOpen] = useState(false);
 
@@ -60,14 +42,11 @@ export default function SubjectStatusGuide() {
           >
             <span className="subject-status-guide-handle" aria-hidden="true" />
             <h2 id="subject-status-guide-title">대상자 현재 상태 안내</h2>
-            <div className="subject-status-guide-list">
-              {STATUS_ITEMS.map((item) => (
-                <div className="subject-status-guide-row" key={item.label}>
-                  <span className={`status-badge ${item.className}`}>{item.label}</span>
-                  <p>{item.description}</p>
-                </div>
-              ))}
-            </div>
+            <img
+              className="subject-status-guide-reference"
+              src="/assets/dashboard/subject-status-guide.png"
+              alt="상품 구매 필요: 대상자 등록 후 아직 제자리 QR 상품을 구매하지 않은 상태. 안전: 상품 구매 후 실종 신고를 하지 않은 상태. 찾는 중: 온라인 실종 신고가 진행 중인 상태."
+            />
             <button className="subject-status-guide-confirm" type="button" onClick={() => setOpen(false)}>
               확인
             </button>

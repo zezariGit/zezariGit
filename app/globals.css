@@ -2004,6 +2004,13 @@ a {
   display: grid;
 }
 
+.subject-status-guide-reference {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
 .subject-status-guide-row {
   min-height: 61px;
   display: grid;
