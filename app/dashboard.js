@@ -166,7 +166,7 @@ export default async function GuardianDashboard({
             selectedPreviewSubject={selectedPreviewSubject}
           />
         ) : isGuardianTab ? (
-          <GuardianInfoTab guardian={guardian} session={session} />
+          <GuardianInfoTab guardian={guardian} session={session} admin={admin} />
         ) : (
           <SubjectsInfoTab
             selectedSubject={selectedEditSubject}
@@ -236,11 +236,11 @@ function DashboardTab({
   );
 }
 
-function GuardianInfoTab({ guardian, session }) {
+function GuardianInfoTab({ guardian, session, admin }) {
   return (
     <section className="dashboard-panel info-panel guardian-info-panel">
       <h2 id="guardian-info">보호자 정보</h2>
-      <GuardianForm guardian={guardian} session={session} />
+      <GuardianForm guardian={guardian} session={session} admin={admin} />
     </section>
   );
 }
@@ -493,7 +493,7 @@ function StatusDashboard({ subjects }) {
   );
 }
 
-function GuardianForm({ guardian, session }) {
+function GuardianForm({ guardian, session, admin }) {
   const socialAccount = isSocialAccount(session);
 
   return (
@@ -527,7 +527,7 @@ function GuardianForm({ guardian, session }) {
                   </label>
                 </>
               )}
-              <GuardianPhoneVerification currentPhone={guardian.phone || ""} />
+              <GuardianPhoneVerification currentPhone={guardian.phone || ""} admin={admin} />
               <label>
                 생년월일
                 <input name="birthDate" type="date" defaultValue={guardian.birth_date || ""} />

@@ -8,7 +8,7 @@ import PasswordVisibilityIcon from "../password-visibility-icon";
 const LOGIN_ID_PATTERN = /^[A-Za-z0-9_]{4,20}$/;
 const PASSWORD_PATTERN = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d\s]).{8,}$/;
 
-export default function GuardianProfileForm({ guardian, preview = false }) {
+export default function GuardianProfileForm({ guardian, preview = false, admin = false }) {
   const original = useMemo(() => ({
     name: String(guardian.name || ""),
     gender: String(guardian.gender || "남성"),
@@ -45,7 +45,9 @@ export default function GuardianProfileForm({ guardian, preview = false }) {
   const birthDate = `${year}-${month}-${day}`;
   const phoneChanged = digits(phone) !== digits(original.phone);
   const phoneValid = /^01[016789]\d{7,8}$/.test(digits(phone));
-  const phoneVerified = phoneChanged && digits(verifiedPhone) === digits(phone) && Boolean(phoneToken);
+  const phoneVerified = phoneChanged && (admin
+    ? phoneValid
+    : digits(verifiedPhone) === digits(phone) && Boolean(phoneToken));
   const loginChanged = loginId.trim().toLowerCase() !== original.loginId.toLowerCase();
   const loginFormatValid = LOGIN_ID_PATTERN.test(loginId.trim());
   const loginVerified = loginChanged && checkedLoginId.toLowerCase() === loginId.trim().toLowerCase();
@@ -206,14 +208,19 @@ export default function GuardianProfileForm({ guardian, preview = false }) {
         <strong>휴대전화번호</strong>
         <div className="profile-inline-input">
           <input name="phone" value={phone} onChange={(event) => changePhone(event.target.value)} inputMode="tel" maxLength={13} />
-          {phoneVerified ? <span className="profile-verified-label">인증 완료</span> : <button className="profile-phone-action" type="button" onClick={sendCode} disabled={!phoneChanged || phoneLoading}>{codeRequested ? "인증번호 재전송" : "인증번호 받기"}</button>}
+          {admin
+            ? <span className="profile-verified-label">관리자 변경</span>
+            : phoneVerified
+              ? <span className="profile-verified-label">인증 완료</span>
+              : <button className="profile-phone-action" type="button" onClick={sendCode} disabled={!phoneChanged || phoneLoading}>{codeRequested ? "인증번호 재전송" : "인증번호 받기"}</button>}
         </div>
-        {codeRequested && !phoneVerified && (
+        {!admin && codeRequested && !phoneVerified && (
           <div className="profile-code-row">
             <div><input value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))} inputMode="numeric" placeholder="인증번호 6자리" /><span>{timer(seconds)}</span></div>
             <button type="button" onClick={verifyCode} disabled={code.length !== 6 || phoneLoading}>확인</button>
           </div>
         )}
+        {admin && phoneChanged && phoneValid && <small className="success">관리자 계정은 인증번호 없이 변경할 수 있습니다.</small>}
         {phoneMessage && <small className={phoneError ? "error" : "success"}>{phoneMessage}</small>}
       </div>
 

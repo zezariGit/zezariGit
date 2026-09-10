@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "../../../lib/auth";
 import { getDashboardData } from "../../../lib/db";
+import { isAdminSession } from "../../../lib/admin";
 import StatusToast from "../../status-toast";
 import { AccountTopbar } from "../account-ui";
 import GuardianProfileForm from "../guardian-profile-form";
@@ -33,12 +34,13 @@ export default async function GuardianProfilePage({ searchParams }) {
         includeSubscriptionPlans: false,
         includeAdDailyRate: false,
       })).guardian;
+  const admin = isAdminSession(session) || Number(guardian?.is_admin || 0) === 1;
 
   return (
     <main className="account-page guardian-profile-page">
       <section className="account-panel guardian-profile-panel">
         <AccountTopbar title="보호자 정보" />
-        <GuardianProfileForm guardian={guardian} preview={preview} />
+        <GuardianProfileForm guardian={guardian} preview={preview} admin={admin} />
       </section>
       <StatusToast message={params?.notice || ""} type={params?.noticeType || "success"} />
     </main>

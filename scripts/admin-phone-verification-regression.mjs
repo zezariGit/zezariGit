@@ -11,9 +11,11 @@ process.env.ADMIN_EMAILS = "general@zezari.com";
 process.env.NODE_ENV = "test";
 
 const {
+  authenticateGuardianCredentials,
   createGuardianSignup,
   ensureSchema,
   requestSignupPhoneVerification,
+  saveGuardianProfile,
   setGuardianAdmin,
   verifySignupPhoneCode,
 } = await import("../lib/db.js");
@@ -94,6 +96,13 @@ await assert.rejects(
   /이미 가입된 휴대폰 번호입니다/,
 );
 
+const roleAdminUser = await authenticateGuardianCredentials("role_admin", "Admin123!");
+const changedAdminPhone = "010-2222-9999";
+await saveGuardianProfile(
+  { user: { id: roleAdminUser.id, email: roleAdminUser.email, provider: "credentials" } },
+  profileForm({ phone: changedAdminPhone, loginId: "role_admin" }),
+);
+
 const regularPhone = "010-3333-4444";
 await createVerifiedGuardian({
   phone: regularPhone,
@@ -101,6 +110,14 @@ await createVerifiedGuardian({
   loginId: "regular_user",
   requestLabel: "regular-user",
 });
+const regularUser = await authenticateGuardianCredentials("regular_user", "Admin123!");
+await assert.rejects(
+  saveGuardianProfile(
+    { user: { id: regularUser.id, email: regularUser.email, provider: "credentials" } },
+    profileForm({ phone: "010-3333-9999", loginId: "regular_user" }),
+  ),
+  /휴대폰 인증을 먼저 완료해 주세요/,
+);
 await assert.rejects(
   requestSignupPhoneVerification(
     { phone: regularPhone, purpose: "signup" },
@@ -118,3 +135,15 @@ function requestMeta(label) {
 }
 
 console.log("Administrator signup phone verification regression passed.");
+
+function profileForm({ phone, loginId }) {
+  const form = new FormData();
+  form.set("guardianName", "인증 테스트");
+  form.set("loginId", loginId);
+  form.set("phone", phone);
+  form.set("birthDate", "1990-01-01");
+  form.set("gender", "남성");
+  form.set("email", "");
+  form.set("profileSettings", "1");
+  return form;
+}

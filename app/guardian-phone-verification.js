@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 const EMPTY_CODE = ["", "", "", "", "", ""];
 
-export default function GuardianPhoneVerification({ currentPhone = "" }) {
+export default function GuardianPhoneVerification({ currentPhone = "", admin = false }) {
   const [phone, setPhone] = useState(currentPhone);
   const [codeInput, setCodeInput] = useState(EMPTY_CODE);
   const [token, setToken] = useState("");
@@ -15,7 +15,10 @@ export default function GuardianPhoneVerification({ currentPhone = "" }) {
   const [message, setMessage] = useState("");
 
   const phoneChanged = phoneDigits(phone) !== phoneDigits(currentPhone);
-  const verified = phoneChanged && phoneDigits(verifiedPhone) === phoneDigits(phone) && Boolean(token);
+  const phoneValid = /^01[016789]\d{7,8}$/.test(phoneDigits(phone));
+  const verified = phoneChanged && (admin
+    ? phoneValid
+    : phoneDigits(verifiedPhone) === phoneDigits(phone) && Boolean(token));
 
   useEffect(() => {
     if (seconds <= 0) return undefined;
@@ -129,13 +132,15 @@ export default function GuardianPhoneVerification({ currentPhone = "" }) {
             autoComplete="tel"
             required
           />
-          <button type="button" className="outline-action" onClick={requestCode} disabled={loading || !phoneChanged || verified}>
-            {verified ? "인증완료" : loading ? "처리중" : "인증번호 받기"}
-          </button>
+          {admin
+            ? <span className="profile-verified-label">관리자 변경</span>
+            : <button type="button" className="outline-action" onClick={requestCode} disabled={loading || !phoneChanged || verified}>
+                {verified ? "인증완료" : loading ? "처리중" : "인증번호 받기"}
+              </button>}
         </span>
       </label>
 
-      {codeRequested && !verified && (
+      {!admin && codeRequested && !verified && (
         <div className="guardian-phone-code-panel">
           <div className="code-heading">
             <strong>인증번호 입력</strong>
@@ -166,6 +171,7 @@ export default function GuardianPhoneVerification({ currentPhone = "" }) {
       )}
 
       {!phoneChanged && currentPhone && <small className="field-helper">현재 인증된 보호자 연락처입니다.</small>}
+      {admin && phoneChanged && phoneValid && <p className="phone-verification-message success" role="status">관리자 계정은 인증번호 없이 변경할 수 있습니다.</p>}
       {message && <p className={verified ? "phone-verification-message success" : "phone-verification-message"} role="status">{message}</p>}
     </div>
   );
