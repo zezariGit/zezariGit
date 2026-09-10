@@ -11,7 +11,10 @@ const [dashboard, carousel, guide, styles, ...icons] = await Promise.all([
 ]);
 
 assert.match(dashboard, /const pageSize = 3;/, "대상자 목록은 3명 단위여야 합니다.");
-assert.match(dashboard, /subjectPages\.push\(\[\]\);/, "대상자 목록 끝에는 추가 전용 페이지가 있어야 합니다.");
+assert.match(dashboard, /subjectPages\.at\(-1\)\.push\(null\)/, "마지막 페이지의 빈 슬롯에는 대상자 추가 버튼이 있어야 합니다.");
+assert.match(dashboard, /subjectPages\.push\(\[null\]\)/, "3명 단위로 가득 찬 경우 다음 페이지에 대상자 추가 버튼이 있어야 합니다.");
+assert.match(dashboard, /subjects\.length === 0 && pageSubjects\.length === 0/, "빈 상태는 대상자가 0명일 때만 표시해야 합니다.");
+assert.doesNotMatch(dashboard, /className="managed-empty-plus"/, "빈 상태 상단의 큰 플러스 아이콘은 표시하지 않아야 합니다.");
 assert.match(dashboard, /안녕하세요, 보호자님!/);
 assert.match(dashboard, /<MyPageTab closeHref=\{closeMyPageHref\} admin=\{admin\} \/>/, "설정 메뉴에 관리자 여부를 전달해야 합니다.");
 assert.match(dashboard, /\.\.\.\(admin \? \[\["관리자 화면", "\/admin"\]\] : \[\]\)/, "관리자 화면 메뉴는 관리자에게만 표시되어야 합니다.");

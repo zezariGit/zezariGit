@@ -409,7 +409,13 @@ function StatusDashboard({ subjects }) {
   for (let index = 0; index < subjects.length; index += pageSize) {
     subjectPages.push(subjects.slice(index, index + pageSize));
   }
-  subjectPages.push([]);
+  if (subjects.length === 0) {
+    subjectPages.push([]);
+  } else if (subjectPages.at(-1).length < pageSize) {
+    subjectPages.at(-1).push(null);
+  } else {
+    subjectPages.push([null]);
+  }
 
   return (
     <section className="status-dashboard" aria-label="관리대상 현재 상태">
@@ -423,6 +429,18 @@ function StatusDashboard({ subjects }) {
             {subjectPages.map((pageSubjects, pageIndex) => (
               <div className="managed-page" key={`managed-page-${pageIndex}`}>
                 {pageSubjects.map((subject) => {
+                  if (!subject) {
+                    return (
+                      <Link
+                        className="managed-add-subject"
+                        href="/?tab=subjects&mode=new#subjects-info"
+                        aria-label="대상자 추가하기"
+                        key={`managed-add-${pageIndex}`}
+                      >
+                        <span aria-hidden="true">+</span>
+                      </Link>
+                    );
+                  }
                   const displayStatus = resolveSubjectStatus(subject);
                   return (
                   <Link
@@ -452,11 +470,10 @@ function StatusDashboard({ subjects }) {
                   </Link>
                   );
                 })}
-                {pageSubjects.length === 0 && (
+                {subjects.length === 0 && pageSubjects.length === 0 && (
                   <div className="managed-empty-state">
-                    <span className="managed-empty-plus" aria-hidden="true">+</span>
-                    <strong>{subjects.length > 0 ? "대상자를 추가해 주세요." : "등록된 대상자가 없습니다."}</strong>
-                    <p>{subjects.length > 0 ? "새로운 대상자를 등록해 주세요." : "대상자를 등록하고 제자리 서비스를 시작해 보세요."}</p>
+                    <strong>등록된 대상자가 없습니다.</strong>
+                    <p>대상자를 등록하고 제자리 서비스를 시작해 보세요.</p>
                     <Link className="managed-empty-add" href="/?tab=subjects&mode=new#subjects-info">
                       <span aria-hidden="true">+</span> 대상자 추가하기
                     </Link>

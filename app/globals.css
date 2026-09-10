@@ -1686,13 +1686,13 @@ a {
 
 .dashboard-home-shell .status-phone-top h2 {
   color: #252b2d;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
 }
 
 .subject-status-guide-trigger {
-  width: 25px;
-  height: 25px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
   border: 0;
@@ -1702,8 +1702,8 @@ a {
 }
 
 .subject-status-guide-trigger img {
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
 }
 
@@ -1835,6 +1835,41 @@ a {
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+
+.dashboard-home-shell .managed-add-subject {
+  width: 100%;
+  min-height: 90px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-top: 1px solid #e8ebe9;
+  background: #ffffff;
+  color: #009b50;
+  text-decoration: none;
+}
+
+.dashboard-home-shell .managed-page > .managed-add-subject:first-child {
+  min-height: 272px;
+  border-top: 0;
+}
+
+.dashboard-home-shell .managed-add-subject span {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  font-size: 34px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.dashboard-home-shell .managed-add-subject:hover,
+.dashboard-home-shell .managed-add-subject:focus-visible {
+  background: #f5fbf7;
+  color: #008f49;
 }
 
 .managed-empty-plus {
