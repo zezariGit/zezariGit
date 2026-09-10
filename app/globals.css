@@ -2248,8 +2248,18 @@ a {
 .signup-profile-terms input[type="checkbox"] {
   width: 16px;
   height: 16px;
+  min-height: 16px;
+  align-self: center;
   margin: 0;
+  padding: 0;
   accent-color: #009b50;
+}
+
+.signup-profile-terms input[type="checkbox"]:focus {
+  border-color: #009b50;
+  box-shadow: none;
+  outline: 1px solid rgba(0, 155, 80, 0.24);
+  outline-offset: 1px;
 }
 
 .signup-profile-terms button {
