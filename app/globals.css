@@ -19578,6 +19578,72 @@ button:disabled:hover {
   display: none;
 }
 
+.subject-preview-actions-panel {
+  overflow: hidden;
+}
+
+.subject-preview-action-map {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 356 / 299;
+  overflow: hidden;
+}
+
+.subject-preview-action-map > img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.subject-preview-action-hotspot {
+  position: absolute;
+  min-height: 0;
+  border: 0;
+  border-radius: 8px;
+  padding: 0;
+  background: transparent;
+}
+
+.subject-preview-action-hotspot.call {
+  top: 1.7%;
+  left: 2.5%;
+  width: 95%;
+  height: 25.4%;
+}
+
+.subject-preview-action-hotspot.location {
+  top: 30.1%;
+  left: 2.5%;
+  width: 46.1%;
+  height: 40.8%;
+}
+
+.subject-preview-action-hotspot.emergency {
+  top: 30.1%;
+  right: 2.5%;
+  width: 46.1%;
+  height: 40.8%;
+}
+
+.subject-preview-action-hotspot.voice {
+  top: 74.2%;
+  left: 2.5%;
+  width: 95%;
+  height: 22.7%;
+  cursor: pointer;
+}
+
+.subject-preview-action-hotspot.voice:not(:disabled):hover,
+.subject-preview-action-hotspot.voice:not(:disabled):focus-visible {
+  background: rgba(0, 155, 80, 0.05);
+  outline: 2px solid rgba(0, 155, 80, 0.25);
+  outline-offset: -2px;
+}
+
+.subject-preview-action-hotspot:disabled {
+  cursor: not-allowed;
+}
+
 .subject-preview-message {
   gap: 7px;
   padding: 8px 10px;

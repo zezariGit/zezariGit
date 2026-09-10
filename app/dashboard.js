@@ -328,27 +328,12 @@ function SubjectPreviewPage({ subject }) {
         </div>
       </div>
 
-      <button className="subject-preview-contact subject-preview-disabled" type="button" disabled>
-        <img src="/assets/dashboard/subject-preview-call.png" alt="보호자에게 전화하기. 안심번호로 연결됩니다." />
-      </button>
-
-      <div className="subject-preview-emergency-grid">
-        <button className="subject-preview-disabled" type="button" disabled>
-          <img src="/assets/dashboard/subject-preview-location.png" alt="위치 공유. 보호자에게 현재 위치를 공유해요." />
-        </button>
-        <button className="subject-preview-disabled" type="button" disabled>
-          <img src="/assets/dashboard/subject-preview-emergency.png" alt="112 신고. 관할기관에 신고합니다." />
-        </button>
-      </div>
-
-      {subject.voice_data_url && (
-        <section className="subject-preview-voice">
-          <SubjectPreviewVoicePlayer
-            src={subject.voice_data_url}
-            name={subject.voice_name || "보호자 음성"}
-          />
-        </section>
-      )}
+      <section className="subject-preview-voice subject-preview-actions-panel">
+        <SubjectPreviewVoicePlayer
+          src={subject.voice_data_url || ""}
+          name={subject.voice_name || "보호자 음성"}
+        />
+      </section>
 
       <section className="subject-preview-message">
         <h2><img src="/assets/dashboard/subject-preview-message.png" alt="보호자가 전하고픈 말" /></h2>
