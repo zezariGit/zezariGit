@@ -279,7 +279,7 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
       setVerifiedPhone(data.phone || signup.phone);
       setPhoneVerificationToken(data.phoneVerificationToken || "");
       setSignupStep("profile");
-      setMessage("휴대폰 인증이 완료되었습니다.");
+      setMessage("");
     } catch {
       setSignupCodeError("인증번호 확인 중 오류가 발생했습니다.");
     } finally {

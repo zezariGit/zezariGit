@@ -2227,7 +2227,7 @@ a {
 .signup-profile-terms {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 8px;
+  gap: 5px;
   margin-top: 0;
   color: #252a2d;
   font-size: 12px;

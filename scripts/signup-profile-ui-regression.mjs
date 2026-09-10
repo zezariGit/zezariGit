@@ -13,6 +13,8 @@ assert.match(source, /disabled=\{signupLoading \|\| !signupProfileReady\}/, "필
 assert.match(source, /const signupProfileReady =[\s\S]*&& requiredTermsAgreed;/, "필수 약관이 버튼 활성화 조건에 포함되어야 합니다.");
 assert.doesNotMatch(source.match(/const signupProfileReady =[\s\S]*?;/)?.[0] || "", /notificationAgreed/, "선택 알림 동의는 버튼 활성화 조건에 포함되면 안 됩니다.");
 assert.match(source, /setSignupStep\("done"\)/, "가입 성공 후 완료 화면으로 이동해야 합니다.");
+assert.doesNotMatch(source, /휴대폰 인증이 완료되었습니다\./, "정보 입력 화면 아래에 인증 완료 문구를 표시하지 않아야 합니다.");
+assert.match(css, /\.signup-profile-terms\s*\{[^}]*gap: 5px;/s, "약관 동의 항목의 세로 간격은 좁게 유지되어야 합니다.");
 assert.match(source, /회원가입이 완료되었습니다![\s\S]*로그인 후 제자리 서비스를 이용해 주세요\.[\s\S]*로그인하기/, "완료 화면 문구와 로그인 버튼이 있어야 합니다.");
 assert.match(source, /setMode\("login"\);[\s\S]*setSignupStep\("phone"\)/, "완료 화면의 로그인 버튼은 로그인 화면으로 이동해야 합니다.");
 assert.match(css, /\.signup-profile-form/);
