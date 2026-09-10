@@ -23,7 +23,10 @@ assert.match(component, /\\d/, "password requires a number");
 assert.match(component, /\[\^A-Za-z0-9\]/, "password requires a special character");
 assert.match(component, /onComplete\(\{ loginId: data\.loginId \|\| "" \}\)/, "successful reset returns to login through the parent");
 assert.match(css, /\.password-reset-code-field\.invalid\s*\{[^}]*border-color: #ff4d57/s, "invalid code field uses the error color");
-assert.match(css, /\.password-reset-success\s*\{/, "verification success banner is styled");
+assert.doesNotMatch(component, /휴대전화번호 인증이 완료되었습니다\./, "verification success copy is removed from the password step");
+assert.match(component, /<\/label>\s*<p className="password-reset-password-help">\s*영문, 숫자, 특수문자를 조합하여 8자 이상 입력해 주세요\./s, "password guidance follows the new password field");
+assert.match(css, /\.password-reset-password-help\s*\{[^}]*text-align: left;[^}]*white-space: nowrap;/s, "password guidance stays gray, left aligned, and on one line");
+assert.doesNotMatch(css, /\.password-reset-password-help\.valid/, "password guidance never changes to green");
 assert.match(css, /\.password-reset-password-field button svg\s*\{/, "password visibility controls are styled");
 
 console.log("Password reset UI regression checks passed.");

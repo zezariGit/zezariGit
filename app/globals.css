@@ -2511,7 +2511,7 @@ a {
 }
 
 .password-reset-password-field + .password-reset-password-field {
-  margin-top: 20px;
+  margin-top: 14px;
 }
 
 .password-reset-password-field > span {
@@ -2554,19 +2554,16 @@ a {
 }
 
 .password-reset-password-help {
-  margin: 16px 0 0;
+  margin: 7px 7px 0;
   color: #9a9fa1;
-  font-size: 13px;
-  line-height: 1.55;
-  text-align: center;
-}
-
-.password-reset-password-help.valid {
-  color: #15934e;
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: left;
+  white-space: nowrap;
 }
 
 .password-reset-card .password-match-message {
-  margin: 8px 7px 0;
+  margin: 7px 7px 0;
   text-align: left;
 }
 

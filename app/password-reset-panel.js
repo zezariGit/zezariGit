@@ -33,11 +33,6 @@ export function PasswordResetPanel({ onBack, onComplete }) {
     matched: Boolean(newPassword) && newPassword === confirmPassword,
   }), [confirmPassword, newPassword]);
   const validPassword = Object.values(passwordChecks).every(Boolean);
-  const passwordFormatValid = passwordChecks.length
-    && passwordChecks.letter
-    && passwordChecks.number
-    && passwordChecks.special;
-
   useEffect(() => {
     if (codeSeconds <= 0) return undefined;
     const timer = window.setInterval(() => {
@@ -132,7 +127,7 @@ export function PasswordResetPanel({ onBack, onComplete }) {
       setPasswordResetToken(data.passwordResetToken || "");
       setCodeSeconds(0);
       setStep("password");
-      showMessage("휴대전화번호 인증이 완료되었습니다.", "success");
+      setMessage("");
     } catch {
       showMessage("인증번호 확인 중 오류가 발생했습니다.");
     } finally {
@@ -245,11 +240,6 @@ export function PasswordResetPanel({ onBack, onComplete }) {
       ) : (
         <form className="signup-step password-reset-step" onSubmit={submitPassword}>
           <h1 className="login-title">비밀번호 찾기</h1>
-          <div className="password-reset-success" role="status">
-            <SuccessCircleIcon />
-            <span>휴대전화번호 인증이 완료되었습니다.</span>
-          </div>
-
           <div className="password-reset-phone-row verified">
             <span>{maskPhoneNumber(verifiedPhone)}</span>
             <strong>인증 완료</strong>
@@ -268,6 +258,9 @@ export function PasswordResetPanel({ onBack, onComplete }) {
               <PasswordEyeIcon visible={showNewPassword} />
             </button>
           </label>
+          <p className="password-reset-password-help">
+            영문, 숫자, 특수문자를 조합하여 8자 이상 입력해 주세요.
+          </p>
           <label className="password-reset-password-field">
             <span>새 비밀번호 확인</span>
             <input
@@ -281,9 +274,6 @@ export function PasswordResetPanel({ onBack, onComplete }) {
               <PasswordEyeIcon visible={showConfirmPassword} />
             </button>
           </label>
-          <p className={`password-reset-password-help ${passwordFormatValid ? "valid" : ""}`}>
-            영문, 숫자, 특수문자를 조합하여<br />8자 이상 입력해 주세요.
-          </p>
           {confirmPassword && (
             <p className={`password-match-message ${passwordChecks.matched ? "valid" : "invalid"}`}>
               {passwordChecks.matched ? "비밀번호가 일치합니다." : "비밀번호가 일치하지 않습니다."}
@@ -342,15 +332,6 @@ function ErrorCircleIcon() {
     <svg className="password-reset-error-icon" viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="12" cy="12" r="9" />
       <path d="M12 7v6M12 17h.01" />
-    </svg>
-  );
-}
-
-function SuccessCircleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" />
-      <path d="m7.5 12 3 3 6-7" />
     </svg>
   );
 }
