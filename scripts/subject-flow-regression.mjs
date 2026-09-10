@@ -19,13 +19,17 @@ const [dashboard, registrationForm, voiceRecorder, voicePlayer, database, styles
   readFile(new URL("../public/assets/dashboard/subject-preview-voice.png", import.meta.url)),
   readFile(new URL("../public/assets/dashboard/subject-preview-message.png", import.meta.url)),
   readFile(new URL("../public/assets/dashboard/subject-preview-actions.png", import.meta.url)),
+  readFile(new URL("../public/assets/dashboard/subject-preview-call-v2.png", import.meta.url)),
+  readFile(new URL("../public/assets/dashboard/subject-preview-location-v2.png", import.meta.url)),
+  readFile(new URL("../public/assets/dashboard/subject-preview-emergency-v2.png", import.meta.url)),
+  readFile(new URL("../public/assets/dashboard/subject-preview-message-v2.png", import.meta.url)),
 ]);
 
-assert.match(dashboard, /src=\{subject\.voice_data_url \|\| ""\}/, "등록된 보호자 음성을 합본 작업 영역에 전달해야 합니다.");
+assert.match(dashboard, /subject\.voice_data_url && \(/, "음성 영역은 등록된 음성이 있을 때만 표시해야 합니다.");
 assert.match(dashboard, /subject-preview-heading\.png/, "미리보기 제목은 제공된 원본 이미지를 사용해야 합니다.");
-assert.match(dashboard, /subject-preview-message\.png/, "보호자 메시지 제목은 제공된 원본 이미지를 사용해야 합니다.");
-assert.match(voicePlayer, /subject-preview-actions\.png/, "미리보기 작업 영역은 제공된 합본 이미지를 사용해야 합니다.");
-assert.match(voicePlayer, /subject-preview-action-hotspot call[\s\S]*subject-preview-action-hotspot location[\s\S]*subject-preview-action-hotspot emergency[\s\S]*subject-preview-action-hotspot voice/, "합본 이미지의 각 작업은 독립된 버튼이어야 합니다.");
+assert.match(dashboard, /subject-preview-call-v2\.png[\s\S]*subject-preview-location-v2\.png[\s\S]*subject-preview-emergency-v2\.png/, "전화, 위치 공유, 112 신고는 새로 제공된 이미지를 각각 사용해야 합니다.");
+assert.match(dashboard, /subject-preview-message-v2\.png[\s\S]*subject\.guardian_message/, "메시지 카드에는 실제 보호자 입력값이 표시되어야 합니다.");
+assert.match(voicePlayer, /subject-preview-voice\.png/, "음성 재생 영역은 제공된 이미지를 사용해야 합니다.");
 assert.match(dashboard, /대상자 정보 수정/);
 assert.match(dashboard, /대상자 정보 등록/);
 assert.match(dashboard, /대상자 등록이 완료되었습니다\./);

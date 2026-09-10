@@ -328,17 +328,31 @@ function SubjectPreviewPage({ subject }) {
         </div>
       </div>
 
-      <section className="subject-preview-voice subject-preview-actions-panel">
-        <SubjectPreviewVoicePlayer
-          src={subject.voice_data_url || ""}
-          name={subject.voice_name || "보호자 음성"}
-        />
-      </section>
+      <button className="subject-preview-contact subject-preview-disabled" type="button" disabled>
+        <img src="/assets/dashboard/subject-preview-call-v2.png" alt="보호자에게 전화하기. 안심번호로 연결됩니다." />
+      </button>
+
+      <div className="subject-preview-emergency-grid">
+        <button className="subject-preview-disabled" type="button" disabled>
+          <img src="/assets/dashboard/subject-preview-location-v2.png" alt="위치 공유. 보호자에게 현재 위치를 공유해요." />
+        </button>
+        <button className="subject-preview-disabled" type="button" disabled>
+          <img src="/assets/dashboard/subject-preview-emergency-v2.png" alt="112 신고. 관할기관에 신고합니다." />
+        </button>
+      </div>
+
+      {subject.voice_data_url && (
+        <section className="subject-preview-voice">
+          <SubjectPreviewVoicePlayer
+            src={subject.voice_data_url}
+            name={subject.voice_name || "보호자 음성"}
+          />
+        </section>
+      )}
 
       <section className="subject-preview-message">
-        <h2><img src="/assets/dashboard/subject-preview-message.png" alt="보호자가 전하고픈 말" /></h2>
+        <img className="subject-preview-message-reference" src="/assets/dashboard/subject-preview-message-v2.png" alt="보호자가 전하고픈 말. 위 메시지는 보호자가 직접 입력한 내용입니다." />
         <p>{subject.guardian_message || "등록된 보호자 메시지가 없습니다."}</p>
-        <small>위 메시지는 보호자가 직접 입력한 내용입니다.</small>
       </section>
 
       <Link
