@@ -313,6 +313,9 @@ function SubjectPreviewPage({ subject }) {
 
   return (
     <section className="guardian-subject-preview" aria-label={`${subject.name} 대상자 정보 미리보기`}>
+      <Link className="subject-preview-back" href="/?tab=dashboard" aria-label="대시보드로 돌아가기">
+        ‹
+      </Link>
       <span className="subject-preview-shield" aria-hidden="true"><ShieldCheckIcon /></span>
       <header className="subject-preview-heading">
         <img src="/assets/dashboard/subject-preview-heading.png" alt="대상자 정보 미리보기. 입력한 내용을 확인해 주세요." />
