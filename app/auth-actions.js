@@ -4,6 +4,7 @@ import Image from "next/image";
 import { signIn, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { PasswordResetPanel } from "./password-reset-panel";
+import { LoginIdRecoveryPanel } from "./login-id-recovery-panel";
 import PasswordVisibilityIcon from "./password-visibility-icon";
 
 const LOGIN_ERROR_MESSAGE = "아이디 또는 비밀번호가 일치하지 않습니다.";
@@ -35,7 +36,13 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState(initialMode === "signup" || initialSignupStep === "done" ? "signup" : "login");
+  const [mode, setMode] = useState(
+    initialMode === "signup" || initialSignupStep === "done"
+      ? "signup"
+      : initialMode === "login-id" || initialMode === "login-id-found"
+        ? "login-id"
+        : "login",
+  );
   const [message, setMessage] = useState(authError ? LOGIN_ERROR_MESSAGE : "");
   const [signupStep, setSignupStep] = useState(initialSignupStep === "done" ? "done" : "phone");
   const [signup, setSignup] = useState({
@@ -173,6 +180,11 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
 
   const openPasswordReset = () => {
     setMode("password-reset");
+    setMessage("");
+  };
+
+  const openLoginIdRecovery = () => {
+    setMode("login-id");
     setMessage("");
   };
 
@@ -540,6 +552,22 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
     );
   }
 
+  if (mode === "login-id") {
+    return (
+      <LoginIdRecoveryPanel
+        onBack={() => setMode("login")}
+        onLogin={(recoveredLoginId) => {
+          setLoginId(recoveredLoginId);
+          setPassword("");
+          setMode("login");
+          setMessage("");
+        }}
+        onPasswordReset={openPasswordReset}
+        initialLoginId={initialMode === "login-id-found" ? "jinyoung10" : ""}
+      />
+    );
+  }
+
   const hasCredentialError = message === LOGIN_ERROR_MESSAGE;
   const loginReady = Boolean(loginId.trim() && password);
   const clearCredentialError = () => {
@@ -617,13 +645,11 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
             />
             <span>자동로그인</span>
           </label>
-          <button
-            className="link-button"
-            type="button"
-            onClick={openPasswordReset}
-          >
-            비밀번호 찾기
-          </button>
+          <div className="login-recovery-links">
+            <button className="link-button" type="button" onClick={openLoginIdRecovery}>아이디 찾기</button>
+            <span aria-hidden="true">|</span>
+            <button className="link-button" type="button" onClick={openPasswordReset}>비밀번호 찾기</button>
+          </div>
         </div>
 
         <button className="login-submit" type="submit" disabled={loading || !loginReady}>

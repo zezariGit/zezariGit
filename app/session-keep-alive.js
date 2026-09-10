@@ -16,7 +16,7 @@ export default function SessionKeepAlive() {
       try {
         const response = await fetch("/api/auth/session", {
           cache: "no-store",
-          credentials: "same-origin",
+          credentials: "include",
           headers: { Accept: "application/json" },
         });
         if (response.ok) lastRefreshAt = Date.now();
@@ -35,12 +35,14 @@ export default function SessionKeepAlive() {
     const intervalId = window.setInterval(refreshSession, REFRESH_INTERVAL_MS);
     document.addEventListener("visibilitychange", refreshWhenActive);
     window.addEventListener("online", refreshWhenActive);
+    window.addEventListener("pageshow", refreshWhenActive);
 
     return () => {
       disposed = true;
       window.clearInterval(intervalId);
       document.removeEventListener("visibilitychange", refreshWhenActive);
       window.removeEventListener("online", refreshWhenActive);
+      window.removeEventListener("pageshow", refreshWhenActive);
     };
   }, []);
 

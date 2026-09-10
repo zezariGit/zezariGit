@@ -21,6 +21,7 @@
     "test:onboarding": "node scripts/onboarding-regression.mjs",
     "test:password-reset": "tsx scripts/password-reset-regression.mjs",
     "test:password-reset-ui": "node scripts/password-reset-ui-regression.mjs",
+    "test:login-id-recovery": "tsx scripts/login-id-recovery-regression.mjs",
     "test:social-link": "tsx scripts/social-account-link-regression.mjs",
     "test:sms-provider": "tsx scripts/sms-provider-regression.mjs"
   },

@@ -5,7 +5,6 @@ import { LoginAuthPanel } from "./auth-actions";
 import GuardianDashboard from "./dashboard";
 import OnboardingGate from "./onboarding-gate";
 import StatusToast from "./status-toast";
-import UserPolicyFooter from "./user-policy-footer";
 import { authOptions, getConfiguredProviderIds } from "../lib/auth";
 import { getActiveQrSignupClaim, getDashboardData } from "../lib/db";
 import { isAdminSession } from "../lib/admin";
@@ -34,7 +33,13 @@ export default async function HomePage({ searchParams }) {
   const notice = resolvedSearchParams?.notice || "";
   const noticeType = resolvedSearchParams?.noticeType || "success";
   const authError = resolvedSearchParams?.error || "";
-  const authMode = resolvedSearchParams?.signup === "1" ? "signup" : "login";
+  const authMode = process.env.NODE_ENV === "development" && resolvedSearchParams?.preview === "find-id-found"
+    ? "login-id-found"
+    : resolvedSearchParams?.signup === "1"
+    ? "signup"
+    : resolvedSearchParams?.findId === "1"
+      ? "login-id"
+      : "login";
   const signupPreviewStep = process.env.NODE_ENV === "development" && resolvedSearchParams?.preview === "signup-complete"
     ? "done"
     : undefined;
@@ -117,7 +122,6 @@ export default async function HomePage({ searchParams }) {
           registeredQrClaim={registeredQrClaim}
           hasQrSignupClaim={Boolean(pendingQrClaim)}
         />
-        <UserPolicyFooter />
         <StatusToast message={notice} type={noticeType} />
       </>
     );
@@ -138,7 +142,6 @@ export default async function HomePage({ searchParams }) {
   return (
     <>
       <OnboardingGate enabled={!session && !pendingQrClaim}>{loginPanel}</OnboardingGate>
-      <UserPolicyFooter />
       <StatusToast message={notice} type={noticeType} />
     </>
   );
