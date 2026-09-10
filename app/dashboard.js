@@ -89,7 +89,7 @@ export default async function GuardianDashboard({
         )}
         {guardianComplete && guardianActive && (
           <MyPageOverlay initialOpen={showMyPage} closeHref={closeMyPageHref}>
-            <MyPageTab closeHref={closeMyPageHref} />
+            <MyPageTab closeHref={closeMyPageHref} admin={admin} />
           </MyPageOverlay>
         )}
         <div className="dashboard-content">
@@ -245,7 +245,7 @@ function GuardianInfoTab({ guardian, session, admin }) {
   );
 }
 
-function MyPageTab({ closeHref = "" }) {
+function MyPageTab({ closeHref = "", admin = false }) {
   const menuItems = [
     ["보호자 정보", "/account/profile"],
     ["쿠폰함", "/account/coupons"],
@@ -254,6 +254,7 @@ function MyPageTab({ closeHref = "" }) {
     ["제자리 서비스 소개", "/?serviceIntro=1"],
     ["이용약관", "/privacy#terms"],
     ["개인정보처리방침", "/privacy"],
+    ...(admin ? [["관리자 화면", "/admin"]] : []),
   ];
   return (
     <section
