@@ -9075,3 +9075,19 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Deployment
 - Not requested in this turn. Commit remains local until the user requests GitHub/Vercel deployment.
+
+## 2026-09-11 KST - Advertisement Dashboard Action Deployment
+
+### User Request
+- Deploy the completed advertisement dashboard action-state changes.
+
+### Deployment
+- Pushed feature commit `0206956` and handoff commit `7f7faea` to GitHub `main`.
+- Vercel production deployment `dpl_CvC4VyKr31PubgnVN78t4He3ahkK` reached `Ready`.
+- Confirmed the deployment owns `https://zezari.family` and compatibility aliases.
+
+### Production Verification
+- Authenticated `/account/ads` rendered successfully on the production domain.
+- Current production data contained review and completed advertisements; neither state exposed action buttons, and review reach remained `-`.
+- The account had no running advertisement at verification time, so no production record was terminated or altered.
+- Running-only `추가/종료`, the same-subject add URL, filters, and the refund warning dialog were verified against the same build locally before deployment with zero browser console errors.
