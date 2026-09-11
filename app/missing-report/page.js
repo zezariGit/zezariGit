@@ -4,7 +4,8 @@ import { authOptions } from "../../lib/auth";
 import { getDashboardData } from "../../lib/db";
 import MissingReportSelector from "./missing-report-selector";
 
-export default async function MissingReportPage() {
+export default async function MissingReportPage({ searchParams }) {
+  const params = await searchParams;
   const session = await getServerSession(authOptions);
   if (!session) redirect("/");
 
@@ -17,7 +18,11 @@ export default async function MissingReportPage() {
 
   return (
     <main className="missing-report-page">
-      <MissingReportSelector subjects={subjects} />
+      <MissingReportSelector
+        subjects={subjects}
+        initialSubjectId={String(params?.subject || "")}
+        forceNew={params?.newAd === "1"}
+      />
     </main>
   );
 }

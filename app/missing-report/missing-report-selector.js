@@ -4,17 +4,22 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { formatDateOnly } from "../../lib/date-format";
 
-export default function MissingReportSelector({ subjects = [] }) {
-  const [selectedId, setSelectedId] = useState("");
+export default function MissingReportSelector({ subjects = [], initialSubjectId = "", forceNew = false }) {
+  const [selectedId, setSelectedId] = useState(() => (
+    subjects.some((subject) => subject.id === initialSubjectId) ? initialSubjectId : ""
+  ));
   const [notice, setNotice] = useState("");
   const selectedSubject = useMemo(
     () => subjects.find((subject) => subject.id === selectedId) || null,
     [selectedId, subjects]
   );
   const selectedStatus = normalizeStatus(selectedSubject?.status);
+  const adSetupHref = selectedSubject
+    ? `/?tab=dashboard&adSubject=${encodeURIComponent(selectedSubject.id)}${forceNew ? "&newAd=1" : ""}`
+    : "";
   const nextHref =
-    selectedStatus === "안전"
-      ? `/?tab=dashboard&adSubject=${encodeURIComponent(selectedSubject.id)}`
+    selectedStatus === "안전" || (forceNew && selectedStatus === "찾는중")
+      ? adSetupHref
       : selectedStatus === "찾는중"
         ? "/account/ads"
         : "";
@@ -36,7 +41,13 @@ export default function MissingReportSelector({ subjects = [] }) {
       return;
     }
 
-    setNotice(status === "찾는중" ? "이미 찾는중인 대상자입니다. 광고 대시보드로 이동할 수 있습니다." : "");
+    setNotice(
+      status === "찾는중"
+        ? forceNew
+          ? "동일 대상자에 새로운 광고를 추가합니다."
+          : "이미 찾는중인 대상자입니다. 광고 대시보드로 이동할 수 있습니다."
+        : ""
+    );
     setSelectedId(subject.id);
   };
 

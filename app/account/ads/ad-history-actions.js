@@ -6,10 +6,11 @@ import FormSubmitButton from "../../form-submit-button";
 
 export default function AdHistoryActions({ ad, action, preview = false }) {
   const [confirming, setConfirming] = useState(false);
+  const addHref = `/missing-report?subject=${encodeURIComponent(ad.subject_id)}&newAd=1`;
   return (
     <>
       <div className="ad-history-actions">
-        <Link href={`/?tab=dashboard&adSubject=${encodeURIComponent(ad.subject_id)}&newAd=1`}>추가</Link>
+        <Link href={addHref}>추가</Link>
         <button type="button" onClick={() => setConfirming(true)}>종료</button>
       </div>
       {confirming && (

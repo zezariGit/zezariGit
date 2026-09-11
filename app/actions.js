@@ -175,13 +175,14 @@ export async function resumeSubjectAdAction(formData) {
 export async function endSubjectAdAction(formData) {
   const session = await getServerSession(authOptions);
   if (!session) throw new Error("로그인이 필요합니다.");
+  const returnTo = String(formData.get("returnTo") || "") === "/account/ads" ? "/account/ads" : "/?tab=dashboard";
   try {
     await endSubjectAd(session, formData);
     revalidatePath("/");
+    revalidatePath("/account/ads");
   } catch (error) {
-    redirect(withNotice("/?tab=dashboard", error.message || "광고 종료에 실패했습니다.", "error"));
+    redirect(withNotice(returnTo, error.message || "광고 종료에 실패했습니다.", "error"));
   }
-  const returnTo = String(formData.get("returnTo") || "") === "/account/ads" ? "/account/ads" : "/?tab=dashboard";
   redirect(withNotice(returnTo, "광고가 종료되었습니다."));
 }
 
