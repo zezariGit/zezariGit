@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-11 KST
 
-Application baseline commit: `0206956` (`main`)
+Application baseline commit: `6e7c669` (`main`)
 
 Production: `https://zezari.family`
 
@@ -274,6 +274,7 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 | 커밋 | 내용 |
 | --- | --- |
+| `6e7c669` | 광고 결제 완료 이미지 반영 및 112 경찰 신고 연계 팝업 구현 |
 | `0206956` | 광고 대시보드 추가 경로와 진행 상태 전용 종료 규칙 보강 |
 | `328bafe` | 실종신고 대상자 선택 후 기존 거리·기간 광고 설정 화면 연결 복구 |
 | `dd1218e` | Meta 독립 관리자 광고 상태 테스트와 광고 대시보드 검증 |
