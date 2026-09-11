@@ -681,29 +681,14 @@ function SubjectRegistrationComplete() {
     <section className="subject-complete-phone" aria-label="대상자 등록 완료">
       <div className="subject-complete-content">
         <img
-          className="subject-complete-qr-image"
-          src="/assets/subject-registration/completion-qr.png"
-          alt=""
-          aria-hidden="true"
+          className="subject-complete-summary-image"
+          src="/assets/subject-registration/completion-summary.png"
+          alt="대상자 등록이 완료되었습니다. 이제 대상자 전용 QR이 적용된 상품을 구매할 수 있어요."
         />
-        <h2>대상자 등록이 완료되었습니다.</h2>
-        <p>이제 대상자 전용 QR이 적용된 상품을 구매할 수 있어요.</p>
         <Link className="login-submit subject-complete-action" href="/shop">
-          <img
-            className="subject-complete-button-icon shop"
-            src="/assets/subject-registration/shop-icon.png"
-            alt=""
-            aria-hidden="true"
-          />
           상품 구매하기
         </Link>
         <Link className="outline-login-button subject-complete-action" href="/?tab=dashboard">
-          <img
-            className="subject-complete-button-icon"
-            src="/assets/subject-registration/dashboard-icon.png"
-            alt=""
-            aria-hidden="true"
-          />
           대시보드 이동하기
         </Link>
       </div>

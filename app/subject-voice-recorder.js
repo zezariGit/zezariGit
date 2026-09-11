@@ -3,9 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 
 const MAX_RECORDING_SECONDS = 30;
+const RECORDING_AUDIO_BITS_PER_SECOND = 64_000;
 
 export default function SubjectVoiceRecorder({ existingVoice = "", existingName = "" }) {
   const [recording, setRecording] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [duration, setDuration] = useState(existingVoice ? 18 : 0);
   const [voiceDataUrl, setVoiceDataUrl] = useState("");
@@ -27,7 +29,7 @@ export default function SubjectVoiceRecorder({ existingVoice = "", existingName 
   useEffect(() => {
     const form = wrapperRef.current?.closest("form");
     form?.dispatchEvent(new CustomEvent("subjectrecordingchange", { bubbles: true }));
-  }, [recording, playableVoice]);
+  }, [recording, processing, playableVoice]);
 
   useEffect(() => () => {
     window.clearInterval(timerRef.current);
@@ -37,7 +39,10 @@ export default function SubjectVoiceRecorder({ existingVoice = "", existingName 
 
   function finishRecording() {
     const recorder = recorderRef.current;
-    if (recorder && recorder.state !== "inactive") recorder.stop();
+    if (recorder && recorder.state !== "inactive") {
+      setProcessing(true);
+      recorder.stop();
+    }
     window.clearInterval(timerRef.current);
     window.clearTimeout(autoStopRef.current);
     timerRef.current = null;
@@ -59,20 +64,26 @@ export default function SubjectVoiceRecorder({ existingVoice = "", existingName 
       elapsedRef.current = 0;
       setPlaying(false);
       setMessage("");
-      const recorder = new MediaRecorder(stream);
+      const recorder = createAudioRecorder(stream);
       recorderRef.current = recorder;
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) chunksRef.current.push(event.data);
       };
       recorder.onstop = () => {
         const recordedSeconds = Math.max(1, elapsedRef.current);
-        const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
+        const mimeType = recorder.mimeType || chunksRef.current[0]?.type || "audio/mp4";
+        const blob = new Blob(chunksRef.current, { type: mimeType });
         const reader = new FileReader();
-        reader.onloadend = () => {
+        reader.onload = () => {
           setVoiceDataUrl(String(reader.result || ""));
-          setVoiceName(`guardian-voice-${Date.now()}.webm`);
+          setVoiceName(`guardian-voice-${Date.now()}.${voiceFileExtension(mimeType)}`);
           setRemovedExisting(false);
           setDuration(recordedSeconds);
+          setProcessing(false);
+        };
+        reader.onerror = () => {
+          setMessage("녹음 파일을 처리하지 못했습니다. 다시 녹음해 주세요.");
+          setProcessing(false);
         };
         reader.readAsDataURL(blob);
         streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -80,6 +91,7 @@ export default function SubjectVoiceRecorder({ existingVoice = "", existingName 
       };
       recorder.start();
       setRecording(true);
+      setProcessing(false);
       timerRef.current = window.setInterval(() => {
         setElapsed((current) => {
           const next = current + 1;
@@ -90,6 +102,10 @@ export default function SubjectVoiceRecorder({ existingVoice = "", existingName 
       }, 1000);
       autoStopRef.current = window.setTimeout(finishRecording, MAX_RECORDING_SECONDS * 1000);
     } catch (error) {
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+      setRecording(false);
+      setProcessing(false);
       const userAgent = navigator.userAgent || "";
       const isTouchIPad = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
       const isIOS = /iPad|iPhone|iPod/i.test(userAgent) || isTouchIPad;
@@ -139,9 +155,9 @@ export default function SubjectVoiceRecorder({ existingVoice = "", existingName 
       <input type="hidden" name="existingVoiceDataUrl" value={existingVoice || ""} />
       <input type="hidden" name="existingVoiceName" value={existingName || ""} />
       <input type="hidden" name="removeVoice" value={removedExisting ? "1" : "0"} />
-      <input type="hidden" name="voiceRecording" value={recording ? "1" : "0"} />
+      <input type="hidden" name="voiceRecording" value={recording || processing ? "1" : "0"} />
 
-      {!recording && !playableVoice && (
+      {!recording && !processing && !playableVoice && (
         <button className="voice-start-button" type="button" onClick={startRecording}>
           <MicrophoneIcon />
           <span>녹음 시작</span>
@@ -161,7 +177,13 @@ export default function SubjectVoiceRecorder({ existingVoice = "", existingName 
         </div>
       )}
 
-      {!recording && playableVoice && (
+      {processing && (
+        <div className="voice-processing-panel" role="status" aria-live="polite">
+          녹음 파일을 저장하고 있습니다.
+        </div>
+      )}
+
+      {!recording && !processing && playableVoice && (
         <div className="voice-recorded-panel">
           <button className={`voice-play-button${playing ? " is-playing" : ""}`} type="button" onClick={togglePlayback} aria-label={playing ? "음성 일시정지" : "음성 재생"}>
             <PlayIcon paused={!playing} />
@@ -183,6 +205,28 @@ export default function SubjectVoiceRecorder({ existingVoice = "", existingName 
       {message && <small className="voice-recorder-message" role="alert">{message}</small>}
     </div>
   );
+}
+
+function createAudioRecorder(stream) {
+  const preferredTypes = ["audio/mp4", "audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus"];
+  const mimeType = preferredTypes.find((type) => MediaRecorder.isTypeSupported?.(type));
+  const options = { audioBitsPerSecond: RECORDING_AUDIO_BITS_PER_SECOND };
+  if (mimeType) options.mimeType = mimeType;
+
+  try {
+    return new MediaRecorder(stream, options);
+  } catch {
+    return new MediaRecorder(stream);
+  }
+}
+
+function voiceFileExtension(mimeType) {
+  const normalized = String(mimeType || "").toLowerCase();
+  if (normalized.includes("ogg")) return "ogg";
+  if (normalized.includes("webm")) return "webm";
+  if (normalized.includes("mpeg")) return "mp3";
+  if (normalized.includes("wav")) return "wav";
+  return "m4a";
 }
 
 function VoiceWave({ active = false }) {

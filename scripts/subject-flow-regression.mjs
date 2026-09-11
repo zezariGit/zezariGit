@@ -10,6 +10,7 @@ const [dashboard, registrationForm, voiceRecorder, voicePlayer, database, styles
   readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
   readFile(new URL("../public/assets/subject-registration/photo-placeholder.png", import.meta.url)),
   readFile(new URL("../public/assets/subject-registration/completion-qr.png", import.meta.url)),
+  readFile(new URL("../public/assets/subject-registration/completion-summary.png", import.meta.url)),
   readFile(new URL("../public/assets/subject-registration/shop-icon.png", import.meta.url)),
   readFile(new URL("../public/assets/subject-registration/dashboard-icon.png", import.meta.url)),
   readFile(new URL("../public/assets/dashboard/subject-preview-heading.png", import.meta.url)),
@@ -38,17 +39,26 @@ assert.ok(
 );
 assert.match(dashboard, /subject-edit-helper[\s\S]*보호자 연락처는 \[설정\]/);
 assert.match(dashboard, /대상자 등록이 완료되었습니다\./);
+assert.match(dashboard, /completion-summary\.png/);
+assert.doesNotMatch(dashboard, /subject-complete-button-icon/, "완료 화면 버튼은 텍스트만 표시해야 합니다.");
 assert.match(dashboard, /href="\/shop"/);
 assert.match(dashboard, /href="\/\?tab=dashboard"/);
 assert.match(registrationForm, /message\.length <= 200/);
 assert.match(registrationForm, /voiceRecording/);
 assert.match(registrationForm, /disabled=\{!formReady \|\| recording\}/);
 assert.match(voiceRecorder, /MAX_RECORDING_SECONDS = 30/);
+assert.match(voiceRecorder, /RECORDING_AUDIO_BITS_PER_SECOND = 64_000/);
+assert.match(voiceRecorder, /recording \|\| processing \? "1" : "0"/);
+assert.match(voiceRecorder, /audio\/mp4/);
+assert.match(voiceRecorder, /chunksRef\.current\[0\]\?\.type/);
 assert.match(voiceRecorder, /removeVoice/);
 assert.match(voiceRecorder, /iPhone 설정에서 Safari 또는 제자리를 선택한 뒤 마이크 권한을 허용해 주세요/);
 assert.match(dashboard, /<span>\{gender\}<\/span>/, "성별은 남성, 여성으로 표시해야 합니다.");
 assert.match(database, /guardianMessage\.length > 200/);
 assert.match(database, /const removeVoice =/);
+assert.match(database, /"audio\/x-m4a"/);
+assert.match(database, /"audio\/aac"/);
+assert.match(database, /audioBuffer\.length > 4 \* 1024 \* 1024/);
 assert.match(styles, /\.subject-preview-emergency-grid/);
 assert.match(styles, /\.voice-recording-panel/);
 assert.match(styles, /\.target-field small,[\s\S]*font-size: 12px;[\s\S]*font-weight: 500;/, "서브 안내 문구 크기와 굵기를 통일해야 합니다.");

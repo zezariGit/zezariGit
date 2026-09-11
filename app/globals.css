@@ -19267,6 +19267,18 @@ button:disabled:hover {
   line-height: 1.55;
 }
 
+.voice-processing-panel {
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid #009b50;
+  border-radius: 7px;
+  background: #f3fbf7;
+  color: #009b50;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .subject-edit-helper {
   display: flex;
   align-items: center;
@@ -19757,16 +19769,25 @@ button:disabled:hover {
 }
 
 .subject-complete-phone {
-  width: 100%;
+  width: min(100%, 390px);
   min-height: 100svh;
-  padding: 105px 24px 52px;
+  padding: 24px 24px 52px;
   align-items: start;
+  justify-self: center;
 }
 
 .subject-complete-content {
   width: 100%;
   max-width: none;
   gap: 17px;
+}
+
+.subject-complete-summary-image {
+  width: min(100%, 303px);
+  height: auto;
+  display: block;
+  margin: 0 auto 41px;
+  object-fit: contain;
 }
 
 .subject-complete-qr-wrap {
@@ -19820,9 +19841,11 @@ button:disabled:hover {
 
 .subject-complete-action {
   min-height: 62px;
+  gap: 0;
   border-radius: 8px;
   font-size: 17px;
   font-weight: 800;
+  text-align: center;
 }
 
 .subject-complete-action svg {
