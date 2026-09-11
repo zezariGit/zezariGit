@@ -32,9 +32,9 @@ Production: `https://zezari.family`
 | GitHub | `https://github.com/zezariGit/zezariGit.git` |
 | Vercel 프로젝트 | scope `zezari`, project `zezari` |
 | 대표 도메인 | `https://zezari.family` |
-| 최근 확인 운영 배포 | `dpl_CvC4VyKr31PubgnVN78t4He3ahkK` (`Ready`, 광고 대시보드 상태별 기능) |
+| 최근 확인 운영 배포 | `dpl_8aXPhgmNbrzEMfN4TRW4R6HqRUG4` (`READY`, 광고 결제 완료 개편 및 112 경찰 신고 연계) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | commit `0206956`; 운영 상태는 `vercel inspect`로 확인 |
+| 최근 애플리케이션 기능 기준 | commit `6e7c669`; 운영 상태는 `vercel inspect`로 확인 |
 
 ### 로컬 시작
 

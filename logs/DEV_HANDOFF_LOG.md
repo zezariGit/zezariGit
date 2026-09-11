@@ -9133,3 +9133,13 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `npm run test:dashboard-ui`: passed.
 - `git diff --check`: passed.
 - `npm run build`: Next.js 16.3.0 production build passed with all 39 routes generated.
+
+### Deployment
+- Feature commit `6e7c669` and handoff commit `99c1b29` pushed to GitHub `main`.
+- Vercel production deployment `dpl_8aXPhgmNbrzEMfN4TRW4R6HqRUG4` reached `READY` status and owns the canonical alias `https://zezari.family`.
+
+### Production Verification
+- `https://zezari.family/` returned HTTP 200.
+- `https://zezari.family/assets/ads/ad-payment-complete.png` returned HTTP 200.
+- `https://zezari.family/payments/toss/ad/success` returned HTTP 200.
+- Vercel error log check (`--level error --since 1h`) returned zero errors.
