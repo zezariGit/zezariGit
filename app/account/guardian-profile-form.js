@@ -280,8 +280,8 @@ export default function GuardianProfileForm({ guardian, provider = "credentials"
         <strong>아이디</strong>
         {socialAccount ? (
           <>
-            <input type="hidden" name="loginId" value={original.loginId} />
-            <input className="profile-social-login" value={socialProviderLabel(provider)} readOnly />
+            <input name="loginId" className="profile-social-login" value={original.loginId} readOnly />
+            <small className="profile-social-provider">{socialProviderLabel(provider)}</small>
           </>
         ) : (
           <>
@@ -402,6 +402,6 @@ function years() { return range(1920, new Date().getFullYear()).reverse(); }
 function timer(value) { return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`; }
 function isSocialProvider(value) { return ["google", "naver", "kakao", "facebook"].includes(String(value || "").trim().toLowerCase()); }
 function socialProviderLabel(value) {
-  const labels = { google: "구글 로그인", naver: "네이버 로그인", kakao: "카카오 로그인", facebook: "페이스북 로그인" };
-  return labels[String(value || "").trim().toLowerCase()] || "SNS 로그인";
+  const labels = { google: "구글 로그인 계정", naver: "네이버 로그인 계정", kakao: "카카오 로그인 계정", facebook: "페이스북 로그인 계정" };
+  return labels[String(value || "").trim().toLowerCase()] || "SNS 로그인 계정";
 }

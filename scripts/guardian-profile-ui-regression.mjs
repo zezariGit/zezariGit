@@ -9,8 +9,9 @@ const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8
 
 assert.match(page, /provider=\{session\.user\?\.provider \|\| "credentials"\}/, "로그인 제공자가 보호자 정보 폼으로 전달되어야 합니다.");
 assert.match(page, /socialProvider\(params\?\.provider\)/, "개발 미리보기에서 SNS 채널 표기를 확인할 수 있어야 합니다.");
-assert.match(component, /google: "구글 로그인"[\s\S]*naver: "네이버 로그인"[\s\S]*kakao: "카카오 로그인"/, "SNS 아이디 항목은 로그인 채널명을 표시해야 합니다.");
-assert.match(component, /type="hidden" name="loginId" value=\{original\.loginId\}/, "SNS 계정의 저장된 아이디는 수정되지 않아야 합니다.");
+assert.match(component, /name="loginId" className="profile-social-login" value=\{original\.loginId\} readOnly/, "SNS 계정도 실제 아이디를 읽기 전용으로 표시해야 합니다.");
+assert.match(component, /profile-social-provider[\s\S]*socialProviderLabel\(provider\)/, "SNS 로그인 채널은 아이디 입력란 아래에 표시해야 합니다.");
+assert.match(component, /google: "구글 로그인 계정"[\s\S]*naver: "네이버 로그인 계정"[\s\S]*kakao: "카카오 로그인 계정"/, "SNS 로그인 채널명이 올바르게 표시되어야 합니다.");
 assert.doesNotMatch(component, /profile-password-toggle/, "비밀번호 변경은 접이식 토글을 사용하지 않아야 합니다.");
 assert.match(component, /verifyGuardianCurrentPasswordAction\(currentPassword\)/, "현재 비밀번호를 서버에서 확인해야 합니다.");
 assert.match(component, /disabled=\{!currentPasswordVerified\}/, "현재 비밀번호 확인 전에는 새 비밀번호 입력이 비활성화되어야 합니다.");

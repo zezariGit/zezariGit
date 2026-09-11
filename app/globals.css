@@ -1506,6 +1506,11 @@ a {
   cursor: default;
 }
 
+.profile-field > small.profile-social-provider {
+  color: #00a548;
+  font-weight: 700;
+}
+
 .profile-password-input button span {
   width: 19px;
   height: 12px;
