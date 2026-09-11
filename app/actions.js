@@ -7,6 +7,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../lib/auth";
 import {
   activateQrForGuardian,
+  activateTestSubjectAd,
   createSubjectAd,
   deleteSubject,
   endSubjectAd,
@@ -132,6 +133,19 @@ export async function createSubjectAdAction(formData) {
     redirect(withNotice("/?tab=dashboard", error.message || "광고 신청 정보를 확인해 주세요.", "error"));
   }
   redirect(withNotice(`/ads/checkout/${encodeURIComponent(result.id)}`, "광고 신청 정보가 저장되었습니다. 결제를 진행해 주세요."));
+}
+
+export async function activateTestSubjectAdAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error("로그인이 필요합니다.");
+  try {
+    await activateTestSubjectAd(session, formData);
+    revalidatePath("/");
+    revalidatePath("/account/ads");
+  } catch (error) {
+    redirect(withNotice("/account/ads", error.message || "테스트 광고 상태를 변경하지 못했습니다.", "error"));
+  }
+  redirect(withNotice("/account/ads", "테스트 광고가 진행 중 상태로 변경되었습니다."));
 }
 
 export async function pauseSubjectAdAction(formData) {

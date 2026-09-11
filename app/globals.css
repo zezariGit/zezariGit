@@ -20093,6 +20093,50 @@ button:disabled:hover {
   color: #fff;
 }
 
+.ad-test-status-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border: 1px solid #b9e7ca;
+  border-radius: 8px;
+  background: #f1faf4;
+}
+
+.ad-test-status-panel > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.ad-test-status-panel strong {
+  color: #087735;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.ad-test-status-panel p {
+  margin: 0;
+  color: #526258;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.ad-test-status-panel button {
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid #00a548;
+  border-radius: 6px;
+  background: #00a548;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
 .ad-history-list {
   display: grid;
   gap: 13px;
@@ -20372,6 +20416,14 @@ button:disabled:hover {
 }
 
 @media (max-width: 359px) {
+  .ad-test-status-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .ad-test-status-panel button {
+    width: 100%;
+  }
+
   .ad-history-card {
     grid-template-columns: 102px minmax(0, 1fr);
     gap: 10px;

@@ -27,6 +27,7 @@ export default async function TossAdSuccessPage({ searchParams }) {
 
   try {
     const { ad } = await getGuardianAdCheckoutData(session, adId);
+    const testPayment = adminPass && Number(ad.is_test_payment || 0) === 1;
     if (ad.paid_at && ad.toss_order_id === orderId) {
       const publication = await publishPaidSubjectAd(adId);
       return (
@@ -34,9 +35,10 @@ export default async function TossAdSuccessPage({ searchParams }) {
           title="광고 결제가 완료되었습니다"
           message={publicationMessage(publication, {
             alreadyPaid: true,
-            adminPass,
+            adminPass: testPayment,
           })}
-          sourceLabel={adminPass ? "관리자 테스트 결제" : "Toss Payments"}
+          sourceLabel={testPayment ? "관리자 테스트 결제" : "Toss Payments"}
+          testAdId={testPayment ? ad.id : ""}
         />
       );
     }
@@ -61,6 +63,7 @@ export default async function TossAdSuccessPage({ searchParams }) {
       <AdPaymentResult
         title="광고 결제가 완료되었습니다"
         message={publicationMessage(publication)}
+        testAdId={testPayment ? ad.id : ""}
       />
     );
   } catch (error) {
@@ -69,6 +72,9 @@ export default async function TossAdSuccessPage({ searchParams }) {
 }
 
 function publicationMessage(publication, { alreadyPaid = false, adminPass = false } = {}) {
+  if (publication?.test && publication?.status === "review") {
+    return "관리자 테스트 결제가 완료되었습니다. Meta에 발행하지 않고 광고 검토 중 상태로 생성했습니다.";
+  }
   if (publication?.published) {
     return adminPass
       ? "관리자 결제패스가 완료되었고 Meta 광고가 자동 발행되었습니다."
@@ -81,7 +87,7 @@ function publicationMessage(publication, { alreadyPaid = false, adminPass = fals
   return `${prefix} Meta 자동 발행은 완료되지 않아 관리자가 발행 재시도를 진행할 수 있습니다.`;
 }
 
-function AdPaymentResult({ title, message, sourceLabel = "Toss Payments" }) {
+function AdPaymentResult({ title, message, sourceLabel = "Toss Payments", testAdId = "" }) {
   return (
     <main className="payment-result-page">
       <section className="payment-result-panel">
@@ -89,6 +95,11 @@ function AdPaymentResult({ title, message, sourceLabel = "Toss Payments" }) {
         <p className="intro-kicker">{sourceLabel}</p>
         <h1>{title}</h1>
         <p>{message}</p>
+        {testAdId && (
+          <a className="primary-button" href={`/account/ads?testAd=${encodeURIComponent(testAdId)}`}>
+            광고 상태 테스트하기
+          </a>
+        )}
         <a className="primary-button" href="/account/ads">
           광고내역 보기
         </a>
