@@ -71,16 +71,19 @@ export default async function HomePage({ searchParams }) {
       />
     );
   }
-  if (["dashboard", "dashboard-empty", "dashboard-notifications", "settings"].includes(dashboardPreview)) {
+  if (["dashboard", "dashboard-empty", "dashboard-notifications", "settings", "ad-campaign"].includes(dashboardPreview)) {
+    const dashboardSubjects = dashboardPreview === "dashboard-empty" ? [] : previewDashboardSubjects();
     return (
       <GuardianDashboard
         guardian={{ id: "preview-guardian", name: "보호자", phone: "010-0000-0000", birth_date: "1990-01-01", is_active: 1, login_id: "preview", password_hash: "preview" }}
-        subjects={dashboardPreview === "dashboard-empty" ? [] : previewDashboardSubjects()}
+        subjects={dashboardSubjects}
         subscription={null}
         session={{ user: { provider: "credentials", email: "" } }}
         activeTab="dashboard"
         showMyPage={dashboardPreview === "settings"}
         notificationPreview={dashboardPreview === "dashboard-notifications"}
+        adSubjectId={dashboardPreview === "ad-campaign" ? dashboardSubjects[0]?.id : ""}
+        forceNewAd={dashboardPreview === "ad-campaign"}
       />
     );
   }

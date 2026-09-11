@@ -164,6 +164,7 @@ export default async function GuardianDashboard({
             adPricing={adPricing}
             selectedAdSubject={selectedAdSubject}
             selectedPreviewSubject={selectedPreviewSubject}
+            forceNewAd={forceNewAd}
           />
         ) : isGuardianTab ? (
           <GuardianInfoTab guardian={guardian} session={session} admin={admin} />
@@ -201,6 +202,7 @@ function DashboardTab({
   adPricing,
   selectedAdSubject,
   selectedPreviewSubject,
+  forceNewAd,
 }) {
   if (!guardianComplete) {
     return (

@@ -2,10 +2,12 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const iconNames = ["notification", "settings", "status-help", "subject-status-guide", "missing", "shop", "support", "safety"];
-const [dashboard, carousel, guide, styles, ...icons] = await Promise.all([
+const [page, dashboard, carousel, guide, adCampaign, styles, ...icons] = await Promise.all([
+  readFile(new URL("../app/page.js", import.meta.url), "utf8"),
   readFile(new URL("../app/dashboard.js", import.meta.url), "utf8"),
   readFile(new URL("../app/managed-subject-carousel.js", import.meta.url), "utf8"),
   readFile(new URL("../app/subject-status-guide.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/ad-campaign-modal.js", import.meta.url), "utf8"),
   readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
   ...iconNames.map((name) => readFile(new URL(`../public/assets/dashboard/${name}.png`, import.meta.url))),
 ]);
@@ -21,6 +23,11 @@ assert.match(dashboard, /\.\.\.\(admin \? \[\["관리자 화면", "\/admin"\]\] 
 assert.match(dashboard, /href=\{`\/\?tab=dashboard&previewSubject=/, "대상자 행 전체가 미리보기 링크여야 합니다.");
 assert.match(dashboard, /등록된 대상자가 없습니다\./);
 assert.match(dashboard, /대상자 추가하기/);
+assert.match(page, /forceNewAd=\{forceNewAd\}/, "루트 페이지가 새 광고 여부를 대시보드에 전달해야 합니다.");
+assert.match(dashboard, /<DashboardTab[\s\S]*forceNewAd=\{forceNewAd\}/, "대시보드가 새 광고 여부를 내부 탭에 전달해야 합니다.");
+assert.match(dashboard, /function DashboardTab\(\{[\s\S]*forceNewAd,[\s\S]*forceNew=\{forceNewAd\}/, "광고 모달이 정의된 새 광고 값을 받아야 합니다.");
+assert.match(page, /"ad-campaign"/, "로그인 없이 광고 설정 단계를 확인할 개발 미리보기가 있어야 합니다.");
+assert.match(adCampaign, /setStep\("duration"\)[\s\S]*setStep\("summary"\)/, "거리 선택 후 기간과 요약 단계가 연결되어야 합니다.");
 assert.match(carousel, /scroll-snap-type|scrollTo\(/, "대상자 페이지는 가로 이동을 지원해야 합니다.");
 assert.match(carousel, /Array\.from\(\{ length: totalPages \}/, "표시점은 페이지 수를 기준으로 만들어야 합니다.");
 assert.match(carousel, /showDots &&/, "빈 대상자 목록에서는 페이지 표시점을 숨겨야 합니다.");
