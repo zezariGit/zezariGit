@@ -1399,20 +1399,16 @@ a {
 
 .profile-password-section {
   display: grid;
-  gap: 10px;
+  gap: 14px;
+  margin-top: 14px;
+  padding-top: 16px;
+  border-top: 1px solid #e7e7e7;
 }
 
-.profile-password-toggle {
-  min-height: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 14px;
-  border: 1px solid #00a548;
-  border-radius: 8px;
-  background: #fff;
-  color: #00a548;
-  font-size: 14px;
+.profile-password-section h2 {
+  margin: 0;
+  color: #202020;
+  font-size: 17px;
   font-weight: 800;
 }
 
@@ -1436,6 +1432,78 @@ a {
   position: relative;
   border: 0;
   background: transparent;
+}
+
+.profile-password-input:has(input:disabled) {
+  border-color: #e1e3e6;
+  background: #f3f4f6;
+}
+
+.profile-password-input input:disabled,
+.profile-password-input button:disabled {
+  color: #aeb3bb;
+  cursor: default;
+}
+
+.profile-password-input.is-verified {
+  border-color: #00a548;
+}
+
+.profile-password-check-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  gap: 8px;
+}
+
+.profile-password-check-row > button {
+  min-height: 48px;
+  border: 1px solid #00a548;
+  border-radius: 7px;
+  background: #fff;
+  color: #00a548;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.profile-password-check-row > button:disabled:not(.is-verified) {
+  border-color: #d6d9dc;
+  background: #f4f5f6;
+  color: #a9adb2;
+}
+
+.profile-password-check-row > button.is-verified {
+  background: #f2fbf5;
+  color: #009f45;
+}
+
+.profile-password-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: -6px;
+}
+
+.profile-password-status.success::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  border-radius: 50%;
+  background: #00a548;
+}
+
+.profile-password-match {
+  flex: 0 0 auto;
+  color: #00a548;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.profile-social-login[readonly] {
+  color: #222;
+  cursor: default;
 }
 
 .profile-password-input button span {

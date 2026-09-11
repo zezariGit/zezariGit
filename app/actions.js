@@ -17,6 +17,7 @@ import {
   saveGuardianProfile,
   saveSubject,
   getActiveQrSignupClaim,
+  verifyGuardianCurrentPassword,
 } from "../lib/db";
 import {
   QR_SIGNUP_CLAIM_COOKIE,
@@ -47,6 +48,18 @@ export async function saveGuardianProfileSettingsAction(formData) {
     redirect(withNotice("/account/profile", error.message || "입력한 정보를 확인해 주세요.", "error"));
   }
   redirect(withNotice("/?panel=my", "보호자 정보가 수정되었습니다."));
+}
+
+export async function verifyGuardianCurrentPasswordAction(currentPassword) {
+  const session = await getServerSession(authOptions);
+  if (!session) return { ok: false, message: "로그인이 필요합니다." };
+
+  try {
+    await verifyGuardianCurrentPassword(session, currentPassword);
+    return { ok: true };
+  } catch {
+    return { ok: false, message: "현재 비밀번호가 일치하지 않습니다." };
+  }
 }
 
 export async function saveSubjectAction(formData) {

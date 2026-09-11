@@ -1,14 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { saveGuardianProfileSettingsAction } from "../actions";
+import {
+  saveGuardianProfileSettingsAction,
+  verifyGuardianCurrentPasswordAction,
+} from "../actions";
 import FormSubmitButton from "../form-submit-button";
 import PasswordVisibilityIcon from "../password-visibility-icon";
 
 const LOGIN_ID_PATTERN = /^[A-Za-z0-9_]{4,20}$/;
 const PASSWORD_PATTERN = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d\s]).{8,}$/;
 
-export default function GuardianProfileForm({ guardian, preview = false, admin = false }) {
+export default function GuardianProfileForm({ guardian, provider = "credentials", preview = false, admin = false }) {
   const original = useMemo(() => ({
     name: String(guardian.name || ""),
     gender: String(guardian.gender || "남성"),
@@ -36,23 +39,29 @@ export default function GuardianProfileForm({ guardian, preview = false, admin =
   const [loginMessage, setLoginMessage] = useState("");
   const [loginError, setLoginError] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
-  const [passwordOpen, setPasswordOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
+  const [currentPasswordVerified, setCurrentPasswordVerified] = useState(false);
+  const [currentPasswordLoading, setCurrentPasswordLoading] = useState(false);
+  const [currentPasswordMessage, setCurrentPasswordMessage] = useState("");
+  const [currentPasswordError, setCurrentPasswordError] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [showPasswords, setShowPasswords] = useState([false, false, false]);
 
+  const socialAccount = isSocialProvider(provider);
   const birthDate = `${year}-${month}-${day}`;
   const phoneChanged = digits(phone) !== digits(original.phone);
   const phoneValid = /^01[016789]\d{7,8}$/.test(digits(phone));
   const phoneVerified = phoneChanged && (admin
     ? phoneValid
     : digits(verifiedPhone) === digits(phone) && Boolean(phoneToken));
-  const loginChanged = loginId.trim().toLowerCase() !== original.loginId.toLowerCase();
+  const loginChanged = !socialAccount && loginId.trim().toLowerCase() !== original.loginId.toLowerCase();
   const loginFormatValid = LOGIN_ID_PATTERN.test(loginId.trim());
   const loginVerified = loginChanged && checkedLoginId.toLowerCase() === loginId.trim().toLowerCase();
-  const passwordStarted = Boolean(currentPassword || password || passwordConfirmation);
-  const passwordValid = Boolean(currentPassword) && PASSWORD_PATTERN.test(password) && password === passwordConfirmation;
+  const passwordStarted = Boolean(password || passwordConfirmation);
+  const passwordRuleValid = PASSWORD_PATTERN.test(password);
+  const passwordMatches = Boolean(passwordConfirmation) && password === passwordConfirmation;
+  const passwordValid = currentPasswordVerified && passwordRuleValid && passwordMatches;
   const basicChanged = name.trim() !== original.name || gender !== original.gender || birthDate !== original.birthDate;
   const basicValid = Boolean(name.trim()) && ["남성", "여성"].includes(gender) && validDate(birthDate);
   const hasChange = basicChanged || phoneChanged || loginChanged || passwordStarted;
@@ -170,6 +179,49 @@ export default function GuardianProfileForm({ guardian, preview = false, admin =
     setLoginError(false);
   };
 
+  const resetPasswordVerification = ({ keepMessage = false } = {}) => {
+    setCurrentPasswordVerified(false);
+    setPassword("");
+    setPasswordConfirmation("");
+    setShowPasswords([false, false, false]);
+    if (!keepMessage) {
+      setCurrentPasswordMessage("");
+      setCurrentPasswordError(false);
+    }
+  };
+
+  const changeCurrentPassword = (value) => {
+    setCurrentPassword(value);
+    if (currentPasswordVerified) resetPasswordVerification();
+    else {
+      setCurrentPasswordMessage("");
+      setCurrentPasswordError(false);
+    }
+  };
+
+  const verifyCurrentPassword = async () => {
+    if (!currentPassword || currentPasswordLoading) return;
+    setCurrentPasswordLoading(true);
+    setCurrentPasswordMessage("");
+    setCurrentPasswordError(false);
+
+    try {
+      const result = preview
+        ? { ok: true }
+        : await verifyGuardianCurrentPasswordAction(currentPassword);
+      if (!result?.ok) throw new Error(result?.message || "현재 비밀번호가 일치하지 않습니다.");
+      setCurrentPasswordVerified(true);
+      setCurrentPasswordMessage("현재 비밀번호가 확인되었습니다.");
+    } catch (error) {
+      setCurrentPassword("");
+      resetPasswordVerification({ keepMessage: true });
+      setCurrentPasswordError(true);
+      setCurrentPasswordMessage(error.message || "현재 비밀번호가 일치하지 않습니다.");
+    } finally {
+      setCurrentPasswordLoading(false);
+    }
+  };
+
   return (
     <form
       className="guardian-profile-form"
@@ -226,27 +278,83 @@ export default function GuardianProfileForm({ guardian, preview = false, admin =
 
       <div className={`profile-field${loginError ? " has-error" : ""}`}>
         <strong>아이디</strong>
-        <div className="profile-inline-input">
-          <input name="loginId" value={loginId} onChange={(event) => changeLoginId(event.target.value)} />
-          <button className="profile-login-action" type="button" onClick={checkLoginId} disabled={!loginChanged || loginLoading}>{loginLoading ? "확인 중" : "중복확인"}</button>
-        </div>
-        {loginMessage && <small className={loginError ? "error" : "success"}>{loginMessage}</small>}
+        {socialAccount ? (
+          <>
+            <input type="hidden" name="loginId" value={original.loginId} />
+            <input className="profile-social-login" value={socialProviderLabel(provider)} readOnly />
+          </>
+        ) : (
+          <>
+            <div className="profile-inline-input">
+              <input name="loginId" value={loginId} onChange={(event) => changeLoginId(event.target.value)} />
+              <button className="profile-login-action" type="button" onClick={checkLoginId} disabled={!loginChanged || loginLoading}>{loginLoading ? "확인 중" : "중복확인"}</button>
+            </div>
+            {loginMessage && <small className={loginError ? "error" : "success"}>{loginMessage}</small>}
+          </>
+        )}
       </div>
 
       {guardian.password_hash && (
         <section className="profile-password-section">
-          <button className="profile-password-toggle" type="button" onClick={() => setPasswordOpen((value) => !value)}>
-            <span>비밀번호 변경</span><span aria-hidden="true">{passwordOpen ? "−" : "+"}</span>
-          </button>
-          {passwordOpen && (
-            <div className="profile-password-fields">
-              <PasswordField label="현재 비밀번호" name="currentPassword" value={currentPassword} setValue={setCurrentPassword} shown={showPasswords[0]} toggle={() => togglePassword(0, setShowPasswords)} />
-              <PasswordField label="새 비밀번호" name="password" value={password} setValue={setPassword} shown={showPasswords[1]} toggle={() => togglePassword(1, setShowPasswords)} />
-              <PasswordField label="새 비밀번호 확인" name="passwordConfirmation" value={passwordConfirmation} setValue={setPasswordConfirmation} shown={showPasswords[2]} toggle={() => togglePassword(2, setShowPasswords)} />
-              <small className={passwordStarted && !passwordValid ? "error" : passwordValid ? "success" : ""}>영문, 숫자, 특수문자를 조합하여 8자 이상 입력해 주세요.</small>
-              {passwordConfirmation && password !== passwordConfirmation && <small className="error">새 비밀번호가 일치하지 않습니다.</small>}
-            </div>
-          )}
+          <h2>비밀번호 변경</h2>
+          <div className="profile-password-fields">
+            <label>
+              <span>현재 비밀번호</span>
+              <span className="profile-password-check-row">
+                <PasswordInput
+                  label="현재 비밀번호"
+                  name="currentPassword"
+                  value={currentPassword}
+                  setValue={changeCurrentPassword}
+                  shown={showPasswords[0]}
+                  toggle={() => togglePassword(0, setShowPasswords)}
+                  placeholder="현재 비밀번호를 입력해 주세요"
+                  verified={currentPasswordVerified}
+                />
+                <button
+                  className={currentPasswordVerified ? "is-verified" : ""}
+                  type="button"
+                  onClick={verifyCurrentPassword}
+                  disabled={!currentPassword || currentPasswordLoading || currentPasswordVerified}
+                >
+                  {currentPasswordVerified ? "확인 완료" : currentPasswordLoading ? "확인 중" : "확인"}
+                </button>
+              </span>
+            </label>
+            {currentPasswordMessage && (
+              <small className={`profile-password-status ${currentPasswordError ? "error" : "success"}`}>
+                {currentPasswordMessage}
+              </small>
+            )}
+            <PasswordField
+              label="새 비밀번호"
+              name="password"
+              value={password}
+              setValue={setPassword}
+              shown={showPasswords[1]}
+              toggle={() => togglePassword(1, setShowPasswords)}
+              placeholder={currentPasswordVerified ? "새 비밀번호를 입력해 주세요" : "현재 비밀번호 확인 후 입력할 수 있습니다"}
+              disabled={!currentPasswordVerified}
+              verified={passwordRuleValid}
+            />
+            <small className={password && passwordRuleValid ? "success" : ""}>
+              {password && passwordRuleValid ? "✓ " : ""}영문, 숫자, 특수문자를 모두 포함한 8자 이상
+              {password && !passwordRuleValid ? " 조건을 확인해 주세요." : ""}
+            </small>
+            <PasswordField
+              label="새 비밀번호 확인"
+              name="passwordConfirmation"
+              value={passwordConfirmation}
+              setValue={setPasswordConfirmation}
+              shown={showPasswords[2]}
+              toggle={() => togglePassword(2, setShowPasswords)}
+              placeholder={currentPasswordVerified ? "새 비밀번호를 다시 입력해 주세요" : "현재 비밀번호 확인 후 입력할 수 있습니다"}
+              disabled={!currentPasswordVerified}
+              verified={passwordMatches}
+              trailing={passwordMatches ? "비밀번호 일치" : ""}
+            />
+            {passwordConfirmation && !passwordMatches && <small className="error">새 비밀번호가 일치하지 않습니다.</small>}
+          </div>
         </section>
       )}
 
@@ -259,8 +367,28 @@ function DateSelect({ value, onChange, values, suffix }) {
   return <select value={value} onChange={(event) => onChange(event.target.value)}>{values.map((item) => { const text = String(item).padStart(2, "0"); return <option key={item} value={text}>{item}{suffix}</option>; })}</select>;
 }
 
-function PasswordField({ label, name, value, setValue, shown, toggle }) {
-  return <label><span>{label}</span><span className="profile-password-input"><input type={shown ? "text" : "password"} name={name} value={value} onChange={(event) => setValue(event.target.value)} /><button type="button" onClick={toggle} aria-label={`${label} ${shown ? "숨기기" : "보기"}`}><PasswordVisibilityIcon visible={shown} /></button></span></label>;
+function PasswordField(props) {
+  return <label><span>{props.label}</span><PasswordInput {...props} /></label>;
+}
+
+function PasswordInput({ label, name, value, setValue, shown, toggle, placeholder = "", disabled = false, verified = false, trailing = "" }) {
+  return (
+    <span className={`profile-password-input${verified ? " is-verified" : ""}`}>
+      <input
+        type={shown ? "text" : "password"}
+        name={name}
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        placeholder={placeholder}
+        disabled={disabled}
+        autoComplete={name === "currentPassword" ? "current-password" : "new-password"}
+      />
+      {trailing && <span className="profile-password-match">{trailing}</span>}
+      <button type="button" onClick={toggle} disabled={disabled} aria-label={`${label} ${shown ? "숨기기" : "보기"}`}>
+        <PasswordVisibilityIcon visible={shown} />
+      </button>
+    </span>
+  );
 }
 
 function togglePassword(index, setter) { setter((values) => values.map((value, current) => current === index ? !value : value)); }
@@ -272,3 +400,8 @@ function validDate(value) { const [year, month, day] = value.split("-").map(Numb
 function range(start, end) { return Array.from({ length: end - start + 1 }, (_, index) => start + index); }
 function years() { return range(1920, new Date().getFullYear()).reverse(); }
 function timer(value) { return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`; }
+function isSocialProvider(value) { return ["google", "naver", "kakao", "facebook"].includes(String(value || "").trim().toLowerCase()); }
+function socialProviderLabel(value) {
+  const labels = { google: "구글 로그인", naver: "네이버 로그인", kakao: "카카오 로그인", facebook: "페이스북 로그인" };
+  return labels[String(value || "").trim().toLowerCase()] || "SNS 로그인";
+}

@@ -23,7 +23,8 @@ const previewGuardian = {
 export default async function GuardianProfilePage({ searchParams }) {
   const params = await searchParams;
   const preview = process.env.NODE_ENV === "development" && params?.preview === "1";
-  const session = preview ? { user: { provider: "credentials" } } : await getServerSession(authOptions);
+  const previewProvider = socialProvider(params?.provider) ? params.provider : "credentials";
+  const session = preview ? { user: { provider: previewProvider } } : await getServerSession(authOptions);
   if (!session) redirect("/");
   const guardian = preview
     ? previewGuardian
@@ -40,9 +41,18 @@ export default async function GuardianProfilePage({ searchParams }) {
     <main className="account-page guardian-profile-page">
       <section className="account-panel guardian-profile-panel">
         <AccountTopbar title="보호자 정보" />
-        <GuardianProfileForm guardian={guardian} preview={preview} admin={admin} />
+        <GuardianProfileForm
+          guardian={guardian}
+          provider={session.user?.provider || "credentials"}
+          preview={preview}
+          admin={admin}
+        />
       </section>
       <StatusToast message={params?.notice || ""} type={params?.noticeType || "success"} />
     </main>
   );
+}
+
+function socialProvider(value) {
+  return ["google", "naver", "kakao", "facebook"].includes(String(value || "").trim().toLowerCase());
 }
