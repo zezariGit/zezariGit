@@ -45,8 +45,7 @@ export default function ShopCheckoutClient({
   coupons = [],
   adminPaymentPassEnabled = false,
 }) {
-  const initialProduct = products.find((item) => item.id === initialProductId) || products[0];
-  const initialDesigns = getShopDesigns(initialProduct);
+  const initialProduct = products.find((item) => item.id === initialProductId) || null;
   const [step, setStep] = useState("configure");
   const [productId, setProductId] = useState(initialProduct?.id || "");
   const [quantity, setQuantity] = useState(1);
@@ -56,7 +55,7 @@ export default function ShopCheckoutClient({
       : subjects[0]?.id || ""
   );
   const [designIndex, setDesignIndex] = useState(0);
-  const [designId, setDesignId] = useState(initialDesigns[0]?.id || "");
+  const [designId, setDesignId] = useState("");
   const [couponId, setCouponId] = useState("");
   const [couponPickerOpen, setCouponPickerOpen] = useState(false);
   const [shippingAddress, setShippingAddress] = useState(guardian?.address || "");
@@ -65,6 +64,7 @@ export default function ShopCheckoutClient({
   const [widgetStatus, setWidgetStatus] = useState("idle");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [helpOpen, setHelpOpen] = useState(false);
   const widgetRef = useRef(null);
   const latestPaymentAmountRef = useRef(0);
   const widgetAmountRef = useRef(null);
@@ -98,14 +98,15 @@ export default function ShopCheckoutClient({
   }, []);
 
   const product = useMemo(
-    () => products.find((item) => item.id === productId) || products[0] || null,
+    () => products.find((item) => item.id === productId) || null,
     [productId, products]
   );
   const designs = useMemo(() => getShopDesigns(product), [product]);
   const selectedSubject = subjects.find((subject) => subject.id === subjectId) || null;
   const selectedDesign = useMemo(() => {
-    return designs.find((design) => design.id === designId) || designs[designIndex] || designs[0] || null;
+    return designs.find((design) => design.id === designId) || null;
   }, [designId, designIndex, designs]);
+  const configurationReady = Boolean(subjectId && product && selectedDesign);
   const productUnitPrice = getDesignUnitPrice(product, selectedDesign);
   const productAmount = productUnitPrice * quantity;
   const subtotalAmount = productAmount;
@@ -123,9 +124,9 @@ export default function ShopCheckoutClient({
   }, [paymentAmount]);
 
   useEffect(() => {
-    const nextDesigns = getShopDesigns(product);
     setDesignIndex(0);
-    setDesignId(nextDesigns[0]?.id || "");
+    setDesignId("");
+    setQuantity(1);
   }, [product]);
 
   useEffect(() => {
@@ -249,6 +250,10 @@ export default function ShopCheckoutClient({
   const validateSelection = () => {
     if (!subjectId) {
       setMessage("상품을 연결할 대상자를 선택해 주세요.");
+      return false;
+    }
+    if (!product) {
+      setMessage("상품을 선택해 주세요.");
       return false;
     }
     if (designs.length > 0 && !selectedDesign) {
@@ -398,7 +403,20 @@ export default function ShopCheckoutClient({
           window.history.back();
         }} aria-label="이전으로 돌아가기">‹</a>
         <h1>{step === "configure" ? "상품 구매" : step === "order" ? "결제" : product.name}</h1>
-        <span className="shop-help-mark" aria-hidden="true">?</span>
+        <button
+          className="shop-help-mark"
+          type="button"
+          onClick={() => setHelpOpen((current) => !current)}
+          aria-label="상품 구매 도움말"
+          aria-expanded={helpOpen}
+        >
+          ?
+        </button>
+        {helpOpen && (
+          <div className="shop-help-popover" role="status">
+            대상자와 상품, 디자인을 선택하면 수량 조절과 다음 단계가 활성화됩니다.
+          </div>
+        )}
       </header>
 
       {step === "configure" && (
@@ -423,7 +441,7 @@ export default function ShopCheckoutClient({
             productUnitPrice={productUnitPrice}
             productAmount={productAmount}
           />
-          <button className="shop-next-button" type="button" onClick={goOrder} disabled={subjects.length === 0}>
+          <button className="shop-next-button" type="button" onClick={goOrder} disabled={!configurationReady}>
             다음
           </button>
         </>
@@ -504,7 +522,9 @@ function ProductConfiguration({
 }) {
   const [productPickerOpen, setProductPickerOpen] = useState(false);
   const [designPickerOpen, setDesignPickerOpen] = useState(false);
+  const [subjectPickerOpen, setSubjectPickerOpen] = useState(false);
   const pickerAreaRef = useRef(null);
+  const selectionReady = Boolean(product && selectedDesign);
 
   useEffect(() => {
     const closePickers = (event) => {
@@ -512,6 +532,7 @@ function ProductConfiguration({
       if (event.type === "pointerdown" && pickerAreaRef.current?.contains(event.target)) return;
       setProductPickerOpen(false);
       setDesignPickerOpen(false);
+      setSubjectPickerOpen(false);
     };
 
     document.addEventListener("pointerdown", closePickers);
@@ -538,16 +559,49 @@ function ProductConfiguration({
   return (
     <>
       <div className="shop-selection-fields" ref={pickerAreaRef}>
-        <div className="shop-field">
-          <label htmlFor="shop-subject-select">나의 관리대상</label>
+        <div className={`shop-field shop-subject-picker ${subjectPickerOpen ? "open" : ""}`}>
+          <label id="shop-subject-picker-label">대상자 선택</label>
           {subjects.length > 0 ? (
-            <select id="shop-subject-select" className="subject-pick-select" value={subjectId} onChange={(event) => setSubjectId(event.target.value)}>
-              {subjects.map((subject) => (
-                <option value={subject.id} key={subject.id}>
-                  {subject.name} / {formatDate(subject.birth_date)}
-                </option>
-              ))}
-            </select>
+            <>
+              <button
+                className="shop-subject-trigger"
+                type="button"
+                aria-labelledby="shop-subject-picker-label shop-subject-picker-value"
+                aria-haspopup="listbox"
+                aria-expanded={subjectPickerOpen}
+                onClick={() => {
+                  setSubjectPickerOpen((current) => !current);
+                  setProductPickerOpen(false);
+                  setDesignPickerOpen(false);
+                }}
+              >
+                <span id="shop-subject-picker-value">
+                  <strong>{subjects.find((subject) => subject.id === subjectId)?.name || "대상자를 선택해 주세요"}</strong>
+                  <small>{formatDate(subjects.find((subject) => subject.id === subjectId)?.birth_date)}</small>
+                </span>
+                <b aria-hidden="true">⌃<i>⌄</i></b>
+              </button>
+              {subjectPickerOpen && (
+                <div className="shop-subject-menu" role="listbox" aria-labelledby="shop-subject-picker-label">
+                  {subjects.map((subject) => (
+                    <button
+                      className={subject.id === subjectId ? "selected" : ""}
+                      type="button"
+                      role="option"
+                      aria-selected={subject.id === subjectId}
+                      onClick={() => {
+                        setSubjectId(subject.id);
+                        setSubjectPickerOpen(false);
+                      }}
+                      key={subject.id}
+                    >
+                      <strong>{subject.name}</strong>
+                      <small>{formatDate(subject.birth_date)}</small>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
           ) : (
             <a className="empty-shop-link" href="/?tab=subjects&mode=new#subjects-info">
               대상자를 먼저 등록해 주세요
@@ -558,7 +612,7 @@ function ProductConfiguration({
         <ShopImagePicker
           id="shop-product-picker"
           label="상품"
-          prompt="상품을 선택해주세요"
+          prompt="상품을 선택해 주세요"
           options={products}
           selectedId={productId}
           imageForOption={productPickerImage}
@@ -570,63 +624,47 @@ function ProductConfiguration({
           onClose={() => setProductPickerOpen(false)}
           onSelect={selectProduct}
           variant="product"
+          placeholderImage="/assets/dashboard-action-shop.png"
         />
 
-        <div className="shop-field shop-design-picker-field">
-          {designs.length > 0 ? (
-            <ShopImagePicker
-              id="shop-design-picker"
-              label="디자인"
-              prompt="디자인을 선택해주세요"
-              options={designs}
-              selectedId={selectedDesign?.id || designId}
-              imageForOption={designPickerImage}
-              open={designPickerOpen}
-              onToggle={() => {
-                setDesignPickerOpen((current) => !current);
-                setProductPickerOpen(false);
-              }}
-              onClose={() => setDesignPickerOpen(false)}
-              onSelect={selectDesign}
-              variant="design"
-            />
-          ) : (
-            <>
-              <label>디자인</label>
-              <p className="shop-note">등록된 12간지 디자인이 없습니다.</p>
-            </>
-          )}
-        </div>
-      </div>
-
-      <div className="shop-selection-summary">
-        <ProductVisual product={product} design={selectedDesign} />
-        <div>
-          <strong>{formatProductDesignName(product, selectedDesign)}</strong>
-          <span>{formatCurrency(productUnitPrice)} / 개</span>
-          {product?.description && <small>{product.description}</small>}
-        </div>
+        <ShopImagePicker
+          id="shop-design-picker"
+          label="디자인"
+          prompt={product && designs.length === 0 ? "선택 가능한 디자인이 없습니다" : "디자인을 선택해 주세요"}
+          options={designs}
+          selectedId={selectedDesign?.id || designId}
+          imageForOption={designPickerImage}
+          open={designPickerOpen}
+          onToggle={() => {
+            setDesignPickerOpen((current) => !current);
+            setProductPickerOpen(false);
+          }}
+          onClose={() => setDesignPickerOpen(false)}
+          onSelect={selectDesign}
+          variant="design"
+          placeholderImage="/assets/shop-icons/zodiac-rabbit.png"
+          disabled={!product || designs.length === 0}
+        />
       </div>
 
       <div className="shop-field">
         <label htmlFor="shop-quantity">수량</label>
         <div className="quantity-control">
-          <button type="button" onClick={() => changeQuantity(quantity - 1)} aria-label="수량 감소">−</button>
-          <input id="shop-quantity" value={quantity} onChange={(event) => changeQuantity(event.target.value)} inputMode="numeric" />
-          <button type="button" onClick={() => changeQuantity(quantity + 1)} aria-label="수량 증가">+</button>
+          <button type="button" onClick={() => changeQuantity(quantity - 1)} aria-label="수량 감소" disabled={!selectionReady || quantity <= 1}>−</button>
+          <input id="shop-quantity" value={quantity} readOnly aria-readonly="true" />
+          <button type="button" onClick={() => changeQuantity(quantity + 1)} aria-label="수량 증가" disabled={!selectionReady}>+</button>
         </div>
       </div>
 
       <div className="standalone-info-panel">
         <div className="shop-summary-list">
           <span>상품 금액</span>
-          <strong>{formatCurrency(productUnitPrice)} / 개</strong>
+          <strong>{selectionReady ? formatCurrency(productUnitPrice) : "−"}</strong>
           <span>상품 수량</span>
           <strong>{quantity}개</strong>
           <span>결제예정금액</span>
-          <strong>{formatCurrency(productAmount)}</strong>
+          <strong>{selectionReady ? formatCurrency(productAmount) : "−"}</strong>
         </div>
-        <p className="shop-note">상품을 구매하고 QR을 활성화하면 관리대상 QR 안심 서비스를 계속 이용할 수 있습니다.</p>
       </div>
     </>
   );
@@ -644,8 +682,10 @@ function ShopImagePicker({
   onClose,
   onSelect,
   variant,
+  placeholderImage = "",
+  disabled = false,
 }) {
-  const selectedOption = options.find((option) => option.id === selectedId) || options[0] || null;
+  const selectedOption = options.find((option) => option.id === selectedId) || null;
   const selectedImage = selectedOption ? imageForOption(selectedOption) : "";
 
   return (
@@ -660,12 +700,13 @@ function ShopImagePicker({
         aria-expanded={open}
         aria-controls={`${id}-options`}
         onClick={onToggle}
+        disabled={disabled}
       >
         <span className="shop-image-picker-thumb" aria-hidden="true">
-          {selectedImage ? <img src={selectedImage} alt="" /> : <b>{label.slice(0, 1)}</b>}
+          {selectedImage || placeholderImage ? <img src={selectedImage || placeholderImage} alt="" /> : <b>{label.slice(0, 1)}</b>}
         </span>
         <strong id={`${id}-value`}>{selectedOption?.name || prompt}</strong>
-        <b className="shop-image-picker-chevron" aria-hidden="true">⌄</b>
+        <b className="shop-image-picker-chevron" aria-hidden="true">›</b>
       </button>
 
       {open && (
@@ -883,7 +924,7 @@ function getDesignUnitPrice(product, design = null) {
   if (design && design.unit_price !== null && design.unit_price !== undefined && design.unit_price !== "") {
     return Number(design.unit_price || 0);
   }
-  return Number(product.unit_price || 0);
+  return Number(product?.unit_price || 0);
 }
 
 function formatProductDesignName(product, design = null) {

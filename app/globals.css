@@ -12102,8 +12102,8 @@ button:disabled:hover {
   min-height: 100vh;
   display: grid;
   place-items: start center;
-  padding: var(--space-lg);
-  background: var(--c-bg);
+  padding: 0;
+  background: var(--c-surface);
 }
 
 .ad-payment-page {
@@ -12309,6 +12309,15 @@ button:disabled:hover {
   padding: var(--space-lg);
 }
 
+.shop-phone-panel {
+  min-height: 100vh;
+  align-content: start;
+  gap: 14px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 .shop-loading-panel {
   min-height: min(720px, calc(100dvh - 32px));
 }
@@ -12371,6 +12380,7 @@ button:disabled:hover {
 }
 
 .shop-topbar {
+  position: relative;
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr) 42px;
   align-items: center;
@@ -12403,6 +12413,22 @@ button:disabled:hover {
 .shop-help-mark {
   justify-self: end;
   font-size: 1rem;
+}
+
+.shop-help-popover {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 6px);
+  right: 0;
+  width: min(280px, calc(100vw - 48px));
+  padding: 10px 12px;
+  border: 1px solid var(--c-primary-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-text-muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
 }
 
 .product-choice-grid {
@@ -12470,21 +12496,105 @@ button:disabled:hover {
 
 .shop-field {
   display: grid;
-  gap: var(--space-xs);
+  gap: 6px;
 }
 
 .shop-field > strong,
 .shop-field > label {
   color: var(--c-text);
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 800;
 }
 
 .shop-selection-fields {
   display: grid;
-  gap: var(--space-sm);
-  padding-block: var(--space-xs) var(--space-sm);
-  border-bottom: 0.5px solid var(--c-border);
+  gap: 14px;
+  padding-block: 2px 0;
+  border-bottom: 0;
+}
+
+.shop-subject-picker {
+  position: relative;
+}
+
+.shop-subject-trigger {
+  width: 100%;
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 22px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 1px solid var(--c-primary);
+  border-radius: var(--radius-sm);
+  background: var(--c-primary-light);
+  color: var(--c-text);
+  text-align: left;
+}
+
+.shop-subject-trigger > span,
+.shop-subject-menu button {
+  display: grid;
+  gap: 2px;
+}
+
+.shop-subject-trigger strong,
+.shop-subject-menu strong {
+  font-size: 0.94rem;
+  font-weight: 900;
+}
+
+.shop-subject-trigger small,
+.shop-subject-menu small {
+  color: var(--c-text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.shop-subject-trigger > b {
+  display: grid;
+  place-items: center;
+  color: var(--c-text);
+  font-size: 0.82rem;
+  font-style: normal;
+  line-height: 0.7;
+}
+
+.shop-subject-trigger > b i {
+  font-style: normal;
+}
+
+.shop-subject-menu {
+  position: absolute;
+  z-index: 36;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  display: grid;
+  gap: 4px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.16);
+}
+
+.shop-subject-menu button {
+  min-height: 52px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--c-text);
+  text-align: left;
+}
+
+.shop-subject-menu button.selected,
+.shop-subject-menu button:hover,
+.shop-subject-menu button:focus-visible {
+  background: var(--c-primary-light);
 }
 
 .shop-selection-summary {
@@ -12574,7 +12684,7 @@ button:disabled:hover {
 
 .quantity-control button {
   min-height: 42px;
-  border: 0.5px solid var(--c-primary-border);
+  border: 1px solid var(--c-primary-border);
   border-radius: var(--radius-sm);
   background: var(--c-primary-light);
   color: var(--c-primary-dark);
@@ -12582,7 +12692,18 @@ button:disabled:hover {
   font-weight: 900;
 }
 
+.quantity-control button:disabled {
+  border-color: #e7e9eb;
+  background: #f6f7f7;
+  color: #c8cccf;
+  cursor: not-allowed;
+}
+
 .quantity-control input {
+  min-height: 42px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
   text-align: center;
   font-weight: 800;
 }
@@ -12612,14 +12733,14 @@ button:disabled:hover {
 }
 
 .shop-image-picker-trigger {
-  min-height: 52px;
+  min-height: 50px;
   width: 100%;
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr) 24px;
   align-items: center;
   gap: var(--space-sm);
   padding: 5px var(--space-sm);
-  border: 0.5px solid var(--c-border);
+  border: 1px solid var(--c-primary);
   border-radius: var(--radius-sm);
   background: var(--c-surface);
   color: var(--c-text);
@@ -12627,8 +12748,16 @@ button:disabled:hover {
   cursor: pointer;
 }
 
+.shop-image-picker-trigger:disabled {
+  border-color: var(--c-primary);
+  background: var(--c-surface);
+  color: var(--c-text);
+  cursor: default;
+  opacity: 1;
+}
+
 .shop-image-picker-trigger.product {
-  grid-template-columns: 64px minmax(0, 1fr) 24px;
+  grid-template-columns: 42px minmax(0, 1fr) 24px;
 }
 
 .shop-image-picker-field.open .shop-image-picker-trigger,
@@ -12652,18 +12781,14 @@ button:disabled:hover {
 }
 
 .shop-image-picker-trigger.product .shop-image-picker-thumb {
-  width: 64px;
+  width: 42px;
   height: 40px;
 }
 
 .shop-image-picker-trigger.product .shop-image-picker-thumb img {
-  width: 58px;
-  height: auto;
-  max-width: none;
-  max-height: none;
-  align-self: start;
-  object-fit: initial;
-  clip-path: inset(0 0 25% 0);
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
 }
 
 .shop-image-picker-thumb b {
@@ -12674,10 +12799,16 @@ button:disabled:hover {
 .shop-image-picker-trigger > strong {
   min-width: 0;
   overflow: hidden;
-  color: var(--c-text);
-  font-size: 0.9rem;
+  color: var(--c-text-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.shop-image-picker-trigger:has(img[src]:not([src="/assets/dashboard-action-shop.png"]):not([src="/assets/shop-icons/zodiac-rabbit.png"])) > strong {
+  color: var(--c-text);
+  font-weight: 800;
 }
 
 .shop-image-picker-chevron {
@@ -12873,6 +13004,12 @@ button:disabled:hover {
   font-weight: 900;
 }
 
+.shop-next-button:disabled {
+  background: #f1f2f2;
+  color: #c7cbcc;
+  cursor: not-allowed;
+}
+
 .payment-action-stack {
   display: grid;
   gap: var(--space-sm);
@@ -12929,9 +13066,9 @@ button:disabled:hover {
 }
 
 .standalone-info-panel {
-  padding: var(--space-md);
-  border: 0.5px solid var(--c-primary-border);
-  border-radius: var(--radius-md);
+  padding: 12px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
   background: var(--c-surface);
 }
 
@@ -13607,18 +13744,18 @@ button:disabled:hover {
 .shop-summary-list {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--space-xs) var(--space-sm);
+  gap: 8px var(--space-sm);
   align-items: center;
 }
 
 .shop-summary-list span {
   color: var(--c-text-muted);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .shop-summary-list strong {
   color: var(--c-text);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   text-align: right;
 }
 
