@@ -9044,3 +9044,34 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Feature Commit
 - `328bafe fix: restore missing ad setup flow`
+
+## 2026-09-11 KST - Advertisement Dashboard Action-State Enforcement
+
+### User Request
+- Show no actions for advertisements under review or completed.
+- Show `추가` and `종료` only for advertisements in progress.
+- Route `추가` through missing-ad subject selection and then the existing setting/payment flow for the same subject.
+- Require a refund warning confirmation before early termination, then display the advertisement as completed.
+
+### Reflected Work
+- Kept action rendering gated by the normalized `running` stage; review and completed cards remain informational only.
+- Changed `추가` to `/missing-report?subject=<id>&newAd=1`, preselecting the same subject before continuing to the existing distance and duration setup.
+- Allowed the explicit new-ad route to continue for a subject already marked `찾는중` while preserving the normal missing-report behavior.
+- Restricted the server termination mutation to `active` and `paused` advertisements; direct requests can no longer terminate a review-stage `ready` advertisement.
+- Revalidated and returned to `/account/ads` after either a successful termination or an error from that screen.
+- Extended the advertisement dashboard regression test for the route, selection state, cache revalidation, and server transition guard.
+
+### Verification
+- `npm run test:ad-dashboard`: passed.
+- `npm run test:dashboard-ui`: passed.
+- `npm run test:subject-flow`: passed.
+- `npm run security:check`: passed.
+- `npm run build`: passed with Next.js 16.3.0 and all 39 routes generated.
+- Local browser verification at `/account/ads?preview=1` confirmed review/running/completed labels, running-only actions, the same-subject add URL, refund warning dialog, filters, zero console errors, and no Next.js error overlay.
+- No real advertisement was terminated during verification.
+
+### Feature Commit
+- `0206956 fix: enforce ad dashboard action states`
+
+### Deployment
+- Not requested in this turn. Commit remains local until the user requests GitHub/Vercel deployment.

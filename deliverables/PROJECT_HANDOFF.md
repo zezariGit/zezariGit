@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-11 KST
 
-Application baseline commit: `328bafe` (`main`)
+Application baseline commit: `0206956` (`main`)
 
 Production: `https://zezari.family`
 
@@ -33,7 +33,7 @@ Production: `https://zezari.family`
 | Vercel 프로젝트 | scope `zezari`, project `zezari` |
 | 대표 도메인 | `https://zezari.family` |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | commit `328bafe`; 운영 상태는 `vercel inspect`로 확인 |
+| 최근 애플리케이션 기능 기준 | commit `0206956`; 운영 상태는 `vercel inspect`로 확인 |
 
 ### 로컬 시작
 
@@ -139,7 +139,7 @@ npm run dev -- -p 3005
 | --- | --- | --- |
 | 광고 목록 | 최신순 카드, 전체/진행 중/광고 완료 필터. 진행 중 필터에 `광고 검토 중`과 `진행 중` 포함 | 완료 |
 | 광고 카드 | 포스터, 대상자, 지역, 기간, 금액, 도달 수, 상태 표시. 검토 중 도달 수는 `-` | 완료 |
-| 상태별 버튼 | 검토 중과 완료는 버튼 없음. 진행 중은 `추가/종료`. 추가는 같은 대상자의 새 광고 설정, 종료는 환불 불가 확인 후 완료 전환 | 완료 |
+| 상태별 버튼 | 검토 중과 완료는 버튼 없음. 진행 중만 `추가/종료` 표시. `추가`는 `/missing-report`에서 같은 대상자를 미리 선택한 뒤 새 거리·기간 설정으로 이동. `종료`는 환불 불가 확인 후에만 완료 전환하며 서버도 `active/paused` 상태만 허용 | 완료 |
 | 실종신고 대상자 선택 | `/missing-report`에서 안전 상태 대상자를 선택하고 다음을 누르면 기존 광고 설정 모달로 이동. `HomePage -> GuardianDashboard -> DashboardTab -> AdCampaignModal`로 대상자와 새 광고 여부를 전달 | 완료 |
 | 광고 설정 | 기존 거리·위치 범위 선택, 기간 선택, 선택 요약, 광고 이미지 미리보기, 결제 화면 이동을 재사용. 이 단계에서는 Meta API를 호출하지 않음 | 완료 |
 | 관리자 상태 테스트 | 관리자 결제패스 광고는 Meta를 호출하지 않고 `광고 검토 중`으로 생성. 결제 완료 화면에서 광고 상태 테스트로 이동하고 관리자만 `진행 중` 전환 가능. 이후 기존 종료 기능으로 `광고 완료` 검증 가능 | 완료 |
@@ -271,6 +271,7 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 | 커밋 | 내용 |
 | --- | --- |
+| `0206956` | 광고 대시보드 추가 경로와 진행 상태 전용 종료 규칙 보강 |
 | `328bafe` | 실종신고 대상자 선택 후 기존 거리·기간 광고 설정 화면 연결 복구 |
 | `dd1218e` | Meta 독립 관리자 광고 상태 테스트와 광고 대시보드 검증 |
 | `8aa8114` | 짧은 오입력도 유효하지 않은 쿠폰 코드로 분류 |
