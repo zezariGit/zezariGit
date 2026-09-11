@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-11 KST
 
-Application baseline commit: `9d79166` (`main`)
+Application baseline commit: `cbd6044` (`main`)
 
 Production: `https://zezari.family`
 
@@ -32,9 +32,9 @@ Production: `https://zezari.family`
 | GitHub | `https://github.com/zezariGit/zezariGit.git` |
 | Vercel 프로젝트 | scope `zezari`, project `zezari` |
 | 대표 도메인 | `https://zezari.family` |
-| 최근 확인 운영 배포 | `dpl_4DeUFiDBvVYF5vALrLTcpzY6T2zn` (`READY`, 결제 및 서비스 현황 개편) |
+| 최근 확인 운영 배포 | `dpl_J2sFbHX7LfBm7EaVH7xkS14Ujdrv` (`READY`, 대시보드 알림 확인 시점 및 위치 이동 개편) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | commit `9d79166`; 운영 상태는 `vercel inspect`로 확인 |
+| 최근 애플리케이션 기능 기준 | commit `cbd6044`; 운영 상태는 `vercel inspect`로 확인 |
 
 ### 로컬 시작
 
@@ -107,7 +107,8 @@ npm run dev -- -p 3005
 | 현재 상태 | 제목 크기와 물음표 아이콘 확대. 물음표 선택 시 `대상자 현재 상태 안내` 바텀시트 표시 | 완료 |
 | 상태 안내 | 제공 이미지 `public/assets/dashboard/subject-status-guide.png`를 그대로 표시 | 완료 |
 | 주요 메뉴 | 실종 신고, 상품 구매, 고객지원(제자리 카카오톡 채널) 이동 | 완료 |
-| 알림 팝오버 | 종 아래 팝오버, 외부 선택·뒤로가기 닫기, 최신순, 내부 스크롤, 미읽음 초록 점/연녹색 배경, 선택 시 읽음 처리만 수행 | 완료 |
+| 알림 팝오버 | 종 아래 팝오버, 외부 선택·뒤로가기 닫기, 최신순, 내부 스크롤. 미확인은 초록 아이콘·점·연녹색 배경, 확인은 회색 아이콘·흰 배경. 여는 것만으로 확인 처리하지 않고 닫기·화면 이탈 시 이번에 노출된 미확인 ID만 일괄 확인 처리하며 내역은 유지 | 완료 |
+| 위치 공유 알림 | 발견자가 전달한 위치 공유 알림은 저장된 HTTPS `map.kakao.com` 주소를 검증한 뒤 항목 선택 시 해당 좌표의 카카오맵으로 이동. 이동 시 노출 알림 확인 처리도 함께 수행 | 완료 |
 | 알림 이벤트 | 안전(위치 공유·안심번호), 온라인 광고, 결제·상품 이벤트를 중복 없이 저장·전송. 관리자 알림 설정과 연동 | 완료 |
 
 ### 대상자 정보
@@ -282,6 +283,7 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 | 커밋 | 내용 |
 | --- | --- |
+| `cbd6044` | 노출 알림 닫기 확인 처리, 상태별 아이콘 수정 및 카카오맵 위치 이동 |
 | `9d79166` | 상품·광고 통합 결제 내역과 결제 상세 화면 개편 |
 | `f5fd50b` | 관리자·일반 사용자 광고 결제 완료 미리보기 분리 |
 | `0ef3ebb` | 광고 테스트 결제 안내를 관리자 전용으로 제한하고 전용 문구 추가 |

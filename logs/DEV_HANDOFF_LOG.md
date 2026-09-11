@@ -9219,3 +9219,35 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Vercel deployment `dpl_4DeUFiDBvVYF5vALrLTcpzY6T2zn` reached `READY` and owns `https://zezari.family` plus compatibility aliases.
 - Production root, billing route, and all three billing assets returned HTTP 200.
 - Vercel error-log query returned no errors.
+
+## 2026-09-11 KST - Dashboard Notification Confirmation Timing And Location Navigation
+
+### User Request
+- Keep unread notifications highlighted while the notification popover is open.
+- Mark only the unread notifications exposed during that visit as confirmed when the popover closes or the dashboard is left.
+- Preserve confirmed notifications in the list, showing confirmed items with gray icons and white backgrounds and unconfirmed items with green icons and light-green backgrounds.
+- Restore location-share notification navigation to the finder-provided Kakao Map location and deploy.
+
+### Reflected Work
+- Replaced per-item immediate read handling with an exposed-unread ID set captured while the popover is open.
+- Added close, browser history, component exit, and `pagehide` finalization with a `keepalive` batch request.
+- Added the guardian-scoped `markGuardianNotificationsReadByIds` DB operation, limited to 100 unique IDs and unread rows owned by the authenticated guardian.
+- Kept all notification records after confirmation; only `read_at` changes.
+- Corrected the previously reversed read/unread image assets for safety, advertisement, and commerce categories.
+- Made only `safety.location_shared` notifications with a valid HTTPS `map.kakao.com` URL interactive and navigate to the saved finder coordinates.
+- Added a Kakao Map location link to the development preview without using production personal location data.
+
+### Verification
+- `npm run test:notifications`: passed.
+- `npm run test:push`: passed.
+- `npm run security:check`: passed.
+- `npm run build`: passed with Next.js 16.3.0 and all 39 routes.
+- `git diff --check`: passed.
+- Browser preview confirmed: opening retained two green unread items; closing and reopening changed them to gray confirmed items without removal; the location item navigated to Kakao Map; no horizontal overflow, Next.js overlay, or app console errors were present.
+
+### Deployment
+- Feature commit `cbd6044` pushed to GitHub `main`.
+- Vercel deployment `dpl_J2sFbHX7LfBm7EaVH7xkS14Ujdrv` reached `READY` and owns `https://zezari.family` plus compatibility aliases.
+- Production root and notification state assets returned HTTP 200; unauthenticated `/api/notifications` correctly returned 401.
+- Vercel error-log query returned no errors.
+- Production read-state mutation was intentionally not performed against the user's real notifications.
