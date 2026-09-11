@@ -20443,3 +20443,261 @@ button:disabled:hover {
     flex-direction: column;
   }
 }
+
+/* Ad Payment Success & Police Report Prompt */
+.ad-payment-success-panel {
+  max-width: 440px;
+  text-align: center;
+  gap: 16px;
+  padding: 32px 24px 28px;
+}
+
+.ad-complete-hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 277px;
+  margin: 0 auto;
+}
+
+.ad-complete-hero-img {
+  width: 100%;
+  max-width: 277px;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.ad-complete-publication-note {
+  margin: 0 auto;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--c-primary-light, #f4faf5);
+  border: 1px solid var(--c-primary-border, #a8e0b6);
+  color: var(--c-primary, #26963F);
+  font-size: 12.5px;
+  line-height: 1.45;
+  text-align: center;
+  max-width: 340px;
+}
+
+.police-report-prompt-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 12px auto 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--c-border, #e5e7eb);
+  width: 100%;
+  max-width: 320px;
+}
+
+.police-report-prompt-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1.4;
+  transition: color 0.15s ease;
+}
+
+.police-report-prompt-link:hover,
+.police-report-prompt-link:focus-visible {
+  color: var(--c-primary, #26963F);
+  outline: none;
+}
+
+.police-report-prompt-sub {
+  margin: 6px 0 16px;
+  font-size: 13.5px;
+  color: #555;
+  line-height: 1.4;
+}
+
+.police-report-prompt-buttons {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.police-report-btn-yes {
+  flex: 1;
+  height: 44px;
+  background: var(--c-primary, #26963F);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  font-family: inherit;
+}
+
+.police-report-btn-yes:hover {
+  background: var(--c-primary-hover, #1f7d34);
+}
+
+.police-report-btn-no {
+  flex: 1;
+  height: 44px;
+  background: #fff;
+  color: #111;
+  border: 1.5px solid var(--c-primary, #26963F);
+  border-radius: var(--radius-md, 8px);
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  font-family: inherit;
+}
+
+.police-report-btn-no:hover {
+  background: var(--c-primary-light, #f4faf5);
+}
+
+.ad-complete-nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+  margin: 16px auto 0;
+}
+
+.ad-complete-nav-links .primary-button,
+.ad-complete-nav-links .plain-button {
+  width: 100%;
+  height: 40px;
+  font-size: 14px;
+}
+
+.police-call-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgb(0 0 0 / 60%);
+}
+
+.police-call-modal-dialog {
+  width: min(100%, 290px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 26px 20px 20px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgb(0 0 0 / 28%);
+  animation: policeModalFadeIn 0.2s ease-out;
+}
+
+@keyframes policeModalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.police-call-modal-icon-wrap {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: #eaf7ed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  color: var(--c-primary, #26963F);
+}
+
+.police-call-modal-phone-icon {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+  transform: rotate(-10deg);
+}
+
+.police-call-modal-dialog h2 {
+  margin: 0 0 6px;
+  color: #111;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.police-call-modal-dialog p {
+  margin: 0 0 20px;
+  color: #555;
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+
+.police-call-modal-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.police-call-modal-cancel {
+  flex: 1;
+  height: 42px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  color: #374151;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+}
+
+.police-call-modal-cancel:hover {
+  background: #f9fafb;
+}
+
+.police-call-modal-confirm {
+  flex: 1;
+  height: 42px;
+  border: none;
+  border-radius: 8px;
+  background: var(--c-primary, #26963F);
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  font-family: inherit;
+}
+
+.police-call-modal-confirm:hover {
+  background: var(--c-primary-hover, #1f7d34);
+}

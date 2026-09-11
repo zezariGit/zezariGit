@@ -6,6 +6,7 @@ import {
   publishPaidSubjectAd,
 } from "../../../../../lib/db";
 import { confirmWidgetPayment } from "../../../../../lib/toss-payments";
+import AdPaymentSuccessClient from "./ad-payment-success-client";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,17 @@ export default async function TossAdSuccessPage({ searchParams }) {
   const orderId = String(params?.orderId || "").trim();
   const amount = Number(params?.amount || 0);
   const adminPass = String(params?.adminPass || "") === "1";
+  const preview = process.env.NODE_ENV === "development" && params?.preview === "1";
+
+  if (preview) {
+    return (
+      <AdPaymentSuccessClient
+        testAdId="preview-test-ad"
+        sourceLabel="Toss Payments"
+        publicationMessage="관리자 테스트 결제가 완료되었습니다. Meta에 발행하지 않고 광고 검토 중 상태로 생성했습니다."
+      />
+    );
+  }
 
   if (!session) {
     return <AdPaymentResult title="로그인이 필요합니다" message="광고 결제 완료 처리를 위해 다시 로그인해 주세요." />;
@@ -31,9 +43,8 @@ export default async function TossAdSuccessPage({ searchParams }) {
     if (ad.paid_at && ad.toss_order_id === orderId) {
       const publication = await publishPaidSubjectAd(adId);
       return (
-        <AdPaymentResult
-          title="광고 결제가 완료되었습니다"
-          message={publicationMessage(publication, {
+        <AdPaymentSuccessClient
+          publicationMessage={publicationMessage(publication, {
             alreadyPaid: true,
             adminPass: testPayment,
           })}
@@ -60,9 +71,8 @@ export default async function TossAdSuccessPage({ searchParams }) {
     const publication = await publishPaidSubjectAd(adId);
 
     return (
-      <AdPaymentResult
-        title="광고 결제가 완료되었습니다"
-        message={publicationMessage(publication)}
+      <AdPaymentSuccessClient
+        publicationMessage={publicationMessage(publication)}
         testAdId={testPayment ? ad.id : ""}
       />
     );

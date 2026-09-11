@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const [page, actions, serverActions, selector, selectorPage, database, successPage, styles] = await Promise.all([
+const [page, actions, serverActions, selector, selectorPage, database, successPage, successClient, styles] = await Promise.all([
   readFile(new URL("../app/account/ads/page.js", import.meta.url), "utf8"),
   readFile(new URL("../app/account/ads/ad-history-actions.js", import.meta.url), "utf8"),
   readFile(new URL("../app/actions.js", import.meta.url), "utf8"),
@@ -9,6 +9,7 @@ const [page, actions, serverActions, selector, selectorPage, database, successPa
   readFile(new URL("../app/missing-report/page.js", import.meta.url), "utf8"),
   readFile(new URL("../lib/db.js", import.meta.url), "utf8"),
   readFile(new URL("../app/payments/toss/ad/success/page.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/payments/toss/ad/success/ad-payment-success-client.js", import.meta.url), "utf8"),
   readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
 ]);
 
@@ -40,6 +41,14 @@ assert.match(database, /export async function endSubjectAd[\s\S]+allowed: \["act
 assert.doesNotMatch(database, /export async function endSubjectAd[\s\S]{0,180}allowed: \["active", "paused", "ready"\]/);
 assert.match(successPage, /광고 상태 테스트하기/);
 assert.match(successPage, /testAd=\$\{encodeURIComponent\(testAdId\)\}/);
-assert.match(styles, /\.ad-test-status-panel\s*\{/);
+assert.match(successPage, /AdPaymentSuccessClient/);
+assert.match(successClient, /\/assets\/ads\/ad-payment-complete\.png/);
+assert.match(successClient, /경찰 신고도 함께 진행하시겠어요\?/);
+assert.match(successClient, /112로 연결해 드립니다/);
+assert.match(successClient, /112로 전화할까요\?/);
+assert.match(successClient, /tel:112/);
+assert.match(successClient, /police-call-modal/);
+assert.match(styles, /\.ad-payment-success-panel\s*\{/);
+assert.match(styles, /\.police-call-modal-dialog\s*\{/);
 
 console.log("Ad dashboard state regression checks passed.");

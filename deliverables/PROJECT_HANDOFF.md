@@ -144,6 +144,7 @@ npm run dev -- -p 3005
 | 실종신고 대상자 선택 | `/missing-report`에서 안전 상태 대상자를 선택하고 다음을 누르면 기존 광고 설정 모달로 이동. `HomePage -> GuardianDashboard -> DashboardTab -> AdCampaignModal`로 대상자와 새 광고 여부를 전달 | 완료 |
 | 광고 설정 | 기존 거리·위치 범위 선택, 기간 선택, 선택 요약, 광고 이미지 미리보기, 결제 화면 이동을 재사용. 이 단계에서는 Meta API를 호출하지 않음 | 완료 |
 | 관리자 상태 테스트 | 관리자 결제패스 광고는 Meta를 호출하지 않고 `광고 검토 중`으로 생성. 결제 완료 화면에서 광고 상태 테스트로 이동하고 관리자만 `진행 중` 전환 가능. 이후 기존 종료 기능으로 `광고 완료` 검증 가능 | 완료 |
+| 광고 결제 완료 및 경찰 신고 연계 | 제공된 광고 결제 완료 그래픽 원본(`/assets/ads/ad-payment-complete.png`) 표시, `경찰 신고도 함께 진행하시겠어요?` 밑줄 링크 및 `[예]`/`[아니오]` 버튼, 클릭 시 `112로 전화할까요?` 팝업 모달에서 112 전화걸기(`tel:112`) 및 광고내역/대시보드 이동 제공 | 완료 |
 | 실제 Meta 광고 | 일반 결제 광고는 기존 Meta 자동 발행 경로 유지 | 조건부: Meta 앱 권한·검수 승인 필요 |
 
 ### 관리자 및 운영 기능
@@ -200,6 +201,7 @@ Meta 권한 승인 전에도 관리자 계정으로 대시보드 상태를 검�
 | 광고 대시보드 | `http://localhost:3005/account/ads?preview=1&testAd=preview-review` |
 | 광고 진행 필터 | `http://localhost:3005/account/ads?status=running&preview=1&testAd=preview-review` |
 | 광고 완료 필터 | `http://localhost:3005/account/ads?status=done&preview=1` |
+| 광고 결제 완료 화면 | `http://localhost:3005/payments/toss/ad/success?preview=1` |
 
 ## 7. 테스트 명령
 

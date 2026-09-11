@@ -41,6 +41,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - `AD_PRICING_MANAGEMENT.md`: administrator billing-day/radius price policy, guardian date/radius quote flow, server calculation, and Toss amount validation.
 - `AD_DISTANCE_DURATION_OPTIONS.md`: administrator-managed distance/duration option grids and the guardian distance, duration, summary, and payment flow.
 - `ADMIN_AD_MARGIN_BUDGET.md`: administrator margin-rate setting, guardian-payment-based Meta lifetime budget, per-ad snapshots, and legacy budget compatibility.
+- `AD_PAYMENT_SUCCESS_POLICE_REPORT.md`: ad payment completion screen overhaul with approved graphic asset, police report prompt, and 112 phone call modal.
 - `ADMIN_DASHBOARD_OPERATIONS_REVAMP.md`: operations-style admin dashboard with overview cards, trend chart, recent tables, order/ad/subscription/sales panels.
 - `GUARDIAN_ADMIN_OPERATIONS_LAYOUT.md`: operations-style guardian management screen with status cards, extended filters, dense grid, detail panel, and CSV export additions.
 - `ADMIN_AD_GRID_MANAGEMENT.md`: admin advertisement grid, selected-row actions, detail panel, click-count schema placeholder, and Meta API readiness.

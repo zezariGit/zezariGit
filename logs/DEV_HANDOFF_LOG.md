@@ -9091,3 +9091,45 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Current production data contained review and completed advertisements; neither state exposed action buttons, and review reach remained `-`.
 - The account had no running advertisement at verification time, so no production record was terminated or altered.
 - Running-only `추가/종료`, the same-subject add URL, filters, and the refund warning dialog were verified against the same build locally before deployment with zero browser console errors.
+
+## 2026-09-11 KST - Advertisement Payment Completion Screen Overhaul And Police Report 112 Call Integration
+
+### User Request
+- Use the first supplied attachment image as the advertisement payment completion graphic.
+- Configure buttons below the completion image matching the second attachment.
+- When clicking `[경찰 신고도 함께 진행하시겠어요?]`, open a popup dialog matching the third attachment and provide the 112 phone call functionality.
+- Proceed without asking for additional confirmation, commit and push to GitHub, and deploy to Vercel.
+- Maintain cumulative requirements and progress in the handoff documentation.
+
+### Reflected Work
+- Saved the supplied graphics to `public/assets/ads/`:
+  - `ad-payment-complete.png`: user-supplied completion graphic with checkmark and Meta review notice.
+  - `police-report-guide.png`: button layout reference asset.
+  - `police-report-call-dialog.png`: 112 confirmation modal reference asset.
+- Created `app/payments/toss/ad/success/ad-payment-success-client.js`:
+  - Displays `ad-payment-complete.png` as the hero completion graphic.
+  - Displays the police report prompt section:
+    - Clickable text `경찰 신고도 함께 진행하시겠어요?` (underlined).
+    - Subtext `경찰 신고가 필요한 경우 112로 연결해 드립니다.`.
+    - Buttons: `[ 예 ]` (opens the 112 call modal), `[ 아니오 ]` (links to `/account/ads`).
+  - Displays the 112 phone call modal:
+    - Centered dialog with dark backdrop overlay and ESC key / backdrop click to close.
+    - Top circular green phone icon (`#26963F` on `#eaf7ed` circle).
+    - Heading: `112로 전화할까요?`.
+    - Subtitle: `경찰 신고를 위해 112로 연결합니다.`.
+    - Buttons: `[ 취소 ]` (closes dialog), `[ 전화하기 ]` (`href="tel:112"`).
+  - Maintained links to `/account/ads` (광고내역 보기), `/?tab=dashboard` (대시보드 이동), and admin test link `광고 상태 테스트하기`.
+- Updated `app/payments/toss/ad/success/page.js`:
+  - Connected `AdPaymentSuccessClient` for payment success and development preview (`?preview=1`).
+  - Preserved fallback `AdPaymentResult` for error states.
+- Added responsive styling in `app/globals.css`.
+- Added deliverable document: `deliverables/AD_PAYMENT_SUCCESS_POLICE_REPORT.md` and updated `deliverables/README.md`.
+- Extended `scripts/ad-dashboard-state-regression.mjs` to test the new components, image path, police report text, 112 call link, and modal styles.
+- Updated `deliverables/PROJECT_HANDOFF.md`, `logs/DEV_HANDOFF_LOG.md`, and `logs/PRESENTATION_PROGRESS_LOG.md`.
+
+### Verification
+- `npm run test:ad-dashboard`: passed.
+- `npm run security:check`: passed.
+- `npm run test:dashboard-ui`: passed.
+- `git diff --check`: passed.
+- `npm run build`: Next.js 16.3.0 production build passed with all 39 routes generated.
