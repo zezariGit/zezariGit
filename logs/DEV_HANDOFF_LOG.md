@@ -9251,3 +9251,33 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Production root and notification state assets returned HTTP 200; unauthenticated `/api/notifications` correctly returned 401.
 - Vercel error-log query returned no errors.
 - Production read-state mutation was intentionally not performed against the user's real notifications.
+
+## 2026-09-11 KST - Administrator-Managed Signup Service Regulations
+
+### User Request
+- Add an administrator menu for editing the privacy collection agreement, service terms, and notification agreement shown during signup.
+- Provide separate tabs, editable content, bold and font-size controls, and immediate reflection in each signup `자세히` popup.
+
+### Reflected Work
+- Added `service_regulations` with schema version 45 and seeded the three supplied reference texts as structured paragraph data.
+- Added the administrator `서비스 규정 관리` menu with `개인정보`, `서비스이용`, and `알림` tabs.
+- Added paragraph content editing, paragraph add/delete, bold toggling, and a restricted 14/16/18/20/24px size selector.
+- Server validation limits document size and allowed formatting; arbitrary HTML is neither stored nor rendered.
+- Added a no-store public regulation API and a signup modal that fetches the latest saved document whenever `자세히` opens.
+- Connected all three rows for credentials signup and SNS signup, including persistence of the SNS optional notification consent.
+- Added development preview `/?preview=signup-terms`.
+
+### Verification
+- `npm run test:service-regulations`: passed.
+- `npm run test:signup-profile-ui`: passed.
+- `npm run test:social-link`: passed.
+- `npm run security:check`: passed.
+- `npm run build`: passed with Next.js 16.3.0 and all 39 routes generated.
+- `git diff --check`: passed.
+- Local DB/API returned HTTP 200; browser checks confirmed privacy, service, and notification popup headers, scrollable bodies, formatting, and no Next.js error overlay.
+
+### Feature Commit
+- `957553b feat: manage signup service regulations`
+
+### Deployment
+- Not requested in this turn. GitHub push and Vercel production deployment are pending.

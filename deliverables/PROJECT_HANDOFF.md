@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-11 KST
 
-Application baseline commit: `cbd6044` (`main`)
+Application baseline commit: `957553b` (`main`, 로컬 기능 커밋; GitHub/Vercel 배포 대기)
 
 Production: `https://zezari.family`
 
@@ -34,7 +34,7 @@ Production: `https://zezari.family`
 | 대표 도메인 | `https://zezari.family` |
 | 최근 확인 운영 배포 | `dpl_J2sFbHX7LfBm7EaVH7xkS14Ujdrv` (`READY`, 대시보드 알림 확인 시점 및 위치 이동 개편) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | commit `cbd6044`; 운영 상태는 `vercel inspect`로 확인 |
+| 최근 애플리케이션 기능 기준 | commit `957553b` 로컬 완료; 운영은 commit `cbd6044`, 배포 `dpl_J2sFbHX7LfBm7EaVH7xkS14Ujdrv` |
 
 ### 로컬 시작
 
@@ -94,7 +94,7 @@ npm run dev -- -p 3005
 | 로그인 | 일반 로그인, SNS 간편 로그인, 아이디 찾기, 비밀번호 찾기 제공. 화면 하단 개인정보취급방침 문구 제거. 사용자가 로그아웃하기 전까지 JWT 세션 유지와 앱 재실행 세션 복구 적용 | 완료 |
 | 아이디 찾기 | 휴대전화 인증 후 가입 아이디 확인. 로그인 화면에서 진입 가능 | 완료 |
 | 비밀번호 찾기 | 휴대전화 인증 후 새 비밀번호 입력. 조건 안내는 새 비밀번호 바로 아래 회색 한 줄, 일치 안내는 확인 입력 아래 표시. 완료 버튼 하단 인증완료 문구 제거 | 완료 |
-| 회원가입 | 휴대전화 인증, 정보 입력, 약관 동의, 완료 화면 제공. 완료 버튼 하단 인증완료 문구 제거. 약관 간격과 체크박스 높이를 본문 글자에 맞춤 | 완료 |
+| 회원가입 | 휴대전화 인증, 정보 입력, 약관 동의, 완료 화면 제공. 개인정보·서비스·알림의 `자세히`는 관리자 최신 저장 내용을 고정 헤더·내부 스크롤 팝업으로 조회. SNS 가입에도 선택 알림 동의와 동일한 상세 팝업 제공 | 구현 완료·배포 대기 |
 | 온보딩 3단계 | 좌우 스와이프, 페이지 점, 다시 보지 않기, 마지막 로그인 버튼 이미지 적용. 로그인 버튼 원본 비율과 모서리가 잘리지 않도록 표시 | 완료 |
 
 ### 보호자 대시보드
@@ -158,6 +158,7 @@ npm run dev -- -p 3005
 | 운영 그리드 | 상세 패널이 있는 보호자·상품·결제·쿠폰 등 목록은 행 전체 선택 및 키보드 선택 지원 | 완료 |
 | QR/상품/결제/구독 | QR 생성·활성화·배정, 상품·디자인 관리, 결제/구독/배송/환불 관련 운영 기능 제공 | 완료 |
 | 광고/알림 | 광고 가격·거리·기간·예산, 광고 상태, 관리자 알림·메시지 템플릿 관리 | 완료 |
+| 서비스 규정 관리 | `개인정보/서비스이용/알림` 3개 탭에서 문단을 편집하고 문단별 굵기·14~24px 글씨 크기 설정, 추가·삭제 및 저장 가능. 저장값은 제한된 JSON 서식으로 검증 후 `service_regulations`에 저장되고 공개 no-store API로 회원가입 팝업에 즉시 반영 | 구현 완료·배포 대기 |
 
 관리자 세부 범위는 `deliverables/ADMIN_*.md`, 광고 세부 범위는 `deliverables/AD*.md` 및 `deliverables/META_*.md`를 참고한다.
 
@@ -197,6 +198,7 @@ Meta 권한 승인 전에도 관리자 계정으로 대시보드 상태를 검�
 | 대상자 등록 | `http://localhost:3005/?preview=subject-registration` |
 | 대상자 수정 | `http://localhost:3005/?preview=subject-edit` |
 | 대상자 등록 완료 | `http://localhost:3005/?preview=subject-registration-complete` |
+| 회원가입 약관 팝업 | `http://localhost:3005/?preview=signup-terms` |
 | 보호자 정보 | `http://localhost:3005/account/profile?preview=1` |
 | SNS 보호자 정보 | `http://localhost:3005/account/profile?preview=1&provider=google` |
 | 쿠폰함 | `http://localhost:3005/account/coupons?preview=1` |
@@ -231,6 +233,7 @@ git diff --check
 | `npm run test:password-reset-ui` | 비밀번호 재설정 UI |
 | `npm run test:signup-phone-ui` | 회원가입 휴대전화 단계 |
 | `npm run test:signup-profile-ui` | 회원가입 정보·약관 단계 |
+| `npm run test:service-regulations` | 관리자 규정 탭·서식·저장 검증과 회원가입 최신 약관 팝업 |
 | `npm run test:social-link` | SNS 계정 연결 |
 | `npm run test:onboarding` | 온보딩 |
 | `npm run test:dashboard-ui` | 보호자 대시보드 |
@@ -283,6 +286,7 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 | 커밋 | 내용 |
 | --- | --- |
+| `957553b` | 관리자 서비스 규정 편집, 공개 최신 조회 API 및 회원가입 약관 팝업 |
 | `cbd6044` | 노출 알림 닫기 확인 처리, 상태별 아이콘 수정 및 카카오맵 위치 이동 |
 | `9d79166` | 상품·광고 통합 결제 내역과 결제 상세 화면 개편 |
 | `f5fd50b` | 관리자·일반 사용자 광고 결제 완료 미리보기 분리 |
