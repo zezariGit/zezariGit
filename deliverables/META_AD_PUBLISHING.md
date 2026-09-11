@@ -113,6 +113,24 @@ There are no remaining Meta asset, token, Page, funding-source, policy, or API c
 - Reconcile reach, impressions, clicks, spend, and contact conversions.
 - Add scheduled retry and operator alerts for repeated publication failures.
 
+## 2026-09-11 Subject Selection Route Recovery
+
+- Production requests to `/?tab=dashboard&adSubject=...` failed before any Meta request because `DashboardTab` referenced `forceNewAd` without receiving it as a prop.
+- Restored the existing route chain: `HomePage -> GuardianDashboard -> DashboardTab -> AdCampaignModal`.
+- Subject selection now opens the existing distance/location, duration, summary, creative preview, and checkout flow.
+- Meta publication remains server-side and post-payment through `publishPaidSubjectAd()`; no Marketing API call occurs while selecting a subject or configuring targeting.
+- Added the development-only preview `/?preview=ad-campaign` and regression assertions for the complete prop chain and distance-to-duration-to-summary steps.
+
+### Meta Reference Alignment
+
+- Meta's official Marketing API materials require a registered app, access token, ad account, and applicable `ads_management`/`ads_read` access for API operations.
+- Meta's official ad creation sample separates campaign creation from the ad set targeting, budget, `start_time`, and `end_time` configuration, followed by image/creative/ad creation.
+- The application keeps the guardian's local configuration UI separate from those privileged server-side API calls and only publishes after payment.
+- References:
+  - `https://developers.meta.com/blog/updates-to-ads-management-standard-access-feature/`
+  - `https://github.com/facebook/facebook-php-business-sdk`
+  - `https://github.com/fbsamples/marketing-api-samples/blob/master/samples/samplecode/adcreation.py`
+
 ## 2026-08-03 Fixed Missing-Person Creative Template
 - The current advertisement creative uses `reference/실종광고 양식.png` as an exact fixed background copied to `public/assets/missing-ad-template.png`.
 - A browser Canvas creates a deterministic 1080 x 1350 JPEG instead of resizing a responsive DOM screenshot.

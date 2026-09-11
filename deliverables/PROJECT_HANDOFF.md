@@ -1,7 +1,9 @@
 # REAL_QR_FIND Current Project Handoff
 
-Last updated: 2026-09-11 KST  
-Application baseline commit: `dd1218e` (`main`)  
+Last updated: 2026-09-11 KST
+
+Application baseline commit: `328bafe` (`main`)
+
 Production: `https://zezari.family`
 
 이 문서는 다른 개발자 또는 AI 에이전트가 이전 대화 없이 현재 프로젝트를 이어서 수행하기 위한 기준 문서다. 과거 작업의 상세 근거는 `logs/DEV_HANDOFF_LOG.md`, 기능별 설계는 `deliverables/README.md`에서 찾는다.
@@ -31,7 +33,7 @@ Production: `https://zezari.family`
 | Vercel 프로젝트 | scope `zezari`, project `zezari` |
 | 대표 도메인 | `https://zezari.family` |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 배포 | commit `dd1218e`, deployment `dpl_AFvzA27Ew4FaRuiFSUXBeZt3iNBZ`, `READY` |
+| 최근 애플리케이션 기능 기준 | commit `328bafe`; 운영 상태는 `vercel inspect`로 확인 |
 
 ### 로컬 시작
 
@@ -138,6 +140,8 @@ npm run dev -- -p 3005
 | 광고 목록 | 최신순 카드, 전체/진행 중/광고 완료 필터. 진행 중 필터에 `광고 검토 중`과 `진행 중` 포함 | 완료 |
 | 광고 카드 | 포스터, 대상자, 지역, 기간, 금액, 도달 수, 상태 표시. 검토 중 도달 수는 `-` | 완료 |
 | 상태별 버튼 | 검토 중과 완료는 버튼 없음. 진행 중은 `추가/종료`. 추가는 같은 대상자의 새 광고 설정, 종료는 환불 불가 확인 후 완료 전환 | 완료 |
+| 실종신고 대상자 선택 | `/missing-report`에서 안전 상태 대상자를 선택하고 다음을 누르면 기존 광고 설정 모달로 이동. `HomePage -> GuardianDashboard -> DashboardTab -> AdCampaignModal`로 대상자와 새 광고 여부를 전달 | 완료 |
+| 광고 설정 | 기존 거리·위치 범위 선택, 기간 선택, 선택 요약, 광고 이미지 미리보기, 결제 화면 이동을 재사용. 이 단계에서는 Meta API를 호출하지 않음 | 완료 |
 | 관리자 상태 테스트 | 관리자 결제패스 광고는 Meta를 호출하지 않고 `광고 검토 중`으로 생성. 결제 완료 화면에서 광고 상태 테스트로 이동하고 관리자만 `진행 중` 전환 가능. 이후 기존 종료 기능으로 `광고 완료` 검증 가능 | 완료 |
 | 실제 Meta 광고 | 일반 결제 광고는 기존 Meta 자동 발행 경로 유지 | 조건부: Meta 앱 권한·검수 승인 필요 |
 
@@ -184,6 +188,7 @@ Meta 권한 승인 전에도 관리자 계정으로 대시보드 상태를 검�
 | 대상자 없는 대시보드 | `http://localhost:3005/?preview=dashboard-empty` |
 | 알림 팝오버 | `http://localhost:3005/?preview=dashboard-notifications` |
 | 설정 팝업 | `http://localhost:3005/?preview=settings` |
+| 실종 광고 설정 | `http://localhost:3005/?preview=ad-campaign` |
 | 대상자 미리보기 | `http://localhost:3005/?preview=subject-preview` |
 | 대상자 등록 | `http://localhost:3005/?preview=subject-registration` |
 | 대상자 수정 | `http://localhost:3005/?preview=subject-edit` |
@@ -266,6 +271,7 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 | 커밋 | 내용 |
 | --- | --- |
+| `328bafe` | 실종신고 대상자 선택 후 기존 거리·기간 광고 설정 화면 연결 복구 |
 | `dd1218e` | Meta 독립 관리자 광고 상태 테스트와 광고 대시보드 검증 |
 | `8aa8114` | 짧은 오입력도 유효하지 않은 쿠폰 코드로 분류 |
 | `766f16c` | 보호자 아이디 유지 및 하단 SNS 로그인 정보 표시 |

@@ -9014,3 +9014,33 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - After every feature or deployment, update `deliverables/PROJECT_HANDOFF.md` first with the current state, then append detailed and presentation summaries to the two logs.
 - Preserve historical logs; do not rewrite them as current truth.
 - Keep incomplete external/provider work in `deliverables/FOLLOW_UP_TASKS.md` until production verification is complete.
+
+## 2026-09-11 KST - Missing Advertisement Setup Route Recovery
+
+### User Request
+- Fix the server error after selecting a subject in `온라인 실종신고` and pressing Next.
+- Reconnect the previously implemented region/range/duration advertising flow and compare the architecture with Meta developer guidance.
+
+### Root Cause
+- Production Vercel logs showed `ReferenceError: forceNewAd is not defined` on `GET /?tab=dashboard&adSubject=...`.
+- `GuardianDashboard` received `forceNewAd`, but the nested `DashboardTab` neither received nor destructured the value before passing it to `AdCampaignModal`.
+- The failure happened during server rendering before any Meta Marketing API request.
+
+### Reflected Work
+- Passed `forceNewAd` from `GuardianDashboard` into `DashboardTab` and then into `AdCampaignModal`.
+- Preserved the existing distance/location, duration, summary, captured creative, checkout, and post-payment Meta publication implementation.
+- Added development preview `/?preview=ad-campaign`.
+- Extended `scripts/dashboard-ui-regression.mjs` to verify the full prop chain and the distance -> duration -> summary flow.
+- Confirmed Meta's current Marketing API access model and official ad-creation sample keep permissions and API object creation separate from the local targeting form.
+
+### Verification
+- Production failure reproduced and Vercel server error identified.
+- `npm run test:dashboard-ui`: passed.
+- `npm run test:ad-dashboard`: passed.
+- `npm run test:subject-flow`: passed.
+- `npm run security:check`: passed.
+- `npm run build`: passed with Next.js 16.3.0.
+- Local browser: distance selection, nationwide targeting, three-day duration, summary, creative preview, and payment button rendered without console errors.
+
+### Feature Commit
+- `328bafe fix: restore missing ad setup flow`
