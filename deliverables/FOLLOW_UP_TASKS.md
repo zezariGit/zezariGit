@@ -12,3 +12,12 @@
 
 - Move an item to completed only after its provider console configuration and production login flow are both verified.
 - Never record provider secrets, access tokens, or environment-variable values in this document.
+
+## Advertising
+
+- [x] Administrator UI testing: test-payment ads can move through `광고 검토 중` -> `진행 중` -> `광고 완료` without calling Meta.
+- [ ] Meta production publishing: complete app review and required Marketing API permissions, verify the ad account/Page connection, and test a real paid ad from publication through status synchronization.
+
+## Device Verification
+
+- [ ] iOS Safari/PWA: re-test microphone permission guidance, 30-second guardian voice recording, subject registration persistence, and saved-audio playback on a physical device.

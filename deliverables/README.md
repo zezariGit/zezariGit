@@ -8,6 +8,7 @@ This folder stores official implementation outputs for the REAL_QR_FIND project.
 - Visual material prompts should be stored under `image_prompts/`.
 
 ## Current Deliverables
+- `PROJECT_HANDOFF.md`: canonical current implementation status, screen requirements, development environment, test commands, deployment procedure, and external follow-up items for developer/AI continuation.
 - `image_prompts/IMAGE_PROMPTS.md`: cumulative prompt archive for diagrams and generated visuals.
 - `INTEGRATION_SETUP.md`: Vercel and Turso integration status and setup guide.
 - `AUTH_SETUP.md`: Google login/signup setup requirements and environment variable plan.

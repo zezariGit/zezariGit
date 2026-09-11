@@ -8978,3 +8978,39 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Deployment
 - Feature commits `b469ef8` and `581fd1d` were pushed to GitHub `main`.
 - Vercel production deployment `dpl_C7aV1X4m3kQVz6Cr89AyAiKgMHJA` reached `READY` and owns the `https://zezari.family` alias.
+
+## 2026-09-11 KST - Canonical AI And Developer Handoff Snapshot
+
+### User Request
+- Maintain cumulative requirements, screen-by-screen implementation status, and GitHub/Vercel development environment information so another AI agent can continue immediately without the prior conversation.
+
+### Reflected Work
+- Added root `README.md` as the repository entry point for developers and AI agents.
+- Added `deliverables/PROJECT_HANDOFF.md` as the canonical current-state snapshot.
+- Consolidated the current architecture, source ownership, external services, environment-variable policy, local startup, preview URLs, test commands, GitHub/Vercel deployment flow, and operational safety boundaries.
+- Consolidated the implemented state of authentication, onboarding, guardian dashboard, notifications, subject registration/edit/preview/completion, settings, guardian profile, coupons, advertising dashboard, administrator tools, and public QR finder flows.
+- Documented the administrator-only Meta-independent advertising test flow and separated it from real Meta publishing.
+- Recorded pending external verification for Meta, Naver, Kakao, Facebook, iOS microphone/recording, and operating-system Push limits.
+- Updated `00_PROJECT_RULES.md` so future agents must read and maintain the canonical handoff snapshot.
+- Updated `deliverables/README.md` and `deliverables/FOLLOW_UP_TASKS.md` to link the handoff snapshot and active external verification tasks.
+
+### Files Changed
+- `README.md`
+- `00_PROJECT_RULES.md`
+- `deliverables/PROJECT_HANDOFF.md`
+- `deliverables/README.md`
+- `deliverables/FOLLOW_UP_TASKS.md`
+- `logs/DEV_HANDOFF_LOG.md`
+- `logs/PRESENTATION_PROGRESS_LOG.md`
+
+### Verification
+- Confirmed the documented Git remote, `main` branch, Vercel project link, production domain, runtime versions, package scripts, application routes, preview routes, and latest deployed advertising commit against the repository and local Vercel metadata.
+- Confirmed no secret values are included in the new documentation.
+- README local-link check: passed.
+- `git diff --check`: passed.
+- `npm run build`: passed with Next.js 16.3.0.
+
+### Maintenance Rule
+- After every feature or deployment, update `deliverables/PROJECT_HANDOFF.md` first with the current state, then append detailed and presentation summaries to the two logs.
+- Preserve historical logs; do not rewrite them as current truth.
+- Keep incomplete external/provider work in `deliverables/FOLLOW_UP_TASKS.md` until production verification is complete.

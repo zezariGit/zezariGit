@@ -7,6 +7,8 @@
 ## Required Living Logs
 Two cumulative log files must be maintained whenever the user requests work or a development decision is made.
 
+Before starting implementation, read `deliverables/PROJECT_HANDOFF.md`. It is the canonical current-state snapshot and must be updated after each completed feature, verification, or deployment so a new developer or AI agent can continue without the prior chat.
+
 1. `logs/DEV_HANDOFF_LOG.md`
    - Purpose: technical handoff log for developers and AI agents.
    - Must include requirements, decisions, architecture, changed files, implementation notes, verification, known issues, and next actions.
