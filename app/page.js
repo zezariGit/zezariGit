@@ -35,13 +35,19 @@ export default async function HomePage({ searchParams }) {
   const authError = resolvedSearchParams?.error || "";
   const authMode = process.env.NODE_ENV === "development" && resolvedSearchParams?.preview === "find-id-found"
     ? "login-id-found"
+    : process.env.NODE_ENV === "development" && resolvedSearchParams?.preview === "signup-terms"
+      ? "signup"
     : resolvedSearchParams?.signup === "1"
     ? "signup"
     : resolvedSearchParams?.findId === "1"
       ? "login-id"
       : "login";
-  const signupPreviewStep = process.env.NODE_ENV === "development" && resolvedSearchParams?.preview === "signup-complete"
-    ? "done"
+  const signupPreviewStep = process.env.NODE_ENV === "development"
+    ? resolvedSearchParams?.preview === "signup-complete"
+      ? "done"
+      : resolvedSearchParams?.preview === "signup-terms"
+        ? "profile"
+        : undefined
     : undefined;
   const dashboardPreview = process.env.NODE_ENV === "development"
     ? String(resolvedSearchParams?.preview || "")

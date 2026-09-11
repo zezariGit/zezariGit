@@ -10,6 +10,7 @@ import AdminWorkspace from "./admin-workspace";
 import AdminExportButton from "./export-button";
 import AdPricingForm from "./ad-pricing-form";
 import ProductAdminWorkspace from "./product-admin-catalog-form";
+import ServiceRegulationEditor from "./service-regulation-editor";
 import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
 import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
 import {
@@ -39,6 +40,7 @@ import {
   getAdPricingSettings,
   getImageUploadSettings,
   getQrAdminData,
+  getServiceRegulations,
   isDbAdminSession,
 } from "../../lib/db";
 import {
@@ -65,6 +67,7 @@ import {
   saveAdminMessageAction,
   saveAdminMessageTemplateAction,
   saveLocationStaffPermissionAction,
+  saveServiceRegulationAction,
   recordLocationDisclosureAction,
   setSubscriptionAdminMemoAction,
   setSubscriptionAdminTestAction,
@@ -110,7 +113,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "image-uploads", "orders", "subscriptions", "ads", "ad-pricing", "missing", "locations", "location-security", "safe-phones", "notifications", "message-templates", "inquiries"].includes(resolvedSearchParams?.section)
+  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "image-uploads", "orders", "subscriptions", "ads", "ad-pricing", "missing", "locations", "location-security", "safe-phones", "notifications", "message-templates", "service-regulations", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -246,6 +249,7 @@ export default async function AdminPage({ searchParams }) {
   const safePhonePoolData = activeSection === "safe-phones" ? await getAdminSafePhonePoolData(safePhoneFilters, selectedSafePhoneId) : null;
   const messagesData = activeSection === "notifications" ? await getAdminMessagesData(messageFilters, composeMessage ? "new" : selectedMessageId) : null;
   const messageTemplatesData = activeSection === "message-templates" ? await getAdminMessageTemplatesData(templateFilters, selectedTemplateId) : null;
+  const serviceRegulationsData = activeSection === "service-regulations" ? await getServiceRegulations() : null;
   const inquiriesData = activeSection === "inquiries" ? await getAdminInquiriesData() : null;
   const qrItems = qrData ? await withQrImages(qrData.qrCodes) : [];
   const selectedSubjectQrImage = adminSubjectsData?.selectedSubject?.qr_target_url
@@ -295,6 +299,8 @@ export default async function AdminPage({ searchParams }) {
                     ? "알림 관리"
                     : activeSection === "message-templates"
                       ? "메시지 템플릿"
+                    : activeSection === "service-regulations"
+                      ? "서비스 규정 관리"
               : activeSection === "inquiries"
                 ? "고객문의 관리"
                 : "보호자 관리";
@@ -335,6 +341,8 @@ export default async function AdminPage({ searchParams }) {
                     ? "가입 보호자에게 푸시 알림 메시지를 작성, 저장, 발송하고 결과를 확인합니다."
                     : activeSection === "message-templates"
                       ? "자동/수동 메시지 템플릿의 채널, 대상, 제목과 내용을 관리합니다."
+                    : activeSection === "service-regulations"
+                      ? "회원가입에서 확인하는 개인정보, 서비스 이용 및 알림 동의 내용을 관리합니다."
               : activeSection === "inquiries"
                 ? "접수된 고객문의의 제목, 작성자, 상태와 작성일시를 조회합니다."
                 : "보호자 목록을 조회하고 배송지, 등록대상자, 이용권, 결제, 광고와 관리메모를 확인합니다.";
@@ -387,6 +395,11 @@ export default async function AdminPage({ searchParams }) {
             <NotificationManagementSection messagesData={messagesData} composeMessage={composeMessage} />
           ) : activeSection === "message-templates" ? (
             <MessageTemplateManagementSection templatesData={messageTemplatesData} />
+          ) : activeSection === "service-regulations" ? (
+            <ServiceRegulationManagementSection
+              regulations={serviceRegulationsData}
+              selectedType={resolvedSearchParams?.regulation || "privacy"}
+            />
           ) : activeSection === "inquiries" ? (
             <InquiryManagementSection inquiriesData={inquiriesData} />
           ) : (
@@ -396,6 +409,36 @@ export default async function AdminPage({ searchParams }) {
       </section>
       <StatusToast message={notice} type={noticeType} />
     </main>
+  );
+}
+
+function ServiceRegulationManagementSection({ regulations, selectedType }) {
+  const types = ["privacy", "service", "notification"];
+  const activeType = types.includes(selectedType) ? selectedType : "privacy";
+  const labels = { privacy: "개인정보", service: "서비스이용", notification: "알림" };
+
+  return (
+    <section className="admin-panel service-regulation-admin" aria-labelledby="service-regulation-admin-title">
+      <div className="service-regulation-admin-heading">
+        <div>
+          <h2 id="service-regulation-admin-title">규정 / 안내 텍스트 편집</h2>
+          <p>회원가입의 자세히 팝업에 표시할 문단을 선택해 내용과 서식을 수정합니다.</p>
+        </div>
+        {regulations[activeType].updatedAt && <span>최근 저장 {formatStandardDateTime(regulations[activeType].updatedAt)}</span>}
+      </div>
+      <nav className="service-regulation-tabs" aria-label="서비스 규정 항목">
+        {types.map((type) => (
+          <Link
+            className={type === activeType ? "active" : ""}
+            href={`/admin?section=service-regulations&regulation=${type}`}
+            key={type}
+          >
+            {labels[type]}
+          </Link>
+        ))}
+      </nav>
+      <ServiceRegulationEditor regulation={regulations[activeType]} saveAction={saveServiceRegulationAction} />
+    </section>
   );
 }
 

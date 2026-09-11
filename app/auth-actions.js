@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { PasswordResetPanel } from "./password-reset-panel";
 import { LoginIdRecoveryPanel } from "./login-id-recovery-panel";
 import PasswordVisibilityIcon from "./password-visibility-icon";
+import ServiceRegulationModal from "./service-regulation-modal";
+import { DEFAULT_SERVICE_REGULATIONS } from "../lib/service-regulations";
 
 const LOGIN_ERROR_MESSAGE = "아이디 또는 비밀번호가 일치하지 않습니다.";
 
@@ -30,21 +32,21 @@ const socialProviders = [
   },
 ];
 
-export function LoginAuthPanel({ enabledProviders = [], authError = "", initialMode = "login", initialSignupStep, qrClaim = false }) {
+export function LoginAuthPanel({ enabledProviders = [], authError = "", initialMode = "login", initialSignupStep, qrClaim = false, serviceRegulations = DEFAULT_SERVICE_REGULATIONS }) {
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState(
-    initialMode === "signup" || initialSignupStep === "done"
+    initialMode === "signup" || ["profile", "done"].includes(initialSignupStep)
       ? "signup"
       : initialMode === "login-id" || initialMode === "login-id-found"
         ? "login-id"
         : "login",
   );
   const [message, setMessage] = useState(authError ? LOGIN_ERROR_MESSAGE : "");
-  const [signupStep, setSignupStep] = useState(initialSignupStep === "done" ? "done" : "phone");
+  const [signupStep, setSignupStep] = useState(["profile", "done"].includes(initialSignupStep) ? initialSignupStep : "phone");
   const [signup, setSignup] = useState({
     email: "",
     phone: "",
@@ -61,8 +63,8 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
     notificationAgreed: false,
   });
   const [codeInput, setCodeInput] = useState(["", "", "", "", "", ""]);
-  const [verifiedPhone, setVerifiedPhone] = useState("");
-  const [phoneVerificationToken, setPhoneVerificationToken] = useState("");
+  const [verifiedPhone, setVerifiedPhone] = useState(initialSignupStep === "profile" ? "010-1234-5678" : "");
+  const [phoneVerificationToken, setPhoneVerificationToken] = useState(initialSignupStep === "profile" ? "preview-token" : "");
   const [signupLoading, setSignupLoading] = useState(false);
   const [phoneVerificationLoading, setPhoneVerificationLoading] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
@@ -72,6 +74,7 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
   const [phoneTouched, setPhoneTouched] = useState(false);
   const [signupPhoneError, setSignupPhoneError] = useState("");
   const [signupCodeError, setSignupCodeError] = useState("");
+  const [openRegulationType, setOpenRegulationType] = useState("");
 
   useEffect(() => {
     const savedLoginId = window.localStorage.getItem("zezari:remember-login-id") || "";
@@ -500,12 +503,12 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
               <small className={signupPasswordValid ? "valid" : ""}>영문, 숫자, 특수문자를 포함하여 8자 이상 입력해 주세요.</small>
             </label>
 
-            <div className={`signup-profile-terms ${profileTouched.terms && !requiredTermsAgreed ? "invalid" : ""}`} onBlur={() => touchProfileField("terms")}>
+            <div className={`signup-profile-terms ${profileTouched.terms && !requiredTermsAgreed ? "invalid" : ""}`}>
               <strong>약관 동의</strong>
               <label><input type="checkbox" checked={allTermsAgreed} onChange={(event) => { const checked = event.target.checked; setSignup((current) => ({ ...current, privacyAgreed: checked, serviceAgreed: checked, notificationAgreed: checked })); }} /><span>전체 동의</span></label>
-              <label><input type="checkbox" checked={signup.privacyAgreed} onChange={(event) => updateSignup("privacyAgreed", event.target.checked)} /><span>(필수) 개인정보 수집 및 이용 동의</span><button type="button">자세히</button></label>
-              <label><input type="checkbox" checked={signup.serviceAgreed} onChange={(event) => updateSignup("serviceAgreed", event.target.checked)} /><span>(필수) 서비스 이용 약관 동의</span><button type="button">자세히</button></label>
-              <label><input type="checkbox" checked={signup.notificationAgreed} onChange={(event) => updateSignup("notificationAgreed", event.target.checked)} /><span>(선택) 알림 동의</span><button type="button">자세히</button></label>
+              <label><input type="checkbox" checked={signup.privacyAgreed} onChange={(event) => updateSignup("privacyAgreed", event.target.checked)} /><span>(필수) 개인정보 수집 및 이용 동의</span><button type="button" onClick={() => setOpenRegulationType("privacy")}>자세히</button></label>
+              <label><input type="checkbox" checked={signup.serviceAgreed} onChange={(event) => updateSignup("serviceAgreed", event.target.checked)} /><span>(필수) 서비스 이용 약관 동의</span><button type="button" onClick={() => setOpenRegulationType("service")}>자세히</button></label>
+              <label><input type="checkbox" checked={signup.notificationAgreed} onChange={(event) => updateSignup("notificationAgreed", event.target.checked)} /><span>(선택) 알림 동의</span><button type="button" onClick={() => setOpenRegulationType("notification")}>자세히</button></label>
               {profileTouched.terms && !requiredTermsAgreed && <small role="alert">필수 약관에 모두 동의해 주세요.</small>}
             </div>
 
@@ -535,6 +538,13 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
         )}
 
         {message && <p className="login-message" role="status">{message}</p>}
+        {openRegulationType && (
+          <ServiceRegulationModal
+            type={openRegulationType}
+            initialDocument={serviceRegulations[openRegulationType]}
+            onClose={() => setOpenRegulationType("")}
+          />
+        )}
       </section>
     );
   }

@@ -2,6 +2,7 @@
 
 import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
+import ServiceRegulationModal from "./service-regulation-modal";
 
 export default function SocialSignupCompletion({ guardian, session, qrClaim = false }) {
   const providerLabel = socialProviderLabel(session?.user?.provider);
@@ -13,6 +14,7 @@ export default function SocialSignupCompletion({ guardian, session, qrClaim = fa
     email: guardian?.email || guardian?.google_email || session?.user?.email || "",
     privacyAgreed: false,
     serviceAgreed: false,
+    notificationAgreed: false,
   });
   const [codeInput, setCodeInput] = useState(["", "", "", "", "", ""]);
   const [verifiedPhone, setVerifiedPhone] = useState("");
@@ -22,6 +24,7 @@ export default function SocialSignupCompletion({ guardian, session, qrClaim = fa
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [phoneVerificationLoading, setPhoneVerificationLoading] = useState(false);
+  const [openRegulationType, setOpenRegulationType] = useState("");
 
   useEffect(() => {
     if (seconds <= 0) return undefined;
@@ -299,7 +302,7 @@ export default function SocialSignupCompletion({ guardian, session, qrClaim = fa
               <em>인증완료</em>
             </label>
             <div className="terms-box">
-              <strong>필수동의</strong>
+              <strong>약관 동의</strong>
               <label>
                 <input
                   type="checkbox"
@@ -307,7 +310,7 @@ export default function SocialSignupCompletion({ guardian, session, qrClaim = fa
                   onChange={(event) => update("privacyAgreed", event.target.checked)}
                 />
                 <span>개인정보 수집 및 이용 동의 (필수)</span>
-                <button type="button">자세히</button>
+                <button type="button" onClick={() => setOpenRegulationType("privacy")}>자세히</button>
               </label>
               <label>
                 <input
@@ -316,7 +319,16 @@ export default function SocialSignupCompletion({ guardian, session, qrClaim = fa
                   onChange={(event) => update("serviceAgreed", event.target.checked)}
                 />
                 <span>서비스 이용 약관 동의 (필수)</span>
-                <button type="button">자세히</button>
+                <button type="button" onClick={() => setOpenRegulationType("service")}>자세히</button>
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={form.notificationAgreed}
+                  onChange={(event) => update("notificationAgreed", event.target.checked)}
+                />
+                <span>알림 동의 (선택)</span>
+                <button type="button" onClick={() => setOpenRegulationType("notification")}>자세히</button>
               </label>
             </div>
             <button className="login-submit" type="submit" disabled={loading}>
@@ -337,6 +349,9 @@ export default function SocialSignupCompletion({ guardian, session, qrClaim = fa
         )}
 
         {message && <p className="login-message" role="status">{message}</p>}
+        {openRegulationType && (
+          <ServiceRegulationModal type={openRegulationType} onClose={() => setOpenRegulationType("")} />
+        )}
       </div>
     </section>
   );

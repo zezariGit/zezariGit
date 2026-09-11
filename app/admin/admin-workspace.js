@@ -25,6 +25,7 @@ const MENU_ITEMS = [
   { id: "safe-phones", label: "안심번호 관리", href: "/admin?section=safe-phones", icon: "phone" },
   { id: "notifications", label: "알림 관리", href: "/admin?section=notifications", icon: "alert" },
   { id: "message-templates", label: "메시지 템플릿", href: "/admin?section=message-templates", icon: "chat" },
+  { id: "service-regulations", label: "서비스 규정 관리", href: "/admin?section=service-regulations", icon: "document" },
   { id: "inquiries", label: "고객 문의", href: "/admin?section=inquiries", icon: "chat" },
   { id: "admins", label: "관리자 관리", href: "/admin?section=admins", icon: "shield" },
 ];
@@ -221,6 +222,15 @@ function iconPath(name) {
           <path d="M4 6.5c0-1.4 1.1-2.5 2.5-2.5h11C18.9 4 20 5.1 20 6.5v6c0 1.4-1.1 2.5-2.5 2.5H11l-5 4v-4.2A2.5 2.5 0 0 1 4 12.5z" />
           <path d="M8 8.5h8" />
           <path d="M8 12h5" />
+        </>
+      );
+    case "document":
+      return (
+        <>
+          <path d="M6 3.5h8l4 4V20H6z" />
+          <path d="M14 3.5V8h4" />
+          <path d="M9 12h6" />
+          <path d="M9 15.5h6" />
         </>
       );
     case "screen":

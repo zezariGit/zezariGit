@@ -22,6 +22,7 @@ import {
   saveAdminCoupon,
   saveAdminMessage,
   saveAdminMessageTemplate,
+  saveServiceRegulation,
   recordLocationDisclosure,
   saveLocationStaffPermission,
   setAdminSubjectAdMemo,
@@ -107,6 +108,21 @@ export async function setImageUploadSettingsAction(formData) {
     redirect(withNotice("/admin?section=image-uploads", error.message || "이미지 제한을 저장하지 못했습니다.", "error"));
   }
   redirect(withNotice("/admin?section=image-uploads", "이미지 업로드 제한이 저장되었습니다."));
+}
+
+export async function saveServiceRegulationAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+  const type = String(formData.get("regulationType") || "privacy");
+
+  try {
+    await saveServiceRegulation(formData, session);
+    revalidatePath("/");
+    revalidatePath("/admin");
+  } catch (error) {
+    redirect(withNotice(`/admin?section=service-regulations&regulation=${encodeURIComponent(type)}`, error.message || "서비스 규정을 저장하지 못했습니다.", "error"));
+  }
+  redirect(withNotice(`/admin?section=service-regulations&regulation=${encodeURIComponent(type)}`, "서비스 규정이 저장되었습니다."));
 }
 
 export async function setGuardianAdminMemoAction(formData) {
