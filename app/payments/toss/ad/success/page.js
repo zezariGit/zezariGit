@@ -20,13 +20,17 @@ export default async function TossAdSuccessPage({ searchParams }) {
   const orderId = String(params?.orderId || "").trim();
   const amount = Number(params?.amount || 0);
   const adminPass = String(params?.adminPass || "") === "1";
-  const preview = process.env.NODE_ENV === "development" && params?.preview === "1";
+  const previewMode = process.env.NODE_ENV === "development" ? String(params?.preview || "") : "";
+  const preview = ["1", "admin", "user"].includes(previewMode);
 
   if (preview) {
+    const previewAdmin = previewMode !== "user";
     return (
       <AdPaymentSuccessClient
-        isAdmin={true}
-        publicationMessage="관리자 테스트 결제가 완료되었습니다. Meta에 발행하지 않고 광고 검토 중 상태로 생성했습니다. [해당 문구는 관리자만 볼 수 있습니다]"
+        isAdmin={previewAdmin}
+        publicationMessage={previewAdmin
+          ? "관리자 테스트 결제가 완료되었습니다. Meta에 발행하지 않고 광고 검토 중 상태로 생성했습니다. [해당 문구는 관리자만 볼 수 있습니다]"
+          : ""}
       />
     );
   }
