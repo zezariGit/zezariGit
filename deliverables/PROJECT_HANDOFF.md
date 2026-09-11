@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-11 KST
 
-Application baseline commit: `f5fd50b` (`main`)
+Application baseline commit: `9d79166` (`main`)
 
 Production: `https://zezari.family`
 
@@ -32,9 +32,9 @@ Production: `https://zezari.family`
 | GitHub | `https://github.com/zezariGit/zezariGit.git` |
 | Vercel 프로젝트 | scope `zezari`, project `zezari` |
 | 대표 도메인 | `https://zezari.family` |
-| 최근 확인 운영 배포 | `dpl_8aXPhgmNbrzEMfN4TRW4R6HqRUG4` (`READY`, 광고 결제 완료 개편 및 112 경찰 신고 연계) |
+| 최근 확인 운영 배포 | `dpl_4DeUFiDBvVYF5vALrLTcpzY6T2zn` (`READY`, 결제 및 서비스 현황 개편) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | commit `f5fd50b`; 운영 상태는 `vercel inspect`로 확인 |
+| 최근 애플리케이션 기능 기준 | commit `9d79166`; 운영 상태는 `vercel inspect`로 확인 |
 
 ### 로컬 시작
 
@@ -133,6 +133,7 @@ npm run dev -- -p 3005
 | 아이디/SNS 표시 | 아이디 입력값은 그대로 표시하고, SNS 계정은 입력창 아래 `구글/네이버/카카오 로그인` 정보 표시. 일반 아이디 변경은 형식·중복확인 후 유효 | 완료 |
 | 비밀번호 변경 | 현재 비밀번호 확인 후 새 비밀번호 입력 가능. 불일치 시 오류, 입력 초기화 및 영역 접힘. 새 비밀번호 정책과 확인 일치 시 변경 가능. 회원가입과 동일한 눈 아이콘 사용 | 완료 |
 | 쿠폰함 | 코드 등록, 사용 가능/완료 목록, 사용완료 회색 스타일, 빈 목록 유지. 공백만 미입력 오류이며 길이와 무관하게 틀린 코드는 `유효하지 않은 쿠폰 코드입니다.` 표시 | 완료 |
+| 결제 및 서비스 현황 | 상품 구매와 온라인 실종광고 결제를 실제 백엔드 데이터에서 불러와 최신순 통합 표시. 상태를 색상·문구로 구분하고 목록 내부 스크롤, 빈 상태, 결제별 읽기 전용 상세 페이지를 제공. 상품 상세는 주문·배송·결제·취소 정보, 광고 상세는 대상자·광고 기간·결제 정보를 표시 | 완료 |
 
 ### 광고 대시보드 및 실종 광고
 
@@ -198,6 +199,11 @@ Meta 권한 승인 전에도 관리자 계정으로 대시보드 상태를 검�
 | 보호자 정보 | `http://localhost:3005/account/profile?preview=1` |
 | SNS 보호자 정보 | `http://localhost:3005/account/profile?preview=1&provider=google` |
 | 쿠폰함 | `http://localhost:3005/account/coupons?preview=1` |
+| 결제 및 서비스 현황 | `http://localhost:3005/account/billing?preview=1` |
+| 결제 내역 없음 | `http://localhost:3005/account/billing?preview=empty` |
+| 광고 결제 상세 | `http://localhost:3005/account/billing/ad/preview-ad?preview=1` |
+| 상품 결제 상세 | `http://localhost:3005/account/billing/order/preview-bracelet?preview=1` |
+| 취소 결제 상세 | `http://localhost:3005/account/billing/order/preview-necklace?preview=1` |
 | 광고 대시보드 | `http://localhost:3005/account/ads?preview=1&testAd=preview-review` |
 | 광고 진행 필터 | `http://localhost:3005/account/ads?status=running&preview=1&testAd=preview-review` |
 | 광고 완료 필터 | `http://localhost:3005/account/ads?status=done&preview=1` |
@@ -232,6 +238,7 @@ git diff --check
 | `npm run test:guardian-profile-ui` | 보호자 정보 |
 | `npm run test:coupon-registration` | 쿠폰 등록 오류 분류 |
 | `npm run test:ad-dashboard` | 광고 상태·필터·버튼·테스트 전환 |
+| `npm run test:billing-history` | 상품·광고 통합 결제 목록과 소유자별 상세 화면 |
 | `npm run test:admin-phone-otp` | 관리자 휴대전화 인증 예외 |
 | `npm run test:admin-grid` | 관리자 행 전체 선택 |
 | `npm run test:push` | Push 구독·아이콘·서비스 워커 |
@@ -275,6 +282,7 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 | 커밋 | 내용 |
 | --- | --- |
+| `9d79166` | 상품·광고 통합 결제 내역과 결제 상세 화면 개편 |
 | `f5fd50b` | 관리자·일반 사용자 광고 결제 완료 미리보기 분리 |
 | `0ef3ebb` | 광고 테스트 결제 안내를 관리자 전용으로 제한하고 전용 문구 추가 |
 | `6e7c669` | 광고 결제 완료 이미지 반영 및 112 경찰 신고 연계 팝업 구현 |

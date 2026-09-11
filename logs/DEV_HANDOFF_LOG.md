@@ -9190,3 +9190,32 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Deployment
 - Not requested; preview modes remain development-only.
+
+## 2026-09-11 KST - Guardian Payment And Service History Rebuild
+
+### User Request
+- Rebuild `설정 > 결제 및 서비스 현황` from the supplied list and detail references.
+- Merge product purchases and online missing-person advertisement payments into one newest-first list backed by production data.
+- Show product, amount, colored payment status, and payment time; keep the list internally scrollable.
+- Open a separate read-only detail page when a payment is selected, then deploy the result.
+
+### Reflected Work
+- Replaced the old subscription-oriented billing screen with a focused payment history matching the supplied mobile references.
+- Added `getGuardianBillingData().payments`, combining guardian-owned `product_orders` and `subject_ads`, refund information, normalized payment states, and newest-first sorting.
+- Added guardian-scoped payment detail resolution so another guardian's order or advertisement cannot be opened by changing the URL.
+- Added `/account/billing/[kind]/[id]` with separate service/order, shipping, payment, and cancellation sections as applicable.
+- Copied the supplied promotion, shopping, and empty-receipt images to `public/assets/billing/` and used them directly.
+- Added development previews for populated, empty, advertisement detail, product detail, and cancelled detail states.
+
+### Verification
+- `npm run test:billing-history`: passed.
+- `npm run security:check`: passed.
+- `npm run build`: passed with Next.js 16.3.0 and the new dynamic billing detail route.
+- `git diff --check`: passed.
+- Browser checks confirmed newest-first cards, internal list scroll, empty state, advertisement detail, cancelled product detail, no horizontal overflow, no error overlay, and zero browser console warnings/errors.
+
+### Deployment
+- Feature commit `9d79166` pushed to GitHub `main`.
+- Vercel deployment `dpl_4DeUFiDBvVYF5vALrLTcpzY6T2zn` reached `READY` and owns `https://zezari.family` plus compatibility aliases.
+- Production root, billing route, and all three billing assets returned HTTP 200.
+- Vercel error-log query returned no errors.
