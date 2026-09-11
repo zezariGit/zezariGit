@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-11 KST
 
-Application baseline commit: `0ef3ebb` (`main`)
+Application baseline commit: `f5fd50b` (`main`)
 
 Production: `https://zezari.family`
 
@@ -34,7 +34,7 @@ Production: `https://zezari.family`
 | 대표 도메인 | `https://zezari.family` |
 | 최근 확인 운영 배포 | `dpl_8aXPhgmNbrzEMfN4TRW4R6HqRUG4` (`READY`, 광고 결제 완료 개편 및 112 경찰 신고 연계) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | commit `0ef3ebb`; 운영 상태는 `vercel inspect`로 확인 |
+| 최근 애플리케이션 기능 기준 | commit `f5fd50b`; 운영 상태는 `vercel inspect`로 확인 |
 
 ### 로컬 시작
 
@@ -201,7 +201,8 @@ Meta 권한 승인 전에도 관리자 계정으로 대시보드 상태를 검�
 | 광고 대시보드 | `http://localhost:3005/account/ads?preview=1&testAd=preview-review` |
 | 광고 진행 필터 | `http://localhost:3005/account/ads?status=running&preview=1&testAd=preview-review` |
 | 광고 완료 필터 | `http://localhost:3005/account/ads?status=done&preview=1` |
-| 광고 결제 완료 화면 | `http://localhost:3005/payments/toss/ad/success?preview=1` |
+| 광고 결제 완료 화면 - 관리자 | `http://localhost:3005/payments/toss/ad/success?preview=admin` |
+| 광고 결제 완료 화면 - 일반 사용자 | `http://localhost:3005/payments/toss/ad/success?preview=user` |
 
 ## 7. 테스트 명령
 
@@ -274,6 +275,7 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 | 커밋 | 내용 |
 | --- | --- |
+| `f5fd50b` | 관리자·일반 사용자 광고 결제 완료 미리보기 분리 |
 | `0ef3ebb` | 광고 테스트 결제 안내를 관리자 전용으로 제한하고 전용 문구 추가 |
 | `6e7c669` | 광고 결제 완료 이미지 반영 및 112 경찰 신고 연계 팝업 구현 |
 | `0206956` | 광고 대시보드 추가 경로와 진행 상태 전용 종료 규칙 보강 |

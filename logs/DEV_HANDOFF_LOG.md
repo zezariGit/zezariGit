@@ -9168,3 +9168,25 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 
 ### Deployment
 - Not requested in this turn.
+
+## 2026-09-11 KST - Non-Administrator Advertisement Success Preview
+
+### User Request
+- Open a preview of the advertisement payment completion screen for a non-administrator.
+
+### Reflected Work
+- Added development-only preview modes `preview=admin` and `preview=user` while preserving legacy `preview=1` as the administrator preview.
+- The user preview passes no administrator publication message and retains the common completion graphic and police-report controls.
+- Extended the advertisement dashboard regression test to lock the preview-mode separation.
+
+### Verification
+- `http://localhost:3005/payments/toss/ad/success?preview=user` returned HTTP 200.
+- Browser snapshot confirmed the administrator-only notice was absent while the payment completion and 112 guidance remained visible.
+- `npm run test:ad-dashboard`: passed.
+- `npm run build`: passed with Next.js 16.3.0 and all 39 routes generated.
+
+### Feature Commit
+- `f5fd50b test: add non-admin ad success preview`
+
+### Deployment
+- Not requested; preview modes remain development-only.
