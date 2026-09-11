@@ -20025,6 +20025,361 @@ button:disabled:hover {
   box-shadow: 0 0 0 2px rgb(0 165 72 / 10%);
 }
 
+.billing-history-page,
+.billing-detail-page {
+  min-height: 100dvh;
+  padding: 0;
+  background: #fff;
+}
+
+.account-page .account-panel.billing-history-panel,
+.account-page .account-panel.billing-detail-panel {
+  width: 390px;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 100dvh;
+  align-content: start;
+  gap: 0;
+  padding: 0 15px 28px;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+}
+
+.billing-history-panel .account-topbar,
+.billing-detail-panel .account-topbar {
+  min-height: 64px;
+}
+
+.billing-history-panel .account-back-link,
+.billing-detail-panel .account-back-link {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  background: transparent;
+  color: #111;
+  font-size: 36px;
+  font-weight: 400;
+}
+
+.billing-history-panel .account-topbar h1,
+.billing-detail-panel .account-topbar h1 {
+  color: #111;
+  font-size: 19px;
+  font-weight: 900;
+}
+
+.billing-history-section {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 17px;
+  padding: 18px 1px 0;
+  border-top: 1px solid #ededed;
+}
+
+.billing-history-section > header {
+  display: grid;
+  gap: 6px;
+}
+
+.billing-history-section > header h2 {
+  margin: 0;
+  color: #111;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.billing-history-section > header p {
+  margin: 0;
+  color: #777;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.billing-payment-list {
+  min-height: 0;
+  max-height: calc(100dvh - 151px);
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 0 2px 3px 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.billing-payment-card {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 14px;
+  padding: 16px;
+  border: 1px solid #dfdfdf;
+  border-radius: 8px;
+  background: #fff;
+  color: #222;
+  text-decoration: none;
+}
+
+.billing-payment-card > header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  grid-column: 1 / -1;
+}
+
+.billing-payment-card > header > strong {
+  min-width: 0;
+  color: #151515;
+  font-size: 16px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.billing-payment-icon {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #eff9f2;
+}
+
+.billing-payment-icon img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.billing-payment-icon.cancelled {
+  background: #fff1f1;
+}
+
+.billing-payment-icon.cancelled img {
+  filter: grayscale(1) sepia(1) saturate(7) hue-rotate(310deg) brightness(0.95);
+}
+
+.billing-payment-card dl {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.billing-payment-card dl > div {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 66px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.billing-payment-card dt,
+.billing-payment-card dd {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.billing-payment-card dt {
+  color: #777;
+}
+
+.billing-payment-card dd {
+  color: #333;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.billing-payment-card dd.amount {
+  color: #111;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.billing-payment-status {
+  width: fit-content;
+  min-height: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 9px;
+  border: 1px solid #31aa61;
+  border-radius: 5px;
+  background: #f1faf4;
+  color: #07903f;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.billing-payment-status.cancelled,
+.billing-payment-status.failed {
+  border-color: #ee7777;
+  background: #fff2f2;
+  color: #d43b3b;
+}
+
+.billing-payment-status.pending {
+  border-color: #dfa83c;
+  background: #fff8e8;
+  color: #a96d00;
+}
+
+.billing-detail-button {
+  min-width: 77px;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: end;
+  padding: 0 12px;
+  border: 1px solid #00a548;
+  border-radius: 6px;
+  color: #009a42;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.billing-empty-state {
+  min-height: calc(100dvh - 64px);
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 9px;
+  padding: 0 22px 80px;
+  border-top: 1px solid #ededed;
+  text-align: center;
+}
+
+.billing-empty-state img {
+  width: 104px;
+  height: 104px;
+  display: block;
+  margin-bottom: 12px;
+  object-fit: cover;
+}
+
+.billing-empty-state strong {
+  color: #181818;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.billing-empty-state p {
+  margin: 0;
+  color: #777;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.billing-detail-panel {
+  padding-bottom: 38px !important;
+}
+
+.billing-detail-summary {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 19px 8px 20px;
+  border-top: 1px solid #ededed;
+  border-bottom: 1px solid #ededed;
+}
+
+.billing-detail-summary .billing-payment-icon {
+  width: 66px;
+  height: 66px;
+}
+
+.billing-detail-summary > div {
+  min-width: 0;
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+
+.billing-detail-summary strong {
+  color: #111;
+  font-size: 17px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.billing-detail-section {
+  display: grid;
+  gap: 13px;
+  padding: 21px 8px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.billing-detail-section h2 {
+  margin: 0;
+  color: #111;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.billing-detail-section dl {
+  display: grid;
+  gap: 11px;
+  margin: 0;
+}
+
+.billing-detail-section dl > div {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.billing-detail-section dt,
+.billing-detail-section dd {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.billing-detail-section dt {
+  color: #777;
+}
+
+.billing-detail-section dd {
+  color: #222;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.billing-detail-section .emphasis dd {
+  color: #009a42;
+  font-weight: 900;
+}
+
+.billing-detail-section.cancelled .emphasis dd {
+  color: #d43b3b;
+}
+
+@media (max-width: 359px) {
+  .billing-payment-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .billing-detail-button {
+    width: 100%;
+  }
+
+  .billing-detail-section dl > div {
+    grid-template-columns: 80px minmax(0, 1fr);
+  }
+}
+
 .ad-history-page {
   padding: 0;
   background: #fff;

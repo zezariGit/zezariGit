@@ -1,136 +1,99 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import Link from "next/link";
-import StatusToast from "../../status-toast";
 import { authOptions } from "../../../lib/auth";
 import { getGuardianBillingData } from "../../../lib/db";
-import { AccountTopbar, formatCurrency, formatDate, subscriptionStatusLabel } from "../account-ui";
-import SubscriptionControls from "../subscription-controls";
+import { AccountTopbar, formatCurrency } from "../account-ui";
+import { formatBillingDateTime, PaymentIcon, PaymentStatus } from "./billing-ui";
+
+const previewPayments = [
+  {
+    id: "preview-ad",
+    payment_kind: "ad",
+    payment_title: "온라인 실종 광고",
+    amount: 69900,
+    payment_status: "paid",
+    payment_date: "2026-09-03 10:08:00",
+  },
+  {
+    id: "preview-bracelet",
+    payment_kind: "order",
+    payment_title: "제자리 QR 팔찌",
+    amount: 29000,
+    payment_status: "paid",
+    payment_date: "2026-08-21 05:32:00",
+  },
+  {
+    id: "preview-ad-old",
+    payment_kind: "ad",
+    payment_title: "온라인 실종 광고",
+    amount: 39900,
+    payment_status: "paid",
+    payment_date: "2026-07-12 01:15:00",
+  },
+  {
+    id: "preview-necklace",
+    payment_kind: "order",
+    payment_title: "제자리 QR 목걸이",
+    amount: 24000,
+    payment_status: "cancelled",
+    payment_date: "2026-06-28 07:47:00",
+  },
+];
 
 export default async function BillingPage({ searchParams }) {
-  const session = await getServerSession(authOptions);
+  const params = await searchParams;
+  const previewMode = process.env.NODE_ENV === "development" ? String(params?.preview || "") : "";
+  const preview = ["1", "empty"].includes(previewMode);
+  const session = preview ? { user: { provider: "credentials" } } : await getServerSession(authOptions);
   if (!session) redirect("/");
 
-  const params = await searchParams;
-  const notice = params?.notice || "";
-  const noticeType = params?.noticeType || "success";
-  const { subjects, subscription, productOrders } = await getGuardianBillingData(session);
-  const statusLabel = subscriptionStatusLabel(subscription?.status);
-  const lifetimeAccess = subscription?.access_type === "product_lifetime";
-  const expiryDate = lifetimeAccess
-    ? "계속 이용"
-    : subscription?.current_period_end
-      ? formatDate(subscription.current_period_end)
-      : "-";
+  const payments = preview
+    ? previewMode === "empty" ? [] : previewPayments
+    : (await getGuardianBillingData(session)).payments;
 
   return (
-    <main className="account-page">
-      <section className="account-panel">
+    <main className="account-page billing-history-page">
+      <section className="account-panel billing-history-panel">
         <AccountTopbar title="결제 및 서비스 현황" />
 
-        <section className="account-section">
-          <h2>QR 안심 서비스 현황</h2>
-          <div className="account-subscription-summary">
-            <div>
-              <strong>{statusLabel}</strong>
-              <span>서비스 이용: {expiryDate}</span>
-              <span>{lifetimeAccess ? "구매한 상품의 QR을 활성화하면 추가 기간 결제 없이 계속 이용할 수 있습니다." : "기존 기간제 서비스 정보입니다."}</span>
+        {payments.length > 0 ? (
+          <section className="billing-history-section" aria-labelledby="billing-history-title">
+            <header>
+              <h2 id="billing-history-title">결제 내역</h2>
+              <p>최근 결제한 내역부터 표시됩니다.</p>
+            </header>
+            <div className="billing-payment-list" aria-label="결제 내역 목록">
+              {payments.map((payment) => (
+                <PaymentCard payment={payment} preview={preview} key={`${payment.payment_kind}:${payment.id}`} />
+              ))}
             </div>
-            <SubscriptionControls status={subscription?.status || "none"} accessType={subscription?.access_type || "periodic"} />
-          </div>
-          <div className="account-subject-list">
-            {subjects.map((subject) => (
-              <article className="account-subject-card" key={subject.id}>
-                <SubjectAvatar subject={subject} />
-                <div>
-                  <strong>{subject.name}</strong>
-                  <span>서비스 상태: {statusLabel}</span>
-                  <span>서비스 이용: {expiryDate}</span>
-                </div>
-                <a href="#payment-history">결제 내역 &gt;</a>
-              </article>
-            ))}
-            {subjects.length === 0 && (
-              <p className="account-empty-text">등록된 관리대상이 없습니다. 관리대상정보에서 먼저 대상자를 등록해 주세요.</p>
-            )}
-          </div>
-        </section>
-
-        <nav className="account-menu-list" aria-label="결제 관련 메뉴">
-          <Link href="/shop">상품 구매</Link>
-          <Link href="/account/coupons">쿠폰함</Link>
-          <Link href="/account/payment-methods">결제수단</Link>
-          <Link href="/account/ads">광고 대시보드</Link>
-        </nav>
-
-        <section className="account-section" id="payment-history">
-          <h2>최근 결제 내역</h2>
-          <div className="account-history-list">
-            {productOrders.map((order) => (
-              <article className="account-history-card" key={order.id}>
-                <div>
-                  <strong>{formatOrderProductName(order)}</strong>
-                  <span>{order.subject_name || "대상자 미선택"} · {Number(order.plan_months || 0) <= 0 ? "QR 서비스 포함 상품" : "기존 기간제 상품"}</span>
-                  <span>{formatDate(order.created_at)}</span>
-                </div>
-                <div>
-                  <strong>{formatCurrency(order.amount)}</strong>
-                  {Number(order.discount_amount || 0) > 0 && (
-                    <span>쿠폰 할인: -{formatCurrency(order.discount_amount)}</span>
-                  )}
-                  <span>{paymentStatusLabel(order.status)}</span>
-                  <span>배송: {shippingStatusLabel(order.fulfillment_status, order.status)}</span>
-                </div>
-                <div className="account-shipping-info">
-                  <strong>배송조회 정보</strong>
-                  <span>택배사: {order.carrier || "아직 입력되지 않았습니다"}</span>
-                  <span>송장번호: {order.tracking_number || "아직 입력되지 않았습니다"}</span>
-                  {order.shipped_at && <span>발송일: {formatDate(order.shipped_at)}</span>}
-                  {order.delivered_at && <span>배송완료일: {formatDate(order.delivered_at)}</span>}
-                </div>
-              </article>
-            ))}
-            {productOrders.length === 0 && (
-              <p className="account-empty-text">아직 결제 내역이 없습니다.</p>
-            )}
-          </div>
-        </section>
+          </section>
+        ) : (
+          <section className="billing-empty-state" aria-label="결제 내역 없음">
+            <img src="/assets/billing/receipt.png" alt="" aria-hidden="true" />
+            <strong>결제 내역이 없습니다.</strong>
+            <p>제자리 앱에서 결제한 내역이 여기에 표시됩니다.</p>
+          </section>
+        )}
       </section>
-      <StatusToast message={notice} type={noticeType} />
     </main>
   );
 }
 
-function SubjectAvatar({ subject }) {
-  const photoSrc = subject.photo_url || subject.photo_data_url;
-  if (photoSrc) {
-    return <img className="account-subject-avatar" src={photoSrc} alt={`${subject.name} 사진`} />;
-  }
+function PaymentCard({ payment, preview }) {
+  const detailHref = `/account/billing/${payment.payment_kind}/${encodeURIComponent(payment.id)}${preview ? "?preview=1" : ""}`;
   return (
-    <div className="account-subject-avatar empty" aria-hidden="true">
-      <span />
-    </div>
+    <a className="billing-payment-card" href={detailHref} aria-label={`${payment.payment_title} 결제 상세보기`}>
+      <header>
+        <PaymentIcon kind={payment.payment_kind} cancelled={payment.payment_status === "cancelled"} />
+        <strong>{payment.payment_title}</strong>
+      </header>
+      <dl>
+        <div><dt>결제 금액</dt><dd className="amount">{formatCurrency(payment.amount)}</dd></div>
+        <div><dt>결제 상태</dt><dd><PaymentStatus status={payment.payment_status} /></dd></div>
+        <div><dt>결제 일시</dt><dd>{formatBillingDateTime(payment.payment_date)}</dd></div>
+      </dl>
+      <span className="billing-detail-button">상세보기</span>
+    </a>
   );
-}
-
-function paymentStatusLabel(status) {
-  if (status === "paid" || status === "activated") return "결제완료";
-  if (status === "paid_waiting_activation") return "활성화대기";
-  if (status === "payment_pending") return "결제대기";
-  if (status === "failed") return "결제실패";
-  return status || "-";
-}
-
-function formatOrderProductName(order) {
-  const productName = order?.product_name || "상품";
-  return order?.design_name ? `${productName} - ${order.design_name}` : productName;
-}
-
-function shippingStatusLabel(fulfillmentStatus, paymentStatus) {
-  if (fulfillmentStatus === "preparing") return "배송 준비";
-  if (fulfillmentStatus === "shipped") return "배송 중";
-  if (fulfillmentStatus === "delivered") return "배송 완료";
-  if (fulfillmentStatus === "cancelled") return "배송 취소";
-  if (["paid", "paid_waiting_activation", "activated"].includes(paymentStatus)) return "배송 준비";
-  return "결제 확인 전";
 }
