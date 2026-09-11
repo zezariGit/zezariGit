@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function AdPaymentSuccessClient({
-  testAdId = "",
-  sourceLabel = "Toss Payments",
+  isAdmin = false,
   publicationMessage = "",
 }) {
   const [policeModalOpen, setPoliceModalOpen] = useState(false);
@@ -30,7 +29,7 @@ export default function AdPaymentSuccessClient({
           />
         </div>
 
-        {publicationMessage && (
+        {isAdmin && publicationMessage && (
           <p className="ad-complete-publication-note">{publicationMessage}</p>
         )}
 
@@ -61,23 +60,6 @@ export default function AdPaymentSuccessClient({
             </Link>
           </div>
         </section>
-
-        <div className="ad-complete-nav-links">
-          {testAdId && (
-            <a
-              className="primary-button"
-              href={`/account/ads?testAd=${encodeURIComponent(testAdId)}`}
-            >
-              광고 상태 테스트하기
-            </a>
-          )}
-          <Link className="primary-button" href="/account/ads">
-            광고내역 보기
-          </Link>
-          <Link className="plain-button" href="/?tab=dashboard">
-            대시보드 이동
-          </Link>
-        </div>
       </section>
 
       {policeModalOpen && (

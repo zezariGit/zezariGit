@@ -1,7 +1,9 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../../lib/auth";
+import { isAdminSession } from "../../../../../lib/admin";
 import {
   getGuardianAdCheckoutData,
+  isDbAdminSession,
   markSubjectAdPaid,
   publishPaidSubjectAd,
 } from "../../../../../lib/db";
@@ -23,9 +25,8 @@ export default async function TossAdSuccessPage({ searchParams }) {
   if (preview) {
     return (
       <AdPaymentSuccessClient
-        testAdId="preview-test-ad"
-        sourceLabel="Toss Payments"
-        publicationMessage="관리자 테스트 결제가 완료되었습니다. Meta에 발행하지 않고 광고 검토 중 상태로 생성했습니다."
+        isAdmin={true}
+        publicationMessage="관리자 테스트 결제가 완료되었습니다. Meta에 발행하지 않고 광고 검토 중 상태로 생성했습니다. [해당 문구는 관리자만 볼 수 있습니다]"
       />
     );
   }
@@ -38,18 +39,18 @@ export default async function TossAdSuccessPage({ searchParams }) {
   }
 
   try {
-    const { ad } = await getGuardianAdCheckoutData(session, adId);
+    const { ad, guardian } = await getGuardianAdCheckoutData(session, adId);
+    const admin = isAdminSession(session) || Number(guardian?.is_admin || 0) === 1 || (await isDbAdminSession(session));
     const testPayment = adminPass && Number(ad.is_test_payment || 0) === 1;
     if (ad.paid_at && ad.toss_order_id === orderId) {
       const publication = await publishPaidSubjectAd(adId);
       return (
         <AdPaymentSuccessClient
-          publicationMessage={publicationMessage(publication, {
+          isAdmin={admin}
+          publicationMessage={admin ? publicationMessage(publication, {
             alreadyPaid: true,
             adminPass: testPayment,
-          })}
-          sourceLabel={testPayment ? "관리자 테스트 결제" : "Toss Payments"}
-          testAdId={testPayment ? ad.id : ""}
+          }) : ""}
         />
       );
     }
@@ -72,8 +73,8 @@ export default async function TossAdSuccessPage({ searchParams }) {
 
     return (
       <AdPaymentSuccessClient
-        publicationMessage={publicationMessage(publication)}
-        testAdId={testPayment ? ad.id : ""}
+        isAdmin={admin}
+        publicationMessage={admin ? publicationMessage(publication) : ""}
       />
     );
   } catch (error) {
@@ -83,11 +84,11 @@ export default async function TossAdSuccessPage({ searchParams }) {
 
 function publicationMessage(publication, { alreadyPaid = false, adminPass = false } = {}) {
   if (publication?.test && publication?.status === "review") {
-    return "관리자 테스트 결제가 완료되었습니다. Meta에 발행하지 않고 광고 검토 중 상태로 생성했습니다.";
+    return "관리자 테스트 결제가 완료되었습니다. Meta에 발행하지 않고 광고 검토 중 상태로 생성했습니다. [해당 문구는 관리자만 볼 수 있습니다]";
   }
   if (publication?.published) {
     return adminPass
-      ? "관리자 결제패스가 완료되었고 Meta 광고가 자동 발행되었습니다."
+      ? "관리자 결제패스가 완료되었고 Meta 광고가 자동 발행되었습니다. [해당 문구는 관리자만 볼 수 있습니다]"
       : "결제와 동시에 Meta 광고가 자동 발행되었습니다. Meta 심사와 노출 현황은 광고내역에서 확인할 수 있습니다.";
   }
   if (publication?.status === "preparing") {

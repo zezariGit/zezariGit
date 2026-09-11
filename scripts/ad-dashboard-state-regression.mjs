@@ -42,6 +42,13 @@ assert.doesNotMatch(database, /export async function endSubjectAd[\s\S]{0,180}al
 assert.match(successPage, /광고 상태 테스트하기/);
 assert.match(successPage, /testAd=\$\{encodeURIComponent\(testAdId\)\}/);
 assert.match(successPage, /AdPaymentSuccessClient/);
+assert.match(successPage, /해당 문구는 관리자만 볼 수 있습니다/);
+assert.match(successPage, /const admin = isAdminSession\(session\)[\s\S]+isDbAdminSession\(session\)/);
+assert.match(successPage, /publicationMessage=\{admin \? publicationMessage\([\s\S]+\) : ""\}/);
+assert.match(successClient, /isAdmin && publicationMessage/);
+assert.doesNotMatch(successClient, /광고 상태 테스트하기/);
+assert.doesNotMatch(successClient, /광고내역 보기/);
+assert.doesNotMatch(successClient, /대시보드 이동/);
 assert.match(successClient, /\/assets\/ads\/ad-payment-complete\.png/);
 assert.match(successClient, /경찰 신고도 함께 진행하시겠어요\?/);
 assert.match(successClient, /112로 연결해 드립니다/);
