@@ -6531,4 +6531,5 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 팝업은 제공 화면처럼 고정 헤더와 본문 내부 스크롤을 사용하고 열 때마다 no-store API로 최신 내용 조회
 - SNS 회원가입의 선택 알림 동의 저장까지 함께 연결
 - 서비스 규정·회원가입·SNS·보안 회귀검사와 Next.js 운영 빌드, 로컬 브라우저 검증 통과
-- 기능 커밋 `957553b` 생성, 이번 요청에는 배포 지시가 없어 GitHub/Vercel 반영은 대기
+- 기능 커밋 `957553b`과 인수인계 커밋을 GitHub `main`에 반영
+- Vercel 운영 배포 `dpl_E19dHgcypFn11T8TGpeSo8YnA951`가 `READY` 상태이며 대표 도메인과 세 약관 API 응답 확인 완료

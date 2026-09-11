@@ -9280,4 +9280,7 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `957553b feat: manage signup service regulations`
 
 ### Deployment
-- Not requested in this turn. GitHub push and Vercel production deployment are pending.
+- Feature and handoff commits were pushed to GitHub `main`.
+- Vercel deployment `dpl_E19dHgcypFn11T8TGpeSo8YnA951` reached `READY` and owns `https://zezari.family` plus compatibility aliases.
+- Production root and all three public regulation endpoints returned HTTP 200 with the expected titles.
+- The post-deployment error-log query returned no errors.
