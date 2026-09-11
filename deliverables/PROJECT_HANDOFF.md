@@ -1,8 +1,8 @@
 # REAL_QR_FIND Current Project Handoff
 
-Last updated: 2026-09-11 KST
+Last updated: 2026-09-12 KST
 
-Application baseline commit: `957553b` (`main`, GitHub/Vercel 운영 반영 완료)
+Application baseline commit: `5fd03e9` (`main`, 로컬 구현 완료, GitHub/Vercel 운영 반영 대기)
 
 Production: `https://zezari.family`
 
@@ -34,7 +34,7 @@ Production: `https://zezari.family`
 | 대표 도메인 | `https://zezari.family` |
 | 최근 확인 운영 배포 | `dpl_E19dHgcypFn11T8TGpeSo8YnA951` (`READY`, 관리자 서비스 규정 관리 및 회원가입 약관 연동) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | commit `957553b`; 운영 배포 `dpl_E19dHgcypFn11T8TGpeSo8YnA951` |
+| 최근 애플리케이션 기능 기준 | local commit `5fd03e9`; 운영 기준 commit `957553b`, deployment `dpl_E19dHgcypFn11T8TGpeSo8YnA951` |
 
 ### 로컬 시작
 
@@ -286,6 +286,7 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 | 커밋 | 내용 |
 | --- | --- |
+| `5fd03e9` | 상품 구매 대상자·상품·디자인·수량 선택 화면 개편, 운영 배포 대기 |
 | `957553b` | 관리자 서비스 규정 편집, 공개 최신 조회 API 및 회원가입 약관 팝업 |
 | `cbd6044` | 노출 알림 닫기 확인 처리, 상태별 아이콘 수정 및 카카오맵 위치 이동 |
 | `9d79166` | 상품·광고 통합 결제 내역과 결제 상세 화면 개편 |

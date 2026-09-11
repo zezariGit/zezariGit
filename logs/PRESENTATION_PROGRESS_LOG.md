@@ -4,6 +4,14 @@ Project: REAL_QR_FIND
 
 This file is the cumulative presentation-ready project log. It is written so the user can use it to prepare status reports or presentation material.
 
+## 2026-09-12 - 상품 구매 선택 화면 개편
+- 제공된 모바일 화면을 기준으로 상단 뒤로가기·도움말, 대상자, 상품, 디자인, 수량, 금액 요약, 다음 버튼을 재배치
+- 가장 최근 등록 대상자를 기본 표시하고 이름은 굵게, 생년월일은 작은 글씨로 구분
+- 상품과 디자인을 각각 선택할 수 있으며 두 항목 선택 전에는 수량과 다음 버튼을 회색 비활성화
+- 기본 수량 1개 및 최소 수량 1개를 적용하고 선택 완료 후 수량 변경에 따라 결제예정금액 자동 갱신
+- 기존 배송지·쿠폰·Toss 결제 단계로 정상 연결되는 것까지 로컬 미리보기 검증 완료
+- 기능 커밋 `5fd03e9` 생성, GitHub 및 Vercel 운영 배포는 대기 중
+
 ## 2026-06-12 - Project Start and Documentation System Setup
 
 ### Request

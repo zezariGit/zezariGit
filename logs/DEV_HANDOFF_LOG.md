@@ -4,6 +4,35 @@ Project: REAL_QR_FIND
 
 This file is the cumulative technical handoff log. It must be updated whenever requirements, implementation, source files, architecture, verification results, or next steps change.
 
+## 2026-09-12 KST - Product Purchase Selection Screen Redesign
+
+### User Request
+- Rebuild the product purchase page to match the supplied mobile reference.
+- Keep back and help controls in the header.
+- Default to the most recently registered subject and allow changing the subject from an expandable selector.
+- Require separate product and design choices before enabling quantity controls and the next step.
+- Start quantity at one, keep the minus control disabled at one, and show disabled controls in gray.
+
+### Reflected Work
+- Replaced the native subject select with an accessible custom listbox showing a bold name, smaller birth date, and up/down indicator.
+- Changed the subject query to newest-first ordering and retained explicit subject URL selection when supplied.
+- Removed automatic product and design selection so both choices are intentional.
+- Added separate product and design pickers, placeholder assets, disabled quantity states, minimum quantity enforcement, and selection-dependent amount/next-button states.
+- Added a working help popover and retained the existing order, shipping, coupon, Toss payment, and admin payment-pass flow after the selection step.
+- Added a development-only preview at `/shop?preview=1` and normalized libSQL row objects before crossing the Server Component boundary.
+- Added `scripts/shop-purchase-ui-regression.mjs` and `npm run test:shop-ui`.
+
+### Verification
+- `npm run test:shop-ui`: passed.
+- `npm run build`: passed with Next.js 16.3.0 and all 39 routes.
+- `git diff --check`: passed.
+- Local browser verification confirmed newest subject defaulting, subject picker markup, disabled initial controls, product/design selection, quantity increase to two, amount recalculation, and successful transition to the payment step.
+- No Next.js runtime error remained after client-data normalization.
+
+### Status
+- Feature commit: `5fd03e9 feat: redesign product purchase selection`.
+- GitHub push and Vercel production deployment have not been requested for this change and remain pending.
+
 ## 2026-06-12 00:00 KST - Project Logging System Initialized
 
 ### User Request
