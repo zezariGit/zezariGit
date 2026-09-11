@@ -5,6 +5,7 @@ import {
   deleteGuardianNotification,
   getGuardianNotificationInbox,
   markGuardianNotificationRead,
+  markGuardianNotificationsReadByIds,
 } from "../../../lib/db";
 import { NO_STORE_HEADERS } from "../../../lib/request-security";
 
@@ -25,12 +26,16 @@ export async function POST(request) {
   }
 
   const payload = await request.json().catch(() => ({}));
-  if (payload?.action !== "mark-read") {
+  if (!["mark-read", "mark-read-visible"].includes(payload?.action)) {
     return NextResponse.json({ message: "지원하지 않는 알림 요청입니다." }, { status: 400, headers: NO_STORE_HEADERS });
   }
 
   try {
-    await markGuardianNotificationRead(session, payload?.id);
+    if (payload.action === "mark-read-visible") {
+      await markGuardianNotificationsReadByIds(session, payload?.ids);
+    } else {
+      await markGuardianNotificationRead(session, payload?.id);
+    }
     return NextResponse.json({ ok: true }, { headers: NO_STORE_HEADERS });
   } catch (error) {
     return NextResponse.json(

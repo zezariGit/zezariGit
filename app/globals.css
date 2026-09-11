@@ -3271,6 +3271,15 @@ a {
   text-align: left;
 }
 
+.notification-item.location-link {
+  cursor: pointer;
+}
+
+.notification-item.location-link:hover,
+.notification-item.location-link:focus-visible {
+  box-shadow: inset 0 0 0 2px rgb(0 166 79 / 18%);
+}
+
 .notification-item.unread {
   background: #f1faf4;
 }

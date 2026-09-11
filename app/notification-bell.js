@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { formatDateTime } from "../lib/date-format";
 
 const PREVIEW_NOTIFICATIONS = [
-  { id: "preview-location", category: "safety", title: "위치가 공유되었습니다", body: "박제자리 관리대상자의 현재 위치를 공유했습니다.", created_at: "2026-09-04T03:10:00.000Z", read_at: null },
+  { id: "preview-location", category: "safety", event_key: "safety.location_shared", title: "위치가 공유되었습니다", body: "박제자리 관리대상자의 현재 위치를 공유했습니다.", url: "https://map.kakao.com/link/map/%EC%A0%9C%EC%9E%90%EB%A6%AC%20%EC%9C%84%EC%B9%98%EA%B3%B5%EC%9C%A0,37.5665,126.978", created_at: "2026-09-04T03:10:00.000Z", read_at: null },
   { id: "preview-contact", category: "safety", title: "보호자 안심번호로 연락이 왔습니다", body: "김제자리 관리대상자의 QR 페이지에서 보호자에게 연락했습니다.", created_at: "2026-09-04T01:20:00.000Z", read_at: null },
   { id: "preview-ad-active", category: "ad", title: "수정된 광고가 게재되었습니다", body: "Meta 검토가 완료되어 온라인 실종 광고가 다시 게재되었습니다.", created_at: "2026-09-04T01:12:00.000Z", read_at: "2026-09-04T01:15:00.000Z" },
   { id: "preview-ad-paused", category: "ad", title: "광고가 일시정지되었습니다", body: "광고 변경 요청으로 기존 광고가 일시정지되었습니다.", created_at: "2026-09-03T10:35:00.000Z", read_at: "2026-09-03T11:00:00.000Z" },
@@ -18,11 +18,20 @@ export default function NotificationBell({ preview = false }) {
   const [notifications, setNotifications] = useState(preview ? PREVIEW_NOTIFICATIONS : []);
   const [unreadCount, setUnreadCount] = useState(preview ? 2 : 0);
   const popoverRef = useRef(null);
+  const notificationsRef = useRef(preview ? PREVIEW_NOTIFICATIONS : []);
+  const exposedUnreadIdsRef = useRef(new Set());
+  const openRef = useRef(false);
+
+  const exposeUnreadNotifications = useCallback((items) => {
+    if (!openRef.current) return;
+    for (const item of items) {
+      if (!item.read_at && item.id) exposedUnreadIdsRef.current.add(item.id);
+    }
+  }, []);
 
   const loadNotifications = useCallback(async () => {
     if (preview) {
-      setNotifications(PREVIEW_NOTIFICATIONS);
-      setUnreadCount(PREVIEW_NOTIFICATIONS.filter((item) => !item.read_at).length);
+      exposeUnreadNotifications(notificationsRef.current);
       return;
     }
     setLoading(true);
@@ -32,43 +41,60 @@ export default function NotificationBell({ preview = false }) {
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data?.message || "알림을 조회하지 못했습니다.");
       const nextNotifications = Array.isArray(data.notifications) ? data.notifications : [];
+      notificationsRef.current = nextNotifications;
       setNotifications(nextNotifications);
       setUnreadCount(Number.isFinite(Number(data.unreadCount))
         ? Math.max(0, Number(data.unreadCount))
         : nextNotifications.filter((item) => !item.read_at).length);
+      exposeUnreadNotifications(nextNotifications);
     } catch (error) {
       setMessage(error.message || "알림을 조회하지 못했습니다.");
     } finally {
       setLoading(false);
     }
-  }, [preview]);
+  }, [exposeUnreadNotifications, preview]);
 
-  const markRead = useCallback(async (notification) => {
-    if (notification.read_at) return;
+  const markExposedNotificationsRead = useCallback(() => {
+    const ids = [...exposedUnreadIdsRef.current];
+    if (ids.length === 0) return;
+    exposedUnreadIdsRef.current.clear();
+    const idSet = new Set(ids);
     const readAt = new Date().toISOString();
-    setNotifications((items) => items.map((item) => item.id === notification.id ? { ...item, read_at: readAt } : item));
-    setUnreadCount((count) => Math.max(0, count - 1));
+    const applyReadState = (items) => items.map((item) => idSet.has(item.id) && !item.read_at ? { ...item, read_at: readAt } : item);
+    notificationsRef.current = applyReadState(notificationsRef.current);
+    setNotifications((items) => applyReadState(items));
+    setUnreadCount((count) => Math.max(0, count - ids.length));
     if (preview) return;
 
-    try {
-      const response = await fetch("/api/notifications", {
+    fetch("/api/notifications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "mark-read", id: notification.id }),
+        body: JSON.stringify({ action: "mark-read-visible", ids }),
+        keepalive: true,
+      })
+      .then((response) => {
+        if (!response.ok) throw new Error("알림을 확인 처리하지 못했습니다.");
+        return notifyServiceWorker({ type: "ZEZARI_NOTIFICATIONS_READ" });
+      })
+      .catch((error) => {
+        const restoreUnreadState = (items) => items.map((item) => idSet.has(item.id) && item.read_at === readAt ? { ...item, read_at: null } : item);
+        notificationsRef.current = restoreUnreadState(notificationsRef.current);
+        setNotifications((items) => restoreUnreadState(items));
+        setUnreadCount((count) => count + ids.length);
+        setMessage(error.message || "알림을 확인 처리하지 못했습니다.");
       });
-      if (!response.ok) throw new Error("알림을 읽음 처리하지 못했습니다.");
-      await notifyServiceWorker({ type: "ZEZARI_NOTIFICATIONS_READ" });
-    } catch (error) {
-      setNotifications((items) => items.map((item) => item.id === notification.id ? { ...item, read_at: null } : item));
-      setUnreadCount((count) => count + 1);
-      setMessage(error.message || "알림을 읽음 처리하지 못했습니다.");
-    }
   }, [preview]);
+
+  const finishClosing = useCallback(() => {
+    openRef.current = false;
+    markExposedNotificationsRead();
+    setOpen(false);
+  }, [markExposedNotificationsRead]);
 
   const closePopover = useCallback(() => {
     if (window.history.state?.zezariNotifications) window.history.back();
-    else setOpen(false);
-  }, []);
+    else finishClosing();
+  }, [finishClosing]);
 
   const toggleOpen = async () => {
     if (open) {
@@ -76,11 +102,17 @@ export default function NotificationBell({ preview = false }) {
       return;
     }
     window.history.pushState({ ...window.history.state, zezariNotifications: true }, "", window.location.href);
+    openRef.current = true;
+    exposeUnreadNotifications(notificationsRef.current);
     setOpen(true);
     await loadNotifications();
   };
 
   useEffect(() => { loadNotifications(); }, [loadNotifications]);
+
+  useEffect(() => {
+    notificationsRef.current = notifications;
+  }, [notifications]);
 
   useEffect(() => {
     if (typeof navigator === "undefined" || !navigator.serviceWorker || preview) return undefined;
@@ -102,7 +134,7 @@ export default function NotificationBell({ preview = false }) {
       if (!popoverRef.current?.contains(event.target)) closePopover();
     };
     const closeFromKeyboard = (event) => { if (event.key === "Escape") closePopover(); };
-    const closeFromHistory = () => setOpen(false);
+    const closeFromHistory = () => finishClosing();
     document.addEventListener("pointerdown", closeFromOutside);
     window.addEventListener("keydown", closeFromKeyboard);
     window.addEventListener("popstate", closeFromHistory);
@@ -111,7 +143,28 @@ export default function NotificationBell({ preview = false }) {
       window.removeEventListener("keydown", closeFromKeyboard);
       window.removeEventListener("popstate", closeFromHistory);
     };
-  }, [closePopover, open]);
+  }, [closePopover, finishClosing, open]);
+
+  useEffect(() => {
+    const finishFromPageExit = () => {
+      if (openRef.current) finishClosing();
+    };
+    window.addEventListener("pagehide", finishFromPageExit);
+    return () => {
+      window.removeEventListener("pagehide", finishFromPageExit);
+      finishFromPageExit();
+    };
+  }, [finishClosing]);
+
+  const openLocationMap = useCallback((notification) => {
+    const mapUrl = getKakaoMapUrl(notification);
+    if (!mapUrl) return;
+    finishClosing();
+    if (window.history.state?.zezariNotifications) {
+      window.history.replaceState({ ...window.history.state, zezariNotifications: false }, "", window.location.href);
+    }
+    window.location.assign(mapUrl);
+  }, [finishClosing]);
 
   return (
     <div className="notification-bell-wrap" ref={popoverRef}>
@@ -136,7 +189,7 @@ export default function NotificationBell({ preview = false }) {
             </div>
           ) : (
             <ul className="notification-list">
-              {notifications.map((notification) => <NotificationItem notification={notification} onRead={markRead} key={notification.id} />)}
+              {notifications.map((notification) => <NotificationItem notification={notification} onOpenLocation={openLocationMap} key={notification.id} />)}
             </ul>
           )}
         </section>
@@ -145,22 +198,49 @@ export default function NotificationBell({ preview = false }) {
   );
 }
 
-function NotificationItem({ notification, onRead }) {
+function NotificationItem({ notification, onOpenLocation }) {
   const unread = !notification.read_at;
   const category = resolveNotificationCategory(notification);
+  const mapUrl = getKakaoMapUrl(notification);
+  const className = `notification-item${unread ? " unread" : ""}${mapUrl ? " location-link" : ""}`;
+  const content = (
+    <>
+      <span className="notification-unread-dot" aria-hidden="true" />
+      <img className="notification-category-icon" src={`/assets/notifications/${category}-${unread ? "unread" : "read"}.png`} alt="" />
+      <span className="notification-item-copy">
+        <strong>{notification.title || "제자리 알림"}</strong>
+        {notification.body && <span>{notification.body}</span>}
+        <time dateTime={notification.created_at}>{formatDateTime(notification.created_at, "")}</time>
+      </span>
+    </>
+  );
+  const ariaLabel = `${notification.title || "제자리 알림"}${unread ? ", 미확인" : ", 확인"}${mapUrl ? ", 카카오맵에서 위치 보기" : ""}`;
+
+  if (mapUrl) {
+    return (
+      <li>
+        <button className={className} type="button" onClick={() => onOpenLocation(notification)} aria-label={ariaLabel}>
+          {content}
+        </button>
+      </li>
+    );
+  }
+
   return (
     <li>
-      <button className={`notification-item${unread ? " unread" : ""}`} type="button" onClick={() => onRead(notification)} aria-label={`${notification.title || "제자리 알림"}${unread ? ", 읽지 않음" : ", 읽음"}`}>
-        <span className="notification-unread-dot" aria-hidden="true" />
-        <img className="notification-category-icon" src={`/assets/notifications/${category}-${unread ? "unread" : "read"}.png`} alt="" />
-        <span className="notification-item-copy">
-          <strong>{notification.title || "제자리 알림"}</strong>
-          {notification.body && <span>{notification.body}</span>}
-          <time dateTime={notification.created_at}>{formatDateTime(notification.created_at, "")}</time>
-        </span>
-      </button>
+      <div className={className} aria-label={ariaLabel}>{content}</div>
     </li>
   );
+}
+
+function getKakaoMapUrl(notification) {
+  if (notification?.event_key !== "safety.location_shared") return "";
+  try {
+    const url = new URL(String(notification.url || ""));
+    return url.protocol === "https:" && url.hostname === "map.kakao.com" ? url.toString() : "";
+  } catch {
+    return "";
+  }
 }
 
 function resolveNotificationCategory(notification) {
