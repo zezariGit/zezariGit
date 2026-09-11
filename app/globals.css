@@ -1160,7 +1160,7 @@ a {
 }
 
 .settings-menu-list a {
-  min-height: 62px;
+  min-height: 66px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1181,8 +1181,8 @@ a {
 }
 
 .my-page-panel .my-logout-section {
-  margin-top: auto;
-  padding: 24px 0 4px;
+  margin-top: 14px;
+  padding: 10px 0 4px;
   border: 0;
   text-align: center;
 }
