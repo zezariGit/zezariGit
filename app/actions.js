@@ -203,7 +203,9 @@ function couponErrorMessage(error) {
   if (message.includes("유효기간") || message.includes("사용할 수 없는") || message.includes("아직 사용할")) {
     return "사용기간이 만료된 쿠폰입니다.";
   }
-  if (message.includes("입력")) return "쿠폰 코드를 입력해 주세요.";
+  if (message === "쿠폰 번호를 입력해 주세요." || message === "쿠폰 코드를 입력해 주세요.") {
+    return "쿠폰 코드를 입력해 주세요.";
+  }
   return "유효하지 않은 쿠폰 코드입니다.";
 }
 

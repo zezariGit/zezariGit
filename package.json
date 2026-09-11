@@ -19,6 +19,7 @@
     "test:signup-phone-ui": "node scripts/signup-phone-ui-regression.mjs",
     "test:signup-profile-ui": "node scripts/signup-profile-ui-regression.mjs",
     "test:guardian-profile-ui": "node scripts/guardian-profile-ui-regression.mjs",
+    "test:coupon-registration": "node scripts/coupon-registration-regression.mjs",
     "test:onboarding": "node scripts/onboarding-regression.mjs",
     "test:password-reset": "tsx scripts/password-reset-regression.mjs",
     "test:password-reset-ui": "node scripts/password-reset-ui-regression.mjs",
