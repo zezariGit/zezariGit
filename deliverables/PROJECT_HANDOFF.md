@@ -31,7 +31,7 @@ Production: `https://zezari.family`
 | Vercel 프로젝트 | scope `zezari`, project `zezari` |
 | 대표 도메인 | `https://zezari.family` |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 운영 배포 | `dpl_AFvzA27Ew4FaRuiFSUXBeZt3iNBZ`, `READY` |
+| 최근 애플리케이션 기능 배포 | commit `dd1218e`, deployment `dpl_AFvzA27Ew4FaRuiFSUXBeZt3iNBZ`, `READY` |
 
 ### 로컬 시작
 
