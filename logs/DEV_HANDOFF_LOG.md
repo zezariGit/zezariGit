@@ -9143,3 +9143,28 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `https://zezari.family/assets/ads/ad-payment-complete.png` returned HTTP 200.
 - `https://zezari.family/payments/toss/ad/success` returned HTTP 200.
 - Vercel error log check (`--level error --since 1h`) returned zero errors.
+
+## 2026-09-11 KST - Administrator-Only Advertisement Test Payment Notice
+
+### User Request
+- Show the administrator test-payment completion message only to administrators.
+- Append `[해당 문구는 관리자만 볼 수 있습니다]` to the message.
+
+### Reflected Work
+- Resolved administrator status on the server from the authenticated admin session, guardian DB flag, and DB admin lookup.
+- Passed no publication message to the client for a non-admin session.
+- Added a client rendering guard requiring both administrator status and a non-empty publication message.
+- Updated the administrator test-payment message to `관리자 테스트 결제가 완료되었습니다. Meta에 발행하지 않고 광고 검토 중 상태로 생성했습니다. [해당 문구는 관리자만 볼 수 있습니다]`.
+- Extended advertisement dashboard regression coverage for server authorization, non-admin empty-message behavior, client gating, and the exact notice.
+
+### Verification
+- `npm run test:ad-dashboard`: passed.
+- `npm run security:check`: passed.
+- `npm run build`: passed with Next.js 16.3.0 and all 39 routes generated.
+- Local administrator preview rendered the exact notice with no console errors or Next.js error overlay.
+
+### Feature Commit
+- `0ef3ebb fix: limit ad payment test notice to admins`
+
+### Deployment
+- Not requested in this turn.

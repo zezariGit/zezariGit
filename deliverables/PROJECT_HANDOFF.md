@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-11 KST
 
-Application baseline commit: `6e7c669` (`main`)
+Application baseline commit: `0ef3ebb` (`main`)
 
 Production: `https://zezari.family`
 
@@ -34,7 +34,7 @@ Production: `https://zezari.family`
 | 대표 도메인 | `https://zezari.family` |
 | 최근 확인 운영 배포 | `dpl_8aXPhgmNbrzEMfN4TRW4R6HqRUG4` (`READY`, 광고 결제 완료 개편 및 112 경찰 신고 연계) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | commit `6e7c669`; 운영 상태는 `vercel inspect`로 확인 |
+| 최근 애플리케이션 기능 기준 | commit `0ef3ebb`; 운영 상태는 `vercel inspect`로 확인 |
 
 ### 로컬 시작
 
@@ -144,7 +144,7 @@ npm run dev -- -p 3005
 | 실종신고 대상자 선택 | `/missing-report`에서 안전 상태 대상자를 선택하고 다음을 누르면 기존 광고 설정 모달로 이동. `HomePage -> GuardianDashboard -> DashboardTab -> AdCampaignModal`로 대상자와 새 광고 여부를 전달 | 완료 |
 | 광고 설정 | 기존 거리·위치 범위 선택, 기간 선택, 선택 요약, 광고 이미지 미리보기, 결제 화면 이동을 재사용. 이 단계에서는 Meta API를 호출하지 않음 | 완료 |
 | 관리자 상태 테스트 | 관리자 결제패스 광고는 Meta를 호출하지 않고 `광고 검토 중`으로 생성. 결제 완료 화면에서 광고 상태 테스트로 이동하고 관리자만 `진행 중` 전환 가능. 이후 기존 종료 기능으로 `광고 완료` 검증 가능 | 완료 |
-| 광고 결제 완료 및 경찰 신고 연계 | 제공된 광고 결제 완료 그래픽 원본(`/assets/ads/ad-payment-complete.png`) 표시, `경찰 신고도 함께 진행하시겠어요?` 밑줄 링크 및 `[예]`/`[아니오]` 버튼, 클릭 시 `112로 전화할까요?` 팝업 모달에서 112 전화걸기(`tel:112`) 및 광고내역/대시보드 이동 제공 | 완료 |
+| 광고 결제 완료 및 경찰 신고 연계 | 제공된 광고 결제 완료 그래픽 원본(`/assets/ads/ad-payment-complete.png`) 표시, `경찰 신고도 함께 진행하시겠어요?` 밑줄 링크 및 `[예]`/`[아니오]` 버튼, 클릭 시 `112로 전화할까요?` 팝업에서 112 전화걸기(`tel:112`) 제공. 관리자 테스트 결제 안내는 관리자에게만 표시하며 끝에 `[해당 문구는 관리자만 볼 수 있습니다]` 표기 | 완료 |
 | 실제 Meta 광고 | 일반 결제 광고는 기존 Meta 자동 발행 경로 유지 | 조건부: Meta 앱 권한·검수 승인 필요 |
 
 ### 관리자 및 운영 기능
@@ -274,6 +274,7 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 | 커밋 | 내용 |
 | --- | --- |
+| `0ef3ebb` | 광고 테스트 결제 안내를 관리자 전용으로 제한하고 전용 문구 추가 |
 | `6e7c669` | 광고 결제 완료 이미지 반영 및 112 경찰 신고 연계 팝업 구현 |
 | `0206956` | 광고 대시보드 추가 경로와 진행 상태 전용 종료 규칙 보강 |
 | `328bafe` | 실종신고 대상자 선택 후 기존 거리·기간 광고 설정 화면 연결 복구 |
