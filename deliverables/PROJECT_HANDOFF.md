@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-12 KST
 
-Application baseline commit: `5182915` (`main`, 로컬 구현 완료, GitHub/Vercel 운영 반영 대기)
+Application baseline commit: `5182915` (`main`, GitHub/Vercel 운영 반영 완료)
 
 Production: `https://zezari.family`
 
@@ -32,9 +32,9 @@ Production: `https://zezari.family`
 | GitHub | `https://github.com/zezariGit/zezariGit.git` |
 | Vercel 프로젝트 | scope `zezari`, project `zezari` |
 | 대표 도메인 | `https://zezari.family` |
-| 최근 확인 운영 배포 | `dpl_E19dHgcypFn11T8TGpeSo8YnA951` (`READY`, 관리자 서비스 규정 관리 및 회원가입 약관 연동) |
+| 최근 확인 운영 배포 | `dpl_DQvpGaaRa2CbgmDg1A4jTwrjZnEn` (`READY`, 상품 구매 흐름 및 상품/디자인 관리) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | local commit `5182915`; 운영 기준 commit `957553b`, deployment `dpl_E19dHgcypFn11T8TGpeSo8YnA951` |
+| 최근 애플리케이션 기능 기준 | local/production feature commit `5182915`; deployment `dpl_DQvpGaaRa2CbgmDg1A4jTwrjZnEn` |
 
 ### 로컬 시작
 

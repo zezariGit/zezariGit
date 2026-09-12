@@ -9378,4 +9378,7 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - `5182915 feat: refine product and design management`
 
 ### Deployment
-- Not requested for this change. GitHub push and Vercel production deployment remain pending.
+- Feature and handoff commits through `22eb8fc` were pushed to GitHub `main`.
+- Vercel deployment `dpl_DQvpGaaRa2CbgmDg1A4jTwrjZnEn` reached `READY` and owns `https://zezari.family` plus compatibility aliases.
+- Production root, shop preview, and shop service-introduction routes returned HTTP 200.
+- Production browser verification confirmed all twelve designs and the `선택 완료` button in one viewport; the post-deployment error-log query returned no errors.
