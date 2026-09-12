@@ -15,12 +15,14 @@ export default async function ShopPage({ searchParams }) {
   const requestedSubjectId = params?.subject || "";
   if (preview) {
     const products = toClientData(sortShopProducts(await getShopProducts()));
+    const paymentPreview = params?.screen === "payment";
     return (
       <main className="shop-page">
         <ShopCheckoutClient
           products={products}
-          initialProductId=""
+          initialProductId={paymentPreview ? products[0]?.id || "" : ""}
           initialSubjectId="preview-recent"
+          initialOrderPreview={paymentPreview}
           subjects={[
             { id: "preview-recent", name: "로로", birth_date: "2022-06-23", created_at: "2026-09-11" },
             { id: "preview-older", name: "제자리", birth_date: "2020-03-18", created_at: "2026-09-10" },

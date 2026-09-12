@@ -35,6 +35,8 @@ export async function POST(request) {
       designIndex: body.designIndex,
       designId: body.designId,
       couponId: body.couponId,
+      recipientName: body.recipientName,
+      recipientPhone: body.recipientPhone,
       shippingAddress: body.shippingAddress,
       shippingAddressDetail: body.shippingAddressDetail,
       paymentMethod: "WIDGET",

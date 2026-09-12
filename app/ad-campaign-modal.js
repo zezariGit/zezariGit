@@ -41,17 +41,25 @@ export default function AdCampaignModal({
   const today = useMemo(() => getKstDateInputValue(), []);
   const distanceOptions = useMemo(() => normalizeDistanceOptions(pricing?.distanceOptions), [pricing]);
   const durationOptions = useMemo(() => normalizeDurationOptions(pricing?.durationOptions), [pricing]);
-  const [step, setStep] = useState("distance");
-  const [distanceOptionId, setDistanceOptionId] = useState(distanceOptions[0]?.id || "");
-  const [durationOptionId, setDurationOptionId] = useState(durationOptions[0]?.id || "");
+  const [distanceOptionId, setDistanceOptionId] = useState("");
+  const [durationOptionId, setDurationOptionId] = useState("");
   const [location, setLocation] = useState({ selected: false, lat: null, lng: null, label: "" });
+  const [locationQuery, setLocationQuery] = useState("");
+  const [locationResults, setLocationResults] = useState([]);
+  const [locationOpen, setLocationOpen] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
   const [locationMessage, setLocationMessage] = useState("");
-  const [locating, setLocating] = useState(false);
+  const [distanceOpen, setDistanceOpen] = useState(false);
+  const [durationOpen, setDurationOpen] = useState(false);
+  const [showErrors, setShowErrors] = useState(false);
   const [capturePending, setCapturePending] = useState(false);
   const creativeInputRef = useRef(null);
   const capturedSubmitRef = useRef(false);
-  const selectedDistance = distanceOptions.find((option) => option.id === distanceOptionId) || distanceOptions[0];
-  const selectedDuration = durationOptions.find((option) => option.id === durationOptionId) || durationOptions[0];
+  const locationSearchRef = useRef(null);
+  const distanceSelectRef = useRef(null);
+  const durationSelectRef = useRef(null);
+  const selectedDistance = distanceOptions.find((option) => option.id === distanceOptionId) || null;
+  const selectedDuration = durationOptions.find((option) => option.id === durationOptionId) || null;
   const startDate = today;
   const endDate = addDaysToDateInput(today, Math.max(0, Number(selectedDuration?.days || 1) - 1));
   const regionLabel = selectedDistance?.coverageType === "country"
@@ -59,20 +67,72 @@ export default function AdCampaignModal({
     : cleanRegionLabel(location.label);
   const quote = calculateOptionQuote(selectedDistance, selectedDuration);
   const activeAd = !forceNew && ["active", "paused", "ready"].includes(subject?.ad_status || "");
+  const backHref = String(subject?.id || "").startsWith("preview-")
+    ? "/missing-report?preview=1"
+    : `/missing-report${subject?.id ? `?subject=${encodeURIComponent(subject.id)}` : ""}`;
+  const regionComplete = selectedDistance?.coverageType === "country" || (location.selected && regionLabel);
   const canSubmit = Boolean(
     selectedDistance
       && selectedDuration
       && quote.amount > 0
-      && (selectedDistance.coverageType === "country" || (location.selected && regionLabel)),
+      && regionComplete,
   );
 
   useEffect(() => {
-    setStep("distance");
-    setDistanceOptionId(distanceOptions[0]?.id || "");
-    setDurationOptionId(durationOptions[0]?.id || "");
+    setDistanceOptionId("");
+    setDurationOptionId("");
     setLocation({ selected: false, lat: null, lng: null, label: "" });
+    setLocationQuery("");
+    setLocationResults([]);
     setLocationMessage("");
-  }, [subject?.id, distanceOptions, durationOptions]);
+    setShowErrors(false);
+  }, [subject?.id]);
+
+  useEffect(() => {
+    const closeMenus = (event) => {
+      if (!locationSearchRef.current?.contains(event.target)) setLocationOpen(false);
+      if (!distanceSelectRef.current?.contains(event.target)) setDistanceOpen(false);
+      if (!durationSelectRef.current?.contains(event.target)) setDurationOpen(false);
+    };
+    document.addEventListener("pointerdown", closeMenus);
+    return () => document.removeEventListener("pointerdown", closeMenus);
+  }, []);
+
+  useEffect(() => {
+    const query = locationQuery.trim();
+    if (selectedDistance?.coverageType === "country" || location.selected || query.length < 2) {
+      setLocationResults([]);
+      setLocationLoading(false);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      setLocationLoading(true);
+      setLocationMessage("");
+      try {
+        const response = await fetch(`/api/maps/search?query=${encodeURIComponent(query)}`, {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data?.message || "지역 검색 결과를 불러오지 못했습니다.");
+        const results = Array.isArray(data.results) ? data.results : [];
+        setLocationResults(results);
+        setLocationOpen(true);
+        if (results.length === 0) setLocationMessage("검색 결과가 없습니다. 읍·면·동 단위로 다시 검색해 주세요.");
+      } catch (error) {
+        if (error.name !== "AbortError") setLocationMessage(error.message || "지역 검색 중 오류가 발생했습니다.");
+      } finally {
+        if (!controller.signal.aborted) setLocationLoading(false);
+      }
+    }, 280);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [location.selected, locationQuery, selectedDistance?.coverageType]);
 
   if (!subject) return null;
 
@@ -85,7 +145,11 @@ export default function AdCampaignModal({
     event.preventDefault();
     const form = event.currentTarget;
     const submitter = event.nativeEvent.submitter;
-    if (!creativeInputRef.current || !canSubmit) return;
+    if (!canSubmit) {
+      setShowErrors(true);
+      return;
+    }
+    if (!creativeInputRef.current) return;
 
     setCapturePending(true);
     try {
@@ -101,175 +165,183 @@ export default function AdCampaignModal({
     }
   }
 
-  async function continueFromDistance() {
-    if (!selectedDistance) return;
-    if (selectedDistance.coverageType === "country") {
-      setLocationMessage("대한민국 전체가 광고 노출 지역으로 설정됩니다.");
-      setStep("duration");
-      return;
-    }
-    if (location.selected) {
-      setStep("duration");
-      return;
-    }
-    if (!navigator.geolocation) {
-      setLocationMessage("현재 브라우저에서는 위치 권한을 사용할 수 없습니다.");
-      return;
-    }
+  function chooseLocation(result) {
+    setLocation({ selected: true, lat: result.lat, lng: result.lng, label: result.label });
+    setLocationQuery(result.label);
+    setLocationResults([]);
+    setLocationOpen(false);
+    setLocationMessage("");
+  }
 
-    setLocating(true);
-    setLocationMessage("광고 중심이 될 현재 위치를 확인하고 있습니다.");
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const lat = Number(position.coords.latitude.toFixed(6));
-        const lng = Number(position.coords.longitude.toFixed(6));
-        let label = "현재 위치 기준";
-        try {
-          const response = await fetch(`/api/maps/search?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`, {
-            cache: "no-store",
-          });
-          const data = await response.json().catch(() => ({}));
-          if (response.ok) label = cleanRegionLabel(data?.result?.label || data?.result?.address) || label;
-        } catch {
-          // Coordinates remain usable even when reverse geocoding is temporarily unavailable.
-        }
-        setLocation({ selected: true, lat, lng, label });
-        setLocationMessage(`${label}을 중심으로 광고 노출 거리를 적용합니다.`);
-        setLocating(false);
-        setStep("duration");
-      },
-      () => {
-        setLocating(false);
-        setLocationMessage("위치 권한을 허용해야 선택한 거리 범위로 광고를 설정할 수 있습니다.");
-      },
-      { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 },
-    );
+  function changeLocationQuery(value) {
+    setLocationQuery(value);
+    setLocation({ selected: false, lat: null, lng: null, label: "" });
+    setLocationOpen(value.trim().length >= 2);
+    setLocationMessage("");
+  }
+
+  function chooseDistance(option) {
+    setDistanceOptionId(option.id);
+    setDistanceOpen(false);
+    setDurationOpen(false);
+  }
+
+  function chooseDuration(option) {
+    setDurationOptionId(option.id);
+    setDurationOpen(false);
+    setDistanceOpen(false);
   }
 
   return (
-    <section className="modal-backdrop ad-modal-backdrop" aria-label="광고 신청" role="dialog" aria-modal="true">
+    <section className="modal-backdrop ad-modal-backdrop ad-setup-backdrop" aria-label="온라인 실종광고 설정" role="dialog" aria-modal="true">
       <ModalScrollLock />
-      <div className="modal-surface ad-modal ad-option-modal" data-modal-surface>
-        <header className="ad-option-modal-header">
-          <div>
-            <p className="intro-kicker">온라인 실종 광고 설정</p>
-            <h2>{subject.name}</h2>
-          </div>
-          {!activeAd && <AdStepIndicator step={step} />}
+      <div className="modal-surface ad-setup-page" data-modal-surface>
+        <header className="ad-setup-topbar">
+          <a href={backHref} aria-label="대상자 선택으로 돌아가기">‹</a>
+          <h2>광고 세팅</h2>
+          <span aria-hidden="true" />
         </header>
 
         {activeAd ? (
           <ActiveAdvertisement subject={subject} pauseAction={pauseAction} resumeAction={resumeAction} endAction={endAction} />
-        ) : step === "distance" ? (
-          <section className="ad-option-step" aria-labelledby="ad-distance-title">
-            <div className="ad-option-step-title">
-              <span className="ad-step-symbol" aria-hidden="true">km</span>
-              <div><h3 id="ad-distance-title">광고 노출 거리 선택</h3><p>광고를 노출할 범위를 선택해 주세요.</p></div>
-            </div>
-            <div className="ad-choice-list" role="radiogroup" aria-label="광고 노출 거리">
-              {distanceOptions.map((option) => (
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked={option.id === distanceOptionId}
-                  className={`ad-choice-card${option.id === distanceOptionId ? " selected" : ""}`}
-                  onClick={() => setDistanceOptionId(option.id)}
-                  key={option.id}
-                >
-                  <span className="ad-choice-icon" aria-hidden="true">{option.coverageType === "country" ? "전국" : `${option.radiusKm}`}</span>
-                  <span className="ad-choice-copy"><strong>{optionDisplayLabel(option)}</strong><small>{option.description}</small></span>
-                  <span className="ad-choice-price">{option.price > 0 ? `+${formatCurrency(option.price)}` : "기본"}</span>
-                  <i aria-hidden="true" />
-                </button>
-              ))}
-            </div>
-            {locationMessage && <p className="ad-location-permission-message" role="status">{locationMessage}</p>}
-            <button type="button" className="action" onClick={continueFromDistance} disabled={!selectedDistance || locating}>
-              {locating ? "현재 위치 확인중" : "다음"}
-            </button>
-          </section>
-        ) : step === "duration" ? (
-          <section className="ad-option-step" aria-labelledby="ad-duration-title">
-            <div className="ad-option-step-title">
-              <span className="ad-step-symbol" aria-hidden="true">일</span>
-              <div><h3 id="ad-duration-title">광고 기간 선택</h3><p>오늘부터 광고를 진행할 기간을 선택해 주세요.</p></div>
-            </div>
-            <div className="ad-choice-list" role="radiogroup" aria-label="광고 기간">
-              {durationOptions.map((option) => (
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked={option.id === durationOptionId}
-                  className={`ad-choice-card${option.id === durationOptionId ? " selected" : ""}`}
-                  onClick={() => setDurationOptionId(option.id)}
-                  key={option.id}
-                >
-                  <span className="ad-choice-icon calendar" aria-hidden="true">{option.days}</span>
-                  <span className="ad-choice-copy"><strong>{option.label}</strong><small>{option.description}</small></span>
-                  <span className="ad-choice-price">{formatCurrency(option.price)}</span>
-                  <i aria-hidden="true" />
-                </button>
-              ))}
-            </div>
-            <div className="ad-step-actions">
-              <button type="button" className="plain-button" onClick={() => setStep("distance")}>이전</button>
-              <button type="button" className="action" onClick={() => setStep("summary")} disabled={!selectedDuration}>다음</button>
-            </div>
-          </section>
         ) : (
-          <form action={createAction} className="ad-request-form ad-preview-form" onSubmit={prepareCreativeImage}>
+          <form action={createAction} className="ad-setup-form" onSubmit={prepareCreativeImage}>
             <input type="hidden" name="subjectId" value={subject.id} />
             <input type="hidden" name="distanceOptionId" value={selectedDistance?.id || ""} />
             <input type="hidden" name="durationOptionId" value={selectedDuration?.id || ""} />
             <input type="hidden" name="region" value={regionLabel} />
-            <input type="hidden" name="regionLatitude" value={location.selected ? location.lat : ""} />
-            <input type="hidden" name="regionLongitude" value={location.selected ? location.lng : ""} />
+            <input type="hidden" name="regionLatitude" value={regionComplete && location.selected ? location.lat : ""} />
+            <input type="hidden" name="regionLongitude" value={regionComplete && location.selected ? location.lng : ""} />
             <input ref={creativeInputRef} type="hidden" name="creativeImageDataUrl" />
 
-            <SelectionSummary
-              subject={subject}
-              distance={selectedDistance}
-              duration={selectedDuration}
-              locationLabel={regionLabel}
-              quote={quote}
-              startDate={startDate}
-              endDate={endDate}
-            />
-            <MissingAdPreview
-              subject={subject}
-              quote={quote}
-              startDate={startDate}
-              endDate={endDate}
-              regionLabel={regionLabel}
-              distance={selectedDistance}
-            />
-            <div className="ad-preview-actions full-field">
-              <button type="button" className="plain-button" onClick={() => setStep("duration")}>다시 선택</button>
-              <FormSubmitButton className="action" pendingText="결제 준비중" disabled={!canSubmit || capturePending}>
-                {capturePending ? "이미지 생성중" : `${formatCurrency(quote.amount)} 결제하기`}
-              </FormSubmitButton>
-            </div>
+            <section className="ad-setup-section" aria-labelledby="ad-setup-region-title">
+              <AdSetupHeading number="1" id="ad-setup-region-title" title="지역 선택" description="광고 거리의 기준이 될 지역을 선택해 주세요." />
+              <div className="ad-setup-location" ref={locationSearchRef}>
+                <div className={`ad-setup-location-input${location.selected ? " selected" : ""}${selectedDistance?.coverageType === "country" ? " country" : ""}${showErrors && !regionComplete ? " invalid" : ""}`}>
+                  <img src="/assets/ad-setup/위치핀.png" alt="" />
+                  <input
+                    value={locationQuery}
+                    onChange={(event) => changeLocationQuery(event.target.value)}
+                    onFocus={() => locationQuery.trim().length >= 2 && setLocationOpen(true)}
+                    placeholder="지역명 또는 주소를 입력해 주세요"
+                    disabled={selectedDistance?.coverageType === "country"}
+                    aria-label="광고 기준 지역"
+                    autoComplete="off"
+                  />
+                  {locationLoading ? <span className="ad-setup-spinner" aria-label="지역 검색 중" /> : location.selected ? <b aria-hidden="true">✓</b> : null}
+                </div>
+                {locationOpen && locationResults.length > 0 && (
+                  <div className="ad-setup-location-results" role="listbox" aria-label="지역 검색 결과">
+                    {locationResults.map((result) => (
+                      <button type="button" role="option" aria-selected="false" onClick={() => chooseLocation(result)} key={result.id}>
+                        <img src="/assets/ad-setup/위치핀.png" alt="" />
+                        <span><strong>{result.label}</strong><small>{result.address}</small></span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <p className="ad-setup-helper">지역명 또는 주소를 읍/면/동 기준으로 검색해 주세요</p>
+              {locationMessage && <p className="ad-setup-message" role="status">{locationMessage}</p>}
+              {showErrors && !regionComplete && <p className="ad-setup-error">광고 기준 지역을 선택해 주세요.</p>}
+            </section>
+
+            <section className="ad-setup-section" aria-labelledby="ad-setup-distance-title">
+              <AdSetupHeading number="2" id="ad-setup-distance-title" title="거리 선택" description="광고를 노출할 범위를 선택해 주세요." />
+              <div className="ad-setup-select-wrap" ref={distanceSelectRef}>
+                <button
+                  className={`ad-setup-select-trigger${selectedDistance ? " selected" : ""}${showErrors && !selectedDistance ? " invalid" : ""}`}
+                  type="button"
+                  aria-expanded={distanceOpen}
+                  onClick={() => { setDistanceOpen((open) => !open); setDurationOpen(false); setLocationOpen(false); }}
+                >
+                  <span>{selectedDistance ? distanceTriggerLabel(selectedDistance) : "거리를 선택해 주세요"}</span>
+                  <b aria-hidden="true">⌄</b>
+                </button>
+                {distanceOpen && (
+                  <div className="ad-setup-option-menu" role="radiogroup" aria-label="광고 거리">
+                    {distanceOptions.map((option) => (
+                      <button type="button" role="radio" aria-checked={option.id === distanceOptionId} onClick={() => chooseDistance(option)} key={option.id}>
+                        <img src={distanceIcon(option)} alt="" />
+                        <span><strong>{distanceOptionTitle(option)}</strong><small>{distanceOptionDescription(option)}</small></span>
+                        {option.id === distanceOptionId && <b aria-hidden="true">✓</b>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {showErrors && !selectedDistance && <p className="ad-setup-error">광고 거리를 선택해 주세요.</p>}
+            </section>
+
+            <section className="ad-setup-section" aria-labelledby="ad-setup-duration-title">
+              <AdSetupHeading number="3" id="ad-setup-duration-title" title="기간 선택" description="광고를 진행할 기간을 선택해 주세요." />
+              <div className="ad-setup-select-wrap" ref={durationSelectRef}>
+                <button
+                  className={`ad-setup-select-trigger${selectedDuration ? " selected" : ""}${showErrors && !selectedDuration ? " invalid" : ""}`}
+                  type="button"
+                  aria-expanded={durationOpen}
+                  onClick={() => { setDurationOpen((open) => !open); setDistanceOpen(false); setLocationOpen(false); }}
+                >
+                  <span>{selectedDuration?.label || "기간을 선택해 주세요"}</span>
+                  <b aria-hidden="true">⌄</b>
+                </button>
+                {durationOpen && (
+                  <div className="ad-setup-option-menu duration" role="radiogroup" aria-label="광고 기간">
+                    {durationOptions.map((option) => (
+                      <button type="button" role="radio" aria-checked={option.id === durationOptionId} onClick={() => chooseDuration(option)} key={option.id}>
+                        <span><strong>{option.label}</strong></span>
+                        {option.id === durationOptionId && <b aria-hidden="true">✓</b>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {showErrors && !selectedDuration && <p className="ad-setup-error">광고 기간을 선택해 주세요.</p>}
+            </section>
+
+            {canSubmit && (
+              <section className="ad-setup-section ad-setup-summary" aria-labelledby="ad-setup-summary-title">
+                <AdSetupHeading number="4" id="ad-setup-summary-title" title="선택 내역" />
+                <div className="ad-setup-summary-card">
+                  <AdSetupSummaryRow icon="대상자.png" label="대상자" value={subject.name} />
+                  <AdSetupSummaryRow icon="광고지역.png" label="광고 기준 지역" value={regionLabel} />
+                  <AdSetupSummaryRow icon="광고거리.png" label="광고 거리" value={selectedDistance.coverageType === "country" ? "전국" : `${selectedDistance.radiusKm}km`} />
+                  <AdSetupSummaryRow icon="광고기간.png" label="광고 기간" value={selectedDuration.label} />
+                </div>
+              </section>
+            )}
+
+            <button
+              className={`ad-setup-next${canSubmit ? "" : " disabled"}`}
+              type="submit"
+              aria-label={canSubmit ? "다음" : "다음, 필수 항목 선택 필요"}
+              disabled={capturePending}
+            >
+              {capturePending ? "준비 중" : "다음"}
+            </button>
           </form>
         )}
-
-        <div className="modal-footer">
-          <a className="plain-button modal-close-button" href="/?tab=dashboard">닫기</a>
-        </div>
       </div>
     </section>
   );
 }
 
-function AdStepIndicator({ step }) {
-  const current = step === "distance" ? 1 : step === "duration" ? 2 : 3;
+function AdSetupHeading({ number, id, title, description = "" }) {
   return (
-    <ol className="ad-step-indicator" aria-label={`광고 설정 ${current}단계`}>
-      {["거리 선택", "기간 선택", "선택 확인"].map((label, index) => (
-        <li className={current === index + 1 ? "active" : current > index + 1 ? "complete" : ""} key={label}>
-          <span>{index + 1}</span>{label}
-        </li>
-      ))}
-    </ol>
+    <header className="ad-setup-heading">
+      <h3 id={id}><span>{number}</span>{title}</h3>
+      {description && <p>{description}</p>}
+    </header>
+  );
+}
+
+function AdSetupSummaryRow({ icon, label, value }) {
+  return (
+    <div>
+      <img src={`/assets/ad-setup/${icon}`} alt="" />
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
   );
 }
 
@@ -552,6 +624,31 @@ function calculateOptionQuote(distance, duration) {
 function optionDisplayLabel(option) {
   if (!option) return "-";
   return option.coverageType === "country" ? option.label : `${option.label} (${option.radiusKm}km)`;
+}
+
+function distanceTriggerLabel(option) {
+  if (!option) return "거리를 선택해 주세요";
+  if (option.coverageType === "country") return "전국 · 전국 단위";
+  return `${option.radiusKm}km · ${distanceOptionDescription(option)}`;
+}
+
+function distanceOptionTitle(option) {
+  return option.coverageType === "country" ? "전국" : `${option.radiusKm}km`;
+}
+
+function distanceOptionDescription(option) {
+  if (option.coverageType === "country") return "전국 단위";
+  if (option.radiusKm <= 10) return "위치 주변";
+  if (option.radiusKm <= 20) return "인근 지역";
+  if (option.radiusKm <= 40) return "인접 도시";
+  return "광역권";
+}
+
+function distanceIcon(option) {
+  if (option.coverageType === "country") return "/assets/ad-setup/준국.png";
+  if (option.radiusKm <= 10) return "/assets/ad-setup/10km_위치주변.png";
+  if (option.radiusKm <= 20) return "/assets/ad-setup/20km_인근지역.png";
+  return "/assets/ad-setup/40km_인접도시.png";
 }
 
 function cleanRegionLabel(value) {

@@ -92,8 +92,8 @@ function publicationMessage(publication, { alreadyPaid = false, adminPass = fals
   }
   if (publication?.published) {
     return adminPass
-      ? "관리자 결제패스가 완료되었고 Meta 광고가 자동 발행되었습니다. [해당 문구는 관리자만 볼 수 있습니다]"
-      : "결제와 동시에 Meta 광고가 자동 발행되었습니다. Meta 심사와 노출 현황은 광고내역에서 확인할 수 있습니다.";
+      ? "관리자 결제패스가 완료되었습니다. 광고는 Meta 검토 대기 상태입니다. [해당 문구는 관리자만 볼 수 있습니다]"
+      : "광고가 Meta 검토 대기 상태로 접수되었습니다.";
   }
   if (publication?.status === "preparing") {
     return "결제는 완료되었으며 Meta 광고를 자동 발행하고 있습니다. 잠시 후 광고내역에서 상태를 확인해 주세요.";

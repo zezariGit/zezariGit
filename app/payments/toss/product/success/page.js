@@ -7,8 +7,14 @@ import ShopComplete from "../../shop-order-complete";
 export const dynamic = "force-dynamic";
 
 export default async function TossProductSuccessPage({ searchParams }) {
-  const session = await getServerSession(authOptions);
   const params = await searchParams;
+  const preview = process.env.NODE_ENV !== "production" && String(params?.preview || "") === "1";
+
+  if (preview) {
+    return <ShopComplete order={{ id: "local-preview" }} />;
+  }
+
+  const session = await getServerSession(authOptions);
   const productOrderId = String(params?.productOrderId || "").trim();
   const paymentKey = String(params?.paymentKey || "").trim();
   const orderId = String(params?.orderId || "").trim();

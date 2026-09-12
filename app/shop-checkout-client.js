@@ -39,9 +39,11 @@ export default function ShopCheckoutClient({
   guardian = null,
   coupons = [],
   adminPaymentPassEnabled = false,
+  initialOrderPreview = false,
 }) {
   const initialProduct = products.find((item) => item.id === initialProductId) || null;
-  const [step, setStep] = useState("configure");
+  const initialDesign = getShopDesigns(initialProduct)[0] || null;
+  const [step, setStep] = useState(initialOrderPreview ? "order" : "configure");
   const [productId, setProductId] = useState(initialProduct?.id || "");
   const [quantity, setQuantity] = useState(1);
   const [subjectId, setSubjectId] = useState(
@@ -50,10 +52,12 @@ export default function ShopCheckoutClient({
       : subjects[0]?.id || ""
   );
   const [designIndex, setDesignIndex] = useState(0);
-  const [designId, setDesignId] = useState("");
-  const [selectedDesignName, setSelectedDesignName] = useState("");
+  const [designId, setDesignId] = useState(initialDesign?.id || "");
+  const [selectedDesignName, setSelectedDesignName] = useState(initialDesign?.name || "");
   const [couponId, setCouponId] = useState("");
   const [couponPickerOpen, setCouponPickerOpen] = useState(false);
+  const [recipientName, setRecipientName] = useState("");
+  const [recipientPhone, setRecipientPhone] = useState("");
   const [shippingAddress, setShippingAddress] = useState(guardian?.address || "");
   const [shippingAddressDetail, setShippingAddressDetail] = useState(guardian?.address_detail || "");
   const [sdkReady, setSdkReady] = useState(false);
@@ -73,7 +77,7 @@ export default function ShopCheckoutClient({
       {
         ...(window.history.state || {}),
         zezariShopCheckout: true,
-        shopStep: "configure",
+        shopStep: initialOrderPreview ? "order" : "configure",
         couponPickerOpen: false,
       },
       "",
@@ -92,7 +96,7 @@ export default function ShopCheckoutClient({
 
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
+  }, [initialOrderPreview]);
 
   const product = useMemo(
     () => products.find((item) => item.id === productId) || null,
@@ -165,6 +169,12 @@ export default function ShopCheckoutClient({
       setWidgetStatus("idle");
       return undefined;
     }
+    if (initialOrderPreview) {
+      widgetRef.current = null;
+      widgetAmountRef.current = null;
+      setWidgetStatus("preview");
+      return undefined;
+    }
     if (freePayment) {
       widgetRef.current = null;
       widgetAmountRef.current = null;
@@ -218,7 +228,7 @@ export default function ShopCheckoutClient({
       cancelled = true;
       widgetRef.current = null;
     };
-  }, [freePayment, sdkReady, step]);
+  }, [freePayment, initialOrderPreview, sdkReady, step]);
 
   useEffect(() => {
     if (step !== "order" || freePayment || widgetStatus !== "ready" || !widgetRef.current) return;
@@ -260,6 +270,14 @@ export default function ShopCheckoutClient({
     }
     if (designs.length > 0 && !selectedDesign) {
       setMessage("상품 디자인을 선택해 주세요.");
+      return false;
+    }
+    if (step === "order" && !recipientName.trim()) {
+      setMessage("수령인 이름을 입력해 주세요.");
+      return false;
+    }
+    if (step === "order" && !/^01\d{8,9}$/.test(recipientPhone.replace(/\D/g, ""))) {
+      setMessage("수령인의 휴대전화 번호를 정확히 입력해 주세요.");
       return false;
     }
     if (step === "order" && !shippingAddress.trim()) {
@@ -321,6 +339,8 @@ export default function ShopCheckoutClient({
         designIndex,
         designId: selectedDesign?.id || "",
         couponId,
+        recipientName,
+        recipientPhone,
         shippingAddress,
         shippingAddressDetail,
         paymentMethod: "WIDGET",
@@ -432,7 +452,11 @@ export default function ShopCheckoutClient({
           }} aria-label="이전으로 돌아가기">‹</a>
         )}
         <h1>{selectionView ? selectionTitle : step === "configure" ? "상품 구매" : "결제"}</h1>
-        <a className="shop-help-mark" href="/shop/service" aria-label="상품구매 서비스 소개">?</a>
+        {step === "configure" || selectionView ? (
+          <a className="shop-help-mark" href="/shop/service" aria-label="상품구매 서비스 소개">?</a>
+        ) : (
+          <span aria-hidden="true" />
+        )}
       </header>
 
       {selectionView === "product" && (
@@ -485,6 +509,10 @@ export default function ShopCheckoutClient({
             design={selectedDesign}
             quantity={quantity}
             subject={selectedSubject}
+            recipientName={recipientName}
+            setRecipientName={setRecipientName}
+            recipientPhone={recipientPhone}
+            setRecipientPhone={setRecipientPhone}
             shippingAddress={shippingAddress}
             setShippingAddress={setShippingAddress}
             shippingAddressDetail={shippingAddressDetail}
@@ -497,6 +525,7 @@ export default function ShopCheckoutClient({
             closeCouponPicker={closeCouponPicker}
             chooseCoupon={chooseCoupon}
             widgetStatus={widgetStatus}
+            paymentPreview={initialOrderPreview}
             subtotalAmount={subtotalAmount}
             discountAmount={discountAmount}
             amount={paymentAmount}
@@ -724,6 +753,10 @@ function OrderInformation({
   design,
   quantity,
   subject,
+  recipientName,
+  setRecipientName,
+  recipientPhone,
+  setRecipientPhone,
   shippingAddress,
   setShippingAddress,
   shippingAddressDetail,
@@ -736,6 +769,7 @@ function OrderInformation({
   closeCouponPicker,
   chooseCoupon,
   widgetStatus,
+  paymentPreview,
   subtotalAmount,
   discountAmount,
   amount,
@@ -744,14 +778,15 @@ function OrderInformation({
     <div className="order-info-stack">
       <section className="order-section">
         <h2>1. 구매 상품</h2>
-        <div className="order-product-row">
-          <div className="order-product-image">
-            <ProductVisual product={product} design={design} />
+        <div className="order-purchase-card">
+          <div className="order-purchase-subject">
+            <span>대상자</span>
+            <strong>{subject?.name || "대상자 미선택"}</strong>
           </div>
-          <div>
+          <div className="order-purchase-details">
             <strong>{formatProductDesignName(product, design)}</strong>
-            <span>{subject?.name || "대상자 미선택"} 대상 / {quantity}개</span>
-            <em>{formatCurrency(amount)}</em>
+            <span>{quantity}개</span>
+            <em>{formatCurrency(subtotalAmount)}</em>
           </div>
         </div>
       </section>
@@ -759,12 +794,37 @@ function OrderInformation({
       <section className="order-section">
         <h2>2. 배송지 선택</h2>
         <div className="shipping-address-box">
-          <span>배송지</span>
+          <label className="checkout-shipping-field">
+            <span>수령인</span>
+            <input
+              type="text"
+              value={recipientName}
+              onChange={(event) => setRecipientName(event.target.value)}
+              placeholder="받으실 분의 이름을 입력해 주세요"
+              autoComplete="name"
+              maxLength={40}
+            />
+          </label>
+          <label className="checkout-shipping-field">
+            <span>연락처</span>
+            <input
+              type="tel"
+              value={recipientPhone}
+              onChange={(event) => setRecipientPhone(event.target.value)}
+              placeholder="휴대전화 번호를 입력해 주세요"
+              autoComplete="tel"
+              inputMode="tel"
+              maxLength={13}
+            />
+          </label>
           <KakaoPostcodeAddress
             defaultValue={shippingAddress}
             defaultDetailValue={shippingAddressDetail}
             addressName="shippingAddress"
             detailName="shippingAddressDetail"
+            addressLabel="배송지"
+            detailLabel="상세 주소"
+            detailPlaceholder="상세 주소를 입력해 주세요"
             addressReadOnly
             onAddressChange={setShippingAddress}
             onDetailChange={setShippingAddressDetail}
@@ -861,12 +921,39 @@ function OrderInformation({
         </div>
       </section>
 
-      <section className="order-section">
+      <section className="order-section payment-method-section">
         <h2>5. 결제 방법</h2>
         {amount <= 0 ? (
           <div className="free-payment-box">
             <strong>쿠폰 전액 할인</strong>
             <span>결제수단 입력 없이 주문을 완료합니다.</span>
+          </div>
+        ) : paymentPreview ? (
+          <div className="payment-method-preview" aria-label="결제수단 미리보기">
+            <strong>결제 방법</strong>
+            <div className="payment-method-preview-options" role="radiogroup" aria-label="결제 방법">
+              <button className="selected" type="button" role="radio" aria-checked="true">
+                신용·<br />체크카드
+              </button>
+              <button type="button" role="radio" aria-checked="false">
+                <span>적립 혜택</span>
+                <b><i>N</i> pay</b>
+              </button>
+            </div>
+            <div className="payment-card-preview">
+              <label htmlFor="preview-card-company">카드사</label>
+              <select id="preview-card-company" defaultValue="">
+                <option value="" disabled>카드사 선택</option>
+              </select>
+            </div>
+            <p><strong>삼성 앱카드</strong> · 6만원 이상 결제 시 1,000원 즉시할인</p>
+            <a href="#payment-benefits">신용카드 무이자 할부 안내 <span aria-hidden="true">›</span></a>
+            <small>* 혜택은 조기 종료될 수 있어요. 결제 전 금액을 꼭 확인해주세요.</small>
+            <label className="payment-agreement-preview">
+              <input type="checkbox" />
+              <span>[필수] 결제 서비스 이용 약관, 개인정보 처리 동의</span>
+              <b aria-hidden="true">›</b>
+            </label>
           </div>
         ) : (
           <div className="toss-widget-shell" aria-busy={widgetStatus === "loading"}>

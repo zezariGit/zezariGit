@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 const POSTCODE_SCRIPT_URL = "https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
 
@@ -80,6 +80,9 @@ export default function KakaoPostcodeAddress({
   defaultDetailValue = "",
   addressName = "address",
   detailName = "addressDetail",
+  addressLabel = "",
+  detailLabel = "",
+  detailPlaceholder = "상세주소를 입력해 주세요 (동·호수 등)",
   addressReadOnly = false,
   onAddressChange,
   onDetailChange,
@@ -89,6 +92,8 @@ export default function KakaoPostcodeAddress({
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const addressId = useId();
+  const detailId = useId();
   const postcodeContainerRef = useRef(null);
   const detailInputRef = useRef(null);
 
@@ -162,8 +167,10 @@ export default function KakaoPostcodeAddress({
 
   return (
     <div className="postcode-address-field">
+      {addressLabel && <label className="postcode-field-label" htmlFor={addressId}>{addressLabel}</label>}
       <div className="postcode-address-row">
         <input
+          id={addressId}
           name={addressName}
           value={address}
           onChange={addressReadOnly ? undefined : (event) => changeAddress(event.target.value)}
@@ -178,13 +185,15 @@ export default function KakaoPostcodeAddress({
           {loading ? "불러오는 중" : "주소 검색"}
         </button>
       </div>
+      {detailLabel && <label className="postcode-field-label" htmlFor={detailId}>{detailLabel}</label>}
       <input
+        id={detailId}
         ref={detailInputRef}
         className="postcode-detail-input"
         name={detailName}
         value={detailAddress}
         onChange={(event) => changeDetailAddress(event.target.value)}
-        placeholder="상세주소를 입력해 주세요 (동·호수 등)"
+        placeholder={detailPlaceholder}
         autoComplete="address-line2"
       />
       {message && <p className="field-helper" role="status">{message}</p>}
