@@ -32,6 +32,7 @@ import {
   getAdminOrdersData,
   getAdminPaymentsData,
   getAdminProductsData,
+  getProductServiceIntro,
   getAdminSafePhonePoolData,
   getAdminSubscriptionsData,
   getAdminSubscriptionPlansData,
@@ -67,6 +68,7 @@ import {
   saveAdminMessageAction,
   saveAdminMessageTemplateAction,
   saveLocationStaffPermissionAction,
+  saveProductServiceIntroAction,
   saveServiceRegulationAction,
   recordLocationDisclosureAction,
   setSubscriptionAdminMemoAction,
@@ -113,7 +115,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "image-uploads", "orders", "subscriptions", "ads", "ad-pricing", "missing", "locations", "location-security", "safe-phones", "notifications", "message-templates", "service-regulations", "inquiries"].includes(resolvedSearchParams?.section)
+  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "product-service-intro", "image-uploads", "orders", "subscriptions", "ads", "ad-pricing", "missing", "locations", "location-security", "safe-phones", "notifications", "message-templates", "service-regulations", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -234,6 +236,7 @@ export default async function AdminPage({ searchParams }) {
     : null;
   const couponsData = activeSection === "coupons" ? await getAdminCouponsData(couponFilters, selectedCouponId) : null;
   const productsData = activeSection === "products" ? await getAdminProductsData() : null;
+  const productServiceIntro = activeSection === "product-service-intro" ? await getProductServiceIntro() : null;
   const imageUploadSettings = activeSection === "image-uploads" ? await getImageUploadSettings() : null;
   const ordersData = activeSection === "orders" ? await getAdminOrdersData(orderFilters, selectedOrderId) : null;
   const subscriptionsData = activeSection === "subscriptions" ? await getAdminSubscriptionsData(subscriptionFilters, selectedSubscriptionId) : null;
@@ -277,6 +280,8 @@ export default async function AdminPage({ searchParams }) {
             ? "쿠폰 관리"
           : activeSection === "products"
             ? "상품 관리"
+            : activeSection === "product-service-intro"
+              ? "상품구매 서비스소개 관리"
             : activeSection === "image-uploads"
               ? "이미지업로드 관리"
             : activeSection === "orders"
@@ -319,6 +324,8 @@ export default async function AdminPage({ searchParams }) {
             ? "쿠폰 코드를 발행하고 할인 조건, 유효기간, 사용 가능 상태를 관리합니다."
           : activeSection === "products"
             ? "사용자 상품 선택 화면에 노출되는 상품 이미지, 가격, 활성 상태를 관리합니다."
+            : activeSection === "product-service-intro"
+              ? "상품 구매 도움말에서 확인하는 세로형 서비스 소개 이미지를 관리합니다."
             : activeSection === "image-uploads"
               ? "보호자와 관리대상 사진의 업로드 허용 용량을 관리합니다."
             : activeSection === "orders"
@@ -373,6 +380,8 @@ export default async function AdminPage({ searchParams }) {
             <CouponManagementSection couponsData={couponsData} />
           ) : activeSection === "products" ? (
             <ProductManagementSection productsData={productsData} selectedProductId={resolvedSearchParams?.product || ""} />
+          ) : activeSection === "product-service-intro" ? (
+            <ProductServiceIntroManagementSection setting={productServiceIntro} />
           ) : activeSection === "image-uploads" ? (
             <ImageUploadManagementSection setting={imageUploadSettings} />
           ) : activeSection === "orders" ? (
@@ -438,6 +447,41 @@ function ServiceRegulationManagementSection({ regulations, selectedType }) {
         ))}
       </nav>
       <ServiceRegulationEditor regulation={regulations[activeType]} saveAction={saveServiceRegulationAction} />
+    </section>
+  );
+}
+
+function ProductServiceIntroManagementSection({ setting }) {
+  return (
+    <section className="admin-panel product-service-intro-admin" aria-labelledby="product-service-intro-title">
+      <div className="service-regulation-admin-heading">
+        <div>
+          <h2 id="product-service-intro-title">상품구매 서비스소개 이미지</h2>
+          <p>세로형 상세페이지 이미지를 저장하면 사용자 상품 구매의 도움말 화면에 즉시 반영됩니다.</p>
+        </div>
+        {setting.updated_at && <span>최근 저장 {formatStandardDateTime(setting.updated_at)}</span>}
+      </div>
+      <form action={saveProductServiceIntroAction} className="product-service-intro-form">
+        <label>
+          <strong>상세페이지 이미지</strong>
+          <input name="introImage" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+          <small>JPEG, PNG, WebP, GIF 형식의 세로형 이미지, 최대 4MB</small>
+        </label>
+        {Number(setting.has_image || 0) === 1 && (
+          <>
+            <label className="product-service-intro-remove">
+              <input name="removeImage" type="checkbox" value="1" />
+              <span>현재 이미지 삭제</span>
+            </label>
+            <div className="product-service-intro-preview">
+              <strong>현재 사용자 화면</strong>
+              <img src={`/api/shop/service-intro/image?v=${encodeURIComponent(setting.updated_at || "")}`} alt="상품구매 서비스소개 현재 이미지" />
+            </div>
+          </>
+        )}
+        {Number(setting.has_image || 0) !== 1 && <p className="empty-text">등록된 이미지가 없어 임시 소개 콘텐츠가 표시됩니다.</p>}
+        <FormSubmitButton className="primary-button" pendingText="저장중">저장</FormSubmitButton>
+      </form>
     </section>
   );
 }

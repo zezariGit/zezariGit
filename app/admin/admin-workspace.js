@@ -16,6 +16,7 @@ const MENU_ITEMS = [
   { id: "payments", label: "결제 관리", href: "/admin?section=payments", icon: "payment" },
   { id: "coupons", label: "쿠폰 관리", href: "/admin?section=coupons", icon: "coupon" },
   { id: "products", label: "상품 관리", href: "/admin?section=products", icon: "box" },
+  { id: "product-service-intro", label: "상품구매 서비스소개 관리", href: "/admin?section=product-service-intro", icon: "image" },
   { id: "image-uploads", label: "이미지업로드 관리", href: "/admin?section=image-uploads", icon: "image" },
   { id: "ads", label: "광고 관리", href: "/admin?section=ads", icon: "megaphone" },
   { id: "ad-pricing", label: "광고결제 관리", href: "/admin?section=ad-pricing", icon: "payment" },

@@ -16,11 +16,6 @@ const PRODUCT_PICKER_IMAGES = {
   "bracelet-necklace-keyring": "/assets/shop-icons/product-bracelet-necklace-keyring.png",
 };
 
-const WIDE_PRODUCT_PICKER_SLUGS = new Set([
-  "bracelet-necklace",
-  "necklace-keyring",
-  "bracelet-necklace-keyring",
-]);
 const ZODIAC_PICKER_IMAGES = {
   쥐: "/assets/shop-icons/zodiac-rat.png",
   소: "/assets/shop-icons/zodiac-ox.png",
@@ -64,7 +59,8 @@ export default function ShopCheckoutClient({
   const [widgetStatus, setWidgetStatus] = useState("idle");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [helpOpen, setHelpOpen] = useState(false);
+  const [selectionView, setSelectionView] = useState("");
+  const [draftSelectionId, setDraftSelectionId] = useState("");
   const widgetRef = useRef(null);
   const latestPaymentAmountRef = useRef(0);
   const widgetAmountRef = useRef(null);
@@ -394,52 +390,76 @@ export default function ShopCheckoutClient({
     }
   };
 
+  const openSelectionView = (view) => {
+    setDraftSelectionId(view === "product" ? productId : designId);
+    setSelectionView(view);
+  };
+
+  const confirmSelection = () => {
+    if (!draftSelectionId) return;
+    if (selectionView === "product") {
+      setProductId(draftSelectionId);
+    } else if (selectionView === "design") {
+      const nextIndex = designs.findIndex((design) => design.id === draftSelectionId);
+      setDesignIndex(Math.max(0, nextIndex));
+      setDesignId(draftSelectionId);
+    }
+    setSelectionView("");
+  };
+
+  const selectionTitle = selectionView === "product" ? "상품 선택" : "디자인 선택";
+
   return (
     <section className="shop-phone-panel">
       <header className="shop-topbar">
-        <a className="shop-back-link" href={step === "configure" ? "/?tab=dashboard" : "#back"} onClick={(event) => {
-          if (step === "configure") return;
-          event.preventDefault();
-          window.history.back();
-        }} aria-label="이전으로 돌아가기">‹</a>
-        <h1>{step === "configure" ? "상품 구매" : step === "order" ? "결제" : product.name}</h1>
-        <button
-          className="shop-help-mark"
-          type="button"
-          onClick={() => setHelpOpen((current) => !current)}
-          aria-label="상품 구매 도움말"
-          aria-expanded={helpOpen}
-        >
-          ?
-        </button>
-        {helpOpen && (
-          <div className="shop-help-popover" role="status">
-            대상자와 상품, 디자인을 선택하면 수량 조절과 다음 단계가 활성화됩니다.
-          </div>
+        {selectionView ? (
+          <button className="shop-back-link plain" type="button" onClick={() => setSelectionView("")} aria-label="상품 구매로 돌아가기">‹</button>
+        ) : (
+          <a className="shop-back-link" href={step === "configure" ? "/?tab=dashboard" : "#back"} onClick={(event) => {
+            if (step === "configure") return;
+            event.preventDefault();
+            window.history.back();
+          }} aria-label="이전으로 돌아가기">‹</a>
         )}
+        <h1>{selectionView ? selectionTitle : step === "configure" ? "상품 구매" : "결제"}</h1>
+        <a className="shop-help-mark" href="/shop/service" aria-label="상품구매 서비스 소개">?</a>
       </header>
 
-      {step === "configure" && (
+      {selectionView === "product" && (
+        <CatalogSelectionView
+          type="product"
+          options={products}
+          selectedId={draftSelectionId}
+          onSelect={setDraftSelectionId}
+          onConfirm={confirmSelection}
+        />
+      )}
+
+      {selectionView === "design" && (
+        <CatalogSelectionView
+          type="design"
+          options={designs}
+          selectedId={draftSelectionId}
+          onSelect={setDraftSelectionId}
+          onConfirm={confirmSelection}
+        />
+      )}
+
+      {!selectionView && step === "configure" && (
         <>
           <ProductConfiguration
             product={product}
-            products={products}
-            productId={productId}
-            setProductId={setProductId}
             designs={designs}
             subjects={subjects}
-            selectedSubject={selectedSubject}
             subjectId={subjectId}
             setSubjectId={setSubjectId}
             quantity={quantity}
             changeQuantity={changeQuantity}
-            designIndex={designIndex}
-            setDesignIndex={setDesignIndex}
-            designId={designId}
-            setDesignId={setDesignId}
             selectedDesign={selectedDesign}
             productUnitPrice={productUnitPrice}
             productAmount={productAmount}
+            openProductSelection={() => openSelectionView("product")}
+            openDesignSelection={() => openSelectionView("design")}
           />
           <button className="shop-next-button" type="button" onClick={goOrder} disabled={!configurationReady}>
             다음
@@ -447,7 +467,7 @@ export default function ShopCheckoutClient({
         </>
       )}
 
-      {step === "order" && (
+      {!selectionView && step === "order" && (
         <>
           <OrderInformation
             product={product}
@@ -503,25 +523,18 @@ export default function ShopCheckoutClient({
 
 function ProductConfiguration({
   product,
-  products,
-  productId,
-  setProductId,
   designs,
   subjects,
   subjectId,
   setSubjectId,
   quantity,
   changeQuantity,
-  designIndex,
-  setDesignIndex,
-  designId,
-  setDesignId,
   selectedDesign,
   productUnitPrice,
   productAmount,
+  openProductSelection,
+  openDesignSelection,
 }) {
-  const [productPickerOpen, setProductPickerOpen] = useState(false);
-  const [designPickerOpen, setDesignPickerOpen] = useState(false);
   const [subjectPickerOpen, setSubjectPickerOpen] = useState(false);
   const pickerAreaRef = useRef(null);
   const selectionReady = Boolean(product && selectedDesign);
@@ -530,8 +543,6 @@ function ProductConfiguration({
     const closePickers = (event) => {
       if (event.type === "keydown" && event.key !== "Escape") return;
       if (event.type === "pointerdown" && pickerAreaRef.current?.contains(event.target)) return;
-      setProductPickerOpen(false);
-      setDesignPickerOpen(false);
       setSubjectPickerOpen(false);
     };
 
@@ -542,19 +553,6 @@ function ProductConfiguration({
       document.removeEventListener("keydown", closePickers);
     };
   }, []);
-
-  const selectProduct = (nextProduct) => {
-    setProductId(nextProduct.id);
-    setProductPickerOpen(false);
-    setDesignPickerOpen(false);
-  };
-
-  const selectDesign = (nextDesign) => {
-    const index = designs.findIndex((design) => design.id === nextDesign.id);
-    setDesignIndex(Math.max(0, index));
-    setDesignId(nextDesign.id);
-    setDesignPickerOpen(false);
-  };
 
   return (
     <>
@@ -569,11 +567,7 @@ function ProductConfiguration({
                 aria-labelledby="shop-subject-picker-label shop-subject-picker-value"
                 aria-haspopup="listbox"
                 aria-expanded={subjectPickerOpen}
-                onClick={() => {
-                  setSubjectPickerOpen((current) => !current);
-                  setProductPickerOpen(false);
-                  setDesignPickerOpen(false);
-                }}
+                onClick={() => setSubjectPickerOpen((current) => !current)}
               >
                 <span id="shop-subject-picker-value">
                   <strong>{subjects.find((subject) => subject.id === subjectId)?.name || "대상자를 선택해 주세요"}</strong>
@@ -582,24 +576,32 @@ function ProductConfiguration({
                 <b aria-hidden="true">⌃<i>⌄</i></b>
               </button>
               {subjectPickerOpen && (
-                <div className="shop-subject-menu" role="listbox" aria-labelledby="shop-subject-picker-label">
-                  {subjects.map((subject) => (
-                    <button
-                      className={subject.id === subjectId ? "selected" : ""}
-                      type="button"
-                      role="option"
-                      aria-selected={subject.id === subjectId}
-                      onClick={() => {
-                        setSubjectId(subject.id);
-                        setSubjectPickerOpen(false);
-                      }}
-                      key={subject.id}
-                    >
-                      <strong>{subject.name}</strong>
-                      <small>{formatDate(subject.birth_date)}</small>
-                    </button>
-                  ))}
-                </div>
+                <>
+                  <div className="shop-subject-backdrop" onMouseDown={() => setSubjectPickerOpen(false)} aria-hidden="true" />
+                  <section className="shop-subject-menu modal" role="dialog" aria-modal="true" aria-labelledby="shop-subject-picker-label">
+                    <div role="listbox" aria-labelledby="shop-subject-picker-label">
+                      {subjects.map((subject) => (
+                        <button
+                          className={subject.id === subjectId ? "selected" : ""}
+                          type="button"
+                          role="option"
+                          aria-selected={subject.id === subjectId}
+                          onClick={() => {
+                            setSubjectId(subject.id);
+                            setSubjectPickerOpen(false);
+                          }}
+                          key={subject.id}
+                        >
+                          <span className="shop-subject-check" aria-hidden="true">✓</span>
+                          <span>
+                            <strong>{subject.name}</strong>
+                            <small>{formatDate(subject.birth_date)}</small>
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                </>
               )}
             </>
           ) : (
@@ -609,40 +611,22 @@ function ProductConfiguration({
           )}
         </div>
 
-        <ShopImagePicker
-          id="shop-product-picker"
+        <ShopSelectionTrigger
           label="상품"
           prompt="상품을 선택해 주세요"
-          options={products}
-          selectedId={productId}
-          imageForOption={productPickerImage}
-          open={productPickerOpen}
-          onToggle={() => {
-            setProductPickerOpen((current) => !current);
-            setDesignPickerOpen(false);
-          }}
-          onClose={() => setProductPickerOpen(false)}
-          onSelect={selectProduct}
-          variant="product"
-          placeholderImage="/assets/dashboard-action-shop.png"
+          selectedOption={product}
+          image={product ? productPickerImage(product) : "/assets/dashboard-action-shop.png"}
+          onClick={openProductSelection}
+          type="product"
         />
 
-        <ShopImagePicker
-          id="shop-design-picker"
+        <ShopSelectionTrigger
           label="디자인"
           prompt={product && designs.length === 0 ? "선택 가능한 디자인이 없습니다" : "디자인을 선택해 주세요"}
-          options={designs}
-          selectedId={selectedDesign?.id || designId}
-          imageForOption={designPickerImage}
-          open={designPickerOpen}
-          onToggle={() => {
-            setDesignPickerOpen((current) => !current);
-            setProductPickerOpen(false);
-          }}
-          onClose={() => setDesignPickerOpen(false)}
-          onSelect={selectDesign}
-          variant="design"
-          placeholderImage="/assets/shop-icons/zodiac-rabbit.png"
+          selectedOption={selectedDesign}
+          image={selectedDesign ? designPickerImage(selectedDesign) : "/assets/shop-icons/zodiac-rabbit.png"}
+          onClick={openDesignSelection}
+          type="design"
           disabled={!product || designs.length === 0}
         />
       </div>
@@ -670,80 +654,56 @@ function ProductConfiguration({
   );
 }
 
-function ShopImagePicker({
-  id,
-  label,
-  prompt,
-  options,
-  selectedId,
-  imageForOption,
-  open,
-  onToggle,
-  onClose,
-  onSelect,
-  variant,
-  placeholderImage = "",
-  disabled = false,
-}) {
-  const selectedOption = options.find((option) => option.id === selectedId) || null;
-  const selectedImage = selectedOption ? imageForOption(selectedOption) : "";
-
+function ShopSelectionTrigger({ label, prompt, selectedOption, image, onClick, type, disabled = false }) {
   return (
-    <div className={`shop-field shop-image-picker-field ${open ? "open" : ""}`}>
-      <label id={`${id}-label`} htmlFor={`${id}-trigger`}>{label}</label>
+    <div className="shop-field">
+      <label>{label}</label>
       <button
-        id={`${id}-trigger`}
-        className={`shop-image-picker-trigger ${variant}`}
+        className={`shop-image-picker-trigger ${type} ${selectedOption ? "selected" : ""}`}
         type="button"
-        aria-labelledby={`${id}-label ${id}-value`}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls={`${id}-options`}
-        onClick={onToggle}
+        onClick={onClick}
         disabled={disabled}
       >
         <span className="shop-image-picker-thumb" aria-hidden="true">
-          {selectedImage || placeholderImage ? <img src={selectedImage || placeholderImage} alt="" /> : <b>{label.slice(0, 1)}</b>}
+          <img src={image} alt="" />
         </span>
-        <strong id={`${id}-value`}>{selectedOption?.name || prompt}</strong>
+        <strong>{selectedOption?.name || prompt}</strong>
         <b className="shop-image-picker-chevron" aria-hidden="true">›</b>
       </button>
-
-      {open && (
-        <section className="shop-image-picker-menu" aria-label={`${label} 선택`}>
-          <header>
-            <strong>{prompt}</strong>
-            <button type="button" onClick={onClose} aria-label={`${label} 선택 닫기`}>×</button>
-          </header>
-          <div
-            id={`${id}-options`}
-            className={`shop-image-picker-grid ${variant}`}
-            role="listbox"
-            aria-labelledby={`${id}-label`}
-          >
-            {options.map((option) => {
-              const image = imageForOption(option);
-              const selected = option.id === selectedId;
-              const wideProduct = variant === "product" && WIDE_PRODUCT_PICKER_SLUGS.has(String(option.slug || ""));
-              return (
-                <button
-                  type="button"
-                  className={`${selected ? "selected" : ""} ${wideProduct ? "wide-product" : ""}`.trim()}
-                  role="option"
-                  aria-selected={selected}
-                  aria-label={`${option.name} 선택`}
-                  onClick={() => onSelect(option)}
-                  key={option.id}
-                >
-                  {image ? <img src={image} alt={option.name} /> : <span>{option.name}</span>}
-                  {selected && <b className="shop-image-picker-check" aria-hidden="true">✓</b>}
-                </button>
-              );
-            })}
-          </div>
-        </section>
-      )}
     </div>
+  );
+}
+
+function CatalogSelectionView({ type, options, selectedId, onSelect, onConfirm }) {
+  const isProduct = type === "product";
+  return (
+    <section className={`shop-catalog-selection-view ${type}`} aria-label={isProduct ? "상품 선택 목록" : "디자인 선택 목록"}>
+      <div className="shop-choice-grid" role="listbox">
+        {options.map((option) => {
+          const selected = option.id === selectedId;
+          const image = isProduct ? productPickerImage(option) : designPickerImage(option);
+          return (
+            <button
+              className={selected ? "selected" : ""}
+              type="button"
+              role="option"
+              aria-selected={selected}
+              aria-label={`${option.name} 선택`}
+              onClick={() => onSelect(option.id)}
+              key={option.id}
+            >
+              <span className="shop-choice-image">
+                {image ? <img src={image} alt="" /> : <b>{productFallbackIcon(option.slug)}</b>}
+              </span>
+              <strong>{option.name}</strong>
+              {isProduct && <em>{formatCurrency(option.unit_price)}</em>}
+              {selected && <span className="shop-choice-check" aria-hidden="true">✓</span>}
+            </button>
+          );
+        })}
+      </div>
+      <button className="shop-choice-confirm" type="button" onClick={onConfirm} disabled={!selectedId}>선택 완료</button>
+    </section>
   );
 }
 

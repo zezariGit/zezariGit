@@ -1,9 +1,15 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const [page, checkout, database, styles] = await Promise.all([
+const [page, checkout, servicePage, serviceControls, imageRoute, adminPage, adminActions, adminWorkspace, database, styles] = await Promise.all([
   readFile(new URL("../app/shop/page.js", import.meta.url), "utf8"),
   readFile(new URL("../app/shop-checkout-client.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/shop/service/page.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/shop/service/shop-service-controls.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/api/shop/service-intro/image/route.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/admin/page.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/admin/actions.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/admin/admin-workspace.js", import.meta.url), "utf8"),
   readFile(new URL("../lib/db.js", import.meta.url), "utf8"),
   readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
 ]);
@@ -18,7 +24,26 @@ assert.match(checkout, /prompt=\{product && designs\.length === 0 \? "선택 가
 assert.match(checkout, /disabled=\{!selectionReady \|\| quantity <= 1\}/);
 assert.match(checkout, /disabled=\{!selectionReady\}>\+<\/button>/);
 assert.match(checkout, /disabled=\{!configurationReady\}/);
+assert.match(checkout, /selectionView === "product"/);
+assert.match(checkout, /selectionView === "design"/);
+assert.match(checkout, /className="shop-subject-backdrop"/);
+assert.match(checkout, /role="dialog" aria-modal="true"/);
+assert.match(checkout, /className="shop-choice-grid" role="listbox"/);
+assert.match(checkout, /className="shop-choice-confirm"[\s\S]*disabled=\{!selectedId\}/);
+assert.match(checkout, /href="\/shop\/service"/);
+assert.match(servicePage, /<h1>제품보기<\/h1>/);
+assert.match(servicePage, /getProductServiceIntro\(\)/);
+assert.match(serviceControls, /router\.back\(\)/);
+assert.match(serviceControls, /window\.scrollTo\(\{ top: 0, behavior: "smooth" \}\)/);
+assert.match(imageRoute, /getProductServiceIntroImage/);
+assert.match(adminWorkspace, /상품구매 서비스소개 관리/);
+assert.match(adminPage, /ProductServiceIntroManagementSection/);
+assert.match(adminActions, /saveProductServiceIntroAction/);
+assert.match(database, /CREATE TABLE IF NOT EXISTS product_service_intro/);
+assert.match(database, /export async function saveProductServiceIntro/);
 assert.match(styles, /\.shop-subject-trigger[\s\S]*background:\s*var\(--c-primary-light\)/);
+assert.match(styles, /\.shop-choice-grid[\s\S]*grid-template-columns:\s*repeat\(2/);
+assert.match(styles, /\.shop-subject-backdrop[\s\S]*backdrop-filter:\s*blur/);
 assert.match(styles, /\.quantity-control button:disabled/);
 assert.match(styles, /\.shop-next-button:disabled/);
 
