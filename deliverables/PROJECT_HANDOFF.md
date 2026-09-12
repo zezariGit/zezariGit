@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-12 KST
 
-Application baseline commit: `fb623a0` (`main`, 로컬 구현 완료, GitHub/Vercel 운영 반영 대기)
+Application baseline commit: `36c8342` (`main`, 로컬 구현 완료, GitHub/Vercel 운영 반영 대기)
 
 Production: `https://zezari.family`
 
@@ -34,7 +34,7 @@ Production: `https://zezari.family`
 | 대표 도메인 | `https://zezari.family` |
 | 최근 확인 운영 배포 | `dpl_E19dHgcypFn11T8TGpeSo8YnA951` (`READY`, 관리자 서비스 규정 관리 및 회원가입 약관 연동) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | local commit `fb623a0`; 운영 기준 commit `957553b`, deployment `dpl_E19dHgcypFn11T8TGpeSo8YnA951` |
+| 최근 애플리케이션 기능 기준 | local commit `36c8342`; 운영 기준 commit `957553b`, deployment `dpl_E19dHgcypFn11T8TGpeSo8YnA951` |
 
 ### 로컬 시작
 
@@ -286,6 +286,7 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 | 커밋 | 내용 |
 | --- | --- |
+| `36c8342` | 상품 미선택 상태의 디자인 선선택과 상품별 실제 디자인 ID 자동 연결 |
 | `fb623a0` | 상품·디자인 전용 선택 화면, 대상자 모달, 상품구매 서비스소개와 관리자 이미지 관리 |
 | `5fd03e9` | 상품 구매 대상자·상품·디자인·수량 선택 화면 개편, 운영 배포 대기 |
 | `957553b` | 관리자 서비스 규정 편집, 공개 최신 조회 API 및 회원가입 약관 팝업 |

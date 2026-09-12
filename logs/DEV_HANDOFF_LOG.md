@@ -4,6 +4,19 @@ Project: REAL_QR_FIND
 
 This file is the cumulative technical handoff log. It must be updated whenever requirements, implementation, source files, architecture, verification results, or next steps change.
 
+## 2026-09-12 KST - Design Selection Before Product Fix
+
+### Issue And Fix
+- The design trigger was disabled until a product was selected because design database IDs belong to individual products.
+- Added a universal twelve-zodiac choice list derived from active product catalogs, allowing design selection from the initial purchase screen.
+- The selected design name is retained independently; after product selection, it is mapped to that product's corresponding real design ID before quantity, pricing, and next-step controls activate.
+
+### Verification
+- Browser flow passed: initial design button enabled, `닭` selected first, `팔찌` selected afterward, matching product design connected, quantity increase enabled, 5,000원 calculated, and next button enabled.
+- `npm run test:shop-ui`: passed.
+- `npm run build`: passed with all 40 routes.
+- Fix commit: `36c8342 fix: allow design selection before product`.
+
 ## 2026-09-12 KST - Shop Selection Flows and Managed Service Introduction
 
 ### User Request

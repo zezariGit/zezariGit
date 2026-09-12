@@ -4,6 +4,12 @@ Project: REAL_QR_FIND
 
 This file is the cumulative presentation-ready project log. It is written so the user can use it to prepare status reports or presentation material.
 
+## 2026-09-12 - 디자인 선선택 오류 수정
+- 상품을 먼저 선택하지 않아도 디자인 선택 화면을 열 수 있도록 수정
+- 디자인을 먼저 선택한 다음 상품을 고르면 해당 상품의 동일 디자인 데이터로 자동 연결
+- 실제 브라우저에서 디자인 선선택, 상품 후선택, 금액 계산, 수량 및 다음 버튼 활성화까지 확인
+- 회귀검사와 40개 라우트 운영 빌드 통과, 수정 커밋 `36c8342`
+
 ## 2026-09-12 - 상품 선택 상세화 및 서비스소개 관리
 - 대상자 선택 시 구매 화면 뒤쪽을 흐리게 처리하고, 선택 대상자를 초록 체크·배경·굵은 이름으로 구분하는 즉시 선택창 적용
 - 상품은 이미지·상품명·실제 가격을 표시하는 2열 카드, 디자인은 12간지 2열 카드 화면으로 구성
