@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-12 KST
 
-Application baseline commit: `5182915` (`main`, GitHub/Vercel 운영 반영 완료)
+Application baseline commit: `cb0ac60` (`main`, GitHub/Vercel 운영 반영 완료)
 
 Production: `https://zezari.family`
 
@@ -32,9 +32,9 @@ Production: `https://zezari.family`
 | GitHub | `https://github.com/zezariGit/zezariGit.git` |
 | Vercel 프로젝트 | scope `zezari`, project `zezari` |
 | 대표 도메인 | `https://zezari.family` |
-| 최근 확인 운영 배포 | `dpl_DQvpGaaRa2CbgmDg1A4jTwrjZnEn` (`READY`, 상품 구매 흐름 및 상품/디자인 관리) |
+| 최근 확인 운영 배포 | `dpl_EEdrxQW4tChzHtZY6pxEaoUw8Sxz` (`READY`, 독립 상품/디자인 관리 및 정사각형 디자인 선택) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | local/production feature commit `5182915`; deployment `dpl_DQvpGaaRa2CbgmDg1A4jTwrjZnEn` |
+| 최근 애플리케이션 기능 기준 | local/production feature commit `cb0ac60`; deployment `dpl_EEdrxQW4tChzHtZY6pxEaoUw8Sxz` |
 
 ### 로컬 시작
 
@@ -286,6 +286,10 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 | 커밋 | 내용 |
 | --- | --- |
+| `cb0ac60` | 디자인 선택 상단 정렬, 114px 정사각형 및 234px 완료 버튼 배치 |
+| `b9ec704` | 운영 상품/디자인 기본 이미지 초기화 재실행 |
+| `d156932` | 사용자·관리자 카탈로그 이미지 contain 맞춤 보강 |
+| `e80bd23` | 상품 7개와 공용 디자인 12개 분리 관리 및 사용자 이미지 연동 |
 | `5182915` | 관리자 상품/디자인 관리 메뉴·개수 현황 및 디자인 12개 한 화면 배치 |
 | `36c8342` | 상품 미선택 상태의 디자인 선선택과 상품별 실제 디자인 ID 자동 연결 |
 | `fb623a0` | 상품·디자인 전용 선택 화면, 대상자 모달, 상품구매 서비스소개와 관리자 이미지 관리 |

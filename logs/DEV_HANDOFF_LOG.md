@@ -9382,3 +9382,36 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Vercel deployment `dpl_DQvpGaaRa2CbgmDg1A4jTwrjZnEn` reached `READY` and owns `https://zezari.family` plus compatibility aliases.
 - Production root, shop preview, and shop service-introduction routes returned HTTP 200.
 - Production browser verification confirmed all twelve designs and the `선택 완료` button in one viewport; the post-deployment error-log query returned no errors.
+
+## 2026-09-12 KST - Independent Product And Design Catalogs
+
+### User Request
+- Use square design-selection cards, keep the entire image visible, place the grid close to the title, enlarge cards by about 1.2 times, and match the confirmation button to the two-column grid width.
+- Make administrator-uploaded product and design images immediately match the user shop.
+- Manage seven products and twelve designs independently with `전체`, `상품`, and `디자인` filters and a shared detail editor.
+- Remove previous administrator catalog entries and uploaded images, restore the current user-facing defaults, and deploy.
+
+### Reflected Work
+- Replaced product-owned duplicate designs with one internal global design library used by every product selection and order validation.
+- Added schema versions 47 and 48 to preserve referenced historical order rows, remove unreferenced legacy catalog rows, deactivate referenced legacy rows, restore the seven canonical products, and clear previous catalog uploads.
+- Rebuilt the administrator catalog as a nineteen-item filtered grid with type badges and a right-side name, price, and image editor.
+- Made administrator uploads the first image source for both user and admin views; current static assets remain the fallback when no upload exists.
+- Changed the user design grid to two 114px square columns, `object-fit: contain`, top alignment below the header, and a static 234px confirmation button directly after all twelve cards.
+
+### Verification
+- Active catalog audit: 7 products and 12 global designs; previous product uploads 0 and design uploads 0 after reset.
+- `npm run test:shop-ui`: passed.
+- `npm run security:check`: passed.
+- `npm run build`: passed with Next.js 16.3.0 and all 40 routes.
+- Production `/shop?preview=1` and `/admin?section=products` returned HTTP 200; Vercel error-log query returned no errors.
+- Production browser checks confirmed the square grid, full default images, aligned button, admin filters, nineteen catalog items, and the shared editor.
+
+### Feature Commits
+- `e80bd23 feat: unify product and design catalogs`
+- `d156932 fix: contain catalog images in square frames`
+- `b9ec704 fix: rerun catalog reset in production`
+- `cb0ac60 fix: align enlarged design grid with confirmation`
+
+### Deployment
+- Feature commits were pushed to GitHub `main`.
+- Vercel deployment `dpl_EEdrxQW4tChzHtZY6pxEaoUw8Sxz` reached `READY` and owns `https://zezari.family` plus compatibility aliases.
