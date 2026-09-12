@@ -4,6 +4,33 @@ Project: REAL_QR_FIND
 
 This file is the cumulative technical handoff log. It must be updated whenever requirements, implementation, source files, architecture, verification results, or next steps change.
 
+## 2026-09-12 KST - Shop Selection Flows and Managed Service Introduction
+
+### User Request
+- Match the supplied product purchase subject, product, and design selection screens.
+- Open a product purchase service introduction page from every upper-right help button.
+- Add an administrator menu that uploads and replaces the service introduction detail image shown to users.
+
+### Reflected Work
+- Changed subject selection into an anchored modal with a blurred backdrop, one selected subject, green check treatment, bold selected name, smaller birth date, immediate application, and automatic close.
+- Added dedicated two-column product and design selection views. Product cards show image, bold name, and live catalog price; design cards show the twelve zodiac images in a two-column grid.
+- Both selection views keep the original purchase value until `선택 완료`; the button stays disabled until an item is selected, and the selected card uses a green border and check badge.
+- Connected all help controls to `/shop/service`, which renders the `제품보기` header, previous-screen back action, administrator image or temporary content, and a fixed scroll-to-top button.
+- Added schema version 46 and `product_service_intro`, with image signature validation, a 4MB limit, administrator attribution, replace/remove behavior, and versioned image delivery through `/api/shop/service-intro/image`.
+- Added the administrator sidebar item `상품구매 서비스소개 관리` with upload, removal, timestamp, and current-image preview.
+- Expanded `npm run test:shop-ui` to cover the selection contracts, service page, image endpoint, schema, administrator menu, and action wiring.
+
+### Verification
+- `npm run test:shop-ui`: passed.
+- `npm run security:check`: passed.
+- `npm run build`: passed with Next.js 16.3.0 and all 40 routes.
+- Local `/shop/service` returned HTTP 200. The image endpoint returned expected HTTP 404 while no administrator image was stored, so temporary content rendered.
+- Browser checks confirmed the anchored blurred subject modal, immediate subject selection, initial disabled selection-complete buttons, two-column product/design cards, selection check badges, value application, service introduction navigation, and scroll-to-top control.
+
+### Status
+- Feature commit: `fb623a0 feat: add guided shop selections and service intro`.
+- GitHub push and Vercel production deployment are pending because this request did not include deployment.
+
 ## 2026-09-12 KST - Product Purchase Selection Screen Redesign
 
 ### User Request
