@@ -2,460 +2,223 @@
 
 import { useMemo, useState } from "react";
 import FormSubmitButton from "../form-submit-button";
-import { createProductCatalogItemAction, setProductCatalogItemAction } from "./actions";
+import {
+  setGlobalProductDesignCatalogItemAction,
+  setProductCatalogItemAction,
+} from "./actions";
 
-export default function ProductAdminWorkspace({ products = [], initialProductId = "" }) {
-  const initialProduct = products.find((product) => product.id === initialProductId) || products[0] || null;
-  const [selectedProductId, setSelectedProductId] = useState(initialProduct?.id || "");
-  const [mode, setMode] = useState(initialProduct ? "edit" : "create");
-  const selectedProduct = useMemo(
-    () => products.find((product) => product.id === selectedProductId) || products[0] || null,
-    [products, selectedProductId],
-  );
-  const nextSortOrder = products.reduce(
-    (max, product) => Math.max(max, Number(product.sort_order || 0)),
-    0,
-  ) + 1;
+const FILTERS = [
+  { id: "all", label: "전체" },
+  { id: "product", label: "상품" },
+  { id: "design", label: "디자인" },
+];
 
-  const selectProduct = (productId) => {
-    setSelectedProductId(productId);
-    setMode("edit");
-    updateSelectedProductUrl(productId);
+const PRODUCT_DEFAULT_IMAGES = {
+  sticker: "/assets/shop-icons/product-sticker.png",
+  bracelet: "/assets/shop-icons/product-bracelet.png",
+  necklace: "/assets/shop-icons/product-necklace.png",
+  keyring: "/assets/shop-icons/product-keyring.png",
+  "bracelet-necklace": "/assets/shop-icons/product-bracelet-necklace.png",
+  "necklace-keyring": "/assets/shop-icons/product-necklace-keyring.png",
+  "bracelet-necklace-keyring": "/assets/shop-icons/product-bracelet-necklace-keyring.png",
+};
+
+const DESIGN_DEFAULT_IMAGES = {
+  쥐: "/assets/shop-icons/zodiac-rat.png",
+  소: "/assets/shop-icons/zodiac-ox.png",
+  호랑이: "/assets/shop-icons/zodiac-tiger.png",
+  토끼: "/assets/shop-icons/zodiac-rabbit.png",
+  용: "/assets/shop-icons/zodiac-dragon.png",
+  뱀: "/assets/shop-icons/zodiac-snake.png",
+  말: "/assets/shop-icons/zodiac-horse.png",
+  양: "/assets/shop-icons/zodiac-sheep.png",
+  원숭이: "/assets/shop-icons/zodiac-monkey.png",
+  닭: "/assets/shop-icons/zodiac-rooster.png",
+  개: "/assets/shop-icons/zodiac-dog.png",
+  돼지: "/assets/shop-icons/zodiac-pig.png",
+};
+
+export default function ProductAdminWorkspace({ products = [], designs = [], initialItemKey = "" }) {
+  const items = useMemo(() => [
+    ...products.map((item) => ({ ...item, type: "product", key: `product:${item.id}` })),
+    ...designs.map((item) => ({ ...item, type: "design", key: `design:${item.id}` })),
+  ], [products, designs]);
+  const initialItem = items.find((item) => item.key === initialItemKey) || items[0] || null;
+  const [filter, setFilter] = useState("all");
+  const [selectedKey, setSelectedKey] = useState(initialItem?.key || "");
+  const visibleItems = filter === "all" ? items : items.filter((item) => item.type === filter);
+  const selectedItem = items.find((item) => item.key === selectedKey) || visibleItems[0] || null;
+
+  const selectFilter = (nextFilter) => {
+    setFilter(nextFilter);
+    const firstVisible = nextFilter === "all" ? items[0] : items.find((item) => item.type === nextFilter);
+    if (selectedItem?.type !== nextFilter && nextFilter !== "all" && firstVisible) {
+      setSelectedKey(firstVisible.key);
+      updateSelectedCatalogUrl(firstVisible.key);
+    }
   };
 
-  const openCreateForm = () => {
-    setMode("create");
-    updateSelectedProductUrl("");
+  const selectItem = (item) => {
+    setSelectedKey(item.key);
+    updateSelectedCatalogUrl(item.key);
   };
 
   return (
-    <div className="product-management-layout">
-      <section className="product-catalog-grid-panel" aria-label="상품 목록">
-        <div className="product-catalog-toolbar">
+    <div className="product-management-layout catalog-independent-layout">
+      <section className="product-catalog-grid-panel" aria-label="상품 및 디자인 목록">
+        <div className="product-catalog-toolbar catalog-filter-toolbar">
           <div>
-            <h3>상품 목록</h3>
-            <span>사용자 상품 선택창과 동일한 카탈로그입니다.</span>
+            <h3>상품/디자인 목록</h3>
+            <span>상품 {products.length}개 · 디자인 {designs.length}개</span>
           </div>
-          <button className="plain-button compact" type="button" onClick={openCreateForm}>
-            + 새 상품
-          </button>
+          <div className="catalog-type-filters" role="tablist" aria-label="카탈로그 구분">
+            {FILTERS.map((item) => (
+              <button
+                aria-selected={filter === item.id}
+                className={filter === item.id ? "active" : ""}
+                key={item.id}
+                onClick={() => selectFilter(item.id)}
+                role="tab"
+                type="button"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="product-catalog-table-scroll">
-          <table className="product-catalog-table">
-            <thead>
-              <tr>
-                <th scope="col">선택</th>
-                <th scope="col">썸네일</th>
-                <th scope="col">상품명</th>
-                <th scope="col">가격</th>
-                <th scope="col">노출</th>
-                <th scope="col">정렬</th>
-                <th scope="col">상세페이지</th>
-                <th scope="col">관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.length === 0 ? (
-                <tr>
-                  <td className="product-catalog-empty" colSpan="8">
-                    등록된 상품이 없습니다. 새 상품을 추가해 주세요.
-                  </td>
-                </tr>
-              ) : products.map((product) => {
-                const isSelected = mode === "edit" && selectedProduct?.id === product.id;
-                return (
-                  <tr
-                    aria-selected={isSelected}
-                    className={isSelected ? "is-selected" : ""}
-                    key={product.id}
-                    onClick={() => selectProduct(product.id)}
-                    onKeyDown={(event) => {
-                      if (event.currentTarget !== event.target || (event.key !== "Enter" && event.key !== " ")) return;
-                      event.preventDefault();
-                      selectProduct(product.id);
-                    }}
-                    tabIndex="0"
-                  >
-                    <td>
-                      <input
-                        aria-label={`${product.name} 선택`}
-                        checked={isSelected}
-                        name="selectedProduct"
-                        onChange={() => selectProduct(product.id)}
-                        type="radio"
-                      />
-                    </td>
-                    <td>
-                      <div className="product-catalog-thumb">
-                        {product.image_data_url ? (
-                          <img src={product.image_data_url} alt="" />
-                        ) : (
-                          <ProductAdminFallback product={product} />
-                        )}
-                      </div>
-                    </td>
-                    <td>
-                      <strong className="product-catalog-name">{product.name || "상품명 미입력"}</strong>
-                      <small>{product.description || "설명 없음"}</small>
-                    </td>
-                    <td className="product-catalog-price">{formatCurrency(product.unit_price)}</td>
-                    <td>
-                      <span className={`product-catalog-status ${product.is_active !== 0 ? "active" : "inactive"}`}>
-                        {product.is_active !== 0 ? "노출" : "숨김"}
-                      </span>
-                    </td>
-                    <td>{Number(product.sort_order || 0)}</td>
-                    <td>
-                      <span className={`product-catalog-detail-state ${Number(product.has_detail_image || 0) === 1 ? "ready" : "empty"}`}>
-                        {Number(product.has_detail_image || 0) === 1 ? "등록" : "미등록"}
-                      </span>
-                    </td>
-                    <td>
-                      <button className="plain-button compact" type="button" onClick={() => selectProduct(product.id)}>
-                        상세
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="catalog-management-grid" role="list">
+          {visibleItems.map((item) => (
+            <button
+              aria-pressed={selectedItem?.key === item.key}
+              className={selectedItem?.key === item.key ? "selected" : ""}
+              key={item.key}
+              onClick={() => selectItem(item)}
+              role="listitem"
+              type="button"
+            >
+              <span className={`catalog-type-badge ${item.type}`}>{item.type === "product" ? "상품" : "디자인"}</span>
+              <span className="catalog-management-image">
+                <img src={catalogItemImage(item)} alt="" />
+              </span>
+              <strong>{item.name}</strong>
+              <em>{catalogPriceLabel(item)}</em>
+            </button>
+          ))}
         </div>
       </section>
 
-      <aside className="product-management-detail-panel" aria-label="상품 상세 편집">
-        {mode === "create" ? (
-          <ProductAdminCreateForm defaultSortOrder={nextSortOrder} onCancel={() => selectedProduct && selectProduct(selectedProduct.id)} />
-        ) : selectedProduct ? (
-          <ProductAdminCatalogForm product={selectedProduct} key={selectedProduct.id} />
-        ) : (
-          <ProductAdminCreateForm defaultSortOrder={nextSortOrder} />
+      <aside className="product-management-detail-panel" aria-label="상품 또는 디자인 상세 편집">
+        {selectedItem ? <CatalogItemEditor item={selectedItem} key={selectedItem.key} /> : (
+          <p className="product-catalog-empty">관리할 항목이 없습니다.</p>
         )}
       </aside>
     </div>
   );
 }
 
-export function ProductAdminCreateForm({ defaultSortOrder = 1, onCancel }) {
-  return (
-    <div className="product-admin-editor">
-      <div className="product-admin-editor-heading">
-        <div>
-          <span>상품 등록</span>
-          <h3>새 상품</h3>
-        </div>
-        {onCancel ? (
-          <button className="plain-button compact" type="button" onClick={onCancel}>
-            취소
-          </button>
-        ) : null}
-      </div>
-      <form action={createProductCatalogItemAction} className="product-admin-create-form">
-        <input type="hidden" name="returnTo" value="/admin?section=products" />
-        <div className="product-admin-detail-scroll">
-          <div className="product-admin-create-fields">
-            <label>
-              상품명
-              <input name="name" placeholder="구매 화면에 표시할 상품명" required />
-            </label>
-            <label>
-              상품 가격
-              <input name="unitPrice" type="number" min="0" step="100" defaultValue="0" required />
-            </label>
-          </div>
-          <label>
-            설명
-            <textarea name="description" rows="3" placeholder="상품 선택과 주문 화면에 표시할 설명" />
-          </label>
-          <label>
-            정렬 순서
-            <input name="sortOrder" type="number" step="1" defaultValue={defaultSortOrder} />
-          </label>
-          <div className="product-admin-create-fields media">
-            <label>
-              상품 썸네일
-              <input name="image" type="file" accept="image/*" />
-              <small>사용자 상품 선택 화면용, 1MB 이하</small>
-            </label>
-            <label>
-              긴 상세페이지 이미지
-              <input name="detailImage" type="file" accept="image/*" />
-              <small>세로형 원본 비율 유지, 4MB 이하</small>
-            </label>
-          </div>
-          <label className="product-admin-create-active">
-            <input name="isActive" type="checkbox" value="1" defaultChecked />
-            <span>추가 즉시 사용자 상품 selectbox에 노출</span>
-          </label>
-          <p className="product-admin-editor-note">상품을 추가하면 디자인 관리용 12간지 항목이 자동으로 생성됩니다.</p>
-        </div>
-        <div className="product-admin-editor-footer">
-          <FormSubmitButton pendingText="추가중">상품 추가</FormSubmitButton>
-        </div>
-      </form>
-    </div>
-  );
-}
-
-export function ProductAdminCatalogForm({ product }) {
-  const [activeTab, setActiveTab] = useState("product");
-  const [draftDesigns, setDraftDesigns] = useState([]);
-  const existingDesigns = product.designs || [];
-  const designRows = [...existingDesigns, ...draftDesigns];
-
-  const addDesign = () => {
-    setDraftDesigns((items) => [
-      ...items,
-      {
-        draftKey: `draft-${Date.now()}-${items.length}`,
-        id: "",
-        name: "",
-        description: "",
-        sort_order: existingDesigns.length + items.length + 1,
-        is_active: 1,
-      },
-    ]);
-    setActiveTab("designs");
-  };
-
-  const removeDraftDesign = (draftKey) => {
-    setDraftDesigns((items) => items.filter((item) => item.draftKey !== draftKey));
-  };
+function CatalogItemEditor({ item }) {
+  const isProduct = item.type === "product";
+  const action = isProduct ? setProductCatalogItemAction : setGlobalProductDesignCatalogItemAction;
 
   return (
-    <div className="product-admin-editor">
+    <div className="product-admin-editor catalog-item-editor">
       <div className="product-admin-editor-heading">
         <div className="product-admin-editor-summary">
           <div className="product-admin-editor-thumb">
-            {product.image_data_url ? (
-              <img src={product.image_data_url} alt="" />
-            ) : (
-              <ProductAdminFallback product={product} />
-            )}
+            <img src={catalogItemImage(item)} alt="" />
           </div>
           <div>
-            <span>상품 상세 정보</span>
-            <h3>{product.name}</h3>
-            <small>{formatCurrency(product.unit_price)} · 디자인 {existingDesigns.length}개</small>
+            <span>{isProduct ? "상품" : "디자인"} 상세</span>
+            <h3>{item.name}</h3>
+            <small>{catalogPriceLabel(item)}</small>
           </div>
         </div>
-        <span className={`product-catalog-status ${product.is_active !== 0 ? "active" : "inactive"}`}>
-          {product.is_active !== 0 ? "노출" : "숨김"}
-        </span>
+        <span className={`catalog-type-badge ${item.type}`}>{isProduct ? "상품" : "디자인"}</span>
       </div>
 
-      <div className="product-admin-tabs" role="tablist" aria-label="상품 상세 메뉴">
-        <button
-          aria-selected={activeTab === "product"}
-          className={activeTab === "product" ? "active" : ""}
-          onClick={() => setActiveTab("product")}
-          role="tab"
-          type="button"
-        >
-          상품 정보
-        </button>
-        <button
-          aria-selected={activeTab === "designs"}
-          className={activeTab === "designs" ? "active" : ""}
-          onClick={() => setActiveTab("designs")}
-          role="tab"
-          type="button"
-        >
-          디자인 관리 ({designRows.length})
-        </button>
-      </div>
+      <form action={action} className="product-admin-form product-admin-editor-form">
+        <input type="hidden" name="returnTo" value={`/admin?section=products&item=${encodeURIComponent(item.key)}`} />
+        {isProduct ? (
+          <>
+            <input type="hidden" name="productId" value={item.id} />
+            <input type="hidden" name="description" value={item.description || ""} />
+            <input type="hidden" name="sortOrder" value={item.sort_order || 0} />
+            <input type="hidden" name="isActive" value="1" />
+            <input type="hidden" name="designCount" value="0" />
+          </>
+        ) : <input type="hidden" name="designId" value={item.id} />}
 
-      <form action={setProductCatalogItemAction} className="product-admin-form product-admin-editor-form">
-        <input type="hidden" name="productId" value={product.id} />
-        <input type="hidden" name="returnTo" value={`/admin?section=products&product=${encodeURIComponent(product.id)}`} />
-        <input type="hidden" name="designCount" value={designRows.length} />
+        <div className="product-admin-detail-scroll catalog-item-fields">
+          <label>
+            {isProduct ? "상품 명칭" : "디자인 명칭"}
+            <input name="name" defaultValue={item.name || ""} required />
+          </label>
+          <label>
+            가격
+            <input
+              name="unitPrice"
+              type="number"
+              min="0"
+              step="100"
+              defaultValue={item.unit_price ?? ""}
+              placeholder={isProduct ? "상품 가격" : "미입력 시 상품 가격 사용"}
+              required={isProduct}
+            />
+            {!isProduct && <small>비워두면 선택한 상품의 가격을 사용합니다.</small>}
+          </label>
 
-        <div className="product-admin-detail-scroll">
-          <div className="product-admin-tab-panel" hidden={activeTab !== "product"} role="tabpanel">
-            <div className="product-admin-create-fields">
-              <label>
-                상품명
-                <input name="name" defaultValue={product.name || ""} required />
-              </label>
-              <label>
-                상품 가격
-                <input name="unitPrice" type="number" min="0" step="100" defaultValue={product.unit_price || 0} />
-              </label>
+          <section className="catalog-image-editor">
+            <strong>{isProduct ? "상품 이미지" : "디자인 이미지"}</strong>
+            <div className="catalog-image-preview">
+              <img src={catalogItemImage(item)} alt={`${item.name} 현재 이미지`} />
             </div>
             <label>
-              설명
-              <textarea name="description" rows="3" defaultValue={product.description || ""} placeholder="상품 설명" />
+              이미지 파일 변경
+              <input name="image" type="file" accept="image/*" />
+              <small>정사각형 이미지 권장, 1MB 이하</small>
             </label>
-            <label>
-              정렬 순서
-              <input name="sortOrder" type="number" step="1" defaultValue={product.sort_order || 0} />
+            <label className="product-design-admin-check">
+              <input name="removeImage" type="checkbox" value="1" />
+              <span>업로드 이미지 삭제 후 기본 이미지 사용</span>
             </label>
-
-            <div className="product-admin-upload-grid">
-              <section>
-                <strong>상품 썸네일</strong>
-                <div className="product-admin-preview">
-                  {product.image_data_url ? (
-                    <img src={product.image_data_url} alt={`${product.name} 상품 썸네일`} />
-                  ) : (
-                    <ProductAdminFallback product={product} />
-                  )}
-                </div>
-                <input name="image" type="file" accept="image/*" />
-                <small>사용자 상품 선택 화면용, 1MB 이하</small>
-                <label className="product-design-admin-check">
-                  <input name="removeImage" type="checkbox" value="1" />
-                  <span>기존 썸네일 삭제</span>
-                </label>
-              </section>
-              <section>
-                <strong>긴 상세페이지</strong>
-                <input name="detailImage" type="file" accept="image/*" />
-                <small>세로형 원본 비율 유지, 4MB 이하</small>
-                <label className="product-design-admin-check">
-                  <input name="removeDetailImage" type="checkbox" value="1" />
-                  <span>기존 상세페이지 삭제</span>
-                </label>
-              </section>
-            </div>
-
-            <label className="product-admin-create-active">
-              <input name="isActive" type="checkbox" value="1" defaultChecked={product.is_active !== 0} />
-              <span>사용자 상품 selectbox에 노출</span>
-            </label>
-
-            <div className="product-admin-detail-preview">
-              <strong>상세페이지 미리보기</strong>
-              {Number(product.has_detail_image || 0) === 1 ? (
-                <img src={productDetailImageUrl(product)} alt={`${product.name} 상세페이지 이미지`} />
-              ) : (
-                <span>등록된 상품 상세페이지 이미지가 없습니다.</span>
-              )}
-            </div>
-          </div>
-
-          <div className="product-admin-tab-panel" hidden={activeTab !== "designs"} role="tabpanel">
-            <fieldset className="product-design-admin-list">
-              <legend>디자인별 이미지와 상세페이지</legend>
-              <div className="product-design-admin-title">
-                <span>각 디자인의 이름, 가격, 썸네일과 상세 이미지를 관리합니다.</span>
-                <button className="plain-button compact" type="button" onClick={addDesign}>
-                  + 디자인 추가
-                </button>
-              </div>
-
-              {designRows.length === 0 && (
-                <p className="product-design-empty">등록된 디자인이 없습니다. 디자인 추가 버튼으로 필요한 디자인을 추가해 주세요.</p>
-              )}
-
-              {designRows.map((design, index) => (
-                <div className="product-design-admin-row" key={design.id || design.draftKey}>
-                  <input type="hidden" name={`designId_${index}`} value={design.id || ""} />
-                  <div className="product-design-admin-header">
-                    <strong>{design.id ? design.name || `디자인 ${index + 1}` : "신규 디자인"}</strong>
-                    <div className="product-design-admin-header-actions">
-                      <label>
-                        <input name={`designIsActive_${index}`} type="checkbox" value="1" defaultChecked={design.is_active !== 0} />
-                        <span>노출</span>
-                      </label>
-                      {!design.id && (
-                        <button className="plain-button compact" type="button" onClick={() => removeDraftDesign(design.draftKey)}>
-                          제거
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <label>
-                    디자인명
-                    <input name={`designName_${index}`} defaultValue={design.name || ""} placeholder="예: 소 디자인" />
-                  </label>
-                  <label>
-                    설명
-                    <input name={`designDescription_${index}`} defaultValue={design.description || ""} placeholder="상세페이지 설명" />
-                  </label>
-                  <div className="product-design-admin-fields">
-                    <label>
-                      디자인 가격
-                      <input name={`designUnitPrice_${index}`} type="number" min="0" step="100" defaultValue={design.unit_price ?? ""} placeholder="기본가 사용" />
-                    </label>
-                    <label>
-                      정렬
-                      <input name={`designSortOrder_${index}`} type="number" step="1" defaultValue={design.sort_order || index + 1} />
-                    </label>
-                  </div>
-                  <div className="product-design-admin-images">
-                    <div>
-                      <span>선택 이미지</span>
-                      <div className="product-design-admin-thumb">
-                        {design.option_image_data_url ? (
-                          <img src={design.option_image_data_url} alt={`${design.name || "디자인"} 선택 이미지`} />
-                        ) : (
-                          <ProductAdminFallback product={product} />
-                        )}
-                      </div>
-                      <input name={`designOptionImage_${index}`} type="file" accept="image/*" />
-                      <label className="product-design-admin-check">
-                        <input name={`removeDesignOptionImage_${index}`} type="checkbox" value="1" />
-                        <span>삭제</span>
-                      </label>
-                    </div>
-                    <div>
-                      <span>상세페이지 이미지</span>
-                      <div className="product-design-admin-thumb detail">
-                        {design.detail_image_data_url ? (
-                          <img src={design.detail_image_data_url} alt={`${design.name || "디자인"} 상세 이미지`} />
-                        ) : (
-                          <ProductAdminFallback product={product} />
-                        )}
-                      </div>
-                      <input name={`designDetailImage_${index}`} type="file" accept="image/*" />
-                      <label className="product-design-admin-check">
-                        <input name={`removeDesignDetailImage_${index}`} type="checkbox" value="1" />
-                        <span>삭제</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </fieldset>
-          </div>
+          </section>
         </div>
 
         <div className="product-admin-editor-footer">
-          <FormSubmitButton pendingText="저장중">상품 정보 저장</FormSubmitButton>
+          <FormSubmitButton pendingText="저장중">{isProduct ? "상품" : "디자인"} 정보 저장</FormSubmitButton>
         </div>
       </form>
     </div>
   );
 }
 
-function ProductAdminFallback({ product }) {
-  return <span aria-hidden="true">{productFallbackIcon(product.slug)}</span>;
+function catalogItemImage(item) {
+  if (item.type === "product") {
+    if (item.image_data_url) return item.image_data_url;
+    return PRODUCT_DEFAULT_IMAGES[item.slug] || "/assets/dashboard-action-shop.png";
+  }
+  if (item.option_image_data_url) return item.option_image_data_url;
+  const designNames = Object.keys(DESIGN_DEFAULT_IMAGES);
+  const catalogIndex = Number(String(item.id || "").match(/^design-catalog-zodiac-(\d+)$/)?.[1] || 0) - 1;
+  return DESIGN_DEFAULT_IMAGES[designNames[catalogIndex]]
+    || DESIGN_DEFAULT_IMAGES[String(item.name || "").trim()]
+    || "/assets/shop-icons/zodiac-rabbit.png";
 }
 
-function productFallbackIcon(slug) {
-  if (slug === "sticker") return "★";
-  if (slug === "bracelet") return "○";
-  if (slug === "necklace") return "◎";
-  if (slug === "keyring") return "●";
-  return "상품";
+function catalogPriceLabel(item) {
+  if (item.type === "design" && (item.unit_price === null || item.unit_price === undefined || item.unit_price === "")) {
+    return "상품 가격 사용";
+  }
+  return `${Number(item.unit_price || 0).toLocaleString("ko-KR")}원`;
 }
 
-function productDetailImageUrl(product) {
-  const version = encodeURIComponent(String(product?.updated_at || ""));
-  return `/api/products/${encodeURIComponent(product.id)}/detail?v=${version}`;
-}
-
-function updateSelectedProductUrl(productId) {
+function updateSelectedCatalogUrl(itemKey) {
   if (typeof window === "undefined") return;
   const nextUrl = new URL(window.location.href);
   nextUrl.searchParams.set("section", "products");
-  if (productId) nextUrl.searchParams.set("product", productId);
-  else nextUrl.searchParams.delete("product");
+  if (itemKey) nextUrl.searchParams.set("item", itemKey);
+  else nextUrl.searchParams.delete("item");
+  nextUrl.searchParams.delete("product");
   window.history.replaceState(window.history.state, "", nextUrl);
-}
-
-function formatCurrency(value) {
-  return `${Number(value || 0).toLocaleString("ko-KR")}원`;
 }

@@ -379,7 +379,7 @@ export default async function AdminPage({ searchParams }) {
           ) : activeSection === "coupons" ? (
             <CouponManagementSection couponsData={couponsData} />
           ) : activeSection === "products" ? (
-            <ProductManagementSection productsData={productsData} selectedProductId={resolvedSearchParams?.product || ""} />
+            <ProductManagementSection productsData={productsData} selectedItemKey={resolvedSearchParams?.item || ""} />
           ) : activeSection === "product-service-intro" ? (
             <ProductServiceIntroManagementSection setting={productServiceIntro} />
           ) : activeSection === "image-uploads" ? (
@@ -3489,12 +3489,9 @@ function SubscriptionAvatar({ subscription }) {
   );
 }
 
-function ProductManagementSection({ productsData, selectedProductId = "" }) {
-  const { products } = productsData;
-  const designCount = products.reduce(
-    (maximum, product) => Math.max(maximum, product.designs?.length || 0),
-    0,
-  );
+function ProductManagementSection({ productsData, selectedItemKey = "" }) {
+  const { products, designs } = productsData;
+  const designCount = designs.length;
 
   return (
     <div className="qr-admin-stack">
@@ -3507,8 +3504,8 @@ function ProductManagementSection({ productsData, selectedProductId = "" }) {
             <AdminExportButton filename="zezari-products.csv" rows={productExportRows(products)} />
           </div>
         </div>
-        <p className="empty-text">현재 {products.length}개 상품과 상품별 최대 {designCount}개 디자인의 이미지, 이름과 가격을 관리할 수 있습니다. 목록에서 상품을 선택하면 오른쪽 상세 패널에서 수정할 수 있습니다.</p>
-        <ProductAdminWorkspace products={products} initialProductId={selectedProductId} />
+        <p className="empty-text">현재 {products.length}개 상품과 공용 {designCount}개 디자인의 이미지, 명칭과 가격을 각각 관리할 수 있습니다. 항목을 선택하면 오른쪽 상세 패널에서 수정할 수 있습니다.</p>
+        <ProductAdminWorkspace products={products} designs={designs} initialItemKey={selectedItemKey} />
       </section>
     </div>
   );

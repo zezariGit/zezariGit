@@ -950,11 +950,15 @@ function couponOptionLabel(coupon) {
 }
 
 function productPickerImage(product) {
+  if (Number(product?.has_image || 0) === 1) return productImageUrl(product);
   return PRODUCT_PICKER_IMAGES[String(product?.slug || "").trim()] || "";
 }
 
 function designPickerImage(design) {
-  return ZODIAC_PICKER_IMAGES[String(design?.name || "").trim()] || "";
+  if (Number(design?.has_option_image || 0) === 1) return productDesignImageUrl(design);
+  const catalogIndex = Number(String(design?.id || "").match(/^design-catalog-zodiac-(\d+)$/)?.[1] || 0) - 1;
+  const catalogName = ZODIAC_DESIGN_ORDER[catalogIndex];
+  return ZODIAC_PICKER_IMAGES[catalogName] || ZODIAC_PICKER_IMAGES[String(design?.name || "").trim()] || "";
 }
 
 function clearTossWidgetContainers() {
@@ -964,19 +968,18 @@ function clearTossWidgetContainers() {
 }
 
 function getShopDesigns(product) {
-  const order = new Map(ZODIAC_DESIGN_ORDER.map((name, index) => [name, index]));
   return [...(product?.designs || [])]
-    .filter((design) => order.has(String(design?.name || "").trim()))
-    .sort((a, b) => order.get(a.name) - order.get(b.name));
+    .sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0));
 }
 
 function getUniversalShopDesigns(products) {
-  const availableNames = new Set(
-    products.flatMap((product) => getShopDesigns(product).map((design) => design.name))
-  );
-  return ZODIAC_DESIGN_ORDER
-    .filter((name) => availableNames.has(name))
-    .map((name, index) => ({ id: `universal-zodiac-${index + 1}`, name }));
+  const designsById = new Map();
+  for (const product of products) {
+    for (const design of getShopDesigns(product)) {
+      if (!designsById.has(design.id)) designsById.set(design.id, design);
+    }
+  }
+  return [...designsById.values()].sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0));
 }
 
 function productFallbackIcon(slug) {
