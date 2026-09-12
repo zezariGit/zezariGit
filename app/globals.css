@@ -13179,7 +13179,7 @@ button:disabled:hover {
 }
 
 .shop-catalog-selection-view.design .shop-choice-grid > button {
-  width: 96px;
+  width: 114px;
   min-height: 0;
   aspect-ratio: 1;
   grid-template-rows: minmax(0, 1fr) auto;
@@ -13194,12 +13194,15 @@ button:disabled:hover {
 }
 
 .shop-catalog-selection-view.design {
+  min-height: 0;
+  grid-template-rows: auto auto;
+  align-content: start;
   gap: 8px;
 }
 
 .shop-catalog-selection-view.design .shop-choice-grid {
-  grid-template-columns: repeat(2, 96px);
-  align-self: end;
+  grid-template-columns: repeat(2, 114px);
+  align-self: start;
   justify-content: center;
   gap: 6px;
 }
@@ -13223,6 +13226,13 @@ button:disabled:hover {
   width: 20px;
   height: 20px;
   font-size: 0.68rem;
+}
+
+.shop-catalog-selection-view.design .shop-choice-confirm {
+  position: static;
+  width: 234px;
+  justify-self: center;
+  box-shadow: none;
 }
 
 .shop-choice-confirm {

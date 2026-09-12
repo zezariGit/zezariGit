@@ -63,8 +63,10 @@ assert.match(database, /export async function setGlobalProductDesignCatalogItem/
 assert.match(styles, /\.shop-subject-trigger[\s\S]*background:\s*var\(--c-primary-light\)/);
 assert.match(styles, /\.shop-choice-grid[\s\S]*grid-template-columns:\s*repeat\(2/);
 assert.match(styles, /\.shop-catalog-selection-view\.design \.shop-choice-grid > button[\s\S]*aspect-ratio:\s*1/);
-assert.match(styles, /\.shop-catalog-selection-view\.design \.shop-choice-grid[\s\S]*grid-template-columns:\s*repeat\(2, 96px\)/);
+assert.match(styles, /\.shop-catalog-selection-view\.design[\s\S]*grid-template-rows:\s*auto auto[\s\S]*align-content:\s*start/);
+assert.match(styles, /\.shop-catalog-selection-view\.design \.shop-choice-grid[\s\S]*grid-template-columns:\s*repeat\(2, 114px\)[\s\S]*align-self:\s*start/);
 assert.match(styles, /\.shop-catalog-selection-view\.design \.shop-choice-image img[\s\S]*width:\s*100%[\s\S]*height:\s*100%[\s\S]*object-fit:\s*contain/);
+assert.match(styles, /\.shop-catalog-selection-view\.design \.shop-choice-confirm[\s\S]*position:\s*static[\s\S]*width:\s*234px/);
 assert.match(styles, /\.catalog-type-filters[\s\S]*grid-template-columns:\s*repeat\(3/);
 assert.match(styles, /\.catalog-management-image img,[\s\S]*width:\s*100%[\s\S]*height:\s*100%[\s\S]*object-fit:\s*contain/);
 assert.match(styles, /\.shop-subject-backdrop[\s\S]*backdrop-filter:\s*blur/);
