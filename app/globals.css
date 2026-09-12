@@ -13205,9 +13205,9 @@ button:disabled:hover {
 }
 
 .shop-catalog-selection-view.design .shop-choice-image img {
-  width: auto;
+  width: 100%;
   max-width: 100%;
-  height: auto;
+  height: 100%;
   max-height: 100%;
   object-fit: contain;
 }
@@ -14245,9 +14245,9 @@ button:disabled:hover {
 
 .catalog-management-image img,
 .catalog-image-preview img {
-  width: auto;
+  width: 100%;
   max-width: 100%;
-  height: auto;
+  height: 100%;
   max-height: 100%;
   object-fit: contain;
 }
