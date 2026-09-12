@@ -51,6 +51,7 @@ export default function ShopCheckoutClient({
   );
   const [designIndex, setDesignIndex] = useState(0);
   const [designId, setDesignId] = useState("");
+  const [selectedDesignName, setSelectedDesignName] = useState("");
   const [couponId, setCouponId] = useState("");
   const [couponPickerOpen, setCouponPickerOpen] = useState(false);
   const [shippingAddress, setShippingAddress] = useState(guardian?.address || "");
@@ -98,10 +99,13 @@ export default function ShopCheckoutClient({
     [productId, products]
   );
   const designs = useMemo(() => getShopDesigns(product), [product]);
+  const universalDesigns = useMemo(() => getUniversalShopDesigns(products), [products]);
+  const designChoices = product ? designs : universalDesigns;
   const selectedSubject = subjects.find((subject) => subject.id === subjectId) || null;
   const selectedDesign = useMemo(() => {
     return designs.find((design) => design.id === designId) || null;
   }, [designId, designIndex, designs]);
+  const displayDesign = selectedDesign || universalDesigns.find((design) => design.name === selectedDesignName) || null;
   const configurationReady = Boolean(subjectId && product && selectedDesign);
   const productUnitPrice = getDesignUnitPrice(product, selectedDesign);
   const productAmount = productUnitPrice * quantity;
@@ -120,10 +124,12 @@ export default function ShopCheckoutClient({
   }, [paymentAmount]);
 
   useEffect(() => {
-    setDesignIndex(0);
-    setDesignId("");
+    const nextDesigns = getShopDesigns(product);
+    const matchingDesign = nextDesigns.find((design) => design.name === selectedDesignName) || null;
+    setDesignIndex(Math.max(0, nextDesigns.findIndex((design) => design.id === matchingDesign?.id)));
+    setDesignId(matchingDesign?.id || "");
     setQuantity(1);
-  }, [product]);
+  }, [product, selectedDesignName]);
 
   useEffect(() => {
     if (couponId && !applicableCoupons.some((coupon) => coupon.id === couponId)) {
@@ -391,7 +397,8 @@ export default function ShopCheckoutClient({
   };
 
   const openSelectionView = (view) => {
-    setDraftSelectionId(view === "product" ? productId : designId);
+    const currentDesignChoice = designChoices.find((design) => design.name === selectedDesignName);
+    setDraftSelectionId(view === "product" ? productId : currentDesignChoice?.id || "");
     setSelectionView(view);
   };
 
@@ -400,9 +407,12 @@ export default function ShopCheckoutClient({
     if (selectionView === "product") {
       setProductId(draftSelectionId);
     } else if (selectionView === "design") {
-      const nextIndex = designs.findIndex((design) => design.id === draftSelectionId);
+      const nextDesign = designChoices.find((design) => design.id === draftSelectionId);
+      if (!nextDesign) return;
+      setSelectedDesignName(nextDesign.name);
+      const nextIndex = designs.findIndex((design) => design.name === nextDesign.name);
       setDesignIndex(Math.max(0, nextIndex));
-      setDesignId(draftSelectionId);
+      setDesignId(nextIndex >= 0 ? designs[nextIndex].id : "");
     }
     setSelectionView("");
   };
@@ -438,7 +448,7 @@ export default function ShopCheckoutClient({
       {selectionView === "design" && (
         <CatalogSelectionView
           type="design"
-          options={designs}
+          options={designChoices}
           selectedId={draftSelectionId}
           onSelect={setDraftSelectionId}
           onConfirm={confirmSelection}
@@ -455,7 +465,8 @@ export default function ShopCheckoutClient({
             setSubjectId={setSubjectId}
             quantity={quantity}
             changeQuantity={changeQuantity}
-            selectedDesign={selectedDesign}
+            displayDesign={displayDesign}
+            designReady={Boolean(selectedDesign)}
             productUnitPrice={productUnitPrice}
             productAmount={productAmount}
             openProductSelection={() => openSelectionView("product")}
@@ -529,7 +540,8 @@ function ProductConfiguration({
   setSubjectId,
   quantity,
   changeQuantity,
-  selectedDesign,
+  displayDesign,
+  designReady,
   productUnitPrice,
   productAmount,
   openProductSelection,
@@ -537,7 +549,7 @@ function ProductConfiguration({
 }) {
   const [subjectPickerOpen, setSubjectPickerOpen] = useState(false);
   const pickerAreaRef = useRef(null);
-  const selectionReady = Boolean(product && selectedDesign);
+  const selectionReady = Boolean(product && designReady);
 
   useEffect(() => {
     const closePickers = (event) => {
@@ -623,11 +635,11 @@ function ProductConfiguration({
         <ShopSelectionTrigger
           label="디자인"
           prompt={product && designs.length === 0 ? "선택 가능한 디자인이 없습니다" : "디자인을 선택해 주세요"}
-          selectedOption={selectedDesign}
-          image={selectedDesign ? designPickerImage(selectedDesign) : "/assets/shop-icons/zodiac-rabbit.png"}
+          selectedOption={displayDesign}
+          image={displayDesign ? designPickerImage(displayDesign) : "/assets/shop-icons/zodiac-rabbit.png"}
           onClick={openDesignSelection}
           type="design"
-          disabled={!product || designs.length === 0}
+          disabled={Boolean(product && designs.length === 0)}
         />
       </div>
 
@@ -956,6 +968,15 @@ function getShopDesigns(product) {
   return [...(product?.designs || [])]
     .filter((design) => order.has(String(design?.name || "").trim()))
     .sort((a, b) => order.get(a.name) - order.get(b.name));
+}
+
+function getUniversalShopDesigns(products) {
+  const availableNames = new Set(
+    products.flatMap((product) => getShopDesigns(product).map((design) => design.name))
+  );
+  return ZODIAC_DESIGN_ORDER
+    .filter((name) => availableNames.has(name))
+    .map((name, index) => ({ id: `universal-zodiac-${index + 1}`, name }));
 }
 
 function productFallbackIcon(slug) {
