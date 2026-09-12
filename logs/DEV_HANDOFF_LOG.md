@@ -9353,3 +9353,29 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Vercel deployment `dpl_E19dHgcypFn11T8TGpeSo8YnA951` reached `READY` and owns `https://zezari.family` plus compatibility aliases.
 - Production root and all three public regulation endpoints returned HTTP 200 with the expected titles.
 - The post-deployment error-log query returned no errors.
+
+## 2026-09-12 KST - Product And Design Administration, Compact Design Selection
+
+### User Request
+- Add a clearly identified administrator menu for managing the current seven products and twelve designs, including images, names, and prices.
+- Reduce the design-selection image/card size so all twelve designs appear above the confirmation button in one viewport.
+
+### Reflected Work
+- Renamed the existing administrator product catalog menu and page to `상품/디자인 관리` instead of creating a duplicate management surface.
+- Added data-driven product and maximum-per-product design counts to the management header.
+- Confirmed the existing editor exposes product image/name/price and per-design option image/name/price fields.
+- Compacted only design-selection cards to a two-column, six-row layout while preserving contained image proportions and the existing product card layout.
+- Extended the shop UI regression test to cover the renamed admin menu, catalog management fields, counts, and compact design CSS.
+
+### Verification
+- `npm run test:shop-ui`: passed.
+- `npm run build`: passed with Next.js 16.3.0 and all 40 routes generated.
+- `git diff --check`: passed.
+- Browser verification at `/shop?preview=1` confirmed all twelve design cards and the disabled `선택 완료` button are visible in the same 886x825 viewport.
+- Administrator browser verification requires an authenticated admin session; source-level assertions cover the protected form and menu.
+
+### Feature Commit
+- `5182915 feat: refine product and design management`
+
+### Deployment
+- Not requested for this change. GitHub push and Vercel production deployment remain pending.
