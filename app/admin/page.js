@@ -279,7 +279,7 @@ export default async function AdminPage({ searchParams }) {
           : activeSection === "coupons"
             ? "쿠폰 관리"
           : activeSection === "products"
-            ? "상품 관리"
+            ? "상품/디자인 관리"
             : activeSection === "product-service-intro"
               ? "상품구매 서비스소개 관리"
             : activeSection === "image-uploads"
@@ -323,7 +323,7 @@ export default async function AdminPage({ searchParams }) {
           : activeSection === "coupons"
             ? "쿠폰 코드를 발행하고 할인 조건, 유효기간, 사용 가능 상태를 관리합니다."
           : activeSection === "products"
-            ? "사용자 상품 선택 화면에 노출되는 상품 이미지, 가격, 활성 상태를 관리합니다."
+            ? "상품과 디자인의 이미지, 이름, 가격 및 사용자 화면 노출 상태를 관리합니다."
             : activeSection === "product-service-intro"
               ? "상품 구매 도움말에서 확인하는 세로형 서비스 소개 이미지를 관리합니다."
             : activeSection === "image-uploads"
@@ -3491,18 +3491,23 @@ function SubscriptionAvatar({ subscription }) {
 
 function ProductManagementSection({ productsData, selectedProductId = "" }) {
   const { products } = productsData;
+  const designCount = products.reduce(
+    (maximum, product) => Math.max(maximum, product.designs?.length || 0),
+    0,
+  );
 
   return (
     <div className="qr-admin-stack">
       <section className="admin-panel">
         <div className="panel-heading">
-          <h2>구매 상품 관리</h2>
+          <h2>상품/디자인 관리</h2>
           <div className="admin-heading-actions">
-            <span>{products.length}개</span>
+            <span>상품 {products.length}개</span>
+            <span>디자인 {designCount}개</span>
             <AdminExportButton filename="zezari-products.csv" rows={productExportRows(products)} />
           </div>
         </div>
-        <p className="empty-text">활성 상품은 관리자 정렬 순서대로 사용자 상품 selectbox에 표시됩니다. 목록에서 상품을 선택하면 오른쪽 상세 패널에서 수정할 수 있습니다.</p>
+        <p className="empty-text">현재 {products.length}개 상품과 상품별 최대 {designCount}개 디자인의 이미지, 이름과 가격을 관리할 수 있습니다. 목록에서 상품을 선택하면 오른쪽 상세 패널에서 수정할 수 있습니다.</p>
         <ProductAdminWorkspace products={products} initialProductId={selectedProductId} />
       </section>
     </div>

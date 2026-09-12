@@ -13179,12 +13179,35 @@ button:disabled:hover {
 }
 
 .shop-catalog-selection-view.design .shop-choice-grid > button {
-  min-height: 166px;
-  grid-template-rows: 118px auto;
+  min-height: 86px;
+  grid-template-rows: 58px auto;
+  gap: 2px;
+  padding: 4px 5px 5px;
 }
 
 .shop-catalog-selection-view.design .shop-choice-image {
-  height: 118px;
+  height: 58px;
+}
+
+.shop-catalog-selection-view.design {
+  gap: 8px;
+}
+
+.shop-catalog-selection-view.design .shop-choice-grid {
+  gap: 6px;
+}
+
+.shop-catalog-selection-view.design .shop-choice-grid > button > strong {
+  font-size: 0.76rem;
+  line-height: 1.15;
+}
+
+.shop-catalog-selection-view.design .shop-choice-check {
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  font-size: 0.68rem;
 }
 
 .shop-choice-confirm {

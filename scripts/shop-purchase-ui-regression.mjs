@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const [page, checkout, servicePage, serviceControls, imageRoute, adminPage, adminActions, adminWorkspace, database, styles] = await Promise.all([
+const [page, checkout, servicePage, serviceControls, imageRoute, adminPage, adminActions, adminWorkspace, productAdmin, database, styles] = await Promise.all([
   readFile(new URL("../app/shop/page.js", import.meta.url), "utf8"),
   readFile(new URL("../app/shop-checkout-client.js", import.meta.url), "utf8"),
   readFile(new URL("../app/shop/service/page.js", import.meta.url), "utf8"),
@@ -10,6 +10,7 @@ const [page, checkout, servicePage, serviceControls, imageRoute, adminPage, admi
   readFile(new URL("../app/admin/page.js", import.meta.url), "utf8"),
   readFile(new URL("../app/admin/actions.js", import.meta.url), "utf8"),
   readFile(new URL("../app/admin/admin-workspace.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/admin/product-admin-catalog-form.js", import.meta.url), "utf8"),
   readFile(new URL("../lib/db.js", import.meta.url), "utf8"),
   readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
 ]);
@@ -40,12 +41,21 @@ assert.match(serviceControls, /router\.back\(\)/);
 assert.match(serviceControls, /window\.scrollTo\(\{ top: 0, behavior: "smooth" \}\)/);
 assert.match(imageRoute, /getProductServiceIntroImage/);
 assert.match(adminWorkspace, /상품구매 서비스소개 관리/);
+assert.match(adminWorkspace, /상품\/디자인 관리/);
 assert.match(adminPage, /ProductServiceIntroManagementSection/);
+assert.match(adminPage, /상품 \{products\.length\}개/);
+assert.match(adminPage, /디자인 \{designCount\}개/);
 assert.match(adminActions, /saveProductServiceIntroAction/);
+assert.match(productAdmin, /상품 썸네일/);
+assert.match(productAdmin, /상품 가격/);
+assert.match(productAdmin, /디자인 관리 \(\{designRows\.length\}\)/);
+assert.match(productAdmin, /디자인명/);
+assert.match(productAdmin, /디자인 가격/);
 assert.match(database, /CREATE TABLE IF NOT EXISTS product_service_intro/);
 assert.match(database, /export async function saveProductServiceIntro/);
 assert.match(styles, /\.shop-subject-trigger[\s\S]*background:\s*var\(--c-primary-light\)/);
 assert.match(styles, /\.shop-choice-grid[\s\S]*grid-template-columns:\s*repeat\(2/);
+assert.match(styles, /\.shop-catalog-selection-view\.design \.shop-choice-grid > button[\s\S]*min-height:\s*86px/);
 assert.match(styles, /\.shop-subject-backdrop[\s\S]*backdrop-filter:\s*blur/);
 assert.match(styles, /\.quantity-control button:disabled/);
 assert.match(styles, /\.shop-next-button:disabled/);
