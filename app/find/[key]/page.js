@@ -213,7 +213,7 @@ export default async function FindPage({ params, searchParams }) {
         </div>
 
         <footer className="finder-public-brand">
-          <img src="/icons/zezari-wordmark-v1-512.png" alt="제자리" />
+          <img src="/assets/finder/zezari-wordmark.png" alt="제자리" />
         </footer>
       </section>
       <StatusToast message={notice} type={noticeType} />
@@ -259,7 +259,8 @@ function calculateAge(value) {
 }
 
 function previewStep(value) {
-  return ["intro", "permission", "confirm", "complete", "permission-denied", "location-error"].includes(value)
+  if (value === "permission") return "permission-denied";
+  return ["intro", "confirm", "complete", "permission-denied", "location-error"].includes(value)
     ? value
     : "idle";
 }

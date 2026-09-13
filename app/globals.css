@@ -12872,17 +12872,21 @@ button:disabled:hover {
 }
 
 .finder-public-brand {
-  width: 94px;
-  height: 34px;
+  width: 108px;
+  height: auto;
+  display: grid;
+  place-items: center;
   justify-self: center;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .finder-public-brand img {
-  width: 156px;
-  height: 156px;
+  width: 108px;
+  max-width: 100%;
+  height: auto;
   display: block;
-  transform: translate(-31px, -59px);
+  object-fit: contain;
+  transform: none;
 }
 
 .finder-emergency-dialog > img {
