@@ -9475,3 +9475,26 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Feature commit `8132c21` (`feat: activate matched QR after product payment`) was pushed to GitHub `main`.
 - Vercel production deployment `dpl_3TsDC48s6EeF1pwmwBWV4ukH6K6n` reached `READY` and was aliased to `https://zezari.family`.
 - `https://zezari.family/` and `https://zezari.family/shop` returned HTTP 200; no post-deploy error logs were reported.
+
+## 2026-09-13 KST - Public QR Finder Information Screen Rebuild
+
+### User Request
+- Rebuild the no-login mobile page shown after a finder scans an active QR to match the supplied reference, keep all existing behavior, show every primary action in the first viewport, and deploy.
+
+### Reflected Work
+- Replaced the generic public subject panel with a compact white mobile layout containing the shield heading, circular subject photo, name, gender, calculated age, birth date, action hierarchy, guardian message, and Zezari wordmark.
+- Kept the safe-phone API flow as the dominant green call button so the guardian's real number remains hidden.
+- Kept the explicit-consent location flow and presented its entry action beside the new 112 action.
+- Added an accessible 112 confirmation dialog with `취소` and final `tel:112` actions; opening the dialog does not initiate a call.
+- Rebuilt the guardian voice control with the supplied play and waveform assets and return `null` when no voice is registered.
+- Copied the seven supplied finder icon assets into `public/assets/finder/` and added `scripts/finder-public-ui-regression.mjs`.
+
+### Verification
+- `npm run build`: passed with Next.js 16.3.0 and 40 routes.
+- `npm run test:finder-public-ui`, `npm run test:subject-flow`, `npm run test:notifications`, `npm run security:check`, and `git diff --check`: passed.
+- Browser verification confirmed the first-view layout, location introduction transition, 112 confirmation dialog, cancel behavior, and `tel:112` link.
+
+### Deployment
+- Feature commit `d2f82a6` (`feat: rebuild public QR finder page`) was pushed to GitHub `main`.
+- Vercel production deployment `dpl_8EradUsEA2wugE68x7T4Uy1TZJ85` reached `READY` and was aliased to `https://zezari.family`.
+- The production finder preview and representative finder assets returned HTTP 200 with the new page heading present. No post-deploy error logs were reported.

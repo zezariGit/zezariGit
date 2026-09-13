@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-13 KST
 
-Application baseline commit: `8132c21` (`main`, GitHub/Vercel 운영 반영 완료)
+Application baseline commit: `d2f82a6` (`main`, GitHub/Vercel 운영 반영 완료)
 
 Production: `https://zezari.family`
 
@@ -32,9 +32,9 @@ Production: `https://zezari.family`
 | GitHub | `https://github.com/zezariGit/zezariGit.git` |
 | Vercel 프로젝트 | scope `zezari`, project `zezari` |
 | 대표 도메인 | `https://zezari.family` |
-| 최근 확인 운영 배포 | `dpl_3TsDC48s6EeF1pwmwBWV4ukH6K6n` (`READY`, 상품 결제 후 매칭 QR 자동 활성화) |
+| 최근 확인 운영 배포 | `dpl_8EradUsEA2wugE68x7T4Uy1TZJ85` (`READY`, QR 발견자 대상자 정보 화면 개편) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | production feature commit `8132c21`; 상품 결제 후 매칭 QR 즉시 활성화 운영 반영 완료 |
+| 최근 애플리케이션 기능 기준 | production feature commit `d2f82a6`; QR 발견자 대상자 정보 화면 및 전체 행동 기능 운영 반영 완료 |
 | 현재 로컬 미배포 작업 | 없음. 관련 없는 기존 미추적 파일은 작업 대상에서 제외 |
 
 ### 로컬 시작
@@ -172,7 +172,9 @@ npm run dev -- -p 3005
 ### 공개 QR 발견자 화면
 
 - `/find/[key]`에서 QR 상태와 연결 대상자를 확인한다.
-- 보호자 안심번호 전화, 위치 공유, 발견 알림, 보호자 메시지, 등록된 경우 음성 재생을 제공한다.
+- 별도 로그인 없이 접근하며 모바일 첫 화면에 대상자 기본 정보, 보호자 메시지, 안심번호 전화, 위치 공유, 112 신고, 등록된 경우 음성 재생, 제자리 로고를 모두 배치한다.
+- 보호자 전화가 가장 강조된 기본 행동이고 실제 연락처 대신 서버가 발급한 안심번호로 연결한다. 112는 즉시 연결하지 않고 확인 팝업의 최종 `전화하기`에서만 `tel:112`를 실행한다.
+- 위치 공유와 음성은 초록색 계열, 112는 옅은 빨간색으로 구분한다. 보호자 음성이 없으면 음성 버튼 영역 자체를 렌더링하지 않는다.
 - 위치 공유는 `안내/명시 동의 → 시스템 위치 권한 요청 → 1회 위치 조회·확인 → 최종 공유 → 완료` 순서다. 동의 전 권한 요청과 최종 버튼 전 서버 전송은 발생하지 않는다.
 - 권한 거부와 GPS·네트워크 조회 실패를 별도 재시도 화면으로 처리하며, 실패 시 위치를 저장하거나 알림을 전송하지 않는다.
 - 보호자는 `/account/location-shares/[id]`에서 공유 시점 좌표·주소·시간·정확도를 확인한다. 위치는 실시간으로 갱신하지 않는다.
