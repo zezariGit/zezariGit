@@ -9452,3 +9452,26 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Re-ran mobile screenshots for all seven previews; `npm run build`, `npm run test:notifications`, and `git diff --check` passed.
 - Added dedicated full-screen QR status layouts: ordinary unassigned QR uses the supplied `미배정 QR입니다` image, expired service uses the supplied `사용할 수 없는 QR입니다` image, and both expose the supplied Kakao inquiry image as a working link to the existing Zezari Kakao channel. Store-sale reserved QR signup/claim behavior remains unchanged.
 - Normalized the near-white outer backgrounds of the unassigned, expired, and Kakao inquiry source images to pure white without changing their text, icons, dimensions, or link behavior; cache-busting asset URLs ensure the corrected images appear immediately.
+
+## 2026-09-13 KST - Product Payment Matched QR Auto-Activation
+
+### User Request
+- Activate the QR already matched to the selected subject immediately when a product purchase completes, then deploy the change.
+
+### Reflected Work
+- Updated both the current QR-service-included purchase path and the legacy standalone product payment path.
+- A non-discarded QR matched to the purchased subject is now enabled and stamped with `activated_at` and `activation_source='guardian_purchase'` during payment completion.
+- The same completion flow changes the order to `activated`, the subject to `안전`, and the included QR service subscription to `active`; no separate post-delivery QR scan is required.
+- Updated success messages for normal Toss payment, full-discount coupon payment, and administrator payment pass. When no activatable matched QR exists, the page reports that its QR state needs review instead of claiming activation succeeded.
+- Added `scripts/product-qr-auto-activation-regression.mjs` and the `npm run test:product-qr-activation` command.
+
+### Verification
+- `npm run build`: passed with Next.js 16.3.0 and 40 routes.
+- `npm run test:product-qr-activation`, `npm run test:shop-ui`, `npm run test:billing-history`, and `npm run test:notifications`: passed.
+- `npm run security:check` and `git diff --check`: passed.
+- No live customer payment was created during verification.
+
+### Deployment
+- Feature commit `8132c21` (`feat: activate matched QR after product payment`) was pushed to GitHub `main`.
+- Vercel production deployment `dpl_3TsDC48s6EeF1pwmwBWV4ukH6K6n` reached `READY` and was aliased to `https://zezari.family`.
+- `https://zezari.family/` and `https://zezari.family/shop` returned HTTP 200; no post-deploy error logs were reported.

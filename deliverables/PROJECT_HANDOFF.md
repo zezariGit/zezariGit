@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-13 KST
 
-Application baseline commit: `88cd05d` (`main`, GitHub/Vercel 운영 반영 완료)
+Application baseline commit: `8132c21` (`main`, GitHub/Vercel 운영 반영 완료)
 
 Production: `https://zezari.family`
 
@@ -32,9 +32,9 @@ Production: `https://zezari.family`
 | GitHub | `https://github.com/zezariGit/zezariGit.git` |
 | Vercel 프로젝트 | scope `zezari`, project `zezari` |
 | 대표 도메인 | `https://zezari.family` |
-| 최근 확인 운영 배포 | `dpl_4YsRnoJ1CHaFSjU7qmhvJTTQVECh` (`READY`, QR 위치 공유·상태 화면 및 누적 UI 변경) |
+| 최근 확인 운영 배포 | `dpl_3TsDC48s6EeF1pwmwBWV4ukH6K6n` (`READY`, 상품 결제 후 매칭 QR 자동 활성화) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | production feature commit `88cd05d`; QR 위치 공유·미배정/만료 QR 상태 화면 운영 반영 완료 |
+| 최근 애플리케이션 기능 기준 | production feature commit `8132c21`; 상품 결제 후 매칭 QR 즉시 활성화 운영 반영 완료 |
 | 현재 로컬 미배포 작업 | 없음. 관련 없는 기존 미추적 파일은 작업 대상에서 제외 |
 
 ### 로컬 시작
@@ -123,6 +123,12 @@ npm run dev -- -p 3005
 | 수정 | 기존 사진 표시·교체, 생년월일 드롭다운, 메시지·음성 재생/재녹음/삭제, 유효 필수값에서 수정 완료 | 완료 |
 | 수정 화면 디자인 | 메시지와 음성 위치 교체, 제목을 `보호자가 전하고픈 말`로 변경, 안내 문구 크기·굵기 통일, 성별 `남성/여성`, 연락처 수정 안내를 최하단 한 줄로 표시 | 완료 |
 | 등록 완료 | 제공된 QR 완료 이미지, 지정된 두 줄 안내, 상품 구매/대시보드 버튼 아이콘 삭제 및 텍스트 중앙 정렬 | 완료 |
+
+### 상품 구매
+
+| 화면/기능 | 누적 요구사항과 현재 동작 | 상태 |
+| --- | --- | --- |
+| 상품 결제 완료 | 결제 대상자에게 매칭된 QR이 있으면 일반 결제·전액 할인·관리자 결제패스 모두 결제 완료 처리와 동시에 QR을 활성화한다. QR은 `guardian_purchase`, 주문은 `activated`, 대상자는 `안전`, 이용권은 `active`로 전환한다. 활성화 가능한 매칭 QR이 없는 예외만 상태 확인 안내를 표시한다 | 완료 |
 
 ### 설정 및 계정
 
