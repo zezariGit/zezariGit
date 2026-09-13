@@ -9439,7 +9439,9 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Playwright/Chrome mobile captures at 390x844 verified every preview, map rendering, contained icons, readable controls, and no Next.js error overlay.
 
 ### Deployment
-- Not requested for this change. Work remains local and uncommitted pending user approval.
+- Feature commit `88cd05d` (`feat: complete QR location sharing flow`) was pushed to GitHub `main`.
+- Vercel production deployment `dpl_4YsRnoJ1CHaFSjU7qmhvJTTQVECh` reached `READY` and was aliased to `https://zezari.family`.
+- The production root, unassigned/expired QR preview routes, and all three QR status image assets returned HTTP 200. No deployment error logs were reported during the post-deploy check.
 
 ### Reference Image Refinement
 - Unified all location-flow headers and page bodies to one white background.
@@ -9449,3 +9451,4 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Matched the guardian detail to the supplied layout with a green shared-status line and the same dynamic map/address/time information hierarchy.
 - Re-ran mobile screenshots for all seven previews; `npm run build`, `npm run test:notifications`, and `git diff --check` passed.
 - Added dedicated full-screen QR status layouts: ordinary unassigned QR uses the supplied `미배정 QR입니다` image, expired service uses the supplied `사용할 수 없는 QR입니다` image, and both expose the supplied Kakao inquiry image as a working link to the existing Zezari Kakao channel. Store-sale reserved QR signup/claim behavior remains unchanged.
+- Normalized the near-white outer backgrounds of the unassigned, expired, and Kakao inquiry source images to pure white without changing their text, icons, dimensions, or link behavior; cache-busting asset URLs ensure the corrected images appear immediately.

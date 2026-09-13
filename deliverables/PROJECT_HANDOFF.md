@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-13 KST
 
-Application baseline commit: `ec3a836` (`main`, GitHub/Vercel 운영 반영 완료)
+Application baseline commit: `88cd05d` (`main`, GitHub/Vercel 운영 반영 완료)
 
 Production: `https://zezari.family`
 
@@ -32,10 +32,10 @@ Production: `https://zezari.family`
 | GitHub | `https://github.com/zezariGit/zezariGit.git` |
 | Vercel 프로젝트 | scope `zezari`, project `zezari` |
 | 대표 도메인 | `https://zezari.family` |
-| 최근 확인 운영 배포 | `dpl_EEdrxQW4tChzHtZY6pxEaoUw8Sxz` (`READY`, 독립 상품/디자인 관리 및 정사각형 디자인 선택) |
+| 최근 확인 운영 배포 | `dpl_4YsRnoJ1CHaFSjU7qmhvJTTQVECh` (`READY`, QR 위치 공유·상태 화면 및 누적 UI 변경) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | production feature commit `ec3a836`; 현재 QR 위치 공유 작업은 local-only |
-| 현재 로컬 미배포 작업 | QR 발견자 위치 공유 단계 분리 및 보호자 공유 위치 상세 화면 구현. 추가 제공 이미지로 안내·권한·완료·오류 화면을 교체하고, 미배정·만료 QR 전용 이미지 화면과 카카오 문의 연결을 추가함. 빌드·회귀·모바일 미리보기 완료, 커밋/배포는 아직 수행하지 않음 |
+| 최근 애플리케이션 기능 기준 | production feature commit `88cd05d`; QR 위치 공유·미배정/만료 QR 상태 화면 운영 반영 완료 |
+| 현재 로컬 미배포 작업 | 없음. 관련 없는 기존 미추적 파일은 작업 대상에서 제외 |
 
 ### 로컬 시작
 
@@ -109,7 +109,7 @@ npm run dev -- -p 3005
 | 상태 안내 | 제공 이미지 `public/assets/dashboard/subject-status-guide.png`를 그대로 표시 | 완료 |
 | 주요 메뉴 | 실종 신고, 상품 구매, 고객지원(제자리 카카오톡 채널) 이동 | 완료 |
 | 알림 팝오버 | 종 아래 팝오버, 외부 선택·뒤로가기 닫기, 최신순, 내부 스크롤. 미확인은 초록 아이콘·점·연녹색 배경, 확인은 회색 아이콘·흰 배경. 여는 것만으로 확인 처리하지 않고 닫기·화면 이탈 시 이번에 노출된 미확인 ID만 일괄 확인 처리하며 내역은 유지 | 완료 |
-| 위치 공유 알림 | 발견자가 최종 공유한 위치는 보호자 알림으로 저장·전송되며, 알림 선택 시 앱 내부의 공유 위치 상세로 이동. 상세에서 카카오맵 연결 및 112 확인 팝업 제공. 이전 카카오맵 직접 링크 알림도 호환 | 로컬 완료, 배포 대기 |
+| 위치 공유 알림 | 발견자가 최종 공유한 위치는 보호자 알림으로 저장·전송되며, 알림 선택 시 앱 내부의 공유 위치 상세로 이동. 상세에서 카카오맵 연결 및 112 확인 팝업 제공. 이전 카카오맵 직접 링크 알림도 호환 | 완료 |
 | 알림 이벤트 | 안전(위치 공유·안심번호), 온라인 광고, 결제·상품 이벤트를 중복 없이 저장·전송. 관리자 알림 설정과 연동 | 완료 |
 
 ### 대상자 정보
