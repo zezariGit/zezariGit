@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { formatDateTime } from "../lib/date-format";
 
 const PREVIEW_NOTIFICATIONS = [
-  { id: "preview-location", category: "safety", event_key: "safety.location_shared", title: "위치가 공유되었습니다", body: "박제자리 관리대상자의 현재 위치를 공유했습니다.", url: "https://map.kakao.com/link/map/%EC%A0%9C%EC%9E%90%EB%A6%AC%20%EC%9C%84%EC%B9%98%EA%B3%B5%EC%9C%A0,37.5665,126.978", created_at: "2026-09-04T03:10:00.000Z", read_at: null },
+  { id: "preview-location", category: "safety", event_key: "safety.location_shared", title: "위치가 공유되었습니다", body: "박제자리 관리대상자의 현재 위치를 공유했습니다.", url: "/account/location-shares/preview?preview=1", created_at: "2026-09-04T03:10:00.000Z", read_at: null },
   { id: "preview-contact", category: "safety", title: "보호자 안심번호로 연락이 왔습니다", body: "김제자리 관리대상자의 QR 페이지에서 보호자에게 연락했습니다.", created_at: "2026-09-04T01:20:00.000Z", read_at: null },
   { id: "preview-ad-active", category: "ad", title: "수정된 광고가 게재되었습니다", body: "Meta 검토가 완료되어 온라인 실종 광고가 다시 게재되었습니다.", created_at: "2026-09-04T01:12:00.000Z", read_at: "2026-09-04T01:15:00.000Z" },
   { id: "preview-ad-paused", category: "ad", title: "광고가 일시정지되었습니다", body: "광고 변경 요청으로 기존 광고가 일시정지되었습니다.", created_at: "2026-09-03T10:35:00.000Z", read_at: "2026-09-03T11:00:00.000Z" },
@@ -157,7 +157,7 @@ export default function NotificationBell({ preview = false }) {
   }, [finishClosing]);
 
   const openLocationMap = useCallback((notification) => {
-    const mapUrl = getKakaoMapUrl(notification);
+    const mapUrl = getLocationUrl(notification);
     if (!mapUrl) return;
     finishClosing();
     if (window.history.state?.zezariNotifications) {
@@ -201,7 +201,7 @@ export default function NotificationBell({ preview = false }) {
 function NotificationItem({ notification, onOpenLocation }) {
   const unread = !notification.read_at;
   const category = resolveNotificationCategory(notification);
-  const mapUrl = getKakaoMapUrl(notification);
+  const mapUrl = getLocationUrl(notification);
   const className = `notification-item${unread ? " unread" : ""}${mapUrl ? " location-link" : ""}`;
   const content = (
     <>
@@ -214,7 +214,7 @@ function NotificationItem({ notification, onOpenLocation }) {
       </span>
     </>
   );
-  const ariaLabel = `${notification.title || "제자리 알림"}${unread ? ", 미확인" : ", 확인"}${mapUrl ? ", 카카오맵에서 위치 보기" : ""}`;
+  const ariaLabel = `${notification.title || "제자리 알림"}${unread ? ", 미확인" : ", 확인"}${mapUrl ? ", 공유 위치 확인" : ""}`;
 
   if (mapUrl) {
     return (
@@ -233,10 +233,12 @@ function NotificationItem({ notification, onOpenLocation }) {
   );
 }
 
-function getKakaoMapUrl(notification) {
+function getLocationUrl(notification) {
   if (notification?.event_key !== "safety.location_shared") return "";
+  const value = String(notification.url || "");
+  if (value.startsWith("/account/location-shares/")) return value;
   try {
-    const url = new URL(String(notification.url || ""));
+    const url = new URL(value);
     return url.protocol === "https:" && url.hostname === "map.kakao.com" ? url.toString() : "";
   } catch {
     return "";

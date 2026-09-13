@@ -17,7 +17,8 @@ export default async function FindPage({ params, searchParams }) {
   const resolvedSearchParams = await searchParams;
   const session = await getServerSession(authOptions);
   const enabledProviders = getConfiguredProviderIds();
-  const data = await getFindPageDataByKey(resolvedParams?.key);
+  const preview = resolvedParams?.key === "preview" && resolvedSearchParams?.preview === "1";
+  const data = preview ? getLocationPreviewData(resolvedSearchParams?.state) : await getFindPageDataByKey(resolvedParams?.key);
   const notice = resolvedSearchParams?.notice || "";
   const noticeType = resolvedSearchParams?.noticeType || "success";
 
@@ -56,6 +57,9 @@ export default async function FindPage({ params, searchParams }) {
 
   if (!data.subject_id || !data.guardian_id) {
     const storeSaleReserved = Number(data.store_sale_reserved || 0) === 1;
+    if (!storeSaleReserved) {
+      return <QrStatusScreen type="unassigned" />;
+    }
     return (
       <main className="find-page">
         <section className="find-shell">
@@ -97,6 +101,9 @@ export default async function FindPage({ params, searchParams }) {
   if (!subscriptionActive && !subscriptionReady) {
     const paused = data.subscription_status === "paused";
     const expired = data.subscription_status === "expired";
+    if (expired) {
+      return <QrStatusScreen type="expired" />;
+    }
     return (
       <main className="find-page">
         <section className="find-shell">
@@ -189,7 +196,13 @@ export default async function FindPage({ params, searchParams }) {
         </div>
 
         <div className="find-action-stack">
-          <LocationShareButton qrKey={data.public_key} />
+          <LocationShareButton
+            qrKey={data.public_key}
+            subjectName={data.subject_name}
+            subjectPhoto={data.photo_data_url || ""}
+            initialStep={previewStep(resolvedSearchParams?.location)}
+            preview={preview}
+          />
         </div>
       </section>
       <StatusToast message={notice} type={noticeType} />
@@ -213,4 +226,76 @@ function statusLabel(status) {
   if (status === "문제없음") return "안전";
   if (["상품구매필요", "QR활성화필요", "안전", "찾는중"].includes(status)) return status;
   return "상품구매필요";
+}
+
+function previewStep(value) {
+  return ["intro", "permission", "confirm", "complete", "permission-denied", "location-error"].includes(value)
+    ? value
+    : "idle";
+}
+
+function getLocationPreviewData(state = "") {
+  const data = {
+    qr_id: "preview-qr",
+    code: "PREVIEW",
+    public_key: "preview",
+    qr_active: 1,
+    qr_activated_at: "2026-09-01T00:00:00.000Z",
+    qr_activation_source: "admin_test",
+    subject_id: "preview-subject",
+    subject_name: "김제자리",
+    birth_date: "2019-06-20",
+    gender: "여성",
+    subject_status: "안전",
+    photo_data_url: "/assets/subject-registration/photo-placeholder.png",
+    guardian_message: "저희 아이는 대화가 조금 어려울 수 있어요. 보호자 음성을 들려주시고, 안전한 곳에서 보호자와 기다려주세요.",
+    voice_data_url: "",
+    guardian_id: "preview-guardian",
+    guardian_google_id: "preview-guardian",
+    subscription_status: "active",
+    subscription_access_type: "product_lifetime",
+  };
+  if (state === "unassigned") {
+    return {
+      ...data,
+      subject_id: null,
+      guardian_id: null,
+      guardian_google_id: null,
+      store_sale_reserved: 0,
+    };
+  }
+  if (state === "expired") {
+    return {
+      ...data,
+      qr_activation_source: "product",
+      subscription_status: "expired",
+      subscription_access_type: "periodic",
+      subscription_period_end: "2026-08-31T23:59:59.000Z",
+    };
+  }
+  return data;
+}
+
+function QrStatusScreen({ type }) {
+  const expired = type === "expired";
+  return (
+    <main className="qr-status-page">
+      <section className="qr-status-shell">
+        <img
+          className="qr-status-message"
+          src={`/assets/qr-status/${expired ? "expired" : "unassigned"}.png?v=20260913-white`}
+          alt={expired ? "사용할 수 없는 QR입니다. 관련된 문의는 관리자에게 문의해 주세요." : "미배정 QR입니다. 관리자에게 문의해 주세요."}
+        />
+        <a
+          className="qr-status-kakao-link"
+          href="https://pf.kakao.com/_xmuiln/chat"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="카카오톡으로 문의하기"
+        >
+          <img src="/assets/qr-status/kakao-inquiry.png?v=20260913-white" alt="카카오톡 문의" />
+        </a>
+      </section>
+    </main>
+  );
 }

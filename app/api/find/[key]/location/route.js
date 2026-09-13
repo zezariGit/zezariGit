@@ -30,6 +30,10 @@ export async function POST(request, { params }) {
     return NextResponse.json(
       {
         ok: true,
+        locationStatus: "stored",
+        notificationStatus: "stored_only",
+        locationShareId: share.id,
+        locationShareUrl: `/account/location-shares/${encodeURIComponent(share.id)}`,
         sent: 0,
         total: 0,
         mapUrl: share.kakaoMapUrl,
@@ -40,20 +44,29 @@ export async function POST(request, { params }) {
     );
   }
 
-  const result = await notifyGuardianLocationShared({
-    guardianId: share.guardianId,
-    subjectName: share.subjectName,
-    locationShareId: share.id,
-    kakaoMapUrl: share.kakaoMapUrl,
-    naverMapUrl: share.naverMapUrl,
-    addressLabel: share.addressLabel,
-    finderContact: share.finderContact,
-  });
+  let result;
+  try {
+    result = await notifyGuardianLocationShared({
+      guardianId: share.guardianId,
+      subjectName: share.subjectName,
+      locationShareId: share.id,
+      kakaoMapUrl: share.kakaoMapUrl,
+      naverMapUrl: share.naverMapUrl,
+      addressLabel: share.addressLabel,
+      finderContact: share.finderContact,
+    });
+  } catch {
+    result = { sent: 0, total: 0 };
+  }
   await recordLocationProvisionResult(share.id, result);
 
   return NextResponse.json(
     {
       ok: true,
+      locationStatus: "stored",
+      notificationStatus: result.sent > 0 ? "delivered" : "stored_only",
+      locationShareId: share.id,
+      locationShareUrl: `/account/location-shares/${encodeURIComponent(share.id)}`,
       sent: result.sent,
       total: result.total,
       mapUrl: share.kakaoMapUrl,

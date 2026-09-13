@@ -9415,3 +9415,37 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Deployment
 - Feature commits were pushed to GitHub `main`.
 - Vercel deployment `dpl_EEdrxQW4tChzHtZY6pxEaoUw8Sxz` reached `READY` and owns `https://zezari.family` plus compatibility aliases.
+## 2026-09-13 KST - QR Finder One-Time Location Sharing Flow
+
+### User Request
+- Rebuild the finder location-sharing experience from the supplied `대상자 정보 페이지` reference screens.
+- Require explicit consent before requesting device location permission, query location once, show a confirmation map before transmitting, provide completion and retryable error screens, and add a guardian point-of-view detail screen.
+- Open local previews for every implemented screen without requesting deployment.
+
+### Reflected Work
+- Replaced the previous one-click permission-and-send component with separate intro, permission, confirmation, sending, completion, permission-denied, and location-error states.
+- The browser Geolocation API runs only after the explicit consent step; the location API runs only after `이 위치 공유하기`.
+- Reused the existing encrypted location store, retention/destruction ledger, reverse-geocode route, Kakao/Naver links, and guardian notification event.
+- Changed new location notifications to open the authenticated internal `/account/location-shares/[id]` view while retaining compatibility with legacy direct Kakao map URLs.
+- Added the guardian view with subject identity, actual coordinate map, stored address/time/accuracy, static-location notice, Kakao map launch, and 112 confirmation dialog.
+- Copied the supplied location, privacy, GPS/network, map, and emergency icons into `public/assets/location-share/`.
+- Added seven development-only preview URLs to `deliverables/PROJECT_HANDOFF.md` and opened each in the in-app browser.
+
+### Verification
+- `npm run build`: passed with Next.js 16.3.0 and 40 routes, including `/account/location-shares/[id]`.
+- `npm run test:notifications`: passed.
+- `npm run security:check`: passed.
+- `git diff --check`: passed.
+- Playwright/Chrome mobile captures at 390x844 verified every preview, map rendering, contained icons, readable controls, and no Next.js error overlay.
+
+### Deployment
+- Not requested for this change. Work remains local and uncommitted pending user approval.
+
+### Reference Image Refinement
+- Unified all location-flow headers and page bodies to one white background.
+- Replaced the intro information panel, permission guide, completion message, permission-denied guide, and location-error guide with the five exact user-supplied raster images while preserving the functional buttons outside each image.
+- Reworked the finder confirmation subject strip to show the name followed by the green `보호자에게 공유할 위치` line.
+- Reworked the dynamic location card to show a large `현재 위치` label, regular-weight address, confirmation time, delivery explanation, and `현재 위치가 정확한지 확인해 주세요.` prompt; removed the displayed accuracy row.
+- Matched the guardian detail to the supplied layout with a green shared-status line and the same dynamic map/address/time information hierarchy.
+- Re-ran mobile screenshots for all seven previews; `npm run build`, `npm run test:notifications`, and `git diff --check` passed.
+- Added dedicated full-screen QR status layouts: ordinary unassigned QR uses the supplied `미배정 QR입니다` image, expired service uses the supplied `사용할 수 없는 QR입니다` image, and both expose the supplied Kakao inquiry image as a working link to the existing Zezari Kakao channel. Store-sale reserved QR signup/claim behavior remains unchanged.

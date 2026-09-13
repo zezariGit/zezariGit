@@ -1,8 +1,8 @@
 # REAL_QR_FIND Current Project Handoff
 
-Last updated: 2026-09-12 KST
+Last updated: 2026-09-13 KST
 
-Application baseline commit: `cb0ac60` (`main`, GitHub/Vercel 운영 반영 완료)
+Application baseline commit: `ec3a836` (`main`, GitHub/Vercel 운영 반영 완료)
 
 Production: `https://zezari.family`
 
@@ -34,7 +34,8 @@ Production: `https://zezari.family`
 | 대표 도메인 | `https://zezari.family` |
 | 최근 확인 운영 배포 | `dpl_EEdrxQW4tChzHtZY6pxEaoUw8Sxz` (`READY`, 독립 상품/디자인 관리 및 정사각형 디자인 선택) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | local/production feature commit `cb0ac60`; deployment `dpl_EEdrxQW4tChzHtZY6pxEaoUw8Sxz` |
+| 최근 애플리케이션 기능 기준 | production feature commit `ec3a836`; 현재 QR 위치 공유 작업은 local-only |
+| 현재 로컬 미배포 작업 | QR 발견자 위치 공유 단계 분리 및 보호자 공유 위치 상세 화면 구현. 추가 제공 이미지로 안내·권한·완료·오류 화면을 교체하고, 미배정·만료 QR 전용 이미지 화면과 카카오 문의 연결을 추가함. 빌드·회귀·모바일 미리보기 완료, 커밋/배포는 아직 수행하지 않음 |
 
 ### 로컬 시작
 
@@ -108,7 +109,7 @@ npm run dev -- -p 3005
 | 상태 안내 | 제공 이미지 `public/assets/dashboard/subject-status-guide.png`를 그대로 표시 | 완료 |
 | 주요 메뉴 | 실종 신고, 상품 구매, 고객지원(제자리 카카오톡 채널) 이동 | 완료 |
 | 알림 팝오버 | 종 아래 팝오버, 외부 선택·뒤로가기 닫기, 최신순, 내부 스크롤. 미확인은 초록 아이콘·점·연녹색 배경, 확인은 회색 아이콘·흰 배경. 여는 것만으로 확인 처리하지 않고 닫기·화면 이탈 시 이번에 노출된 미확인 ID만 일괄 확인 처리하며 내역은 유지 | 완료 |
-| 위치 공유 알림 | 발견자가 전달한 위치 공유 알림은 저장된 HTTPS `map.kakao.com` 주소를 검증한 뒤 항목 선택 시 해당 좌표의 카카오맵으로 이동. 이동 시 노출 알림 확인 처리도 함께 수행 | 완료 |
+| 위치 공유 알림 | 발견자가 최종 공유한 위치는 보호자 알림으로 저장·전송되며, 알림 선택 시 앱 내부의 공유 위치 상세로 이동. 상세에서 카카오맵 연결 및 112 확인 팝업 제공. 이전 카카오맵 직접 링크 알림도 호환 | 로컬 완료, 배포 대기 |
 | 알림 이벤트 | 안전(위치 공유·안심번호), 온라인 광고, 결제·상품 이벤트를 중복 없이 저장·전송. 관리자 알림 설정과 연동 | 완료 |
 
 ### 대상자 정보
@@ -166,6 +167,9 @@ npm run dev -- -p 3005
 
 - `/find/[key]`에서 QR 상태와 연결 대상자를 확인한다.
 - 보호자 안심번호 전화, 위치 공유, 발견 알림, 보호자 메시지, 등록된 경우 음성 재생을 제공한다.
+- 위치 공유는 `안내/명시 동의 → 시스템 위치 권한 요청 → 1회 위치 조회·확인 → 최종 공유 → 완료` 순서다. 동의 전 권한 요청과 최종 버튼 전 서버 전송은 발생하지 않는다.
+- 권한 거부와 GPS·네트워크 조회 실패를 별도 재시도 화면으로 처리하며, 실패 시 위치를 저장하거나 알림을 전송하지 않는다.
+- 보호자는 `/account/location-shares/[id]`에서 공유 시점 좌표·주소·시간·정확도를 확인한다. 위치는 실시간으로 갱신하지 않는다.
 - 위치정보 암호화·보관·접근·파기 정책은 `deliverables/location-service/LOCATION_SECURITY_COMPLIANCE.md`를 기준으로 한다.
 
 ## 5. 광고 상태 테스트 절차
@@ -212,6 +216,15 @@ Meta 권한 승인 전에도 관리자 계정으로 대시보드 상태를 검�
 | 광고 완료 필터 | `http://localhost:3005/account/ads?status=done&preview=1` |
 | 광고 결제 완료 화면 - 관리자 | `http://localhost:3005/payments/toss/ad/success?preview=admin` |
 | 광고 결제 완료 화면 - 일반 사용자 | `http://localhost:3005/payments/toss/ad/success?preview=user` |
+| QR 위치 공유 안내 | `http://localhost:3005/find/preview?preview=1&location=intro` |
+| QR 위치 권한 요청 | `http://localhost:3005/find/preview?preview=1&location=permission` |
+| QR 위치 확인 | `http://localhost:3005/find/preview?preview=1&location=confirm` |
+| QR 위치 공유 완료 | `http://localhost:3005/find/preview?preview=1&location=complete` |
+| QR 위치 권한 거부 안내 | `http://localhost:3005/find/preview?preview=1&location=permission-denied` |
+| QR 위치 확인 오류 | `http://localhost:3005/find/preview?preview=1&location=location-error` |
+| 보호자 공유 위치 확인 | `http://localhost:3005/account/location-shares/preview?preview=1` |
+| QR 미배정 | `http://localhost:3005/find/preview?preview=1&state=unassigned` |
+| QR 서비스 만료 | `http://localhost:3005/find/preview?preview=1&state=expired` |
 
 ## 7. 테스트 명령
 
