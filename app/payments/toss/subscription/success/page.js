@@ -36,8 +36,10 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
       <ShopComplete
         title="주문이 완료되었습니다!"
         message={adminPass
-          ? "관리자 결제패스로 테스트 구독 주문이 완료되었습니다. 상품 수령 후 QR 코드를 활성화해 주세요."
-          : "이미 결제가 완료된 주문입니다. 상품 수령 후 QR 코드를 활성화해 주세요."}
+          ? "관리자 결제패스로 테스트 주문과 매칭된 QR 활성화가 완료되었습니다."
+          : productOrder.status === "activated"
+            ? "이미 결제가 완료되었고 매칭된 QR도 활성화되었습니다."
+            : "이미 결제가 완료된 주문입니다."}
         order={productOrder}
       />
     );
@@ -72,7 +74,7 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
         <ShopComplete
           title="주문이 완료되었습니다!"
           message={waitingForActivation
-            ? "쿠폰 전액 할인으로 결제가 완료되었습니다. 상품을 수령한 뒤 QR을 활성화하면 서비스를 계속 이용할 수 있습니다."
+            ? "쿠폰 전액 할인 결제는 완료되었지만 활성화 가능한 매칭 QR이 없어 QR 상태 확인이 필요합니다."
             : "쿠폰 전액 할인으로 결제가 완료되었고, QR 안심 서비스가 연결되었습니다."}
           order={order}
         />
@@ -96,7 +98,7 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
       <ShopComplete
         title="주문이 완료되었습니다!"
         message={waitingForActivation
-          ? "상품을 수령한 뒤 QR을 활성화하면 QR 안심 서비스를 계속 이용할 수 있습니다."
+          ? "결제는 완료되었지만 활성화 가능한 매칭 QR이 없어 QR 상태 확인이 필요합니다."
           : "상품 결제가 완료되었고 QR 안심 서비스가 연결되었습니다."}
         order={order}
       />

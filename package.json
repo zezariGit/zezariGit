@@ -24,6 +24,7 @@
     "test:ad-dashboard": "node scripts/ad-dashboard-state-regression.mjs",
     "test:billing-history": "node scripts/billing-history-regression.mjs",
     "test:shop-ui": "node scripts/shop-purchase-ui-regression.mjs",
+    "test:product-qr-activation": "node scripts/product-qr-auto-activation-regression.mjs",
     "test:onboarding": "node scripts/onboarding-regression.mjs",
     "test:password-reset": "tsx scripts/password-reset-regression.mjs",
     "test:password-reset-ui": "node scripts/password-reset-ui-regression.mjs",

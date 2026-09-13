@@ -65,7 +65,9 @@ export default async function TossProductSuccessPage({ searchParams }) {
       return (
         <ShopComplete
           title="주문이 완료되었습니다!"
-          message="쿠폰 전액 할인으로 결제가 완료되었습니다. 상품 수령 후 QR 코드를 활성화해 주세요."
+          message={completedOrder?.status === "activated"
+            ? "쿠폰 전액 할인 결제와 매칭된 QR 활성화가 완료되었습니다."
+            : "쿠폰 전액 할인 결제가 완료되었습니다."}
           order={completedOrder}
         />
       );
@@ -82,12 +84,15 @@ export default async function TossProductSuccessPage({ searchParams }) {
       status: "paid",
       paymentMethod: payment.method || "결제위젯",
     });
+    const completedOrder = await getProductOrderForGuardian(session, productOrderId);
 
     return (
       <ShopComplete
         title="주문이 완료되었습니다!"
-        message="상품을 수령하신 후, QR 코드를 활성화해야 제자리 서비스 이용이 시작됩니다."
-        order={order}
+        message={completedOrder?.status === "activated"
+          ? "상품 결제와 매칭된 QR 활성화가 완료되었습니다."
+          : "상품 결제가 완료되었습니다."}
+        order={completedOrder}
       />
     );
   } catch (error) {
