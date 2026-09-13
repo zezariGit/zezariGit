@@ -1,8 +1,8 @@
 # REAL_QR_FIND Current Project Handoff
 
-Last updated: 2026-09-13 KST
+Last updated: 2026-09-14 KST
 
-Application baseline commit: `d2f82a6` (`main`, GitHub/Vercel 운영 반영 완료)
+Application baseline commit: `3ec024a` (`main`, GitHub/Vercel 운영 반영 완료)
 
 Production: `https://zezari.family`
 
@@ -32,9 +32,9 @@ Production: `https://zezari.family`
 | GitHub | `https://github.com/zezariGit/zezariGit.git` |
 | Vercel 프로젝트 | scope `zezari`, project `zezari` |
 | 대표 도메인 | `https://zezari.family` |
-| 최근 확인 운영 배포 | `dpl_8EradUsEA2wugE68x7T4Uy1TZJ85` (`READY`, QR 발견자 대상자 정보 화면 개편) |
+| 최근 확인 운영 배포 | `dpl_A6uBH9qvSMb3bZQLGoi5ParMBrs9` (`READY`, QR 위치 권한 즉시 요청 및 결과별 분기) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | production feature commit `d2f82a6`; QR 발견자 대상자 정보 화면 및 전체 행동 기능 운영 반영 완료 |
+| 최근 애플리케이션 기능 기준 | production feature commit `3ec024a`; QR 발견자 로고 정렬과 위치 권한 즉시 요청·결과별 분기 운영 반영 완료 |
 | 현재 로컬 미배포 작업 | 없음. 관련 없는 기존 미추적 파일은 작업 대상에서 제외 |
 
 ### 로컬 시작
@@ -176,6 +176,7 @@ npm run dev -- -p 3005
 - 보호자 전화가 가장 강조된 기본 행동이고 실제 연락처 대신 서버가 발급한 안심번호로 연결한다. 112는 즉시 연결하지 않고 확인 팝업의 최종 `전화하기`에서만 `tel:112`를 실행한다.
 - 위치 공유와 음성은 초록색 계열, 112는 옅은 빨간색으로 구분한다. 보호자 음성이 없으면 음성 버튼 영역 자체를 렌더링하지 않는다.
 - 위치 공유는 `안내/명시 동의 → 시스템 위치 권한 요청 → 1회 위치 조회·확인 → 최종 공유 → 완료` 순서다. 동의 전 권한 요청과 최종 버튼 전 서버 전송은 발생하지 않는다.
+- `위치 공유 동의하기`의 클릭 이벤트에서 `navigator.geolocation.getCurrentPosition`을 즉시 호출한다. 권한 거부(`code=1`)는 권한 거부 안내, 위치 조회 불가·시간 초과(`code=2/3`)는 위치 확인 오류, 성공은 지도 확인 화면으로 각각 분기한다.
 - 권한 거부와 GPS·네트워크 조회 실패를 별도 재시도 화면으로 처리하며, 실패 시 위치를 저장하거나 알림을 전송하지 않는다.
 - 보호자는 `/account/location-shares/[id]`에서 공유 시점 좌표·주소·시간·정확도를 확인한다. 위치는 실시간으로 갱신하지 않는다.
 - 위치정보 암호화·보관·접근·파기 정책은 `deliverables/location-service/LOCATION_SECURITY_COMPLIANCE.md`를 기준으로 한다.
@@ -225,7 +226,7 @@ Meta 권한 승인 전에도 관리자 계정으로 대시보드 상태를 검�
 | 광고 결제 완료 화면 - 관리자 | `http://localhost:3005/payments/toss/ad/success?preview=admin` |
 | 광고 결제 완료 화면 - 일반 사용자 | `http://localhost:3005/payments/toss/ad/success?preview=user` |
 | QR 위치 공유 안내 | `http://localhost:3005/find/preview?preview=1&location=intro` |
-| QR 위치 권한 요청 | `http://localhost:3005/find/preview?preview=1&location=permission` |
+| QR 위치 권한 즉시 요청 흐름 | `http://localhost:3005/find/preview?preview=1&location=intro`에서 `위치 공유 동의하기` 선택 |
 | QR 위치 확인 | `http://localhost:3005/find/preview?preview=1&location=confirm` |
 | QR 위치 공유 완료 | `http://localhost:3005/find/preview?preview=1&location=complete` |
 | QR 위치 권한 거부 안내 | `http://localhost:3005/find/preview?preview=1&location=permission-denied` |
@@ -307,6 +308,7 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 | 커밋 | 내용 |
 | --- | --- |
+| `3ec024a` | 발견자 화면 제자리 로고 교체·중앙 정렬 및 위치 공유 동의 즉시 권한 요청·결과별 화면 분기 |
 | `cb0ac60` | 디자인 선택 상단 정렬, 114px 정사각형 및 234px 완료 버튼 배치 |
 | `b9ec704` | 운영 상품/디자인 기본 이미지 초기화 재실행 |
 | `d156932` | 사용자·관리자 카탈로그 이미지 contain 맞춤 보강 |

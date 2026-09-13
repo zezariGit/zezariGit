@@ -9498,3 +9498,29 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Feature commit `d2f82a6` (`feat: rebuild public QR finder page`) was pushed to GitHub `main`.
 - Vercel production deployment `dpl_8EradUsEA2wugE68x7T4Uy1TZJ85` reached `READY` and was aliased to `https://zezari.family`.
 - The production finder preview and representative finder assets returned HTTP 200 with the new page heading present. No post-deploy error logs were reported.
+
+## 2026-09-14 KST - Finder Wordmark And Immediate Location Permission
+
+### User Request
+- Replace the clipped, left-shifted finder footer wordmark with the supplied image, center it, and enlarge it to roughly twice the location icon's visual size.
+- Request the browser's system location permission immediately when `위치 공유 동의하기` is selected.
+- Route permission denial, location acquisition failure, and successful acquisition to separate dedicated screens.
+
+### Reflected Work
+- Added the supplied `334x162` wordmark as `public/assets/finder/zezari-wordmark.png`, removed the previous sprite-like crop transform, and rendered it centered at 108px wide without clipping.
+- Removed the misleading intermediate permission-denied guide shown before any permission request.
+- The consent click now directly calls `navigator.geolocation.getCurrentPosition`; denial routes to `permission-denied`, unavailable/timeout routes to `location-error`, and success routes to the map confirmation screen.
+- Preview mode now exercises the real browser permission request instead of bypassing it with mock success. Direct preview parameters remain available for deterministic review of each result screen.
+- Retry actions issue a new location request directly, and busy controls prevent duplicate requests.
+
+### Verification
+- `npm run test:finder-public-ui`: passed with direct permission invocation and result-routing assertions.
+- `npm run test:notifications`: passed.
+- `npm run security:check`: passed.
+- `npm run build`: passed with Next.js 16.3.0 and all 40 routes.
+- Local and production checks confirmed HTTP 200 for the base finder preview, permission-denied, location-error, map-confirmation, and new wordmark asset routes.
+- Production browser verification confirmed the map confirmation screen and centered uncropped wordmark. Post-deployment error-log query returned no errors.
+
+### Deployment
+- Feature commit `3ec024a` (`fix: streamline finder location permission flow`) was pushed to GitHub `main`.
+- Vercel deployment `dpl_A6uBH9qvSMb3bZQLGoi5ParMBrs9` reached `READY` and owns `https://zezari.family` plus compatibility aliases.
