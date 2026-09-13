@@ -12547,6 +12547,384 @@ button:disabled:hover {
 .find-location-action strong { color: #15983d; font-size: 1.15rem; }
 .find-location-action small { font-size: 0.88rem; }
 
+.finder-public-page {
+  min-height: 100svh;
+  place-items: start center;
+  padding: 0;
+  background: #ffffff;
+}
+
+.finder-public-shell {
+  width: min(100%, 430px);
+  min-height: 100svh;
+  align-content: start;
+  gap: 8px;
+  padding: 10px 8px 8px;
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.finder-public-heading {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  padding: 0 4px 1px;
+  text-align: center;
+}
+
+.finder-public-heading > img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.finder-public-heading h1 {
+  margin: 0;
+  color: #101417;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.finder-public-heading p {
+  color: #159c47;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.finder-public-heading > span {
+  width: 26px;
+  height: 2px;
+  margin-top: 2px;
+  background: #16a14a;
+}
+
+.finder-public-profile {
+  min-height: 112px;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 16px;
+  padding: 12px;
+  border: 1px solid #e6e9e7;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 3px 10px rgba(24, 54, 38, 0.04);
+}
+
+.finder-public-profile .find-profile-photo {
+  width: 88px;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 50%;
+  background: #f1f4f2;
+}
+
+.finder-public-profile .find-profile-info {
+  gap: 6px;
+}
+
+.finder-public-profile .find-profile-info strong {
+  color: #111518;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.finder-public-profile .find-profile-info span {
+  color: #38516c;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.finder-primary-call-wrap {
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.finder-primary-call {
+  width: 100%;
+  min-height: 70px;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 9px 24px;
+  border: 0;
+  border-radius: 8px;
+  background: #07963f;
+  color: #ffffff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.finder-primary-call:hover,
+.finder-primary-call:focus-visible {
+  background: #057e35;
+}
+
+.finder-primary-call:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.finder-primary-call > img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.finder-primary-call > span {
+  display: grid;
+  gap: 3px;
+}
+
+.finder-primary-call strong {
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.3;
+}
+
+.finder-primary-call small {
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.finder-primary-call-wrap .find-safe-phone-link,
+.finder-primary-call-wrap .find-notify-message {
+  width: 100%;
+  padding: 3px 6px 0;
+  font-size: 11px;
+  text-align: center;
+}
+
+.finder-public-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.finder-public-action-grid .find-location-action,
+.finder-emergency-action {
+  width: 100%;
+  min-height: 112px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  padding: 9px 6px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.finder-public-action-grid .find-location-action {
+  background: #f6f8f7;
+}
+
+.finder-public-action-grid .find-location-action > img,
+.finder-emergency-action > img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.finder-public-action-grid .find-location-action > span,
+.finder-emergency-action > span {
+  display: grid;
+  gap: 3px;
+  text-align: center;
+}
+
+.finder-public-action-grid .find-location-action strong,
+.finder-emergency-action strong {
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.finder-public-action-grid .find-location-action small,
+.finder-emergency-action small {
+  color: #202522;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.finder-emergency-action {
+  background: #fff0f2;
+  color: #f31b45;
+}
+
+.finder-emergency-action:hover,
+.finder-emergency-action:focus-visible {
+  background: #ffe4e8;
+}
+
+.finder-public-shell > .find-audio-box {
+  gap: 3px;
+}
+
+.finder-public-shell .guardian-voice-play-button {
+  min-height: 68px;
+  grid-template-columns: 40px 54px minmax(0, 1fr);
+  gap: 8px;
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #f6f8f7;
+  color: #131816;
+}
+
+.finder-public-shell .guardian-voice-play-button:hover,
+.finder-public-shell .guardian-voice-play-button:focus-visible,
+.finder-public-shell .guardian-voice-play-button.playing {
+  background: #eaf5ed;
+  color: #131816;
+}
+
+.finder-public-shell .guardian-voice-button-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 0;
+  background: transparent;
+  object-fit: contain;
+}
+
+.finder-public-shell .guardian-voice-waveform {
+  width: 54px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.finder-public-shell .guardian-voice-play-button > span:last-child {
+  display: grid;
+  gap: 3px;
+}
+
+.finder-public-shell .guardian-voice-play-button strong {
+  color: #119a45;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.finder-public-shell .guardian-voice-play-button small {
+  color: #232825;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.finder-public-shell .find-audio-box em,
+.finder-public-shell .find-audio-error {
+  font-size: 10px !important;
+  text-align: center;
+}
+
+.finder-public-shell .find-guardian-message {
+  gap: 6px;
+  padding: 10px 12px 8px;
+  border: 1px solid #ebeeec;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.finder-public-shell .find-guardian-message h2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #109a44;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.finder-public-shell .find-guardian-message h2 img {
+  width: 19px;
+  height: 19px;
+  object-fit: contain;
+}
+
+.finder-public-shell .find-guardian-message p {
+  max-height: 65px;
+  overflow-y: auto;
+  padding: 8px 10px;
+  background: #fffbfb;
+  color: #1b1e1c;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.55;
+  scrollbar-width: thin;
+}
+
+.finder-public-shell .find-guardian-message small {
+  color: #617791;
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.finder-public-brand {
+  width: 94px;
+  height: 34px;
+  justify-self: center;
+  overflow: hidden;
+}
+
+.finder-public-brand img {
+  width: 156px;
+  height: 156px;
+  display: block;
+  transform: translate(-31px, -59px);
+}
+
+.finder-emergency-dialog > img {
+  width: 44px;
+  height: 44px;
+}
+
+@media (max-height: 730px) and (max-width: 520px) {
+  .finder-public-shell {
+    gap: 6px;
+    padding-top: 6px;
+  }
+
+  .finder-public-heading > img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .finder-public-heading h1 {
+    font-size: 18px;
+  }
+
+  .finder-public-profile {
+    min-height: 104px;
+    grid-template-columns: 80px minmax(0, 1fr);
+    padding: 10px;
+  }
+
+  .finder-public-profile .find-profile-photo {
+    width: 80px;
+  }
+
+  .finder-public-action-grid .find-location-action,
+  .finder-emergency-action {
+    min-height: 104px;
+  }
+
+  .finder-public-shell .find-guardian-message p {
+    max-height: 57px;
+  }
+}
+
 .location-flow,
 .guardian-location-page {
   min-height: 100vh;
@@ -23834,5 +24212,26 @@ button:disabled:hover {
 
   .ad-payment-reach strong {
     font-size: 16px;
+  }
+}
+
+@media (max-width: 720px) {
+  .finder-public-profile {
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
+
+  .finder-public-profile .find-profile-photo {
+    width: 88px;
+    justify-self: stretch;
+  }
+}
+
+@media (max-height: 730px) and (max-width: 520px) {
+  .finder-public-profile {
+    grid-template-columns: 80px minmax(0, 1fr);
+  }
+
+  .finder-public-profile .find-profile-photo {
+    width: 80px;
   }
 }

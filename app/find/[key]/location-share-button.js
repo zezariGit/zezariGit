@@ -50,8 +50,8 @@ export default function LocationShareButton({ qrKey, subjectName = "김제자리
 
   if (step === "idle") return (
     <button className="find-location-action" type="button" onClick={() => setStep("intro")}>
-      <img src="/assets/location-share/map-location.png" alt="" />
-      <span><strong>위치 공유</strong><small>보호자에게 현재 위치를 공유해요</small></span>
+      <img src="/assets/finder/location-share.png" alt="" />
+      <span><strong>위치 공유</strong><small>보호자에게<br />현재 위치를 공유해요</small></span>
     </button>
   );
 

@@ -13,6 +13,7 @@
     "test:admin-grid": "node scripts/admin-grid-selection-regression.mjs",
     "test:dashboard-ui": "node scripts/dashboard-ui-regression.mjs",
     "test:subject-flow": "node scripts/subject-flow-regression.mjs",
+    "test:finder-public-ui": "node scripts/finder-public-ui-regression.mjs",
     "test:notifications": "node scripts/notification-popover-regression.mjs",
     "test:admin-phone-otp": "tsx scripts/admin-phone-verification-regression.mjs",
     "test:login-ui": "node scripts/login-ui-regression.mjs",

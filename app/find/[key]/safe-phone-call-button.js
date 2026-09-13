@@ -33,11 +33,13 @@ export default function SafePhoneCallButton({ qrKey }) {
   };
 
   return (
-    <div className="find-safe-phone-card">
-      <span className="find-safe-phone-label">안심번호 통화</span>
-      <p>통화할 때만 임시 번호가 배정되며 보호자의 실제 전화번호는 공개되지 않습니다.</p>
-      <button className="primary-button" type="button" onClick={requestCall} disabled={loading}>
-        {loading ? "안심번호 연결중" : "안심번호로 보호자에게 전화하기"}
+    <div className="find-safe-phone-card finder-primary-call-wrap">
+      <button className="finder-primary-call" type="button" onClick={requestCall} disabled={loading}>
+        <img src="/assets/finder/guardian-call.png" alt="" />
+        <span>
+          <strong>{loading ? "안심번호 연결 중" : "보호자에게 전화하기"}</strong>
+          <small>안심번호로 연결됩니다</small>
+        </span>
       </button>
       {safePhone && telUrl && (
         <a className="find-safe-phone-link" href={telUrl}>

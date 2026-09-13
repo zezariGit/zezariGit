@@ -8,6 +8,7 @@ import { formatDateOnly } from "../../../lib/date-format";
 import LocationShareButton from "./location-share-button";
 import GuardianVoicePlayer from "./guardian-voice-player";
 import SafePhoneCallButton from "./safe-phone-call-button";
+import EmergencyCallButton from "./emergency-call-button";
 import QrClaimSignupActions from "./qr-claim-signup-actions";
 
 export const dynamic = "force-dynamic";
@@ -168,34 +169,28 @@ export default async function FindPage({ params, searchParams }) {
   }
 
   return (
-    <main className="find-page">
-      <section className="find-shell">
-        <p className="intro-kicker">REAL_QR_FIND</p>
-        <h1>{data.subject_name}</h1>
+    <main className="find-page finder-public-page">
+      <section className="find-shell finder-public-shell">
+        <header className="finder-public-heading">
+          <img src="/assets/finder/shield-check.png" alt="" />
+          <h1>도움이 필요한 분의 정보입니다</h1>
+          <p>함께 도와주세요.</p>
+          <span aria-hidden="true" />
+        </header>
 
-        <div className="find-profile">
+        <div className="find-profile finder-public-profile">
           <div className="find-profile-photo">
             {data.photo_data_url ? <img src={data.photo_data_url} alt={`${data.subject_name} 사진`} /> : <span />}
           </div>
           <div className="find-profile-info">
-            <span>생년월일: {formatDate(data.birth_date)}</span>
-            <span>성별: {data.gender || "-"}</span>
-            <span>현재 상태: {statusLabel(data.subject_status)}</span>
+            <strong>{data.subject_name}</strong>
+            <span>{formatSubjectSummary(data.gender, data.birth_date)}</span>
           </div>
         </div>
 
         <SafePhoneCallButton qrKey={data.public_key} />
 
-        <div className="find-guardian-message">
-          <h2>보호자 안내</h2>
-          {data.guardian_message && <p>{data.guardian_message}</p>}
-          <GuardianVoicePlayer
-            src={data.voice_data_url || ""}
-            name={data.voice_name || "보호자 음성 메시지"}
-          />
-        </div>
-
-        <div className="find-action-stack">
+        <div className="finder-public-action-grid">
           <LocationShareButton
             qrKey={data.public_key}
             subjectName={data.subject_name}
@@ -203,7 +198,23 @@ export default async function FindPage({ params, searchParams }) {
             initialStep={previewStep(resolvedSearchParams?.location)}
             preview={preview}
           />
+          <EmergencyCallButton />
         </div>
+
+        <GuardianVoicePlayer
+          src={data.voice_data_url || ""}
+          name={data.voice_name || "보호자 음성 메시지"}
+        />
+
+        <div className="find-guardian-message">
+          <h2><img src="/assets/finder/guardian-message.png" alt="" />보호자가 전하고픈 말</h2>
+          {data.guardian_message && <p>{data.guardian_message}</p>}
+          <small>위 메시지는 보호자가 직접 입력한 내용입니다.</small>
+        </div>
+
+        <footer className="finder-public-brand">
+          <img src="/icons/zezari-wordmark-v1-512.png" alt="제자리" />
+        </footer>
       </section>
       <StatusToast message={notice} type={noticeType} />
     </main>
@@ -222,10 +233,29 @@ function formatDate(value) {
   return formatDateOnly(value);
 }
 
-function statusLabel(status) {
-  if (status === "문제없음") return "안전";
-  if (["상품구매필요", "QR활성화필요", "안전", "찾는중"].includes(status)) return status;
-  return "상품구매필요";
+function formatSubjectSummary(gender, birthDate) {
+  const normalizedBirthDate = formatDate(birthDate);
+  const age = calculateAge(birthDate);
+  return [
+    gender || "성별 미입력",
+    age === null ? null : `만 ${age}세`,
+    normalizedBirthDate === "-" ? null : `(${normalizedBirthDate.replaceAll("-", ".")})`,
+  ].filter(Boolean).join(" · ").replace(" · (", " (");
+}
+
+function calculateAge(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  const [, year, month, day] = match.map(Number);
+  const nowParts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Seoul",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(new Date()).filter((part) => part.type !== "literal").map((part) => [part.type, Number(part.value)])
+  );
+  return nowParts.year - year - (nowParts.month < month || (nowParts.month === month && nowParts.day < day) ? 1 : 0);
 }
 
 function previewStep(value) {
@@ -243,13 +273,13 @@ function getLocationPreviewData(state = "") {
     qr_activated_at: "2026-09-01T00:00:00.000Z",
     qr_activation_source: "admin_test",
     subject_id: "preview-subject",
-    subject_name: "김제자리",
-    birth_date: "2019-06-20",
+    subject_name: "이하율",
+    birth_date: "2016-05-10",
     gender: "여성",
     subject_status: "안전",
     photo_data_url: "/assets/subject-registration/photo-placeholder.png",
     guardian_message: "저희 아이는 대화가 조금 어려울 수 있어요. 보호자 음성을 들려주시고, 안전한 곳에서 보호자와 기다려주세요.",
-    voice_data_url: "",
+    voice_data_url: "data:audio/wav;base64,UklGRjQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YRAAAACAgICAgICAgICAgICAgA==",
     guardian_id: "preview-guardian",
     guardian_google_id: "preview-guardian",
     subscription_status: "active",
