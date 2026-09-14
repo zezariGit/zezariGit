@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import BackButton from "./back-button";
 
 const EMPTY_CODE = ["", "", "", "", "", ""];
 
@@ -167,10 +168,7 @@ export function PasswordResetPanel({ onBack, onComplete }) {
 
   return (
     <section className="auth-panel signup-card password-reset-card" aria-label="비밀번호 찾기">
-      <button className="signup-back-button" type="button" onClick={onBack}>
-        <span aria-hidden="true">‹</span>
-        <span className="visually-hidden">로그인으로 돌아가기</span>
-      </button>
+      <BackButton className="signup-back-button" onClick={onBack} label="로그인으로 돌아가기" />
 
       {step === "verification" ? (
         <div className="signup-step password-reset-step">

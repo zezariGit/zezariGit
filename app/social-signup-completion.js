@@ -3,6 +3,7 @@
 import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import ServiceRegulationModal from "./service-regulation-modal";
+import BackButton from "./back-button";
 
 export default function SocialSignupCompletion({ guardian, session, qrClaim = false }) {
   const providerLabel = socialProviderLabel(session?.user?.provider);
@@ -204,14 +205,11 @@ export default function SocialSignupCompletion({ guardian, session, qrClaim = fa
     <section className="dashboard-signup-panel" aria-label="SNS 회원가입 정보 입력">
       <div className="signup-card">
         {step !== "done" && (
-          <button
+          <BackButton
             className="signup-back-button"
-            type="button"
             onClick={() => (step === "phone" ? signOut({ callbackUrl: "/" }) : setStep("phone"))}
-          >
-            <span aria-hidden="true">‹</span>
-            <span className="visually-hidden">이전</span>
-          </button>
+            label="이전"
+          />
         )}
 
         {step === "phone" && (

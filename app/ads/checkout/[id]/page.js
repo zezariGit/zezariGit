@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import AdPaymentClient from "../../../ad-payment-client";
@@ -6,6 +5,7 @@ import StatusToast from "../../../status-toast";
 import { isAdminSession } from "../../../../lib/admin";
 import { authOptions } from "../../../../lib/auth";
 import { getGuardianAdCheckoutData } from "../../../../lib/db";
+import BackButton from "../../../back-button";
 
 export default async function AdCheckoutPage({ params, searchParams }) {
   const { id } = await params;
@@ -20,7 +20,7 @@ export default async function AdCheckoutPage({ params, searchParams }) {
       <main className="ad-payment-page">
         <section className="ad-payment-phone">
           <header className="shop-topbar ad-payment-topbar">
-            <Link className="shop-back-link" href="/?preview=ad-campaign" aria-label="광고 세팅으로 돌아가기">‹</Link>
+            <BackButton className="shop-back-link" href="/?preview=ad-campaign" label="광고 세팅으로 돌아가기" />
             <h1>광고 결제</h1>
             <span aria-hidden="true" />
           </header>
@@ -58,7 +58,7 @@ export default async function AdCheckoutPage({ params, searchParams }) {
       <main className="ad-payment-page">
         <section className="ad-payment-phone">
           <header className="shop-topbar ad-payment-topbar">
-            <Link className="shop-back-link" href={`/?adSubject=${encodeURIComponent(guardianVisibleAd.subject_id)}&newAd=1`} aria-label="광고 세팅으로 돌아가기">‹</Link>
+            <BackButton className="shop-back-link" href={`/?adSubject=${encodeURIComponent(guardianVisibleAd.subject_id)}&newAd=1`} label="광고 세팅으로 돌아가기" />
             <h1>광고 결제</h1>
             <span aria-hidden="true" />
           </header>

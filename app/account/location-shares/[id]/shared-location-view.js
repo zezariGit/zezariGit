@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { LocationMap } from "../../../find/[key]/location-share-button";
+import BackButton from "../../../back-button";
 
 export default function SharedLocationView({ share }) {
   const [emergencyOpen, setEmergencyOpen] = useState(false);
@@ -11,7 +12,7 @@ export default function SharedLocationView({ share }) {
     <main className="guardian-location-page">
       <section className="guardian-location-shell">
         <header className="location-flow-header">
-          <button type="button" onClick={() => window.history.back()} aria-label="뒤로가기">‹</button>
+          <BackButton onClick={() => window.history.back()} />
           <h1>공유된 위치 확인</h1><span />
         </header>
         <div className="guardian-location-body">

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import KakaoPostcodeAddress from "./kakao-postcode-address";
+import BackButton from "./back-button";
 import { formatDateOnly } from "../lib/date-format";
 
 const TOSS_SDK_URL = "https://js.tosspayments.com/v2/standard";
@@ -443,13 +444,13 @@ export default function ShopCheckoutClient({
     <section className="shop-phone-panel">
       <header className="shop-topbar">
         {selectionView ? (
-          <button className="shop-back-link plain" type="button" onClick={() => setSelectionView("")} aria-label="상품 구매로 돌아가기">‹</button>
+          <BackButton className="shop-back-link plain" onClick={() => setSelectionView("")} label="상품 구매로 돌아가기" />
         ) : (
-          <a className="shop-back-link" href={step === "configure" ? "/?tab=dashboard" : "#back"} onClick={(event) => {
+          <BackButton className="shop-back-link" href={step === "configure" ? "/?tab=dashboard" : "#back"} onClick={(event) => {
             if (step === "configure") return;
             event.preventDefault();
             window.history.back();
-          }} aria-label="이전으로 돌아가기">‹</a>
+          }} label="이전으로 돌아가기" />
         )}
         <h1>{selectionView ? selectionTitle : step === "configure" ? "상품 구매" : "결제"}</h1>
         {step === "configure" || selectionView ? (
@@ -869,7 +870,7 @@ function OrderInformation({
         >
           <section className="coupon-picker-panel">
             <header>
-              <button type="button" onClick={closeCouponPicker} aria-label="결제 화면으로 돌아가기">‹</button>
+              <BackButton onClick={closeCouponPicker} label="결제 화면으로 돌아가기" />
               <h3>쿠폰 선택</h3>
               <span aria-hidden="true" />
             </header>

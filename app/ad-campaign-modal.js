@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import FormSubmitButton from "./form-submit-button";
 import ModalScrollLock from "./modal-scroll-lock";
+import BackButton from "./back-button";
 import { formatDateOnly } from "../lib/date-format";
 import { sanitizeAdGuardianMessage } from "../lib/ad-creative-text";
 
@@ -197,7 +198,7 @@ export default function AdCampaignModal({
       <ModalScrollLock />
       <div className="modal-surface ad-setup-page" data-modal-surface>
         <header className="ad-setup-topbar">
-          <a href={backHref} aria-label="대상자 선택으로 돌아가기">‹</a>
+          <BackButton href={backHref} label="대상자 선택으로 돌아가기" />
           <h2>광고 세팅</h2>
           <span aria-hidden="true" />
         </header>

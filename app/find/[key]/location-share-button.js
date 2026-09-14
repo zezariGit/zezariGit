@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import BackButton from "../../back-button";
 
 const PREVIEW_LOCATION = { latitude: 37.5665, longitude: 126.978, accuracy: 18, addressLabel: "서울특별시 중구 세종대로 110", checkedAt: "2026-09-13T14:30:00+09:00" };
 
@@ -70,7 +71,7 @@ export default function LocationShareButton({ qrKey, subjectName = "김제자리
 }
 
 function LocationHeader({ title, onBack }) {
-  return <header className="location-flow-header">{onBack ? <button type="button" onClick={onBack} aria-label="뒤로가기">‹</button> : <span />}<h1>{title}</h1><span /></header>;
+  return <header className="location-flow-header">{onBack ? <BackButton onClick={onBack} /> : <span />}<h1>{title}</h1><span /></header>;
 }
 
 function IntroScreen({ busy, onAgree, onCancel }) {

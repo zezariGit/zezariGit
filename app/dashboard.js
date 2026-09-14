@@ -25,6 +25,7 @@ import SubjectPreviewVoicePlayer from "./subject-preview-voice-player";
 import SubjectStatusGuide from "./subject-status-guide";
 import { isAdminSession } from "../lib/admin";
 import { formatDateOnly } from "../lib/date-format";
+import BackButton from "./back-button";
 
 const genders = ["남성", "여성"];
 
@@ -96,10 +97,7 @@ export default async function GuardianDashboard({
         {!registeredSubject && !selectedPreviewSubject && !isSubjectsTab && <header className="dashboard-header">
           <div>
             {guardianComplete && !isDashboard && (
-              <Link className="dashboard-back-link" href="/?tab=dashboard">
-                <span aria-hidden="true">‹</span>
-                대시보드로 돌아가기
-              </Link>
+              <BackButton className="dashboard-back-link" href="/?tab=dashboard" label="대시보드로 돌아가기" />
             )}
             {!isSubjectsTab && !isDashboard && (
               <p className="intro-kicker">{guardianComplete ? "보호자 대시보드" : "정보 입력"}</p>
@@ -266,9 +264,7 @@ function MyPageTab({ closeHref = "", admin = false }) {
     >
       <div className="my-page-title-row">
         {closeHref && (
-          <button className="my-page-close-button" type="button" data-my-page-close aria-label="설정 닫기">
-            <span aria-hidden="true">‹</span>
-          </button>
+          <BackButton className="my-page-close-button" data-my-page-close label="설정 닫기" />
         )}
         <h2>설정</h2>
         <span aria-hidden="true" />
@@ -315,9 +311,7 @@ function SubjectPreviewPage({ subject }) {
 
   return (
     <section className="guardian-subject-preview" aria-label={`${subject.name} 대상자 정보 미리보기`}>
-      <Link className="subject-preview-back" href="/?tab=dashboard" aria-label="대시보드로 돌아가기">
-        ‹
-      </Link>
+      <BackButton className="subject-preview-back" href="/?tab=dashboard" label="대시보드로 돌아가기" />
       <span className="subject-preview-shield" aria-hidden="true"><ShieldCheckIcon /></span>
       <header className="subject-preview-heading">
         <img src="/assets/dashboard/subject-preview-heading.png" alt="대상자 정보 미리보기. 입력한 내용을 확인해 주세요." />
@@ -584,13 +578,11 @@ function SubjectForm({ subject, imageUploadSettings }) {
   return (
     <article className={`subject-edit-card ${isExisting ? "is-editing" : "is-registering"}`}>
       <header className="subject-form-header">
-        <Link
+        <BackButton
           className="subject-form-back"
           href={isExisting ? `/?tab=dashboard&previewSubject=${encodeURIComponent(subject.id)}` : "/?tab=dashboard"}
-          aria-label={isExisting ? "대상자 정보 미리보기로 돌아가기" : "대시보드로 돌아가기"}
-        >
-          <span aria-hidden="true">‹</span>
-        </Link>
+          label={isExisting ? "대상자 정보 미리보기로 돌아가기" : "대시보드로 돌아가기"}
+        />
         <h1>{isExisting ? "대상자 정보 수정" : "대상자 정보 등록"}</h1>
         {isExisting && <p>정확한 정보를 위해 수정해 주세요.</p>}
       </header>

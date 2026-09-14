@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { formatDateTime } from "../lib/date-format";
+import BackButton from "./back-button";
 
 const PREVIEW_NOTIFICATIONS = [
   { id: "preview-location", category: "safety", event_key: "safety.location_shared", title: "위치가 공유되었습니다", body: "박제자리 관리대상자의 현재 위치를 공유했습니다.", url: "/account/location-shares/preview?preview=1", created_at: "2026-09-04T03:10:00.000Z", read_at: null },
@@ -176,7 +177,7 @@ export default function NotificationBell({ preview = false }) {
       {open && (
         <section className="notification-popover" role="dialog" aria-label="알림" aria-modal="false">
           <header className="notification-popover-header">
-            <button className="notification-back-button" type="button" onClick={closePopover} aria-label="알림 닫기"><ChevronLeftIcon /></button>
+            <BackButton className="notification-back-button" onClick={closePopover} label="알림 닫기" />
             <strong>알림</strong>
             <button className={`notification-refresh-button${loading ? " loading" : ""}`} type="button" onClick={loadNotifications} disabled={loading} aria-label={loading ? "알림 조회 중" : "알림 새로고침"}><RefreshIcon /></button>
           </header>
@@ -251,10 +252,6 @@ function resolveNotificationCategory(notification) {
   if (/광고|Meta|META/.test(value)) return "ad";
   if (/결제|상품|환불|취소/.test(value)) return "commerce";
   return "safety";
-}
-
-function ChevronLeftIcon() {
-  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>;
 }
 
 function RefreshIcon() {

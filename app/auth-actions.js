@@ -8,6 +8,7 @@ import { LoginIdRecoveryPanel } from "./login-id-recovery-panel";
 import PasswordVisibilityIcon from "./password-visibility-icon";
 import ServiceRegulationModal from "./service-regulation-modal";
 import { DEFAULT_SERVICE_REGULATIONS } from "../lib/service-regulations";
+import BackButton from "./back-button";
 
 const LOGIN_ERROR_MESSAGE = "아이디 또는 비밀번호가 일치하지 않습니다.";
 
@@ -365,10 +366,7 @@ export function LoginAuthPanel({ enabledProviders = [], authError = "", initialM
     return (
       <section className="auth-panel signup-card" aria-label="회원가입">
         {signupStep !== "done" && (
-          <button className="signup-back-button" type="button" onClick={signupStep === "phone" ? closeSignup : () => setSignupStep("phone")}>
-            <span aria-hidden="true">‹</span>
-            <span className="visually-hidden">이전</span>
-          </button>
+          <BackButton className="signup-back-button" onClick={signupStep === "phone" ? closeSignup : () => setSignupStep("phone")} label="이전" />
         )}
 
         {signupStep === "phone" && (

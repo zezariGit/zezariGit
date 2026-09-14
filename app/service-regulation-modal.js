@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import ServiceRegulationDocument from "./service-regulation-document";
 import { DEFAULT_SERVICE_REGULATIONS } from "../lib/service-regulations";
+import BackButton from "./back-button";
 
 export default function ServiceRegulationModal({ type, initialDocument, onClose }) {
   const [document, setDocument] = useState(initialDocument || DEFAULT_SERVICE_REGULATIONS[type]);
@@ -34,9 +35,7 @@ export default function ServiceRegulationModal({ type, initialDocument, onClose 
     <div className="service-regulation-overlay" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <section className="service-regulation-modal" role="dialog" aria-modal="true" aria-labelledby="service-regulation-title">
         <header>
-          <button type="button" onClick={onClose} aria-label="약관 닫기">
-            <span aria-hidden="true">‹</span>
-          </button>
+          <BackButton onClick={onClose} label="약관 닫기" />
           <h2 id="service-regulation-title">{document.title}</h2>
           <span aria-hidden="true" />
         </header>

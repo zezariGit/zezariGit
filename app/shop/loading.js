@@ -1,9 +1,11 @@
+import { BackIcon } from "../back-button";
+
 export default function ShopLoading() {
   return (
     <main className="shop-page">
       <section className="shop-phone-panel shop-loading-panel" aria-busy="true" aria-label="상품 정보를 불러오는 중">
         <header className="shop-topbar">
-          <span className="shop-back-link" aria-hidden="true">‹</span>
+          <span className="app-back-button shop-back-link" aria-hidden="true"><BackIcon /></span>
           <h1>상품 구매</h1>
           <span className="shop-help-mark" aria-hidden="true">?</span>
         </header>

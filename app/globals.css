@@ -12935,6 +12935,56 @@ button:disabled:hover {
   }
 }
 
+/* Shared back control for every page header and modal header. */
+.app-back-button.app-back-button {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  flex: 0 0 40px;
+  margin: 0;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: #17191a !important;
+  font-size: 0 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  appearance: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-back-button.app-back-button:hover,
+.app-back-button.app-back-button:focus-visible {
+  background: #eef8f1 !important;
+  color: #079548 !important;
+  outline: none;
+}
+
+.app-back-button.app-back-button:focus-visible {
+  box-shadow: 0 0 0 2px rgba(7, 149, 72, 0.2);
+}
+
+.app-back-button-icon {
+  width: 12px;
+  height: 12px;
+  display: block;
+  border-bottom: 2px solid currentColor;
+  border-left: 2px solid currentColor;
+  box-sizing: border-box;
+  transform: translateX(2px) rotate(45deg);
+  pointer-events: none;
+}
+
+.app-back-button[aria-hidden="true"] {
+  cursor: default;
+  pointer-events: none;
+}
+
 .location-flow,
 .guardian-location-page {
   min-height: 100vh;

@@ -1,5 +1,7 @@
 "use client";
 
+import BackButton from "./back-button";
+
 import { useEffect, useRef, useState } from "react";
 
 const EMPTY_CODE = ["", "", "", "", "", ""];
@@ -191,7 +193,7 @@ export function LoginIdRecoveryPanel({ onBack, onLogin, onPasswordReset, initial
 function RecoveryHeader({ onBack }) {
   return (
     <header className="login-id-recovery-header">
-      <button type="button" onClick={onBack} aria-label="로그인으로 돌아가기">‹</button>
+      <BackButton onClick={onBack} label="로그인으로 돌아가기" />
       <h1>아이디 찾기</h1>
     </header>
   );

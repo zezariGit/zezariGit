@@ -1,4 +1,4 @@
-import Link from "next/link";
+import BackButton from "../back-button";
 
 export const metadata = {
   title: "개인정보처리방침 | zezari",
@@ -10,7 +10,7 @@ export default function PrivacyPolicyPage() {
     <main className="privacy-page">
       <article className="privacy-shell">
         <header className="privacy-header">
-          <Link className="privacy-back-link" href="/" aria-label="사용자페이지로 돌아가기">‹</Link>
+          <BackButton className="privacy-back-link" href="/" label="사용자페이지로 돌아가기" />
           <div>
             <img className="privacy-brand-logo" src="/assets/finder/zezari-wordmark.png" alt="제자리" />
             <h1>개인정보처리방침</h1>

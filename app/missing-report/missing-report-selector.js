@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { formatDateOnly } from "../../lib/date-format";
+import BackButton from "../back-button";
 
 export default function MissingReportSelector({ subjects = [], initialSubjectId = "", forceNew = false }) {
   const initialSubject = subjects.find((subject) => subject.id === initialSubjectId) || null;
@@ -39,7 +40,7 @@ export default function MissingReportSelector({ subjects = [], initialSubjectId 
   return (
     <section className="missing-report-panel" aria-label="온라인 실종광고 대상자 선택">
       <header className="missing-report-topbar">
-        <Link href="/?tab=dashboard" aria-label="대시보드로 돌아가기">←</Link>
+        <BackButton href="/?tab=dashboard" label="대시보드로 돌아가기" />
         <h1 className="sr-only">온라인 실종광고 대상자 선택</h1>
       </header>
 
