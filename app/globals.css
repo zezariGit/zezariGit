@@ -23215,6 +23215,11 @@ button:disabled:hover {
   color: #505050;
 }
 
+.ad-history-status.rejected {
+  background: #ffeded;
+  color: #c52323;
+}
+
 .ad-history-details dl {
   min-width: 0;
   display: grid;

@@ -117,6 +117,7 @@ function AdHistoryCard({ ad, preview }) {
 
 function adStage(ad) {
   if (String(ad.status) === "ended") return "done";
+  if (String(ad.status) === "rejected") return "rejected";
   if (["active", "paused"].includes(String(ad.status))) return "running";
   return "review";
 }
@@ -124,6 +125,7 @@ function adStage(ad) {
 function adStageLabel(stage) {
   if (stage === "running") return "진행 중";
   if (stage === "done") return "광고 완료";
+  if (stage === "rejected") return "광고 반려";
   return "광고 검토 중";
 }
 

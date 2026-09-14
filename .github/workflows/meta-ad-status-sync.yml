@@ -1,0 +1,27 @@
+name: Sync Meta ad review status
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: meta-ad-review-status-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Update reviewing advertisements
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          test -n "$CRON_SECRET"
+          curl --fail-with-body --silent --show-error --retry 2 \
+            --header "Authorization: Bearer $CRON_SECRET" \
+            https://zezari.family/api/cron/meta-ad-status
