@@ -27,7 +27,8 @@ assert.match(page, /forceNewAd=\{forceNewAd\}/, "루트 페이지가 새 광고 
 assert.match(dashboard, /<DashboardTab[\s\S]*forceNewAd=\{forceNewAd\}/, "대시보드가 새 광고 여부를 내부 탭에 전달해야 합니다.");
 assert.match(dashboard, /function DashboardTab\(\{[\s\S]*forceNewAd,[\s\S]*forceNew=\{forceNewAd\}/, "광고 모달이 정의된 새 광고 값을 받아야 합니다.");
 assert.match(page, /"ad-campaign"/, "로그인 없이 광고 설정 단계를 확인할 개발 미리보기가 있어야 합니다.");
-assert.match(adCampaign, /setStep\("duration"\)[\s\S]*setStep\("summary"\)/, "거리 선택 후 기간과 요약 단계가 연결되어야 합니다.");
+assert.match(adCampaign, /const canSubmit = Boolean\([\s\S]*selectedDistance[\s\S]*selectedDuration[\s\S]*regionComplete/, "지역·거리·기간 선택이 완료되어야 다음 단계로 진행할 수 있어야 합니다.");
+assert.match(adCampaign, /\{canSubmit && \([\s\S]*ad-setup-summary[\s\S]*ad-setup-next/, "필수값 완료 시 선택 내역과 다음 버튼이 같은 스크롤 화면에 표시되어야 합니다.");
 assert.match(carousel, /scroll-snap-type|scrollTo\(/, "대상자 페이지는 가로 이동을 지원해야 합니다.");
 assert.match(carousel, /Array\.from\(\{ length: totalPages \}/, "표시점은 페이지 수를 기준으로 만들어야 합니다.");
 assert.match(carousel, /showDots &&/, "빈 대상자 목록에서는 페이지 표시점을 숨겨야 합니다.");
@@ -38,6 +39,8 @@ assert.match(guide, /role="dialog"/);
 assert.match(styles, /\.dashboard-shell\.dashboard-home-shell/);
 assert.match(styles, /\.subject-status-guide-overlay/);
 assert.match(styles, /\.subject-status-guide-reference\s*\{[^}]*width: 100%;[^}]*height: auto;[^}]*object-fit: contain;/s, "상태 안내 이미지는 잘리지 않아야 합니다.");
+assert.match(styles, /\.ad-setup-backdrop\s*\{[^}]*overflow: hidden;[^}]*touch-action: pan-y;/s, "광고 세팅 배경은 전용 스크롤 영역으로 터치 이동을 전달해야 합니다.");
+assert.match(styles, /\.ad-setup-page\s*\{[^}]*height: 100dvh;[^}]*overflow-y: auto;[^}]*safe-area-inset-bottom[^}]*touch-action: pan-y;/s, "모바일 광고 세팅 화면은 하단 버튼까지 세로 스크롤되어야 합니다.");
 
 for (const [index, icon] of icons.entries()) {
   assert.equal(icon.toString("ascii", 1, 4), "PNG", `${iconNames[index]} 아이콘이 PNG가 아닙니다.`);
