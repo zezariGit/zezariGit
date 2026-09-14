@@ -14,6 +14,7 @@ export default function LocationShareButton({ qrKey, subjectName = "김제자리
   const requestPermission = async () => {
     if (busy) return;
     setError("");
+    if (preview) { setLocation(PREVIEW_LOCATION); setStep("confirm"); return; }
     if (!navigator.geolocation) { setStep("location-error"); return; }
     setBusy(true);
     try {
@@ -28,7 +29,8 @@ export default function LocationShareButton({ qrKey, subjectName = "김제자리
       setStep("confirm");
     } catch (requestError) {
       setError(locationErrorMessage(requestError));
-      setStep(requestError?.code === 1 ? "permission-denied" : "location-error");
+      const permissionState = await getGeolocationPermissionState();
+      setStep(isPermissionDeniedError(requestError) || permissionState === "denied" ? "permission-denied" : "location-error");
     } finally { setBusy(false); }
   };
 
@@ -120,7 +122,17 @@ export function LocationMap({ location }) {
 
 function buildMapEmbedUrl(latitude, longitude) { const lat = Number(latitude); const lng = Number(longitude); const delta = 0.006; const bbox = [lng - delta, lat - delta, lng + delta, lat + delta].join(","); return `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${encodeURIComponent(`${lat},${lng}`)}`; }
 async function reverseGeocode(latitude, longitude) { try { const response = await fetch(`/api/maps/search?lat=${encodeURIComponent(latitude)}&lng=${encodeURIComponent(longitude)}`, { cache: "no-store" }); const data = await response.json().catch(() => ({})); if (response.ok && data?.result?.address) return data.result.address; if (response.ok && data?.result?.label) return data.result.label; } catch {} return `위도 ${Number(latitude).toFixed(5)}, 경도 ${Number(longitude).toFixed(5)}`; }
-function getCurrentPosition() { return new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 })); }
-function locationErrorMessage(error) { if (error?.code === 1) return "현재 사이트의 위치 권한이 거부되었습니다."; if (error?.code === 2) return "GPS 또는 네트워크에서 현재 위치를 확인하지 못했습니다."; if (error?.code === 3) return "위치 확인 시간이 초과되었습니다."; return error?.message || "현재 위치를 확인하지 못했습니다."; }
+async function getCurrentPosition() {
+  try {
+    return await requestCurrentPosition({ enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });
+  } catch (error) {
+    if (isPermissionDeniedError(error)) throw error;
+    return requestCurrentPosition({ enableHighAccuracy: false, timeout: 18000, maximumAge: 60000 });
+  }
+}
+function requestCurrentPosition(options) { return new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, options)); }
+async function getGeolocationPermissionState() { try { if (!navigator.permissions?.query) return "unknown"; return (await navigator.permissions.query({ name: "geolocation" })).state; } catch { return "unknown"; } }
+function isPermissionDeniedError(error) { return Number(error?.code) === 1 || error?.name === "NotAllowedError"; }
+function locationErrorMessage(error) { if (isPermissionDeniedError(error)) return "현재 사이트의 위치 권한이 거부되었습니다."; if (Number(error?.code) === 2) return "GPS 또는 네트워크에서 현재 위치를 확인하지 못했습니다."; if (Number(error?.code) === 3) return "위치 확인 시간이 초과되었습니다."; return error?.message || "현재 위치를 확인하지 못했습니다."; }
 function stepTitle(step) { if (step === "intro") return "위치 공유 안내"; if (step === "confirm") return "위치 확인"; if (step === "complete") return "위치 공유 완료"; if (step === "permission-denied") return "위치 권한 안내"; return "위치 확인 오류"; }
 function formatKoreanDateTime(value) { const date = new Date(value); if (Number.isNaN(date.getTime())) return "-"; return new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).format(date); }
