@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-14 KST
 
-Application baseline commit: `3ec024a` (`main`, GitHub/Vercel 운영 반영 완료)
+Application baseline commit: `5065efa` (`main`, GitHub/Vercel 운영 반영 완료)
 
 Production: `https://zezari.family`
 
@@ -32,9 +32,9 @@ Production: `https://zezari.family`
 | GitHub | `https://github.com/zezariGit/zezariGit.git` |
 | Vercel 프로젝트 | scope `zezari`, project `zezari` |
 | 대표 도메인 | `https://zezari.family` |
-| 최근 확인 운영 배포 | `dpl_A6uBH9qvSMb3bZQLGoi5ParMBrs9` (`READY`, QR 위치 권한 즉시 요청 및 결과별 분기) |
+| 최근 확인 운영 배포 | `dpl_9nBjnB9LGknXavxXpjU7dMcbj4Gk` (`READY`, QR 위치 미리보기 복구 및 실제 조회 폴백) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | production feature commit `3ec024a`; QR 발견자 로고 정렬과 위치 권한 즉시 요청·결과별 분기 운영 반영 완료 |
+| 최근 애플리케이션 기능 기준 | production feature commit `5065efa`; QR 위치 미리보기 지도 전환과 실제 위치 조회 폴백 운영 반영 완료 |
 | 현재 로컬 미배포 작업 | 없음. 관련 없는 기존 미추적 파일은 작업 대상에서 제외 |
 
 ### 로컬 시작
@@ -177,6 +177,7 @@ npm run dev -- -p 3005
 - 위치 공유와 음성은 초록색 계열, 112는 옅은 빨간색으로 구분한다. 보호자 음성이 없으면 음성 버튼 영역 자체를 렌더링하지 않는다.
 - 위치 공유는 `안내/명시 동의 → 시스템 위치 권한 요청 → 1회 위치 조회·확인 → 최종 공유 → 완료` 순서다. 동의 전 권한 요청과 최종 버튼 전 서버 전송은 발생하지 않는다.
 - `위치 공유 동의하기`의 클릭 이벤트에서 `navigator.geolocation.getCurrentPosition`을 즉시 호출한다. 권한 거부(`code=1`)는 권한 거부 안내, 위치 조회 불가·시간 초과(`code=2/3`)는 위치 확인 오류, 성공은 지도 확인 화면으로 각각 분기한다.
+- 개발·운영의 `preview=1` 화면은 위치 API를 지원하지 않는 인앱 브라우저에서도 검토할 수 있도록 샘플 위치로 지도 확인 화면을 표시한다. 실제 QR 주소만 단말 위치를 요청하며, 고정밀 조회 실패 시 일반 정확도로 한 번 더 조회한다.
 - 권한 거부와 GPS·네트워크 조회 실패를 별도 재시도 화면으로 처리하며, 실패 시 위치를 저장하거나 알림을 전송하지 않는다.
 - 보호자는 `/account/location-shares/[id]`에서 공유 시점 좌표·주소·시간·정확도를 확인한다. 위치는 실시간으로 갱신하지 않는다.
 - 위치정보 암호화·보관·접근·파기 정책은 `deliverables/location-service/LOCATION_SECURITY_COMPLIANCE.md`를 기준으로 한다.
@@ -308,6 +309,7 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 | 커밋 | 내용 |
 | --- | --- |
+| `5065efa` | 인앱 미리보기의 샘플 지도 전환 복구 및 실제 QR 위치 조회의 일반 정확도 폴백 추가 |
 | `3ec024a` | 발견자 화면 제자리 로고 교체·중앙 정렬 및 위치 공유 동의 즉시 권한 요청·결과별 화면 분기 |
 | `cb0ac60` | 디자인 선택 상단 정렬, 114px 정사각형 및 234px 완료 버튼 배치 |
 | `b9ec704` | 운영 상품/디자인 기본 이미지 초기화 재실행 |

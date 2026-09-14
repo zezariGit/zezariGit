@@ -9510,8 +9510,9 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Added the supplied `334x162` wordmark as `public/assets/finder/zezari-wordmark.png`, removed the previous sprite-like crop transform, and rendered it centered at 108px wide without clipping.
 - Removed the misleading intermediate permission-denied guide shown before any permission request.
 - The consent click now directly calls `navigator.geolocation.getCurrentPosition`; denial routes to `permission-denied`, unavailable/timeout routes to `location-error`, and success routes to the map confirmation screen.
-- Preview mode now exercises the real browser permission request instead of bypassing it with mock success. Direct preview parameters remain available for deterministic review of each result screen.
+- Preview mode uses the safe sample location so embedded preview browsers without Geolocation support can reach the map confirmation screen. Direct preview parameters remain available for deterministic review of each result screen.
 - Retry actions issue a new location request directly, and busy controls prevent duplicate requests.
+- Real QR pages first request a fresh high-accuracy position, then retry once with normal accuracy and a short cached-position allowance when the device reports unavailable or timeout. A permission-state check after failure keeps denial separate from acquisition failure.
 
 ### Verification
 - `npm run test:finder-public-ui`: passed with direct permission invocation and result-routing assertions.
@@ -9524,3 +9525,5 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 ### Deployment
 - Feature commit `3ec024a` (`fix: streamline finder location permission flow`) was pushed to GitHub `main`.
 - Vercel deployment `dpl_A6uBH9qvSMb3bZQLGoi5ParMBrs9` reached `READY` and owns `https://zezari.family` plus compatibility aliases.
+- Follow-up commit `5065efa` (`fix: recover finder location preview and fallback`) restored the preview map flow and added real-device location fallback.
+- Follow-up Vercel deployment `dpl_9nBjnB9LGknXavxXpjU7dMcbj4Gk` reached `READY`. Production browser verification confirmed that preview consent opens the map confirmation screen, all result routes returned HTTP 200, and no deployment error logs were reported.
