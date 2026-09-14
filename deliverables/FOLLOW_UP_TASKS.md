@@ -15,8 +15,8 @@
 
 ## Advertising
 
-- [x] Administrator UI testing: test-payment ads can move through `광고 검토 중` -> `진행 중` -> `광고 완료` without calling Meta.
-- [ ] Meta production publishing: complete app review and required Marketing API permissions, verify the ad account/Page connection, and test a real paid ad from publication through status synchronization.
+- [x] Administrator UI testing: local preview and legacy `test_in_review` rows can verify dashboard states without creating a new Meta advertisement.
+- [x] Meta production publishing and status synchronization: a live administrator-pass advertisement was published, read through the protected status API, and moved from review to active.
 
 ## Device Verification
 

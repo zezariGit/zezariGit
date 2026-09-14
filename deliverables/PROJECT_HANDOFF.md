@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-14 KST
 
-Application baseline commit: `6b87e71` (`main`, GitHub/Vercel 운영 반영 완료)
+Application baseline commit: `d58ded6` (`main`, GitHub/Vercel 운영 반영 완료)
 
 Production: `https://zezari.family`
 
@@ -32,9 +32,9 @@ Production: `https://zezari.family`
 | GitHub | `https://github.com/zezariGit/zezariGit.git` |
 | Vercel 프로젝트 | scope `zezari`, project `zezari` |
 | 대표 도메인 | `https://zezari.family` |
-| 최근 확인 운영 배포 | `dpl_yxQJhK27WftRDkMPFxaZHRybbS2m` (`READY`, 관리자 결제패스 Meta 실발행 및 1분 시작 예약) |
+| 최근 확인 운영 배포 | `dpl_DfNfCAC9CM49xJijkaw4XB5HmznF` (`READY`, Meta 검토 상태 5분 자동 동기화) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | production feature commit `6b87e71`; 일반 결제와 관리자 결제패스 모두 Meta 실광고 발행 및 약 1분 후 시작 예약 운영 반영 완료 |
+| 최근 애플리케이션 기능 기준 | production feature commit `d58ded6`; Meta 검토 중 광고의 5분 상태 조회와 활동 중 자동 전환 운영 반영 완료 |
 | 현재 로컬 미배포 작업 | 없음. 관련 없는 기존 미추적 파일은 작업 대상에서 제외 |
 
 ### 로컬 시작
@@ -57,6 +57,7 @@ npm run dev -- -p 3005
 | SOLAPI | 휴대전화 인증번호 발송 | `lib/sms.js` |
 | Toss Payments | 상품·구독·광고 결제 | `lib/toss-payments.js`, `app/api/payments/toss/` |
 | Meta Marketing API | 실종 광고 생성·상태 동기화 | `lib/meta-marketing.js` |
+| GitHub Actions | Vercel Hobby의 주기 제한을 보완하는 Meta 광고 상태 5분 스케줄러 | `.github/workflows/meta-ad-status-sync.yml` |
 | Web Push/VAPID | 보호자 알림 | `lib/push.js`, `public/sw.js` |
 | Bizcall | 보호자 안심번호 연결 | `lib/bizcall.js` |
 | Resend | 비활성 기본값의 이메일 인증 대체 경로 | `lib/email-verification.js` |
@@ -155,6 +156,7 @@ npm run dev -- -p 3005
 | 관리자 상태 테스트 | 과거에 생성된 `meta_status=test_in_review`이면서 Meta 광고 ID가 없는 레거시 테스트 광고만 수동 `진행 중` 전환 가능. 새 관리자 결제패스 광고는 이 테스트 전환 대상이 아니며 실제 Meta 발행 경로를 사용 | 완료 |
 | 광고 결제 완료 및 경찰 신고 연계 | 제공된 광고 결제 완료 그래픽(`/assets/ad-payment/payment-complete.png`) 표시, `경찰 신고도 함께 진행하시겠어요?` 안내 및 `[예]`/`[아니요]` 버튼, 클릭 시 `112로 전화할까요?` 팝업에서 112 전화걸기(`tel:112`) 제공. 관리자 패스의 실제 Meta 발행 안내는 관리자에게만 표시하며 끝에 `[해당 문구는 관리자만 볼 수 있습니다]` 표기 | 완료 |
 | 실제 Meta 광고 | 일반 Toss 결제와 관리자 결제패스 모두 결제 완료 후 같은 자동 발행 함수를 사용. 저장된 지역·전국 범위, 반경, 기간, `meta_budget_amount`를 Meta 광고 세트에 전달하고 시작 시각은 발행 처리 시점 약 1분 후로 예약. 관리자 패스는 Toss 과금·매출 집계만 제외되며 실제 Meta 광고비는 발생 | 조건부: Meta 앱 권한·검수 승인 필요 |
+| Meta 검토 상태 자동 갱신 | GitHub Actions가 5분마다 비밀키 보호 API `/api/cron/meta-ad-status`를 호출. 제자리 `ready`이면서 Meta 발행 ID가 있는 광고만 `effective_status` 조회. `ACTIVE`면 `active/ad_active`로 전환하고 시작 알림을 1회 생성하여 다음 조회에서 자동 제외. 검토 대기 상태는 계속 조회하고 반려·정지·삭제도 해당 제자리 상태로 반영 | 완료 |
 
 ### 관리자 및 운영 기능
 
@@ -260,6 +262,7 @@ git diff --check
 | `npm run test:coupon-registration` | 쿠폰 등록 오류 분류 |
 | `npm run test:ad-dashboard` | 광고 상태·필터·버튼·테스트 전환 |
 | `npm run test:ad-meta-payment` | 일반 결제·관리자 패스의 Meta 발행 연결, 지역·범위·기간·예산 및 1분 시작 예약 |
+| `npm run test:ad-meta-status` | Meta 유효 상태 분류, 검토 대상 조회, 활동 중 전환, 보호 API와 5분 스케줄러 |
 | `npm run test:billing-history` | 상품·광고 통합 결제 목록과 소유자별 상세 화면 |
 | `npm run test:admin-phone-otp` | 관리자 휴대전화 인증 예외 |
 | `npm run test:admin-grid` | 관리자 행 전체 선택 |
@@ -304,6 +307,7 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 | 커밋 | 내용 |
 | --- | --- |
+| `d58ded6` | Meta 검토 중 광고를 5분마다 확인하고 활동 중·반려·정지·종료 상태를 자동 반영 |
 | `6b87e71` | 관리자 결제패스 광고를 실제 Meta 발행 경로에 연결하고 시작 시각을 약 1분 후로 예약 |
 | `5065efa` | 인앱 미리보기의 샘플 지도 전환 복구 및 실제 QR 위치 조회의 일반 정확도 폴백 추가 |
 | `3ec024a` | 발견자 화면 제자리 로고 교체·중앙 정렬 및 위치 공유 동의 즉시 권한 요청·결과별 화면 분기 |

@@ -6565,3 +6565,12 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 레거시 화면 테스트 광고와 새 실집행 광고의 상태 전환 조건을 분리
 - 전용 회귀검사·광고 대시보드 검사·보안검사·운영 빌드 통과
 - 기능 커밋 `6b87e71`, Vercel 배포 `dpl_yxQJhK27WftRDkMPFxaZHRybbS2m` 운영 반영 완료
+
+## 2026-09-14 - Meta 광고 검토 상태 5분 자동 갱신
+- 결제 후 제자리에서 `광고 검토 중`인 광고만 Meta 상태를 5분마다 자동 확인
+- Meta `활동 중` 확인 즉시 제자리 광고를 `진행 중`으로 전환하고 해당 광고의 추가 확인 중단
+- 검토 대기·처리 중은 계속 확인하고 반려·정지·삭제 상태도 제자리 상태에 반영
+- 인증 비밀키로 보호된 운영 API와 중복 실행을 막는 GitHub Actions 스케줄러 구성
+- Vercel Hobby 주기 제한을 확인해 별도 유료 전환 없이 GitHub Actions 5분 스케줄로 구현
+- 첫 운영 실행에서 검토 광고 1건을 확인해 활동 중 1건으로 정상 전환, 실패 0건 확인
+- 기능 커밋 `d58ded6`, Vercel 배포 `dpl_DfNfCAC9CM49xJijkaw4XB5HmznF` 운영 반영 완료

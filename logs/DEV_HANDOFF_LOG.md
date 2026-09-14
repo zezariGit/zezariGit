@@ -9553,3 +9553,29 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Feature commit `6b87e71` (`feat: publish admin-pass ads to Meta`) was pushed to GitHub `main`.
 - Vercel production deployment `dpl_yxQJhK27WftRDkMPFxaZHRybbS2m` reached `READY` and owns `https://zezari.family` plus compatibility aliases.
 - Production root and advertisement checkout routes returned HTTP 200.
+
+## 2026-09-14 KST - Meta Review Status Five-Minute Synchronization
+
+### User Request
+- Poll Meta every five minutes after advertisement payment while the Zezari dashboard still shows `광고 검토 중`.
+- Change the Zezari advertisement to `진행 중` when Meta reports it active, then stop polling that advertisement.
+
+### Reflected Work
+- Added `getMetaAdvertisementDeliveryStatus` for `effective_status`, `configured_status`, and update-time reads from the Meta ad object.
+- Added `syncReviewingMetaAds`, selecting only paid, published `ready` advertisements with a Meta ad ID.
+- Mapped Meta review states to continued polling, `ACTIVE` to Zezari `active/ad_active`, issue states to `rejected`, pause states to `paused`, and deleted/archive states to `ended`.
+- Reused the deduplicated `ad.started` and `ad.rejected` guardian notifications.
+- Added the bearer-protected `/api/cron/meta-ad-status` route with constant-time secret comparison.
+- The Vercel team is on Hobby and cannot run five-minute native cron jobs, so added `.github/workflows/meta-ad-status-sync.yml` with a five-minute schedule and non-overlapping concurrency.
+- Generated one secret without displaying or writing it to the repository, then configured it as Vercel Production `CRON_SECRET` and GitHub Actions `CRON_SECRET`.
+- Added a distinct guardian dashboard `광고 반려` status presentation.
+
+### Verification
+- `npm run test:ad-meta-status`, `npm run test:ad-dashboard`, and `npm run security:check`: passed.
+- `npm run build`: passed with Next.js 16.3.0 and the new `/api/cron/meta-ad-status` route among 40 routes.
+- An unauthenticated production route request returned HTTP 401.
+- Manual GitHub Actions run `34794546572` succeeded: checked 1, active 1, failed 0.
+
+### Deployment
+- Feature commit `d58ded6` (`feat: sync Meta ad review status`) was pushed to GitHub `main`.
+- Vercel production deployment `dpl_DfNfCAC9CM49xJijkaw4XB5HmznF` reached `READY` and owns `https://zezari.family`.

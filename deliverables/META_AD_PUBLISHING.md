@@ -108,10 +108,16 @@ There are no remaining Meta asset, token, Page, funding-source, policy, or API c
 - Existing advertisements created before this version do not contain a captured poster; they must be re-created through the updated application flow before full publication.
 
 ## Future Work
-- Meta webhook or scheduled insight synchronization.
-- Store effective delivery/review status separately from configured status.
+- Reconcile scheduled status polling with a Meta webhook if webhook delivery is introduced later.
 - Reconcile reach, impressions, clicks, spend, and contact conversions.
 - Add scheduled retry and operator alerts for repeated publication failures.
+
+## 2026-09-14 Review Status Synchronization
+- Added a bearer-protected production route that reads Meta `effective_status` for Zezari advertisements still marked `ready` after publication.
+- Added a GitHub Actions `*/5 * * * *` schedule because the current Vercel Hobby plan does not support five-minute native cron execution.
+- `ACTIVE` now updates the guardian dashboard to `진행 중`, sends the existing start notification once, and removes the advertisement from subsequent checks.
+- Pending review states continue polling; disapproved, paused, archived, and deleted states leave the review set with corresponding local status updates.
+- The first production run checked one reviewing advertisement and changed one advertisement to active with zero failures.
 
 ## 2026-09-11 Subject Selection Route Recovery
 

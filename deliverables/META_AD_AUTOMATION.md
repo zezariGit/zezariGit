@@ -67,6 +67,17 @@ All budget amounts and multipliers are editable in `/admin?section=ad-pricing`.
 
 The claim expires after five minutes so a stalled serverless request can be retried without permanently blocking the advertisement.
 
+## Review Status Synchronization
+
+- `.github/workflows/meta-ad-status-sync.yml` calls `/api/cron/meta-ad-status` every five minutes.
+- Vercel is on the Hobby plan, whose native cron interval cannot meet the five-minute requirement, so GitHub Actions provides the scheduler.
+- Both sides use the same secret `CRON_SECRET`; the route rejects missing or invalid bearer credentials.
+- Each run selects only paid, Meta-published advertisements whose Zezari status is still `ready`.
+- Meta `effective_status` values `PENDING_REVIEW`, `IN_PROCESS`, and `PREAPPROVED` remain in the polling set.
+- `ACTIVE` changes the Zezari status to `active` and Meta status to `ad_active`, emits the existing `ad.started` notification once, and is excluded from later runs.
+- Disapproved/issue, paused, and archived/deleted results are mapped to `rejected`, `paused`, and `ended`, so they also leave the review polling set.
+- API lookup failures retain the advertisement in `ready`, record a sanitized error, and retry on the next scheduled run.
+
 ## Existing Advertisement Compatibility
 - Schema version is `24`.
 - Existing rows were backfilled with their prior amount as a `legacy` Meta budget.
