@@ -1,5 +1,5 @@
 import { timingSafeEqual } from "crypto";
-import { syncReviewingMetaAds } from "../../../../lib/db";
+import { syncSubjectAdLifecycle } from "../../../../lib/db";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -16,7 +16,7 @@ export async function GET(request) {
     return Response.json({ ok: false, message: "Unauthorized" }, { status: 401 });
   }
 
-  const summary = await syncReviewingMetaAds();
+  const summary = await syncSubjectAdLifecycle();
   return Response.json({ ok: true, ...summary });
 }
 

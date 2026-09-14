@@ -5,9 +5,10 @@ import StatusToast from "../../status-toast";
 import { activateTestSubjectAdAction, endSubjectAdAction } from "../../actions";
 import { authOptions } from "../../../lib/auth";
 import { isAdminSession } from "../../../lib/admin";
-import { getGuardianAdDashboardData } from "../../../lib/db";
+import { getGuardianAdDashboardData, syncGuardianSubjectAdLifecycle } from "../../../lib/db";
 import { AccountTopbar, formatCurrency, formatDate } from "../account-ui";
 import AdHistoryActions from "./ad-history-actions";
+import AdStatusAutoSync from "./ad-status-auto-sync";
 
 const previewAds = [
   { id: "preview-review", subject_id: "preview-1", subject_name: "김제자리", status: "ready", meta_status: "test_in_review", is_test_payment: 1, region: "서울특별시 강남구 역삼동", start_date: "2026-09-05", end_date: "2026-09-11", amount: 89900, reach_count: 0, creative_image_url: "/assets/missing-ad-template.png", created_at: "2026-09-08" },
@@ -22,9 +23,17 @@ export default async function AccountAdsPage({ searchParams }) {
   const session = preview ? { user: { provider: "credentials" } } : await getServerSession(authOptions);
   if (!session) redirect("/");
   const statusFilter = ["all", "running", "done"].includes(params?.status) ? params.status : "all";
-  const data = preview
-    ? { guardian: { is_admin: 1 }, ads: previewMode === "empty" ? [] : previewAds }
-    : await getGuardianAdDashboardData(session);
+  let data;
+  if (preview) {
+    data = { guardian: { is_admin: 1 }, ads: previewMode === "empty" ? [] : previewAds };
+  } else {
+    try {
+      await syncGuardianSubjectAdLifecycle(session);
+    } catch (error) {
+      console.error("Guardian advertisement lifecycle sync failed", error);
+    }
+    data = await getGuardianAdDashboardData(session);
+  }
   const ads = data.ads;
   const admin = preview || isAdminSession(session) || Number(data.guardian?.is_admin || 0) === 1;
   const selectedTestAd = admin
@@ -43,6 +52,7 @@ export default async function AccountAdsPage({ searchParams }) {
   return (
     <main className="account-page ad-history-page">
       <section className="account-panel ad-history-panel">
+        <AdStatusAutoSync enabled={!preview && ads.some((ad) => adStage(ad) === "review")} />
         <AccountTopbar title="광고 대시보드" />
         <nav className="ad-history-filters" aria-label="광고 상태 필터">
           <FilterLink active={statusFilter === "all"} href={filterHref("all", preview, selectedTestAd?.id)}>전체</FilterLink>
