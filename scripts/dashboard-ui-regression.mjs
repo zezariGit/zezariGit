@@ -2,12 +2,13 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const iconNames = ["notification", "settings", "status-help", "subject-status-guide", "missing", "shop", "support", "safety"];
-const [page, dashboard, carousel, guide, adCampaign, styles, ...icons] = await Promise.all([
+const [page, dashboard, carousel, guide, adCampaign, privacyPage, styles, ...icons] = await Promise.all([
   readFile(new URL("../app/page.js", import.meta.url), "utf8"),
   readFile(new URL("../app/dashboard.js", import.meta.url), "utf8"),
   readFile(new URL("../app/managed-subject-carousel.js", import.meta.url), "utf8"),
   readFile(new URL("../app/subject-status-guide.js", import.meta.url), "utf8"),
   readFile(new URL("../app/ad-campaign-modal.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/privacy/page.js", import.meta.url), "utf8"),
   readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
   ...iconNames.map((name) => readFile(new URL(`../public/assets/dashboard/${name}.png`, import.meta.url))),
 ]);
@@ -29,6 +30,8 @@ assert.match(dashboard, /function DashboardTab\(\{[\s\S]*forceNewAd,[\s\S]*force
 assert.match(page, /"ad-campaign"/, "로그인 없이 광고 설정 단계를 확인할 개발 미리보기가 있어야 합니다.");
 assert.match(adCampaign, /const canSubmit = Boolean\([\s\S]*selectedDistance[\s\S]*selectedDuration[\s\S]*regionComplete/, "지역·거리·기간 선택이 완료되어야 다음 단계로 진행할 수 있어야 합니다.");
 assert.match(adCampaign, /\{canSubmit && \([\s\S]*ad-setup-summary[\s\S]*ad-setup-next/, "필수값 완료 시 선택 내역과 다음 버튼이 같은 스크롤 화면에 표시되어야 합니다.");
+assert.match(privacyPage, /className="privacy-brand-logo"[\s\S]*zezari-wordmark\.png/, "설정의 약관 문서에는 제자리 로고가 표시되어야 합니다.");
+assert.doesNotMatch(privacyPage, />REAL_QR_FIND</, "약관 문서 상단에 개발 프로젝트명이 노출되면 안 됩니다.");
 assert.match(carousel, /scroll-snap-type|scrollTo\(/, "대상자 페이지는 가로 이동을 지원해야 합니다.");
 assert.match(carousel, /Array\.from\(\{ length: totalPages \}/, "표시점은 페이지 수를 기준으로 만들어야 합니다.");
 assert.match(carousel, /showDots &&/, "빈 대상자 목록에서는 페이지 표시점을 숨겨야 합니다.");
@@ -41,6 +44,7 @@ assert.match(styles, /\.subject-status-guide-overlay/);
 assert.match(styles, /\.subject-status-guide-reference\s*\{[^}]*width: 100%;[^}]*height: auto;[^}]*object-fit: contain;/s, "상태 안내 이미지는 잘리지 않아야 합니다.");
 assert.match(styles, /\.ad-setup-backdrop\s*\{[^}]*overflow: hidden;[^}]*touch-action: pan-y;/s, "광고 세팅 배경은 전용 스크롤 영역으로 터치 이동을 전달해야 합니다.");
 assert.match(styles, /\.ad-setup-page\s*\{[^}]*height: 100dvh;[^}]*overflow-y: auto;[^}]*safe-area-inset-bottom[^}]*touch-action: pan-y;/s, "모바일 광고 세팅 화면은 하단 버튼까지 세로 스크롤되어야 합니다.");
+assert.match(styles, /\.privacy-brand-logo\s*\{[^}]*width: 112px;[^}]*height: auto;[^}]*object-fit: contain;/s, "약관 화면의 제자리 로고는 비율을 유지해야 합니다.");
 
 for (const [index, icon] of icons.entries()) {
   assert.equal(icon.toString("ascii", 1, 4), "PNG", `${iconNames[index]} 아이콘이 PNG가 아닙니다.`);

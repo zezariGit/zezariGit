@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export const metadata = {
   title: "개인정보처리방침 | zezari",
-  description: "REAL_QR_FIND 제자리 서비스 개인정보처리방침",
+  description: "제자리 서비스 개인정보처리방침",
 };
 
 export default function PrivacyPolicyPage() {
@@ -12,11 +12,11 @@ export default function PrivacyPolicyPage() {
         <header className="privacy-header">
           <Link className="privacy-back-link" href="/" aria-label="사용자페이지로 돌아가기">‹</Link>
           <div>
-            <p className="intro-kicker">REAL_QR_FIND</p>
+            <img className="privacy-brand-logo" src="/assets/finder/zezari-wordmark.png" alt="제자리" />
             <h1>개인정보처리방침</h1>
             <p>
               제자리(이하 &quot;회사&quot;)는 이용자의 개인정보를 중요하게 생각하며 개인정보 보호법 등
-              관련 법령을 준수합니다. 이 방침은 REAL_QR_FIND 서비스에서 어떤 정보를 왜 처리하고
+              관련 법령을 준수합니다. 이 방침은 제자리 서비스에서 어떤 정보를 왜 처리하고
               어떻게 보호하는지 안내합니다.
             </p>
             <span>시행일자: 2026년 7월 24일</span>
