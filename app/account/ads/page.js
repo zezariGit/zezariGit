@@ -48,11 +48,19 @@ export default async function AccountAdsPage({ searchParams }) {
     if (statusFilter === "done") return stage === "done";
     return true;
   });
+  const nextExpiryDate = ads
+    .filter((ad) => adStage(ad) === "running")
+    .map((ad) => String(ad.end_date || ""))
+    .filter((date) => /^\d{4}-\d{2}-\d{2}$/.test(date))
+    .sort()[0] || "";
 
   return (
     <main className="account-page ad-history-page">
       <section className="account-panel ad-history-panel">
-        <AdStatusAutoSync enabled={!preview && ads.some((ad) => adStage(ad) === "review")} />
+        <AdStatusAutoSync
+          reviewEnabled={!preview && ads.some((ad) => adStage(ad) === "review")}
+          nextExpiryDate={preview ? "" : nextExpiryDate}
+        />
         <AccountTopbar title="광고 대시보드" />
         <nav className="ad-history-filters" aria-label="광고 상태 필터">
           <FilterLink active={statusFilter === "all"} href={filterHref("all", preview, selectedTestAd?.id)}>전체</FilterLink>
