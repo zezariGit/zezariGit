@@ -9527,3 +9527,29 @@ This file is the cumulative technical handoff log. It must be updated whenever r
 - Vercel deployment `dpl_A6uBH9qvSMb3bZQLGoi5ParMBrs9` reached `READY` and owns `https://zezari.family` plus compatibility aliases.
 - Follow-up commit `5065efa` (`fix: recover finder location preview and fallback`) restored the preview map flow and added real-device location fallback.
 - Follow-up Vercel deployment `dpl_9nBjnB9LGknXavxXpjU7dMcbj4Gk` reached `READY`. Production browser verification confirmed that preview consent opens the map confirmation screen, all result routes returned HTTP 200, and no deployment error logs were reported.
+
+## 2026-09-14 KST - Administrator Payment Pass Meta Publication
+
+### User Request
+- Make an administrator payment-pass advertisement run on Meta with the configured region, range, duration, and budget just like a normally paid advertisement.
+- Schedule both Toss-paid and administrator-pass advertisements to start approximately one minute after payment processing.
+
+### Reflected Work
+- Removed the `is_test_payment` Meta-publication bypass. The field remains only to distinguish Toss-free administrator transactions from customer revenue.
+- Changed all newly paid advertisements, including administrator passes, to enter `meta_publish_queued` and use the existing idempotent `publishPaidSubjectAd` pipeline.
+- Reused the existing Meta ad-set payload so country/custom-location targeting, radius, selected end date, and `meta_budget_amount` remain identical between payment methods.
+- Reduced the earliest Meta ad-set start from fifteen minutes to one minute after publication processing.
+- Restricted the old manual no-Meta state transition to legacy `test_in_review` rows with no Meta advertisement ID.
+- Replaced the administrator checkout and completion copy with an explicit warning that Toss is skipped but real Meta publication and spend still occur.
+- Added `npm run test:ad-meta-payment` and refreshed stale advertisement-dashboard assertions.
+
+### Verification
+- `npm run test:ad-meta-payment`, `npm run test:ad-dashboard`, and `npm run security:check`: passed.
+- `npm run build`: passed with Next.js 16.3.0 and all 40 routes.
+- Local administrator checkout preview rendered the actual Meta-spend warning with no Next.js error overlay.
+- No live Toss payment, administrator pass, or Meta advertisement was created during verification.
+
+### Deployment
+- Feature commit `6b87e71` (`feat: publish admin-pass ads to Meta`) was pushed to GitHub `main`.
+- Vercel production deployment `dpl_yxQJhK27WftRDkMPFxaZHRybbS2m` reached `READY` and owns `https://zezari.family` plus compatibility aliases.
+- Production root and advertisement checkout routes returned HTTP 200.

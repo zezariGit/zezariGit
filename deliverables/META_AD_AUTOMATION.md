@@ -53,14 +53,17 @@ Default region tiers:
 All budget amounts and multipliers are editable in `/admin?section=ad-pricing`.
 
 ## Payment and Publication Flow
-1. Toss confirms the guardian payment.
+1. Toss confirms the guardian payment, or an authenticated administrator completes the payment pass.
 2. The service stores payment completion first.
 3. The service claims the advertisement with `meta_publish_preparing`.
 4. It uploads the saved poster and creates the Meta campaign, ad set, creative, and ad.
 5. The independently calculated `meta_budget_amount` is used as `lifetime_budget`.
-6. Successful publication sets the service advertisement to `active` and Meta state to `ad_active`.
-7. If Meta fails, payment remains completed, the advertisement returns to `ready`, and Meta state becomes `meta_publish_failed`.
-8. The administrator can select the failed row and use `광고발행 재시도`.
+6. The ad set uses the saved region/country targeting, radius, selected end date, and a start time approximately one minute after publication processing begins.
+7. Successful publication stores the Meta identifiers and presents the service advertisement as awaiting Meta review.
+8. If Meta fails, payment remains completed, the advertisement returns to `ready`, and Meta state becomes `meta_publish_failed`.
+9. The administrator can select the failed row and use `광고발행 재시도`.
+
+`subject_ads.is_test_payment = 1` identifies a Toss-free administrator transaction for revenue reporting. It no longer suppresses Meta publication for new administrator payment-pass advertisements, so a pass can incur real Meta spend.
 
 The claim expires after five minutes so a stalled serverless request can be retried without permanently blocking the advertisement.
 

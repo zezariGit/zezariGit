@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-14 KST
 
-Application baseline commit: `5065efa` (`main`, GitHub/Vercel 운영 반영 완료)
+Application baseline commit: `6b87e71` (`main`, GitHub/Vercel 운영 반영 완료)
 
 Production: `https://zezari.family`
 
@@ -32,9 +32,9 @@ Production: `https://zezari.family`
 | GitHub | `https://github.com/zezariGit/zezariGit.git` |
 | Vercel 프로젝트 | scope `zezari`, project `zezari` |
 | 대표 도메인 | `https://zezari.family` |
-| 최근 확인 운영 배포 | `dpl_9nBjnB9LGknXavxXpjU7dMcbj4Gk` (`READY`, QR 위치 미리보기 복구 및 실제 조회 폴백) |
+| 최근 확인 운영 배포 | `dpl_yxQJhK27WftRDkMPFxaZHRybbS2m` (`READY`, 관리자 결제패스 Meta 실발행 및 1분 시작 예약) |
 | 호환 도메인 | `https://real-qr-find.vercel.app`, `https://zezari-zezari.vercel.app` |
-| 최근 애플리케이션 기능 기준 | production feature commit `5065efa`; QR 위치 미리보기 지도 전환과 실제 위치 조회 폴백 운영 반영 완료 |
+| 최근 애플리케이션 기능 기준 | production feature commit `6b87e71`; 일반 결제와 관리자 결제패스 모두 Meta 실광고 발행 및 약 1분 후 시작 예약 운영 반영 완료 |
 | 현재 로컬 미배포 작업 | 없음. 관련 없는 기존 미추적 파일은 작업 대상에서 제외 |
 
 ### 로컬 시작
@@ -152,9 +152,9 @@ npm run dev -- -p 3005
 | 상태별 버튼 | 검토 중과 완료는 버튼 없음. 진행 중만 `추가/종료` 표시. `추가`는 `/missing-report`에서 같은 대상자를 미리 선택한 뒤 새 거리·기간 설정으로 이동. `종료`는 환불 불가 확인 후에만 완료 전환하며 서버도 `active/paused` 상태만 허용 | 완료 |
 | 실종신고 대상자 선택 | `/missing-report`에서 안전 상태 대상자를 선택하고 다음을 누르면 기존 광고 설정 모달로 이동. `HomePage -> GuardianDashboard -> DashboardTab -> AdCampaignModal`로 대상자와 새 광고 여부를 전달 | 완료 |
 | 광고 설정 | 기존 거리·위치 범위 선택, 기간 선택, 선택 요약, 광고 이미지 미리보기, 결제 화면 이동을 재사용. 이 단계에서는 Meta API를 호출하지 않음 | 완료 |
-| 관리자 상태 테스트 | 관리자 결제패스 광고는 Meta를 호출하지 않고 `광고 검토 중`으로 생성. 결제 완료 화면에서 광고 상태 테스트로 이동하고 관리자만 `진행 중` 전환 가능. 이후 기존 종료 기능으로 `광고 완료` 검증 가능 | 완료 |
-| 광고 결제 완료 및 경찰 신고 연계 | 제공된 광고 결제 완료 그래픽 원본(`/assets/ads/ad-payment-complete.png`) 표시, `경찰 신고도 함께 진행하시겠어요?` 밑줄 링크 및 `[예]`/`[아니오]` 버튼, 클릭 시 `112로 전화할까요?` 팝업에서 112 전화걸기(`tel:112`) 제공. 관리자 테스트 결제 안내는 관리자에게만 표시하며 끝에 `[해당 문구는 관리자만 볼 수 있습니다]` 표기 | 완료 |
-| 실제 Meta 광고 | 일반 결제 광고는 기존 Meta 자동 발행 경로 유지 | 조건부: Meta 앱 권한·검수 승인 필요 |
+| 관리자 상태 테스트 | 과거에 생성된 `meta_status=test_in_review`이면서 Meta 광고 ID가 없는 레거시 테스트 광고만 수동 `진행 중` 전환 가능. 새 관리자 결제패스 광고는 이 테스트 전환 대상이 아니며 실제 Meta 발행 경로를 사용 | 완료 |
+| 광고 결제 완료 및 경찰 신고 연계 | 제공된 광고 결제 완료 그래픽(`/assets/ad-payment/payment-complete.png`) 표시, `경찰 신고도 함께 진행하시겠어요?` 안내 및 `[예]`/`[아니요]` 버튼, 클릭 시 `112로 전화할까요?` 팝업에서 112 전화걸기(`tel:112`) 제공. 관리자 패스의 실제 Meta 발행 안내는 관리자에게만 표시하며 끝에 `[해당 문구는 관리자만 볼 수 있습니다]` 표기 | 완료 |
+| 실제 Meta 광고 | 일반 Toss 결제와 관리자 결제패스 모두 결제 완료 후 같은 자동 발행 함수를 사용. 저장된 지역·전국 범위, 반경, 기간, `meta_budget_amount`를 Meta 광고 세트에 전달하고 시작 시각은 발행 처리 시점 약 1분 후로 예약. 관리자 패스는 Toss 과금·매출 집계만 제외되며 실제 Meta 광고비는 발생 | 조건부: Meta 앱 권한·검수 승인 필요 |
 
 ### 관리자 및 운영 기능
 
@@ -182,20 +182,13 @@ npm run dev -- -p 3005
 - 보호자는 `/account/location-shares/[id]`에서 공유 시점 좌표·주소·시간·정확도를 확인한다. 위치는 실시간으로 갱신하지 않는다.
 - 위치정보 암호화·보관·접근·파기 정책은 `deliverables/location-service/LOCATION_SECURITY_COMPLIANCE.md`를 기준으로 한다.
 
-## 5. 광고 상태 테스트 절차
+## 5. 광고 상태 미리보기 및 운영 주의
 
-Meta 권한 승인 전에도 관리자 계정으로 대시보드 상태를 검증할 수 있다.
-
-1. 대시보드에서 `실종 신고`를 선택한다.
-2. 안전 상태 대상자를 선택하고 지역·거리·기간을 설정한다.
-3. 광고 결제 화면에서 관리자 전용 결제패스를 사용한다.
-4. 결제 완료 화면의 `광고 상태 테스트하기`를 선택한다.
-5. 광고 대시보드에서 `광고 검토 중`, 도달 수 `-`, 버튼 미표시, 진행 중 필터 포함을 확인한다.
-6. 관리자 테스트 패널의 `진행 중으로 전환`을 선택한다.
-7. 카드가 `진행 중`과 `추가/종료` 버튼을 표시하는지 확인한다.
-8. `종료` 선택 후 환불 불가 확인 팝업을 거쳐 `광고 완료` 및 완료 필터를 확인한다.
-
-관리자 테스트 광고는 `is_test_payment=1`, `meta_status=test_*`로 구분되며 Meta API에 발행되지 않는다. 실제 사용자 결제 광고와 매출 집계는 기존 운영 규칙을 따른다.
+- 로컬 `/account/ads?preview=1&testAd=preview-review`에서 광고 검토 중·진행 중·완료 카드와 필터 UI를 비용 없이 확인한다.
+- 관리자 결제패스는 더 이상 Meta 비발행 테스트 수단이 아니다. 누르면 Toss 승인은 생략되지만 저장된 실제 Meta 예산으로 광고 생성 요청이 실행된다.
+- `is_test_payment=1`은 관리자 패스 거래를 고객 매출에서 제외하기 위한 결제 구분값이며 Meta 발행 차단 플래그가 아니다.
+- 과거 `meta_status=test_in_review`이고 Meta 광고 ID가 없는 레거시 행만 관리자 수동 상태 전환을 허용한다.
+- 운영에서 결제패스·일반 결제를 검증할 때는 Meta 광고비와 광고 노출이 실제 발생할 수 있으므로 대상·예산·지역·기간을 먼저 확인한다.
 
 ## 6. 로컬 미리보기 주소
 
@@ -219,6 +212,7 @@ Meta 권한 승인 전에도 관리자 계정으로 대시보드 상태를 검�
 | 결제 및 서비스 현황 | `http://localhost:3005/account/billing?preview=1` |
 | 결제 내역 없음 | `http://localhost:3005/account/billing?preview=empty` |
 | 광고 결제 상세 | `http://localhost:3005/account/billing/ad/preview-ad?preview=1` |
+| 광고 결제 - 관리자 패스 표시 | `http://localhost:3005/ads/checkout/preview-ad?preview=admin` |
 | 상품 결제 상세 | `http://localhost:3005/account/billing/order/preview-bracelet?preview=1` |
 | 취소 결제 상세 | `http://localhost:3005/account/billing/order/preview-necklace?preview=1` |
 | 광고 대시보드 | `http://localhost:3005/account/ads?preview=1&testAd=preview-review` |
@@ -265,6 +259,7 @@ git diff --check
 | `npm run test:guardian-profile-ui` | 보호자 정보 |
 | `npm run test:coupon-registration` | 쿠폰 등록 오류 분류 |
 | `npm run test:ad-dashboard` | 광고 상태·필터·버튼·테스트 전환 |
+| `npm run test:ad-meta-payment` | 일반 결제·관리자 패스의 Meta 발행 연결, 지역·범위·기간·예산 및 1분 시작 예약 |
 | `npm run test:billing-history` | 상품·광고 통합 결제 목록과 소유자별 상세 화면 |
 | `npm run test:admin-phone-otp` | 관리자 휴대전화 인증 예외 |
 | `npm run test:admin-grid` | 관리자 행 전체 선택 |
@@ -295,7 +290,7 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 ## 9. 알려진 외부 과제 및 검증 경계
 
-- Meta: 실제 광고 발행은 앱 검수, Marketing API 권한, 광고계정·페이지 연결과 유효한 토큰이 필요하다. 관리자 테스트 광고는 이를 우회해 UI 상태만 검증한다.
+- Meta: 실제 광고 발행은 앱 검수, Marketing API 권한, 광고계정·페이지 연결과 유효한 토큰이 필요하다. 관리자 결제패스도 실제 Meta 발행을 시도하므로 권한이 없으면 `meta_publish_failed`가 기록되고, 권한이 있으면 실제 광고비가 발생한다.
 - Naver: 재검수 승인 후 비회원 최초 가입과 재로그인을 운영에서 확인해야 한다.
 - Kakao: 대표 도메인 콜백과 최초 가입·재로그인 운영 검증이 필요하다.
 - Facebook: 운영 콜백, 권한, 앱 모드와 최초 가입·재로그인 검증이 필요하다.
@@ -309,6 +304,7 @@ curl.exe -sS -o NUL -w "%{http_code}" -L https://zezari.family/
 
 | 커밋 | 내용 |
 | --- | --- |
+| `6b87e71` | 관리자 결제패스 광고를 실제 Meta 발행 경로에 연결하고 시작 시각을 약 1분 후로 예약 |
 | `5065efa` | 인앱 미리보기의 샘플 지도 전환 복구 및 실제 QR 위치 조회의 일반 정확도 폴백 추가 |
 | `3ec024a` | 발견자 화면 제자리 로고 교체·중앙 정렬 및 위치 공유 동의 즉시 권한 요청·결과별 화면 분기 |
 | `cb0ac60` | 디자인 선택 상단 정렬, 114px 정사각형 및 234px 완료 버튼 배치 |

@@ -6556,3 +6556,12 @@ This file is the cumulative presentation-ready project log. It is written so the
 - 서비스 규정·회원가입·SNS·보안 회귀검사와 Next.js 운영 빌드, 로컬 브라우저 검증 통과
 - 기능 커밋 `957553b`과 인수인계 커밋을 GitHub `main`에 반영
 - Vercel 운영 배포 `dpl_E19dHgcypFn11T8TGpeSo8YnA951`가 `READY` 상태이며 대표 도메인과 세 약관 API 응답 확인 완료
+
+## 2026-09-14 - 관리자 결제패스 광고 실집행 전환
+- 광고 관리자 결제패스도 일반 Toss 결제와 동일한 Meta 자동 발행 경로를 사용하도록 변경
+- 고객 결제금액과 분리된 실제 Meta 예산, 선택 지역·전국 범위, 거리, 기간을 그대로 광고 세트에 적용
+- Meta 광고 시작 시각을 결제 처리 약 1분 뒤로 예약해 승인 완료 후 빠르게 게재될 수 있도록 개선
+- 관리자 결제패스 화면에 Toss 과금은 없지만 실제 Meta 광고비가 발생한다는 운영 경고 추가
+- 레거시 화면 테스트 광고와 새 실집행 광고의 상태 전환 조건을 분리
+- 전용 회귀검사·광고 대시보드 검사·보안검사·운영 빌드 통과
+- 기능 커밋 `6b87e71`, Vercel 배포 `dpl_yxQJhK27WftRDkMPFxaZHRybbS2m` 운영 반영 완료
