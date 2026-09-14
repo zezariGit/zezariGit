@@ -36,7 +36,7 @@ assert.match(carousel, /Array\.from\(\{ length: totalPages \}/, "표시점은 �
 assert.match(carousel, /showDots &&/, "빈 대상자 목록에서는 페이지 표시점을 숨겨야 합니다.");
 assert.match(guide, /대상자 현재 상태 안내/);
 assert.match(guide, /상품 구매 필요[\s\S]*안전[\s\S]*찾는 중/);
-assert.match(guide, /src="\/assets\/dashboard\/subject-status-guide\.png"/, "상태 설명은 제공된 원본 이미지를 사용해야 합니다.");
+assert.match(guide, /src="\/assets\/dashboard\/subject-status-guide\.png\?v=20260914-hq"/, "상태 설명은 제공된 고해상도 이미지를 사용해야 합니다.");
 assert.match(guide, /role="dialog"/);
 assert.match(styles, /\.dashboard-shell\.dashboard-home-shell/);
 assert.match(styles, /\.subject-status-guide-overlay/);

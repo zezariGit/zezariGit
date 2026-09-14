@@ -44,7 +44,7 @@ export default function SubjectStatusGuide() {
             <h2 id="subject-status-guide-title">대상자 현재 상태 안내</h2>
             <img
               className="subject-status-guide-reference"
-              src="/assets/dashboard/subject-status-guide.png"
+              src="/assets/dashboard/subject-status-guide.png?v=20260914-hq"
               alt="상품 구매 필요: 대상자 등록 후 아직 제자리 QR 상품을 구매하지 않은 상태. 안전: 상품 구매 후 실종 신고를 하지 않은 상태. 찾는 중: 온라인 실종 신고가 진행 중인 상태."
             />
             <button className="subject-status-guide-confirm" type="button" onClick={() => setOpen(false)}>

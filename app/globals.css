@@ -12235,6 +12235,10 @@ button:disabled:hover {
   object-fit: contain;
 }
 
+.qr-status-message-unassigned {
+  transform: translateX(7px);
+}
+
 .qr-status-kakao-link {
   width: 145px;
   display: block;

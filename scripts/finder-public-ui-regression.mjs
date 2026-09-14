@@ -19,6 +19,7 @@ assert.match(page, /assets\/finder\/zezari-wordmark\.png/);
 assert.match(page, /if \(!data\.qr_activated_at \|\| subscriptionReady\) \{[\s\S]*return <QrStatusScreen type="unassigned"/);
 assert.match(page, /if \(state === "purchase-needed"\)[\s\S]*qr_activated_at: null[\s\S]*subject_status: "상품구매필요"/);
 assert.doesNotMatch(page, /상품 수령 후 활성화|아직 활성화되지 않은 QR입니다|activateQrAction/);
+assert.match(page, /qr-status-message-unassigned/);
 assert.match(safePhone, /\/api\/find\/\$\{encodeURIComponent\(qrKey\)\}\/safe-phone/);
 assert.match(safePhone, /window\.location\.assign\(data\.telUrl\)/);
 assert.match(locationShare, /setStep\("intro"\)/);

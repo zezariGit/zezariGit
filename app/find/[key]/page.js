@@ -285,7 +285,7 @@ function QrStatusScreen({ type }) {
     <main className="qr-status-page">
       <section className="qr-status-shell">
         <img
-          className="qr-status-message"
+          className={`qr-status-message${expired ? "" : " qr-status-message-unassigned"}`}
           src={`/assets/qr-status/${expired ? "expired" : "unassigned"}.png?v=20260913-white`}
           alt={expired ? "사용할 수 없는 QR입니다. 관련된 문의는 관리자에게 문의해 주세요." : "미배정 QR입니다. 관리자에게 문의해 주세요."}
         />
