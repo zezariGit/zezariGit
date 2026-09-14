@@ -5126,49 +5126,6 @@ a {
   line-height: 1.55;
 }
 
-.ad-current-panel {
-  display: grid;
-  gap: var(--space-md);
-  padding: var(--space-md);
-  border: 0.5px solid var(--c-border);
-  border-radius: var(--radius-md);
-  background: var(--c-primary-light);
-}
-
-.ad-current-summary {
-  display: grid;
-  gap: 6px;
-}
-
-.ad-current-summary strong {
-  color: var(--c-primary-dark);
-  font-size: 1.3rem;
-}
-
-.ad-current-summary span {
-  color: var(--c-text-muted);
-  overflow-wrap: anywhere;
-}
-
-.ad-state-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-}
-
-.ad-state-actions .activate-button,
-.ad-state-actions .danger-button,
-.ad-state-actions .primary-button {
-  width: auto;
-  margin-top: 0;
-}
-
-.ad-state-actions .ad-feed-link {
-  min-height: 38px;
-  padding: 0 14px;
-  text-decoration: none;
-}
-
 .ad-status-pill {
   width: fit-content;
   min-height: 30px;

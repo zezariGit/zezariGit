@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import FormSubmitButton from "./form-submit-button";
 import ModalScrollLock from "./modal-scroll-lock";
 import BackButton from "./back-button";
 import { formatDateOnly } from "../lib/date-format";
@@ -23,21 +22,10 @@ const FALLBACK_DURATION_OPTIONS = [
   { id: "duration-30", label: "30일", days: 30, description: "30일간", price: 300000 },
 ];
 
-const statusLabels = {
-  active: "광고중",
-  paused: "일시정지",
-  ready: "준비중",
-  ended: "종료",
-};
-
 export default function AdCampaignModal({
   subject,
   pricing,
   createAction,
-  pauseAction,
-  resumeAction,
-  endAction,
-  forceNew = false,
 }) {
   const today = useMemo(() => getKstDateInputValue(), []);
   const distanceOptions = useMemo(() => normalizeDistanceOptions(pricing?.distanceOptions), [pricing]);
@@ -67,7 +55,6 @@ export default function AdCampaignModal({
     ? "대한민국"
     : cleanRegionLabel(location.label);
   const quote = calculateOptionQuote(selectedDistance, selectedDuration);
-  const activeAd = !forceNew && ["active", "paused", "ready"].includes(subject?.ad_status || "");
   const backHref = String(subject?.id || "").startsWith("preview-")
     ? "/missing-report?preview=1"
     : `/missing-report${subject?.id ? `?subject=${encodeURIComponent(subject.id)}` : ""}`;
@@ -203,10 +190,7 @@ export default function AdCampaignModal({
           <span aria-hidden="true" />
         </header>
 
-        {activeAd ? (
-          <ActiveAdvertisement subject={subject} pauseAction={pauseAction} resumeAction={resumeAction} endAction={endAction} />
-        ) : (
-          <form action={createAction} className="ad-setup-form" onSubmit={prepareCreativeImage}>
+        <form action={createAction} className="ad-setup-form" onSubmit={prepareCreativeImage}>
             <input type="hidden" name="subjectId" value={subject.id} />
             <input type="hidden" name="distanceOptionId" value={selectedDistance?.id || ""} />
             <input type="hidden" name="durationOptionId" value={selectedDuration?.id || ""} />
@@ -320,8 +304,7 @@ export default function AdCampaignModal({
             >
               {capturePending ? "준비 중" : "다음"}
             </button>
-          </form>
-        )}
+        </form>
       </div>
     </section>
   );
@@ -342,26 +325,6 @@ function AdSetupSummaryRow({ icon, label, value }) {
       <img src={`/assets/ad-setup/${icon}`} alt="" />
       <span>{label}</span>
       <strong>{value}</strong>
-    </div>
-  );
-}
-
-function ActiveAdvertisement({ subject, pauseAction, resumeAction, endAction }) {
-  return (
-    <div className="ad-current-panel">
-      <div className="ad-current-summary">
-        <span className={`ad-status-pill ${subject.ad_status}`}>{statusLabels[subject.ad_status] || "진행중"}</span>
-        <strong>{formatCurrency(subject.ad_amount || 0)}</strong>
-        <span>{formatDate(subject.ad_start_date)} ~ {formatDate(subject.ad_end_date)}</span>
-        <span>{formatAdLocation(subject)}</span>
-        <span>Meta API: {formatMetaStatus(subject.ad_meta_status)}</span>
-      </div>
-      <div className="ad-state-actions">
-        {subject.ad_meta_preview_url ? <a className="primary-button compact ad-feed-link" href={subject.ad_meta_preview_url} target="_blank" rel="noreferrer">광고 피드 보기</a> : null}
-        {subject.ad_status === "active" && <form action={pauseAction}><input type="hidden" name="adId" value={subject.ad_id} /><FormSubmitButton className="activate-button" pendingText="정지중">일시정지</FormSubmitButton></form>}
-        {subject.ad_status === "paused" && <form action={resumeAction}><input type="hidden" name="adId" value={subject.ad_id} /><FormSubmitButton className="activate-button" pendingText="재개중">광고 재개</FormSubmitButton></form>}
-        <form action={endAction}><input type="hidden" name="adId" value={subject.ad_id} /><FormSubmitButton className="danger-button compact" pendingText="종료중">광고끝내기</FormSubmitButton></form>
-      </div>
     </div>
   );
 }
@@ -679,26 +642,6 @@ function formatCurrency(value) {
 
 function formatDate(value) {
   return formatDateOnly(value);
-}
-
-function formatAdLocation(subject) {
-  if (subject?.ad_coverage_type === "country") return subject?.ad_distance_label || "대한민국 전체";
-  const radius = Number(subject?.ad_region_radius_km || 0);
-  if (subject?.ad_region && radius > 0) return `${subject.ad_region} / ${subject.ad_distance_label || `반경 ${radius}km`}`;
-  return subject?.ad_region || "지역 미입력";
-}
-
-function formatMetaStatus(status) {
-  if (status === "campaign_active") return "캠페인 활성";
-  if (status === "campaign_paused") return "캠페인 일시정지";
-  if (status === "ad_active") return "광고 활성";
-  if (status === "ad_paused") return "광고 일시정지";
-  if (status === "meta_publish_queued") return "자동 발행 대기";
-  if (status === "meta_publish_preparing") return "자동 발행 중";
-  if (status === "meta_publish_failed") return "발행 재시도 필요";
-  if (status === "meta_api_access_blocked") return "Meta 권한 승인 필요";
-  if (status === "meta_api_pending") return "연동 대기";
-  return status || "연동 대기";
 }
 
 function subjectPhotoSrc(subject) {

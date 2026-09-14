@@ -1,8 +1,5 @@
 import {
   createSubjectAdAction,
-  endSubjectAdAction,
-  pauseSubjectAdAction,
-  resumeSubjectAdAction,
   saveGuardianAction,
 } from "./actions";
 import AdCampaignModal from "./ad-campaign-modal";
@@ -40,7 +37,6 @@ export default async function GuardianDashboard({
   activeTab = "dashboard",
   showMyPage = false,
   adSubjectId = "",
-  forceNewAd = false,
   previewSubjectId = "",
   editSubjectId = "",
   registeredSubjectId = "",
@@ -162,7 +158,6 @@ export default async function GuardianDashboard({
             adPricing={adPricing}
             selectedAdSubject={selectedAdSubject}
             selectedPreviewSubject={selectedPreviewSubject}
-            forceNewAd={forceNewAd}
           />
         ) : isGuardianTab ? (
           <GuardianInfoTab guardian={guardian} session={session} admin={admin} />
@@ -200,7 +195,6 @@ function DashboardTab({
   adPricing,
   selectedAdSubject,
   selectedPreviewSubject,
-  forceNewAd,
 }) {
   if (!guardianComplete) {
     return (
@@ -225,11 +219,7 @@ function DashboardTab({
         <AdCampaignModal
           subject={selectedAdSubject}
           pricing={adPricing}
-          forceNew={forceNewAd}
           createAction={createSubjectAdAction}
-          pauseAction={pauseSubjectAdAction}
-          resumeAction={resumeSubjectAdAction}
-          endAction={endSubjectAdAction}
         />
       )}
     </>

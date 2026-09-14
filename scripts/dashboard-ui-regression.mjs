@@ -24,9 +24,8 @@ assert.match(dashboard, /\.\.\.\(admin \? \[\["관리자 화면", "\/admin"\]\] 
 assert.match(dashboard, /href=\{`\/\?tab=dashboard&previewSubject=/, "대상자 행 전체가 미리보기 링크여야 합니다.");
 assert.match(dashboard, /등록된 대상자가 없습니다\./);
 assert.match(dashboard, /대상자 추가하기/);
-assert.match(page, /forceNewAd=\{forceNewAd\}/, "루트 페이지가 새 광고 여부를 대시보드에 전달해야 합니다.");
-assert.match(dashboard, /<DashboardTab[\s\S]*forceNewAd=\{forceNewAd\}/, "대시보드가 새 광고 여부를 내부 탭에 전달해야 합니다.");
-assert.match(dashboard, /function DashboardTab\(\{[\s\S]*forceNewAd,[\s\S]*forceNew=\{forceNewAd\}/, "광고 모달이 정의된 새 광고 값을 받아야 합니다.");
+assert.doesNotMatch(adCampaign, /ActiveAdvertisement|ad-current-panel/, "광고 설정 화면에 예전 현재 광고 요약 화면이 노출되면 안 됩니다.");
+assert.match(adCampaign, /<form action=\{createAction\} className="ad-setup-form"/, "광고 설정 진입 시 새 광고 설정 폼을 바로 표시해야 합니다.");
 assert.match(page, /"ad-campaign"/, "로그인 없이 광고 설정 단계를 확인할 개발 미리보기가 있어야 합니다.");
 assert.match(adCampaign, /const canSubmit = Boolean\([\s\S]*selectedDistance[\s\S]*selectedDuration[\s\S]*regionComplete/, "지역·거리·기간 선택이 완료되어야 다음 단계로 진행할 수 있어야 합니다.");
 assert.match(adCampaign, /\{canSubmit && \([\s\S]*ad-setup-summary[\s\S]*ad-setup-next/, "필수값 완료 시 선택 내역과 다음 버튼이 같은 스크롤 화면에 표시되어야 합니다.");

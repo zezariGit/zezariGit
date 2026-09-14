@@ -25,7 +25,6 @@ export default async function HomePage({ searchParams }) {
         : "dashboard";
   const showMyPage = resolvedSearchParams?.panel === "my" || requestedTab === "my";
   const adSubjectId = resolvedSearchParams?.adSubject || "";
-  const forceNewAd = resolvedSearchParams?.newAd === "1";
   const previewSubjectId = resolvedSearchParams?.previewSubject || "";
   const editSubjectId = resolvedSearchParams?.editSubject || "";
   const registeredSubjectId = resolvedSearchParams?.registered || "";
@@ -89,7 +88,6 @@ export default async function HomePage({ searchParams }) {
         showMyPage={dashboardPreview === "settings"}
         notificationPreview={dashboardPreview === "dashboard-notifications"}
         adSubjectId={dashboardPreview === "ad-campaign" ? dashboardSubjects[0]?.id : ""}
-        forceNewAd={dashboardPreview === "ad-campaign"}
       />
     );
   }
@@ -124,7 +122,6 @@ export default async function HomePage({ searchParams }) {
           activeTab={activeTab}
           showMyPage={showMyPage}
           adSubjectId={adSubjectId}
-          forceNewAd={forceNewAd}
           previewSubjectId={previewSubjectId}
           editSubjectId={editSubjectId}
           registeredSubjectId={registeredSubjectId}
