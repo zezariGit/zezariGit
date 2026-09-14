@@ -21,6 +21,7 @@ assert.equal(classifyMetaAdvertisementDeliveryStatus("DELETED"), "ended");
 
 assert.match(metaMarketing, /fields: "id,effective_status,configured_status,status,updated_time"/);
 assert.match(database, /export async function syncReviewingMetaAds/);
+assert.match(database, /meta\.state === "active" \? "ad_active"/);
 assert.match(database, /WHERE status = 'ready'[\s\S]+meta_published_at IS NOT NULL[\s\S]+meta_ad_id/);
 assert.match(database, /SET status = \?, meta_status = \?, meta_last_error = NULL/);
 assert.match(database, /eventKey: "ad\.started"/);
