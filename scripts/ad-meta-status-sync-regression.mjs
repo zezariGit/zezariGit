@@ -22,6 +22,7 @@ assert.equal(classifyMetaAdvertisementDeliveryStatus("CAMPAIGN_PAUSED"), "paused
 assert.equal(classifyMetaAdvertisementDeliveryStatus("DELETED"), "ended");
 
 assert.match(metaMarketing, /fields: "id,effective_status,configured_status,status,updated_time"/);
+assert.match(metaMarketing, /timeoutMs: 8000/);
 assert.match(database, /export async function syncReviewingMetaAds/);
 assert.match(database, /export async function completeExpiredSubjectAds/);
 assert.match(database, /DATE\(a\.end_date\) < DATE\('now', '\+9 hours'\)/);
