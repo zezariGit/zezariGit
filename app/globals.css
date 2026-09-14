@@ -15546,30 +15546,6 @@ button:disabled:hover {
   }
 }
 
-.qr-activation-shell {
-  gap: var(--space-md);
-}
-
-.qr-activation-profile {
-  grid-template-columns: 1fr;
-  align-items: stretch;
-}
-
-.qr-activation-profile .find-profile-photo {
-  width: min(100%, 320px);
-  aspect-ratio: 1;
-  justify-self: center;
-}
-
-.qr-activation-profile .find-profile-info {
-  width: min(100%, 320px);
-  justify-self: center;
-}
-
-.qr-activation-form {
-  display: grid;
-}
-
 .shop-summary-panel {
   padding: var(--space-md);
 }

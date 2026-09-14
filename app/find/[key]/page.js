@@ -1,5 +1,4 @@
 import { getServerSession } from "next-auth";
-import { activateQrAction } from "../../actions";
 import StatusToast from "../../status-toast";
 import { authOptions, getConfiguredProviderIds } from "../../../lib/auth";
 import { getGuardianKey } from "../../../lib/db";
@@ -99,6 +98,10 @@ export default async function FindPage({ params, searchParams }) {
     data.subscription_access_type
   );
 
+  if (!data.qr_activated_at || subscriptionReady) {
+    return <QrStatusScreen type="unassigned" />;
+  }
+
   if (!subscriptionActive && !subscriptionReady) {
     const paused = data.subscription_status === "paused";
     const expired = data.subscription_status === "expired";
@@ -120,47 +123,6 @@ export default async function FindPage({ params, searchParams }) {
               <span>QR 코드</span>
               <strong>{data.code}</strong>
             </div>
-          )}
-        </section>
-        <StatusToast message={notice} type={noticeType} />
-      </main>
-    );
-  }
-
-  if (!data.qr_activated_at || subscriptionReady) {
-    return (
-      <main className="find-page">
-        <section className="find-shell qr-activation-shell">
-          <p className="intro-kicker">상품 수령 후 활성화</p>
-          <h1>{owner ? "QR 코드 활성화가 필요합니다" : "아직 활성화되지 않은 QR입니다"}</h1>
-          {owner ? (
-            <>
-              <div className="find-profile qr-activation-profile">
-                <div className="find-profile-photo">
-                  {data.photo_data_url ? <img src={data.photo_data_url} alt={`${data.subject_name} 사진`} /> : <span />}
-                </div>
-                <div className="find-profile-info">
-                  <strong>{data.subject_name}</strong>
-                  <span>{formatDate(data.birth_date)}</span>
-                  <span>해당 대상자의 QR 코드를 활성화하시겠어요?</span>
-                </div>
-              </div>
-              <form action={activateQrAction} className="qr-activation-form">
-                <input type="hidden" name="publicKey" value={data.public_key} />
-                <button className="shop-next-button" type="submit">
-                  QR 코드 활성화하기
-                </button>
-              </form>
-              <p className="find-notify-message">활성화가 완료되면 이 QR에서 대상자 정보를 계속 조회할 수 있습니다.</p>
-            </>
-          ) : (
-            <>
-              <p>보호자가 상품 수령 후 QR 코드를 활성화하면 대상자 정보와 보호자 안심번호를 확인할 수 있습니다.</p>
-              <div className="find-key-box">
-                <span>QR 코드</span>
-                <strong>{data.code}</strong>
-              </div>
-            </>
           )}
         </section>
         <StatusToast message={notice} type={noticeType} />
@@ -293,6 +255,16 @@ function getLocationPreviewData(state = "") {
       guardian_id: null,
       guardian_google_id: null,
       store_sale_reserved: 0,
+    };
+  }
+  if (state === "purchase-needed") {
+    return {
+      ...data,
+      qr_activated_at: null,
+      qr_activation_source: null,
+      subject_status: "상품구매필요",
+      subscription_status: null,
+      subscription_access_type: null,
     };
   }
   if (state === "expired") {
