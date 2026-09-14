@@ -329,7 +329,7 @@ export default function AdPaymentClient({
       </div>
 
       {adminPaymentPassEnabled && !paid && (
-        <p className="admin-payment-pass-note">관리자 테스트 전용 · 실제 Toss 결제는 발생하지 않습니다.</p>
+        <p className="admin-payment-pass-note">관리자 전용 · Toss 결제는 발생하지 않지만 설정된 예산으로 실제 Meta 광고가 발행됩니다.</p>
       )}
 
       {posterOpen && (

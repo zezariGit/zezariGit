@@ -28,7 +28,10 @@ export default async function AccountAdsPage({ searchParams }) {
   const ads = data.ads;
   const admin = preview || isAdminSession(session) || Number(data.guardian?.is_admin || 0) === 1;
   const selectedTestAd = admin
-    ? ads.find((ad) => ad.id === String(params?.testAd || "") && Number(ad.is_test_payment || 0) === 1 && adStage(ad) === "review")
+    ? ads.find((ad) => ad.id === String(params?.testAd || "")
+      && Number(ad.is_test_payment || 0) === 1
+      && String(ad.meta_status || "") === "test_in_review"
+      && adStage(ad) === "review")
     : null;
   const filteredAds = ads.filter((ad) => {
     const stage = adStage(ad);

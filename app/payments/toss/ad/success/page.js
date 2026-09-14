@@ -29,7 +29,7 @@ export default async function TossAdSuccessPage({ searchParams }) {
       <AdPaymentSuccessClient
         isAdmin={previewAdmin}
         publicationMessage={previewAdmin
-          ? "관리자 테스트 결제가 완료되었습니다. Meta에 발행하지 않고 광고 검토 중 상태로 생성했습니다. [해당 문구는 관리자만 볼 수 있습니다]"
+          ? "관리자 결제패스가 완료되었습니다. 설정한 지역·범위·기간과 Meta 예산으로 광고가 접수되며, 시작 시각은 결제 처리 약 1분 후로 예약됩니다. [해당 문구는 관리자만 볼 수 있습니다]"
           : ""}
       />
     );
@@ -87,12 +87,9 @@ export default async function TossAdSuccessPage({ searchParams }) {
 }
 
 function publicationMessage(publication, { alreadyPaid = false, adminPass = false } = {}) {
-  if (publication?.test && publication?.status === "review") {
-    return "관리자 테스트 결제가 완료되었습니다. Meta에 발행하지 않고 광고 검토 중 상태로 생성했습니다. [해당 문구는 관리자만 볼 수 있습니다]";
-  }
   if (publication?.published) {
     return adminPass
-      ? "관리자 결제패스가 완료되었습니다. 광고는 Meta 검토 대기 상태입니다. [해당 문구는 관리자만 볼 수 있습니다]"
+      ? "관리자 결제패스가 완료되었습니다. 설정한 지역·범위·기간과 Meta 예산으로 광고가 접수되었으며, 시작 시각은 결제 처리 약 1분 후로 예약되었습니다. [해당 문구는 관리자만 볼 수 있습니다]"
       : "광고가 Meta 검토 대기 상태로 접수되었습니다.";
   }
   if (publication?.status === "preparing") {
