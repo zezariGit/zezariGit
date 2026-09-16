@@ -1,21 +1,32 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const [database, subscriptionSuccess, productSuccess] = await Promise.all([
+const [database, subscriptionSuccess, productSuccess, dashboard, adminPage, actions, adminActions] = await Promise.all([
   readFile(new URL("../lib/db.js", import.meta.url), "utf8"),
   readFile(new URL("../app/payments/toss/subscription/success/page.js", import.meta.url), "utf8"),
   readFile(new URL("../app/payments/toss/product/success/page.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/dashboard.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/admin/page.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/actions.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/admin/actions.js", import.meta.url), "utf8"),
 ]);
 
-assert.match(database, /q\.id AS qr_id[\s\S]*q\.lifecycle_status AS qr_lifecycle_status/);
-assert.match(database, /const hasActivatableMatchedQr = Boolean\([\s\S]*order\.qr_id[\s\S]*discarded/);
-assert.match(database, /UPDATE qr_codes[\s\S]*is_active = 1[\s\S]*activated_at = COALESCE\(activated_at, CURRENT_TIMESTAMP\)[\s\S]*activation_source = 'guardian_purchase'/);
-assert.match(database, /const qrActivated = Boolean\(order\.qr_activated_at\) \|\| hasActivatableMatchedQr/);
-assert.match(database, /const nextOrderStatus = qrActivated \? "activated" : "paid_waiting_activation"/);
-assert.match(database, /const subjectStatus = qrActivated \? "안전" : "QR활성화필요"/);
-assert.match(subscriptionSuccess, /매칭된 QR 활성화가 완료되었습니다/);
-assert.doesNotMatch(subscriptionSuccess, /상품 수령 후 QR 코드를 활성화/);
-assert.match(productSuccess, /상품 결제와 매칭된 QR 활성화가 완료되었습니다/);
-assert.doesNotMatch(productSuccess, /상품을 수령하신 후, QR 코드를 활성화/);
+assert.match(database, /async function assignQrToSubject[\s\S]*activated_at = CURRENT_TIMESTAMP,[\s\S]*activation_source = 'subject_registration'/);
+assert.match(database, /const nextOrderStatus = "activated"/);
+assert.match(database, /const subjectStatus = "안전"/);
+assert.match(database, /WHERE status = 'QR활성화필요'/);
+assert.match(database, /WHERE status = 'paid_waiting_activation'/);
+assert.doesNotMatch(database, /SET status = 'QR활성화필요'/);
+assert.doesNotMatch(database, /const nextOrderStatus = .*paid_waiting_activation/);
+assert.doesNotMatch(database, /export async function activateQrForGuardian/);
+assert.doesNotMatch(database, /export async function setQrAdminTestActivation/);
+assert.match(subscriptionSuccess, /대상자 서비스를 바로 이용할 수 있습니다/);
+assert.match(productSuccess, /대상자 서비스를 바로 이용할 수 있습니다/);
+assert.doesNotMatch(subscriptionSuccess, /활성화 가능한 매칭 QR|QR 활성화가 완료/);
+assert.doesNotMatch(productSuccess, /QR 활성화가 완료/);
+assert.doesNotMatch(dashboard, />QR 활성화 필요</);
+assert.doesNotMatch(adminPage, />QR활성화필요<|>QR미활성화<|구매 없이 QR 수동 활성화/);
+assert.doesNotMatch(actions, /activateQrAction/);
+assert.doesNotMatch(adminActions, /setQrAdminTestActivationAction/);
 
-console.log("product QR auto-activation regression passed");
+console.log("subject registration QR auto-activation regression passed");

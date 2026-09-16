@@ -31,15 +31,13 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
   if (!productOrder) {
     return <PaymentResult title="주문 정보를 찾을 수 없습니다" message="현재 로그인한 보호자의 주문인지 확인해 주세요." />;
   }
-  if (productOrder && ["paid", "paid_waiting_activation", "activated"].includes(productOrder.status)) {
+  if (productOrder && ["paid", "activated"].includes(productOrder.status)) {
     return (
       <ShopComplete
         title="주문이 완료되었습니다!"
         message={adminPass
-          ? "관리자 결제패스로 테스트 주문과 매칭된 QR 활성화가 완료되었습니다."
-          : productOrder.status === "activated"
-            ? "이미 결제가 완료되었고 매칭된 QR도 활성화되었습니다."
-            : "이미 결제가 완료된 주문입니다."}
+          ? "관리자 결제패스로 테스트 주문과 결제 완료 상태가 저장되었습니다."
+          : "이미 결제가 완료된 주문입니다."}
         order={productOrder}
       />
     );
@@ -57,7 +55,7 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
       if (Number(productOrder.amount || 0) !== 0) {
         throw new Error("전액 할인 상품 주문 정보가 일치하지 않습니다.");
       }
-      const result = await completePrepaidSubscriptionPurchase({
+      await completePrepaidSubscriptionPurchase({
         guardianId: productOrder.guardian_id,
         productOrderId,
         payment: {
@@ -68,14 +66,10 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
         },
       });
       const order = await getProductOrderForGuardian(session, productOrderId);
-      const waitingForActivation = result.status === "ready";
-
       return (
         <ShopComplete
           title="주문이 완료되었습니다!"
-          message={waitingForActivation
-            ? "쿠폰 전액 할인 결제는 완료되었지만 활성화 가능한 매칭 QR이 없어 QR 상태 확인이 필요합니다."
-            : "쿠폰 전액 할인으로 결제가 완료되었고, QR 안심 서비스가 연결되었습니다."}
+          message="쿠폰 전액 할인으로 결제가 완료되어 대상자 서비스를 바로 이용할 수 있습니다."
           order={order}
         />
       );
@@ -86,20 +80,16 @@ export default async function TossSubscriptionSuccessPage({ searchParams }) {
       throw new Error("토스페이먼츠 승인 결과가 상품 주문과 일치하지 않습니다.");
     }
 
-    const result = await completePrepaidSubscriptionPurchase({
+    await completePrepaidSubscriptionPurchase({
       guardianId: productOrder.guardian_id,
       productOrderId,
       payment,
     });
     const order = await getProductOrderForGuardian(session, productOrderId);
-    const waitingForActivation = result.status === "ready";
-
     return (
       <ShopComplete
         title="주문이 완료되었습니다!"
-        message={waitingForActivation
-          ? "결제는 완료되었지만 활성화 가능한 매칭 QR이 없어 QR 상태 확인이 필요합니다."
-          : "상품 결제가 완료되었고 QR 안심 서비스가 연결되었습니다."}
+        message="상품 결제가 완료되어 대상자 서비스를 바로 이용할 수 있습니다."
         order={order}
       />
     );

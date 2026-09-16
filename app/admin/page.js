@@ -56,7 +56,6 @@ import {
   setProductOrderFulfillmentAction,
   setQrAdminMemoAction,
   setQrActiveAction,
-  setQrAdminTestActivationAction,
   setQrLifecycleAction,
   setQrStoreSaleReservationAction,
   setQrSubjectAction,
@@ -540,7 +539,7 @@ function AdminDashboardSection({ dashboardData }) {
               note: `(전체 대상자 ${qrRatio.toFixed(1)}%)`,
             },
             {
-              label: "미활성 QR",
+              label: "사용 중지 QR",
               value: formatCountWithUnit(dashboardData.inactiveQrCount, "개"),
               note: `(전체 대상자 ${inactiveQrRatio.toFixed(1)}%)`,
             },
@@ -622,7 +621,6 @@ function AdminDashboardSection({ dashboardData }) {
           compact
           columns={["구분", "건수"]}
           rows={[
-            ["QR 미활성화 (10일 초과)", formatMetricValue(dashboardData.risks.qrPendingOver10)],
             ["상품 발송대기중 (2일 이상)", formatMetricValue(dashboardData.risks.shippingWaitingOver2)],
             ["구독 만료 예정일 (7일 이내)", formatMetricValue(dashboardData.risks.subscriptionExpiring7)],
             ["광고 심사 지연 (1시간 이상)", formatMetricValue(dashboardData.risks.adReviewOver1)],
@@ -667,7 +665,6 @@ function AdminDashboardSection({ dashboardData }) {
           centerValue={formatCountWithUnit(dashboardData.subscriptionStatus.active, "건")}
           items={[
             { label: "구독중", value: dashboardData.subscriptionStatus.active, color: "#f4b657" },
-            { label: "활성대기", value: dashboardData.subscriptionStatus.ready, color: "#8b76e8" },
             { label: "일시정지", value: dashboardData.subscriptionStatus.paused, color: "#3d7df2" },
             { label: "만료", value: dashboardData.subscriptionStatus.expired, color: "#aab2bd" },
             { label: "취소", value: dashboardData.subscriptionStatus.cancelled, color: "#e35b5b" },
@@ -3240,7 +3237,6 @@ function SubscriptionManagementSection({ subscriptionsData }) {
             <select name="subscriptionStatus" defaultValue={filters.status}>
               <option value="all">전체</option>
               <option value="active">구독중</option>
-              <option value="ready">QR활성화 대기</option>
               <option value="paused">일시정지</option>
               <option value="expired">만료</option>
               <option value="cancelled">취소</option>
@@ -3411,9 +3407,8 @@ function SubscriptionManagementSection({ subscriptionsData }) {
                         </label>
                         <label>
                           구독 상태
-                          <select name="status" defaultValue={selectedSubscription.status || "ready"}>
+                          <select name="status" defaultValue={selectedSubscription.status === "ready" ? "active" : selectedSubscription.status || "active"}>
                             <option value="active">이용중</option>
-                            <option value="ready">QR 활성화 대기</option>
                             <option value="paused">일시정지</option>
                             <option value="expired">기간 만료</option>
                             <option value="cancelled">해지</option>
@@ -3961,9 +3956,8 @@ function SubjectManagementSection({ adminSubjectsData, selectedSubjectQrImage })
           />
           <GuardianStatCard icon="linked" title="안전" value={formatCountWithUnit(summary.safeSubjects, "명")} note={`${safePercent(summary.safeSubjects, summary.totalSubjects).toFixed(2)}%`} noteTone="positive" />
           <GuardianStatCard icon="money" title="상품구매필요" value={formatCountWithUnit(summary.purchaseNeededSubjects, "명")} note={`${safePercent(summary.purchaseNeededSubjects, summary.totalSubjects).toFixed(2)}%`} noteTone={Number(summary.purchaseNeededSubjects || 0) > 0 ? "negative" : "neutral"} />
-          <GuardianStatCard icon="qr" title="QR미활성화" value={formatCountWithUnit(summary.qrNeededSubjects, "명")} note={`${safePercent(summary.qrNeededSubjects, summary.totalSubjects).toFixed(2)}%`} noteTone={Number(summary.qrNeededSubjects || 0) > 0 ? "negative" : "neutral"} />
           <GuardianStatCard icon="person" title="찾는 중" value={formatCountWithUnit(summary.searchingSubjects, "명")} note={`${safePercent(summary.searchingSubjects, summary.totalSubjects).toFixed(2)}%`} noteTone={Number(summary.searchingSubjects || 0) > 0 ? "negative" : "neutral"} />
-          <GuardianStatCard icon="blocked" title="비활성" value={formatCountWithUnit(summary.inactiveQrSubjects, "명")} note={`${safePercent(summary.inactiveQrSubjects, summary.totalSubjects).toFixed(2)}%`} />
+          <GuardianStatCard icon="blocked" title="사용 중지" value={formatCountWithUnit(summary.inactiveQrSubjects, "명")} note={`${safePercent(summary.inactiveQrSubjects, summary.totalSubjects).toFixed(2)}%`} />
           <GuardianStatCard icon="blocked" title="삭제" value={formatCountWithUnit(summary.deletedSubjects, "명")} note={`${safePercent(summary.deletedSubjects, summary.totalSubjects).toFixed(2)}%`} />
         </div>
       </section>
@@ -3982,7 +3976,6 @@ function SubjectManagementSection({ adminSubjectsData, selectedSubjectQrImage })
             <select name="subjectStatus" defaultValue={filters.status}>
               <option value="all">전체</option>
               <option value="상품구매필요">상품구매필요</option>
-              <option value="QR활성화필요">QR활성화필요</option>
               <option value="안전">안전</option>
               <option value="찾는중">찾는중</option>
             </select>
@@ -3991,9 +3984,8 @@ function SubjectManagementSection({ adminSubjectsData, selectedSubjectQrImage })
             QR 상태
             <select name="subjectQr" defaultValue={filters.qr}>
               <option value="all">전체</option>
-              <option value="active">활성</option>
-              <option value="pending">활성화 대기</option>
-              <option value="inactive">비활성</option>
+              <option value="active">사용 중</option>
+              <option value="inactive">사용 중지</option>
               <option value="unassigned">미매칭</option>
             </select>
           </label>
@@ -4170,49 +4162,19 @@ function SubjectManagementSection({ adminSubjectsData, selectedSubjectQrImage })
                       <div>
                         <div className="guardian-detail-row"><strong>QR 번호</strong><span className="inline-scroll-value">{selectedSubject.qr_code || "미매칭"}</span>{selectedSubject.qr_target_url && <Link href={selectedSubject.qr_target_url} target="_blank">상세보기 &gt;</Link>}</div>
                         <div className="guardian-detail-row"><strong>QR 상태</strong><span>{qrAdminStateLabel(selectedSubject)}</span></div>
-                        <div className="guardian-detail-row"><strong>활성화 구분</strong><span>{qrActivationSourceLabel(selectedSubject.qr_activation_source)}</span></div>
                         <div className="guardian-detail-row"><strong>발급일</strong><span>{formatRecentDateTime(selectedSubject.qr_updated_at)}</span></div>
-                        <div className="guardian-detail-row"><strong>활성화 시점</strong><span>{formatRecentDateTime(selectedSubject.qr_activated_at)}</span></div>
                         <div className="guardian-detail-row"><strong>기간 보정 시작</strong><span>{formatRecentDateTime(selectedSubject.qr_subscription_hold_started_at)}</span></div>
                         <div className="guardian-detail-row"><strong>누적 보정일</strong><span>{formatMetricValue(selectedSubject.qr_subscription_hold_total_days)}일</span></div>
                         <div className="guardian-detail-row"><strong>최근 수정일</strong><span>{formatRecentDateTime(selectedSubject.qr_updated_at)}</span></div>
                       </div>
                     </article>
                     {selectedSubject.qr_id && (
-                      <div className="subject-qr-toggle-control admin-test-activation-control">
-                        <div>
-                          <strong>관리자 수기 테스트</strong>
-                          <p>
-                            {selectedSubject.qr_activation_source === "admin_test"
-                              ? "현재 이 대상자 QR은 결제 없이 테스트 활성화되어 있습니다."
-                              : selectedSubject.qr_activated_at
-                                ? "정상 구매 절차로 활성화된 QR은 테스트 활성화로 덮어쓰지 않습니다."
-                                : "해당 QR만 공개 페이지, 안심번호, 위치공유를 결제 없이 테스트합니다. 주문·결제·구독 내역은 생성되지 않습니다."}
-                          </p>
-                        </div>
-                        {(!selectedSubject.qr_activated_at || selectedSubject.qr_activation_source === "admin_test") && (
-                          <form action={setQrAdminTestActivationAction}>
-                            <input type="hidden" name="qrId" value={selectedSubject.qr_id} />
-                            <input type="hidden" name="subjectId" value={selectedSubject.id} />
-                            <input type="hidden" name="activate" value={selectedSubject.qr_activation_source === "admin_test" ? "0" : "1"} />
-                            <input type="hidden" name="returnTo" value={buildSubjectAdminUrl(filters, selectedSubject.id)} />
-                            <FormSubmitButton
-                              className={selectedSubject.qr_activation_source === "admin_test" ? "plain-button" : "activate-button"}
-                              pendingText={selectedSubject.qr_activation_source === "admin_test" ? "해제중" : "활성화중"}
-                            >
-                              {selectedSubject.qr_activation_source === "admin_test" ? "수동 활성화 해제" : "구매 없이 QR 수동 활성화"}
-                            </FormSubmitButton>
-                          </form>
-                        )}
-                      </div>
-                    )}
-                    {selectedSubject.qr_id && (
                       <div className="subject-qr-toggle-control">
                         <div>
                           <strong>QR 서비스 상태 변경</strong>
                           <p>
                             {subscription?.status === "active"
-                              ? "비활성화 후 24시간을 초과하면 재활성화 시 완료 일수만큼 구독 종료일이 연장됩니다."
+                              ? "사용 중지 후 24시간을 초과하면 재개 시 완료 일수만큼 구독 종료일이 연장됩니다."
                               : "현재 활성 구독이 없어 QR 상태만 변경됩니다."}
                           </p>
                         </div>
@@ -4222,9 +4184,9 @@ function SubjectManagementSection({ adminSubjectsData, selectedSubjectQrImage })
                           <input type="hidden" name="returnTo" value={buildSubjectAdminUrl(filters, selectedSubject.id)} />
                           <FormSubmitButton
                             className={Number(selectedSubject.qr_is_active || 0) === 1 ? "plain-button" : "activate-button"}
-                            pendingText={Number(selectedSubject.qr_is_active || 0) === 1 ? "비활성화중" : "활성화중"}
+                            pendingText={Number(selectedSubject.qr_is_active || 0) === 1 ? "중지중" : "재개중"}
                           >
-                            {Number(selectedSubject.qr_is_active || 0) === 1 ? "QR 비활성화" : "QR 활성화"}
+                            {Number(selectedSubject.qr_is_active || 0) === 1 ? "QR 사용 중지" : "QR 사용 재개"}
                           </FormSubmitButton>
                         </form>
                       </div>
@@ -4362,10 +4324,10 @@ function QrManagementSection({ qrData, qrItems }) {
             </select>
           </label>
           <fieldset className="guardian-filter-date qr-filter-date">
-            <legend>활성화일</legend>
-            <input type="date" name="qrStart" defaultValue={qrData.filters.startDate} aria-label="활성화 시작일" />
+            <legend>연결일</legend>
+            <input type="date" name="qrStart" defaultValue={qrData.filters.startDate} aria-label="연결 시작일" />
             <span>~</span>
-            <input type="date" name="qrEnd" defaultValue={qrData.filters.endDate} aria-label="활성화 종료일" />
+            <input type="date" name="qrEnd" defaultValue={qrData.filters.endDate} aria-label="연결 종료일" />
           </fieldset>
           <Link className="plain-button guardian-reset-button" href="/admin?section=qr">초기화</Link>
           <button type="submit">검색</button>
@@ -4394,7 +4356,7 @@ function QrManagementSection({ qrData, qrItems }) {
                 <span role="columnheader">보호자명</span>
                 <span role="columnheader">상태</span>
                 <span role="columnheader">생성일</span>
-                <span role="columnheader">활성화일</span>
+                <span role="columnheader">연결일</span>
                 <span role="columnheader">만료일</span>
                 <span role="columnheader">관리</span>
               </div>
@@ -4480,7 +4442,7 @@ function QrManagementSection({ qrData, qrItems }) {
                       <div><dt>보호자명</dt><dd>{selectedQr.guardian_name || "미배정"}</dd></div>
                       <div><dt>연락처</dt><dd>{selectedQr.guardian_safe_phone || selectedQr.guardian_phone || "-"}</dd></div>
                       <div><dt>생성일</dt><dd>{formatRecentDateTime(selectedQr.created_at)}</dd></div>
-                      <div><dt>활성화일</dt><dd>{formatRecentDateTime(selectedQr.activated_at)}</dd></div>
+                      <div><dt>연결일</dt><dd>{formatRecentDateTime(selectedQr.activated_at)}</dd></div>
                       <div><dt>만료일</dt><dd>{formatRecentDateTime(selectedQr.subscription_ends_at)}</dd></div>
                       <div><dt>기간 보정 시작</dt><dd>{formatRecentDateTime(selectedQr.subscription_hold_started_at)}</dd></div>
                       <div><dt>누적 보정일</dt><dd>{formatMetricValue(selectedQr.subscription_hold_total_days)}일</dd></div>
@@ -4558,8 +4520,8 @@ function QrManagementSection({ qrData, qrItems }) {
                             <input type="hidden" name="qrId" value={selectedQr.id} />
                             <input type="hidden" name="active" value={selectedQr.is_active ? "0" : "1"} />
                             <input type="hidden" name="returnTo" value={selectedQrReturnTo} />
-                            <FormSubmitButton className={selectedQr.is_active ? "plain-button" : "activate-button"} pendingText={selectedQr.is_active ? "비활성화중" : "활성화중"}>
-                              {selectedQr.is_active ? "QR 비활성화" : "QR 활성화"}
+                            <FormSubmitButton className={selectedQr.is_active ? "plain-button" : "activate-button"} pendingText={selectedQr.is_active ? "중지중" : "재개중"}>
+                              {selectedQr.is_active ? "QR 사용 중지" : "QR 사용 재개"}
                             </FormSubmitButton>
                           </form>
                         )}
@@ -4949,13 +4911,13 @@ function qrExportRows(qrItems = []) {
     상태: qrLifecycleLabel(qr.lifecycle_status),
     스토어판매선점: Number(qr.store_sale_reserved || 0) === 1 ? "선점" : "미선점",
     스토어판매선점일시: formatRecentDateTime(qr.store_sale_reserved_at),
-    활성화상태: qrActivationLabel(qr),
+    사용상태: qrActivationLabel(qr),
     보호자: qr.guardian_name || "미배정",
     관리대상: formatQrSubjectLabel(qr),
     보호자연락처: qr.guardian_safe_phone || qr.guardian_phone || "-",
     공개URL: qr.target_url,
     생성일: formatRecentDateTime(qr.created_at),
-    활성화일: formatRecentDateTime(qr.activated_at),
+    연결일: formatRecentDateTime(qr.activated_at),
     만료일: formatRecentDateTime(qr.subscription_ends_at),
   }));
 }
@@ -5140,9 +5102,8 @@ function inquiryStatusLabel(status) {
 }
 
 function subscriptionStatusLabel(status) {
-  if (status === "active") return "이용중";
+  if (status === "active" || status === "ready") return "이용중";
   if (status === "paused") return "일시정지";
-  if (status === "ready") return "활성화 대기";
   if (status === "cancelled") return "해지";
   if (status === "expired") return "기간 만료";
   return "서비스 정보 없음";
@@ -5165,22 +5126,13 @@ function orderPurchaseTypeLabel(order) {
 
 function qrAdminStateLabel(subject) {
   if (!subject?.qr_id) return "미매칭";
-  if (!Number(subject.qr_is_active || 0)) return "비활성";
-  if (subject.qr_activated_at) return "활성";
-  return "활성화 대기";
-}
-
-function qrActivationSourceLabel(source) {
-  if (source === "admin_test") return "관리자 테스트";
-  if (source === "guardian_purchase") return "보호자 구매 활성화";
-  return "-";
+  return Number(subject.qr_is_active || 0) ? "사용 중" : "사용 중지";
 }
 
 function qrAdminStateClass(subject) {
   if (!subject?.qr_id) return "unassigned";
   if (!Number(subject.qr_is_active || 0)) return "inactive";
-  if (subject.qr_activated_at) return "active";
-  return "pending";
+  return "active";
 }
 
 function qrLifecycleLabel(status) {
@@ -5196,7 +5148,7 @@ function qrLifecycleClass(qr) {
 }
 
 function qrActivationLabel(qr) {
-  return Number(qr?.is_active || 0) === 1 ? "활성" : "미활성";
+  return Number(qr?.is_active || 0) === 1 ? "사용 중" : "사용 중지";
 }
 
 function qrActivationClass(qr) {
@@ -5233,7 +5185,7 @@ function subscriptionPlanLabel(subscription) {
 function subscriptionServicePeriodLabel(subscription) {
   if (!subscription) return "-";
   if (subscription.access_type === "product_lifetime") {
-    return subscription.status === "ready" ? "QR 활성화 후 계속 이용" : "계속 이용";
+    return "계속 이용";
   }
   return formatSubscriptionPeriod(subscription);
 }
@@ -5241,7 +5193,7 @@ function subscriptionServicePeriodLabel(subscription) {
 function formatSubscriptionPeriod(subscription) {
   const start = formatDate(subscription?.current_period_start);
   if (subscription?.access_type === "product_lifetime") {
-    return start === "-" ? "QR 활성화 대기" : `${start}부터 계속 이용`;
+    return start === "-" ? "계속 이용" : `${start}부터 계속 이용`;
   }
   const end = formatDate(subscription?.current_period_end);
   if (start === "-" && end === "-") return "-";
@@ -5249,8 +5201,7 @@ function formatSubscriptionPeriod(subscription) {
 }
 
 function subscriptionAdminStateClass(status) {
-  if (status === "active") return "active";
-  if (status === "ready") return "ready";
+  if (status === "active" || status === "ready") return "active";
   if (status === "paused") return "paused";
   if (status === "expired") return "expired";
   if (status === "cancelled") return "cancelled";
@@ -5378,7 +5329,7 @@ function paymentRefundableAmount(payment) {
 }
 
 function isPaidOrder(status) {
-  return ["paid", "paid_waiting_activation", "activated"].includes(status);
+  return ["paid", "activated"].includes(status);
 }
 
 function paymentStatusLabel(status) {
@@ -5537,13 +5488,12 @@ function statusClass(status) {
   const normalized = statusLabel(status);
   if (normalized === "상품구매필요") return "purchase-needed";
   if (normalized === "찾는중") return "searching";
-  if (normalized === "QR활성화필요") return "qr-needed";
   return "safe";
 }
 
 function statusLabel(status) {
   if (status === "문제없음") return "안전";
-  if (["상품구매필요", "QR활성화필요", "안전", "찾는중"].includes(status)) return status;
+  if (["상품구매필요", "안전", "찾는중"].includes(status)) return status;
   return "상품구매필요";
 }
 

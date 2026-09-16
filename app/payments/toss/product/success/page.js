@@ -34,7 +34,7 @@ export default async function TossProductSuccessPage({ searchParams }) {
   if (!order) {
     return <ShopComplete title="주문 정보를 찾을 수 없습니다" message="다시 상품 선택 화면에서 결제를 시작해 주세요." />;
   }
-  if (["paid", "paid_waiting_activation", "activated"].includes(order.status)) {
+  if (["paid", "activated"].includes(order.status)) {
     return (
       <ShopComplete
         title="주문이 완료되었습니다!"
@@ -65,9 +65,7 @@ export default async function TossProductSuccessPage({ searchParams }) {
       return (
         <ShopComplete
           title="주문이 완료되었습니다!"
-          message={completedOrder?.status === "activated"
-            ? "쿠폰 전액 할인 결제와 매칭된 QR 활성화가 완료되었습니다."
-            : "쿠폰 전액 할인 결제가 완료되었습니다."}
+          message="쿠폰 전액 할인 결제가 완료되어 대상자 서비스를 바로 이용할 수 있습니다."
           order={completedOrder}
         />
       );
@@ -89,9 +87,7 @@ export default async function TossProductSuccessPage({ searchParams }) {
     return (
       <ShopComplete
         title="주문이 완료되었습니다!"
-        message={completedOrder?.status === "activated"
-          ? "상품 결제와 매칭된 QR 활성화가 완료되었습니다."
-          : "상품 결제가 완료되었습니다."}
+        message="상품 결제가 완료되어 대상자 서비스를 바로 이용할 수 있습니다."
         order={completedOrder}
       />
     );

@@ -42,9 +42,9 @@ export default async function FindPage({ params, searchParams }) {
     return (
       <main className="find-page">
         <section className="find-shell">
-          <p className="intro-kicker">QR 비활성</p>
+          <p className="intro-kicker">QR 사용 중지</p>
           <h1>현재 사용할 수 없는 QR입니다</h1>
-          <p>관리자가 비활성화한 QR 코드입니다. 필요한 경우 보호자 또는 관리자에게 문의해 주세요.</p>
+          <p>관리자가 사용을 중지한 QR 코드입니다. 필요한 경우 보호자 또는 관리자에게 문의해 주세요.</p>
           <div className="find-key-box">
             <span>식별 문자열</span>
             <strong>{data.public_key}</strong>
@@ -90,19 +90,13 @@ export default async function FindPage({ params, searchParams }) {
   }
 
   const owner = Boolean(session && getGuardianKey(session) === data.guardian_google_id);
-  const adminTestActive = data.qr_activation_source === "admin_test";
-  const subscriptionReady = !adminTestActive && data.subscription_status === "ready";
-  const subscriptionActive = adminTestActive || hasActiveAccess(
+  const subscriptionActive = !data.subscription_status || hasActiveAccess(
     data.subscription_status,
     data.subscription_period_end,
     data.subscription_access_type
   );
 
-  if (!data.qr_activated_at || subscriptionReady) {
-    return <QrStatusScreen type="unassigned" />;
-  }
-
-  if (!subscriptionActive && !subscriptionReady) {
+  if (!subscriptionActive) {
     const paused = data.subscription_status === "paused";
     const expired = data.subscription_status === "expired";
     if (expired) {
@@ -113,7 +107,7 @@ export default async function FindPage({ params, searchParams }) {
         <section className="find-shell">
           <p className="intro-kicker">서비스 확인 필요</p>
           <h1>{paused ? "현재 서비스가 일시정지되어 있습니다" : expired ? "기존 이용기간이 만료되었습니다" : "사용 가능한 QR 안심 서비스가 없습니다"}</h1>
-          <p>상품 구매와 QR 활성화가 완료되기 전에는 대상자 정보가 표시되지 않습니다.</p>
+          <p>현재 서비스 이용 상태를 확인한 뒤 다시 시도해 주세요.</p>
           {owner ? (
             <a className="primary-button" href={paused ? "/account/billing" : "/shop"}>
               {paused ? "서비스 재개하기" : "상품 구매하기"}
@@ -234,7 +228,7 @@ function getLocationPreviewData(state = "") {
     public_key: "preview",
     qr_active: 1,
     qr_activated_at: "2026-09-01T00:00:00.000Z",
-    qr_activation_source: "admin_test",
+    qr_activation_source: "subject_registration",
     subject_id: "preview-subject",
     subject_name: "이하율",
     birth_date: "2016-05-10",
@@ -260,8 +254,8 @@ function getLocationPreviewData(state = "") {
   if (state === "purchase-needed") {
     return {
       ...data,
-      qr_activated_at: null,
-      qr_activation_source: null,
+      qr_activated_at: "2026-09-01T00:00:00.000Z",
+      qr_activation_source: "subject_registration",
       subject_status: "상품구매필요",
       subscription_status: null,
       subscription_access_type: null,

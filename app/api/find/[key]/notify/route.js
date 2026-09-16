@@ -11,10 +11,7 @@ export async function POST(request, { params }) {
     return NextResponse.json({ message: "등록되지 않은 QR입니다." }, { status: 404 });
   }
   if (!data.qr_active) {
-    return NextResponse.json({ message: "비활성화된 QR입니다." }, { status: 400 });
-  }
-  if (!data.qr_activated_at) {
-    return NextResponse.json({ message: "아직 보호자가 활성화하지 않은 QR입니다." }, { status: 400 });
+    return NextResponse.json({ message: "사용이 중지된 QR입니다." }, { status: 400 });
   }
   if (!data.subject_id || !data.guardian_id) {
     return NextResponse.json({ message: "관리대상과 연결되지 않은 QR입니다." }, { status: 400 });

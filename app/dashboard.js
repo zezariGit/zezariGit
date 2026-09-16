@@ -722,48 +722,30 @@ function statusClass(status) {
   const normalized = statusLabel(status);
   if (normalized === "상품구매필요") return "purchase-needed";
   if (normalized === "찾는중") return "searching";
-  if (normalized === "QR활성화필요") return "qr-needed";
   return "safe";
 }
 
 function statusLabel(status) {
   if (status === "문제없음") return "안전";
-  if (["상품구매필요", "QR활성화필요", "안전", "찾는중"].includes(status)) return status;
+  if (["상품구매필요", "안전", "찾는중"].includes(status)) return status;
   return "상품구매필요";
 }
 
 function subjectStatusDisplayLabel(status) {
   if (status === "상품구매필요") return "상품 구매 필요";
   if (status === "찾는중") return "찾는 중";
-  if (status === "QR활성화필요") return "QR 활성화 필요";
   return "안전";
 }
 
 function resolveSubjectStatus(subject) {
   const storedStatus = statusLabel(subject?.status);
   if (storedStatus === "찾는중") return "찾는중";
-
-  const qrEnabled = Number(subject?.qr_is_active || 0) === 1;
-  const qrActivated = Boolean(subject?.qr_activated_at);
-  if (qrEnabled && qrActivated) return "안전";
-
-  if (
-    Number(subject?.has_product_purchase || 0) === 1
-    || storedStatus === "QR활성화필요"
-    || storedStatus === "안전"
-    || qrActivated
-  ) {
-    return "QR활성화필요";
-  }
-  return "상품구매필요";
+  return storedStatus;
 }
 
 function subjectStatusActionHref(subject, status) {
   if (status === "상품구매필요") {
     return `/shop?subject=${encodeURIComponent(subject.id)}`;
-  }
-  if (status === "QR활성화필요") {
-    return subject.qr_target_url || `/shop?subject=${encodeURIComponent(subject.id)}`;
   }
   return "";
 }

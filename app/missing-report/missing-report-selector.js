@@ -159,7 +159,6 @@ function StatusBadge({ status }) {
 
 function normalizeStatus(status) {
   if (status === "문제없음") return "안전";
-  if (status === "QR활성화필요") return "상품구매필요";
   if (["상품구매필요", "안전", "찾는중"].includes(status)) return status;
   return "상품구매필요";
 }

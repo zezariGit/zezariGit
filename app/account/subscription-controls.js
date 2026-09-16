@@ -39,8 +39,7 @@ export default function SubscriptionControls({ status = "none", accessType = "pe
       {["none", "expired", "failed"].includes(status) && (
         <a className="subscription-button" href="/shop">상품 구매</a>
       )}
-      {status === "active" && accessType === "product_lifetime" && <span className="subscription-badge">계속 이용</span>}
-      {status === "ready" && <span className="subscription-badge paused">QR 활성화 대기</span>}
+      {(status === "active" || status === "ready") && accessType === "product_lifetime" && <span className="subscription-badge">계속 이용</span>}
       {message && <p className="subscription-message" role="status">{message}</p>}
     </div>
   );
