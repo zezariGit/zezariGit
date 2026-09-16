@@ -11484,6 +11484,29 @@ button:disabled:hover {
   color: var(--c-text-muted);
 }
 
+.inactive-account-panel {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.inactive-account-login-button {
+  width: 100%;
+  min-height: 48px;
+  margin-top: var(--space-xs);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--c-primary);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.inactive-account-login-button:hover,
+.inactive-account-login-button:focus-visible {
+  background: var(--c-primary-dark);
+}
+
 .phone-notch {
   position: absolute;
   top: 10px;

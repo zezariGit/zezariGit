@@ -76,11 +76,11 @@ export default async function HomePage({ searchParams }) {
       />
     );
   }
-  if (["dashboard", "dashboard-empty", "dashboard-notifications", "settings", "ad-campaign"].includes(dashboardPreview)) {
+  if (["dashboard", "dashboard-empty", "dashboard-notifications", "dashboard-inactive", "settings", "ad-campaign"].includes(dashboardPreview)) {
     const dashboardSubjects = dashboardPreview === "dashboard-empty" ? [] : previewDashboardSubjects();
     return (
       <GuardianDashboard
-        guardian={{ id: "preview-guardian", name: "보호자", phone: "010-0000-0000", birth_date: "1990-01-01", is_active: 1, login_id: "preview", password_hash: "preview" }}
+        guardian={{ id: "preview-guardian", name: "보호자", phone: "010-0000-0000", birth_date: "1990-01-01", is_active: dashboardPreview === "dashboard-inactive" ? 0 : 1, login_id: "preview", password_hash: "preview" }}
         subjects={dashboardSubjects}
         subscription={null}
         session={{ user: { provider: "credentials", email: "" } }}
@@ -147,7 +147,7 @@ export default async function HomePage({ searchParams }) {
 
   return (
     <>
-      <OnboardingGate enabled={!session && !pendingQrClaim}>{loginPanel}</OnboardingGate>
+      <OnboardingGate enabled={!session && !pendingQrClaim && resolvedSearchParams?.login !== "1"}>{loginPanel}</OnboardingGate>
       <StatusToast message={notice} type={noticeType} />
     </>
   );

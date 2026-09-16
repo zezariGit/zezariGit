@@ -132,9 +132,12 @@ export default async function GuardianDashboard({
         </header>}
 
         {!guardianActive ? (
-          <section className="dashboard-panel setup-panel">
+          <section className="dashboard-panel setup-panel inactive-account-panel">
             <h2>계정이 비활성화되었습니다</h2>
             <p>관리자에게 문의해 주세요. 비활성화된 보호자 계정은 관리 기능을 사용할 수 없습니다.</p>
+            <LogoutButton className="inactive-account-login-button" callbackUrl="/?login=1">
+              로그인 화면으로 돌아가기
+            </LogoutButton>
           </section>
         ) : (
           <>

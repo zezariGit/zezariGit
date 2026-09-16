@@ -2,9 +2,10 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const iconNames = ["notification", "settings", "status-help", "subject-status-guide", "missing", "shop", "support", "safety"];
-const [page, dashboard, carousel, guide, adCampaign, privacyPage, styles, ...icons] = await Promise.all([
+const [page, dashboard, authActions, carousel, guide, adCampaign, privacyPage, styles, ...icons] = await Promise.all([
   readFile(new URL("../app/page.js", import.meta.url), "utf8"),
   readFile(new URL("../app/dashboard.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/auth-actions.js", import.meta.url), "utf8"),
   readFile(new URL("../app/managed-subject-carousel.js", import.meta.url), "utf8"),
   readFile(new URL("../app/subject-status-guide.js", import.meta.url), "utf8"),
   readFile(new URL("../app/ad-campaign-modal.js", import.meta.url), "utf8"),
@@ -19,6 +20,10 @@ assert.match(dashboard, /subjectPages\.push\(\[null\]\)/, "3명 단위로 가득
 assert.match(dashboard, /subjects\.length === 0 && pageSubjects\.length === 0/, "빈 상태는 대상자가 0명일 때만 표시해야 합니다.");
 assert.doesNotMatch(dashboard, /className="managed-empty-plus"/, "빈 상태 상단의 큰 플러스 아이콘은 표시하지 않아야 합니다.");
 assert.match(dashboard, /안녕하세요, 보호자님!/);
+assert.match(dashboard, /inactive-account-login-button[\s\S]*callbackUrl="\/\?login=1"[\s\S]*로그인 화면으로 돌아가기/, "비활성 계정 안내에서 로그인 화면으로 돌아갈 수 있어야 합니다.");
+assert.match(authActions, /LogoutButton\(\{[\s\S]*callbackUrl = "\/"[\s\S]*signOut\(\{ callbackUrl \}\)/, "로그아웃 버튼은 지정된 로그인 복귀 주소로 이동해야 합니다.");
+assert.match(page, /"dashboard-inactive"/, "비활성 계정 화면을 로그인 없이 확인할 개발 미리보기가 있어야 합니다.");
+assert.match(page, /resolvedSearchParams\?\.login !== "1"/, "로그인 복귀 URL은 온보딩을 건너뛰어야 합니다.");
 assert.match(dashboard, /<MyPageTab closeHref=\{closeMyPageHref\} admin=\{admin\} \/>/, "설정 메뉴에 관리자 여부를 전달해야 합니다.");
 assert.match(dashboard, /\.\.\.\(admin \? \[\["관리자 화면", "\/admin"\]\] : \[\]\)/, "관리자 화면 메뉴는 관리자에게만 표시되어야 합니다.");
 assert.match(dashboard, /href=\{`\/\?tab=dashboard&previewSubject=/, "대상자 행 전체가 미리보기 링크여야 합니다.");

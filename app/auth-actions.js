@@ -745,9 +745,9 @@ export function GoogleLoginButton({ enabledProviders = ["google"] }) {
   return <SocialLoginButtons enabledProviders={enabledProviders.filter((provider) => provider === "google")} />;
 }
 
-export function LogoutButton({ className = "action secondary", children = "Log out" } = {}) {
+export function LogoutButton({ className = "action secondary", children = "Log out", callbackUrl = "/" } = {}) {
   return (
-    <button className={className} type="button" onClick={() => signOut({ callbackUrl: "/" })}>
+    <button className={className} type="button" onClick={() => signOut({ callbackUrl })}>
       {children}
     </button>
   );
