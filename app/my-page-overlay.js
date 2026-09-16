@@ -30,17 +30,17 @@ export default function MyPageOverlay({ initialOpen = false, closeHref = "/?tab=
     const url = new URL(window.location.href);
     if (url.searchParams.get("panel") !== "my") {
       url.searchParams.set("panel", "my");
-      window.history.pushState({ zezariMyPage: true }, "", `${url.pathname}${url.search}${url.hash}`);
+      router.push(`${url.pathname}${url.search}${url.hash}`, { scroll: false });
     }
-  }, []);
+  }, [router]);
 
   const closeModal = useCallback(() => {
     setOpen(false);
     const currentUrl = new URL(window.location.href);
     if (currentUrl.searchParams.get("panel") === "my") {
-      window.history.replaceState({}, "", closeHref);
+      router.replace(closeHref, { scroll: false });
     }
-  }, [closeHref]);
+  }, [closeHref, router]);
 
   useEffect(() => {
     window.addEventListener(OPEN_EVENT, openModal);

@@ -20,7 +20,7 @@
     "test:phone-auth": "tsx scripts/phone-auth-regression.mjs",
     "test:signup-phone-ui": "node scripts/signup-phone-ui-regression.mjs",
     "test:signup-profile-ui": "node scripts/signup-profile-ui-regression.mjs",
-    "test:service-regulations": "node scripts/service-regulations-regression.mjs",
+    "test:service-regulations": "tsx scripts/service-regulations-regression.mjs",
     "test:guardian-profile-ui": "node scripts/guardian-profile-ui-regression.mjs",
     "test:coupon-registration": "node scripts/coupon-registration-regression.mjs",
     "test:ad-dashboard": "node scripts/ad-dashboard-state-regression.mjs",

@@ -3,14 +3,16 @@ import ShopServiceControls from "./shop-service-controls";
 
 export const dynamic = "force-dynamic";
 
-export default async function ShopServicePage() {
+export default async function ShopServicePage({ searchParams }) {
+  const params = await searchParams;
+  const settingsEntry = params?.from === "settings";
   const setting = JSON.parse(JSON.stringify(await getProductServiceIntro()));
   const hasImage = Number(setting.has_image || 0) === 1;
 
   return (
     <main className="shop-service-page" id="shop-service-top">
       <header className="shop-service-topbar">
-        <ShopServiceControls mode="back" />
+        <ShopServiceControls mode="back" backHref={settingsEntry ? "/?panel=my" : ""} />
         <h1>제품보기</h1>
         <span aria-hidden="true" />
       </header>

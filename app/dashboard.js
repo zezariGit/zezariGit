@@ -246,10 +246,10 @@ function MyPageTab({ closeHref = "", admin = false }) {
     ["쿠폰함", "/account/coupons"],
     ["광고 대시보드", "/account/ads"],
     ["결제 및 서비스 현황", "/account/billing"],
-    ["제자리 서비스 소개", "/?serviceIntro=1"],
-    ["이용약관", "/privacy#terms"],
-    ["개인정보처리방침", "/privacy"],
-    ...(admin ? [["관리자 화면", "/admin"]] : []),
+    ["제자리 서비스 소개", "/shop/service?from=settings"],
+    ["이용약관", "/privacy?type=service"],
+    ["개인정보처리방침", "/privacy?type=privacy"],
+    ...(admin ? [["관리자 화면", "/admin?from=settings"]] : []),
   ];
   return (
     <section

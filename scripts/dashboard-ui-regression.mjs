@@ -29,7 +29,7 @@ assert.match(authActions, /LogoutButton\(\{[\s\S]*callbackUrl = "\/"[\s\S]*signO
 assert.match(page, /"dashboard-inactive"/, "비활성 계정 화면을 로그인 없이 확인할 개발 미리보기가 있어야 합니다.");
 assert.match(page, /resolvedSearchParams\?\.login !== "1"/, "로그인 복귀 URL은 온보딩을 건너뛰어야 합니다.");
 assert.match(dashboard, /<MyPageTab closeHref=\{closeMyPageHref\} admin=\{admin\} \/>/, "설정 메뉴에 관리자 여부를 전달해야 합니다.");
-assert.match(dashboard, /\.\.\.\(admin \? \[\["관리자 화면", "\/admin"\]\] : \[\]\)/, "관리자 화면 메뉴는 관리자에게만 표시되어야 합니다.");
+assert.match(dashboard, /\.\.\.\(admin \? \[\["관리자 화면", "\/admin\?from=settings"\]\] : \[\]\)/, "관리자 화면 메뉴는 관리자에게만 표시되어야 합니다.");
 assert.match(dashboard, /href=\{`\/\?tab=dashboard&previewSubject=/, "대상자 행 전체가 미리보기 링크여야 합니다.");
 assert.match(dashboard, /등록된 대상자가 없습니다\./);
 assert.match(dashboard, /대상자 추가/);

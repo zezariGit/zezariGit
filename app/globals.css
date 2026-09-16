@@ -19732,6 +19732,26 @@ button:disabled:hover {
   font-size: var(--font-size-md);
 }
 
+.managed-regulation-header {
+  align-items: center;
+}
+
+.managed-regulation-header > div {
+  min-width: 0;
+}
+
+.managed-regulation-content {
+  min-height: 420px;
+}
+
+.managed-regulation-content .service-regulation-document p {
+  color: var(--c-text-muted);
+}
+
+.managed-regulation-content .service-regulation-document p.is-bold {
+  color: var(--c-text);
+}
+
 @media (max-width: 720px) {
   .privacy-page {
     padding: 0;

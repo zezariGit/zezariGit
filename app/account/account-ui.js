@@ -4,7 +4,7 @@ import BackButton from "../back-button";
 export function AccountTopbar({ title, backHref = "/?panel=my", action = null }) {
   return (
     <header className="account-topbar">
-      <BackButton className="account-back-link" href={backHref} label="설정으로 돌아가기" />
+      <BackButton className="account-back-link" href={backHref} replace label="설정으로 돌아가기" />
       <h1>{title}</h1>
       <div className="account-topbar-action">{action}</div>
     </header>

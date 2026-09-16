@@ -445,7 +445,7 @@ function ServiceRegulationManagementSection({ regulations, selectedType }) {
           </Link>
         ))}
       </nav>
-      <ServiceRegulationEditor regulation={regulations[activeType]} saveAction={saveServiceRegulationAction} />
+      <ServiceRegulationEditor key={activeType} regulation={regulations[activeType]} saveAction={saveServiceRegulationAction} />
     </section>
   );
 }
