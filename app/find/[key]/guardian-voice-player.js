@@ -49,10 +49,9 @@ export default function GuardianVoicePlayer({ src, name = "보호자 음성 메�
         className={`guardian-voice-play-button${status === "playing" ? " playing" : ""}`}
         type="button"
         onClick={togglePlayback}
+        aria-label={status === "playing" ? "보호자 음성 일시정지" : "보호자 음성 듣기"}
       >
-        <img className="guardian-voice-button-icon" src="/assets/finder/voice-play.png" alt="" />
-        <img className="guardian-voice-waveform" src="/assets/finder/voice-waveform.png" alt="" />
-        <span><strong>{status === "playing" ? "보호자 음성 일시정지" : "보호자 음성 듣기"}</strong><small>대상자를 안심시켜 주세요</small></span>
+        <img className="guardian-voice-button-image" src="/assets/finder/guardian-voice-button.png" alt="" />
       </button>
       {status === "playing" && <em>보호자 음성을 재생하고 있습니다.</em>}
       {message && <p className="find-audio-error">{message}</p>}

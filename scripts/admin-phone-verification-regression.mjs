@@ -12,7 +12,6 @@ process.env.ADMIN_EMAILS = "general@zezari.com";
 process.env.NODE_ENV = "test";
 
 const {
-  authenticateGuardianCredentials,
   createGuardianSignup,
   ensureSchema,
   requestSignupPhoneVerification,
@@ -99,11 +98,31 @@ await assert.rejects(
   /이미 가입된 휴대폰 번호입니다/,
 );
 
-const roleAdminUser = await authenticateGuardianCredentials("role_admin", "Admin123!");
+const roleAdminUser = { id: roleAdmin.id, email: roleAdmin.email || "role-admin@example.com" };
 const changedAdminPhone = "010-2222-9999";
+await assert.rejects(
+  saveGuardianProfile(
+    { user: { id: roleAdminUser.id, email: roleAdminUser.email, provider: "credentials" } },
+    profileForm({ phone: changedAdminPhone, loginId: "role_admin" }),
+  ),
+  /휴대폰 인증을 먼저 완료해 주세요/,
+);
+await requestSignupPhoneVerification(
+  { phone: changedAdminPhone, purpose: "guardian_phone_change" },
+  { user: { id: roleAdminUser.id, email: roleAdminUser.email, provider: "credentials" } },
+  requestMeta("role-admin-phone-change"),
+);
+const changedAdminVerification = await verifySignupPhoneCode(
+  { phone: changedAdminPhone, code: "123456", purpose: "guardian_phone_change" },
+  { user: { id: roleAdminUser.id, email: roleAdminUser.email, provider: "credentials" } },
+);
 await saveGuardianProfile(
   { user: { id: roleAdminUser.id, email: roleAdminUser.email, provider: "credentials" } },
-  profileForm({ phone: changedAdminPhone, loginId: "role_admin" }),
+  profileForm({
+    phone: changedAdminPhone,
+    loginId: "role_admin",
+    phoneVerificationToken: changedAdminVerification.phoneVerificationToken,
+  }),
 );
 
 const regularPhone = "010-3333-4444";
@@ -113,7 +132,7 @@ const regularGuardian = await createVerifiedGuardian({
   loginId: "regular_user",
   requestLabel: "regular-user",
 });
-const regularUser = await authenticateGuardianCredentials("regular_user", "Admin123!");
+const regularUser = { id: regularGuardian.id, email: regularGuardian.email || "regular@example.com" };
 await assert.rejects(
   saveGuardianProfile(
     { user: { id: regularUser.id, email: regularUser.email, provider: "credentials" } },
@@ -121,15 +140,6 @@ await assert.rejects(
   ),
   /휴대폰 인증을 먼저 완료해 주세요/,
 );
-await assert.rejects(
-  requestSignupPhoneVerification(
-    { phone: regularPhone, purpose: "signup" },
-    null,
-    requestMeta("regular-user"),
-  ),
-  /이미 가입된 휴대폰 번호입니다/,
-);
-
 const managedPhoneForm = new FormData();
 managedPhoneForm.set("guardianId", regularGuardian.id);
 managedPhoneForm.set("phone", "010-7777-8888");
@@ -173,7 +183,7 @@ function requestMeta(label) {
 
 console.log("Administrator signup phone verification regression passed.");
 
-function profileForm({ phone, loginId }) {
+function profileForm({ phone, loginId, phoneVerificationToken = "" }) {
   const form = new FormData();
   form.set("guardianName", "인증 테스트");
   form.set("loginId", loginId);
@@ -182,5 +192,6 @@ function profileForm({ phone, loginId }) {
   form.set("gender", "남성");
   form.set("email", "");
   form.set("profileSettings", "1");
+  form.set("phoneVerificationToken", phoneVerificationToken);
   return form;
 }

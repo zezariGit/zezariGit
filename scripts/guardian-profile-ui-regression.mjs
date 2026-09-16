@@ -7,17 +7,20 @@ const actions = await readFile(new URL("../app/actions.js", import.meta.url), "u
 const db = await readFile(new URL("../lib/db.js", import.meta.url), "utf8");
 const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
-assert.match(page, /provider=\{session\.user\?\.provider \|\| "credentials"\}/, "로그인 제공자가 보호자 정보 폼으로 전달되어야 합니다.");
-assert.match(page, /socialProvider\(params\?\.provider\)/, "개발 미리보기에서 SNS 채널 표기를 확인할 수 있어야 합니다.");
-assert.match(component, /name="loginId" className="profile-social-login" value=\{original\.loginId\} readOnly/, "SNS 계정도 실제 아이디를 읽기 전용으로 표시해야 합니다.");
-assert.match(component, /profile-social-provider[\s\S]*socialProviderLabel\(provider\)/, "SNS 로그인 채널은 아이디 입력란 아래에 표시해야 합니다.");
-assert.match(component, /google: "구글 로그인 계정"[\s\S]*naver: "네이버 로그인 계정"[\s\S]*kakao: "카카오 로그인 계정"/, "SNS 로그인 채널명이 올바르게 표시되어야 합니다.");
-assert.doesNotMatch(component, /profile-password-toggle/, "비밀번호 변경은 접이식 토글을 사용하지 않아야 합니다.");
-assert.match(component, /verifyGuardianCurrentPasswordAction\(currentPassword\)/, "현재 비밀번호를 서버에서 확인해야 합니다.");
-assert.match(component, /disabled=\{!currentPasswordVerified\}/, "현재 비밀번호 확인 전에는 새 비밀번호 입력이 비활성화되어야 합니다.");
-assert.match(component, /setCurrentPassword\(""\)[\s\S]*resetPasswordVerification/, "현재 비밀번호 불일치 시 비밀번호 입력값을 초기화해야 합니다.");
-assert.match(actions, /export async function verifyGuardianCurrentPasswordAction/, "현재 비밀번호 확인 서버 액션이 있어야 합니다.");
-assert.match(db, /verifyPassword\(currentPassword, guardian\.password_hash\)/, "현재 비밀번호는 저장된 해시와 비교해야 합니다.");
-assert.match(css, /\.profile-password-input:has\(input:disabled\)/, "확인 전 비밀번호 입력은 비활성 스타일이어야 합니다.");
+assert.match(page, /previewState = \["phone-change", "completed"\]/, "보호자 정보 상태별 미리보기를 제공해야 합니다.");
+assert.match(component, /<strong>이름<\/strong>/, "이름 수정 항목이 있어야 합니다.");
+assert.match(component, /<legend>성별<\/legend>/, "성별 수정 항목이 있어야 합니다.");
+assert.match(component, /<legend>생년월일<\/legend>/, "생년월일 수정 항목이 있어야 합니다.");
+assert.match(component, /<strong>휴대전화번호<\/strong>/, "휴대전화번호 수정 항목이 있어야 합니다.");
+assert.match(component, /번호 변경/, "휴대전화번호 변경 진입 버튼이 있어야 합니다.");
+assert.match(component, /purpose: "guardian_phone_change"/, "새 휴대전화번호 인증을 별도 목적으로 요청해야 합니다.");
+assert.match(component, /Array\.from\(\{ length: 6 \}/, "인증번호는 6개 칸으로 입력해야 합니다.");
+assert.match(component, /!phoneChanged \|\| phoneVerified/, "번호 변경 시 인증 완료 전에는 저장할 수 없어야 합니다.");
+assert.doesNotMatch(component, /profile-social-login|socialProviderLabel|비밀번호 변경|아이디.*중복확인/, "아이디, 비밀번호 및 SNS 항목을 표시하지 않아야 합니다.");
+assert.match(actions, /redirect\(withNotice\("\/\?panel=my", "보호자 정보가 수정되었습니다\."\)\)/, "저장 후 설정 화면에 완료 안내를 표시해야 합니다.");
+assert.match(db, /profileSettings \? String\(current\.guardian\.login_id \|\| ""\)/, "프로필 수정 시 기존 로그인 아이디를 보존해야 합니다.");
+assert.match(db, /purpose: "guardian_phone_change"[\s\S]*guardianId: current\.guardian\.id/, "변경된 휴대전화번호 인증을 서버에서 소비해야 합니다.");
+assert.doesNotMatch(db, /adminMayBypassPhoneVerification/, "관리자도 새 휴대전화번호 인증을 생략할 수 없어야 합니다.");
+assert.match(css, /\.profile-verification-row[\s\S]*repeat\(6, minmax\(0, 1fr\)\)/, "6자리 인증번호 입력 레이아웃이 있어야 합니다.");
 
 console.log("Guardian profile UI regression checks passed.");

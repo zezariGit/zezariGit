@@ -193,10 +193,17 @@ function formatSubjectSummary(gender, birthDate) {
   const normalizedBirthDate = formatDate(birthDate);
   const age = calculateAge(birthDate);
   return [
-    gender || "성별 미입력",
+    formatSubjectGender(gender),
     age === null ? null : `만 ${age}세`,
     normalizedBirthDate === "-" ? null : `(${normalizedBirthDate.replaceAll("-", ".")})`,
   ].filter(Boolean).join(" · ").replace(" · (", " (");
+}
+
+function formatSubjectGender(value) {
+  const gender = String(value || "").trim();
+  if (gender === "남" || gender === "남성") return "남성";
+  if (gender === "여" || gender === "여성") return "여성";
+  return gender || "성별 미입력";
 }
 
 function calculateAge(value) {

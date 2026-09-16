@@ -81,17 +81,20 @@ export default async function HomePage({ searchParams }) {
   if (["dashboard", "dashboard-empty", "dashboard-notifications", "dashboard-inactive", "settings", "ad-campaign"].includes(dashboardPreview)) {
     const dashboardSubjects = dashboardPreview === "dashboard-empty" ? [] : previewDashboardSubjects();
     return (
-      <GuardianDashboard
-        guardian={{ id: "preview-guardian", name: "보호자", phone: "010-0000-0000", birth_date: "1990-01-01", is_active: dashboardPreview === "dashboard-inactive" ? 0 : 1, login_id: "preview", password_hash: "preview" }}
-        subjects={dashboardSubjects}
-        subscription={null}
-        session={{ user: { provider: "credentials", email: "" } }}
-        activeTab="dashboard"
-        showMyPage={dashboardPreview === "settings"}
-        notificationPreview={dashboardPreview === "dashboard-notifications"}
-        adSubjectId={dashboardPreview === "ad-campaign" ? dashboardSubjects[0]?.id : ""}
-        previewMode={dashboardPreview}
-      />
+      <>
+        <GuardianDashboard
+          guardian={{ id: "preview-guardian", name: "보호자", phone: "010-0000-0000", birth_date: "1990-01-01", is_active: dashboardPreview === "dashboard-inactive" ? 0 : 1, login_id: "preview", password_hash: "preview" }}
+          subjects={dashboardSubjects}
+          subscription={null}
+          session={{ user: { provider: "credentials", email: "" } }}
+          activeTab="dashboard"
+          showMyPage={dashboardPreview === "settings"}
+          notificationPreview={dashboardPreview === "dashboard-notifications"}
+          adSubjectId={dashboardPreview === "ad-campaign" ? dashboardSubjects[0]?.id : ""}
+          previewMode={dashboardPreview}
+        />
+        <StatusToast message={notice} type={noticeType} />
+      </>
     );
   }
   const session = await getServerSession(authOptions);

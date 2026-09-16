@@ -21,6 +21,8 @@ assert.match(page, /const subscriptionActive = !data\.subscription_status/);
 assert.match(page, /if \(state === "purchase-needed"\)[\s\S]*qr_activation_source: "subject_registration"[\s\S]*subject_status: "상품구매필요"/);
 assert.doesNotMatch(page, /상품 수령 후 활성화|아직 활성화되지 않은 QR입니다|activateQrAction/);
 assert.match(page, /qr-status-message-unassigned/);
+assert.match(page, /gender === "남" \|\| gender === "남성"\) return "남성"/);
+assert.match(page, /gender === "여" \|\| gender === "여성"\) return "여성"/);
 assert.match(safePhone, /\/api\/find\/\$\{encodeURIComponent\(qrKey\)\}\/safe-phone/);
 assert.match(safePhone, /window\.location\.assign\(data\.telUrl\)/);
 assert.match(locationShare, /setStep\("intro"\)/);
@@ -37,6 +39,7 @@ assert.match(emergency, /112에 전화할까요/);
 assert.match(emergency, /href="tel:112"/);
 assert.match(voice, /if \(!hasVoice\) return null/);
 assert.match(voice, /audio\.play\(\)/);
+assert.match(voice, /assets\/finder\/guardian-voice-button\.png/);
 assert.match(styles, /\.finder-public-page[\s\S]*min-height:\s*100svh/);
 assert.match(styles, /\.finder-public-action-grid[\s\S]*grid-template-columns:\s*repeat\(2/);
 
@@ -44,8 +47,7 @@ await Promise.all([
   "guardian-call.png",
   "location-share.png",
   "emergency-call.png",
-  "voice-play.png",
-  "voice-waveform.png",
+  "guardian-voice-button.png",
   "guardian-message.png",
   "shield-check.png",
 ].map((name) => access(new URL(`../public/assets/finder/${name}`, import.meta.url))));
