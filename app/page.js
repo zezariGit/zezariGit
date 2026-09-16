@@ -5,7 +5,7 @@ import { LoginAuthPanel } from "./auth-actions";
 import GuardianDashboard from "./dashboard";
 import OnboardingGate from "./onboarding-gate";
 import StatusToast from "./status-toast";
-import { authOptions, getConfiguredProviderIds } from "../lib/auth";
+import { authOptions } from "../lib/auth";
 import { getActiveQrSignupClaim, getDashboardData } from "../lib/db";
 import { isAdminSession } from "../lib/admin";
 import {
@@ -32,20 +32,20 @@ export default async function HomePage({ searchParams }) {
   const notice = resolvedSearchParams?.notice || "";
   const noticeType = resolvedSearchParams?.noticeType || "success";
   const authError = resolvedSearchParams?.error || "";
-  const authMode = process.env.NODE_ENV === "development" && resolvedSearchParams?.preview === "find-id-found"
-    ? "login-id-found"
-    : process.env.NODE_ENV === "development" && resolvedSearchParams?.preview === "signup-terms"
-      ? "signup"
-    : resolvedSearchParams?.signup === "1"
-    ? "signup"
-    : resolvedSearchParams?.findId === "1"
-      ? "login-id"
-      : "login";
+  const authPreview = process.env.NODE_ENV === "development" ? String(resolvedSearchParams?.preview || "") : "";
+  const authMode = authPreview.startsWith("phone-signup") || resolvedSearchParams?.signup === "1" ? "signup" : "login";
   const signupPreviewStep = process.env.NODE_ENV === "development"
-    ? resolvedSearchParams?.preview === "signup-complete"
-      ? "done"
-      : resolvedSearchParams?.preview === "signup-terms"
-        ? "profile"
+    ? authPreview === "phone-signup-profile"
+      ? "profile"
+      : authPreview === "phone-signup-existing"
+        ? "existing"
+        : undefined
+    : undefined;
+  const loginPreviewStep = process.env.NODE_ENV === "development"
+    ? authPreview === "phone-login-code"
+      ? "code"
+      : authPreview === "phone-login-unregistered"
+        ? "unregistered"
         : undefined
     : undefined;
   const dashboardPreview = process.env.NODE_ENV === "development"
@@ -55,6 +55,7 @@ export default async function HomePage({ searchParams }) {
     "subject-preview",
     "subject-edit",
     "subject-registration",
+    "subject-registration-required",
     "subject-registration-complete",
   ];
   if (subjectPreviewModes.includes(dashboardPreview)) {
@@ -62,12 +63,13 @@ export default async function HomePage({ searchParams }) {
     const isPreview = dashboardPreview === "subject-preview";
     const isEdit = dashboardPreview === "subject-edit";
     const isComplete = dashboardPreview === "subject-registration-complete";
+    const isRequired = dashboardPreview === "subject-registration-required";
     return (
       <GuardianDashboard
         guardian={{ id: "preview-guardian", name: "보호자", phone: "010-0000-0000", birth_date: "1990-01-01", is_active: 1, login_id: "preview", password_hash: "preview" }}
-        subjects={[sampleSubject]}
+        subjects={isRequired ? [] : [sampleSubject]}
         subscription={null}
-        session={{ user: { provider: "credentials", email: "" } }}
+        session={{ user: { provider: "phone", email: "" } }}
         activeTab={isPreview ? "dashboard" : "subjects"}
         previewSubjectId={isPreview ? sampleSubject.id : ""}
         editSubjectId={isEdit ? sampleSubject.id : ""}
@@ -92,7 +94,6 @@ export default async function HomePage({ searchParams }) {
     );
   }
   const session = await getServerSession(authOptions);
-  const enabledProviders = getConfiguredProviderIds();
   const pendingQrClaim = await resolvePendingQrClaim();
 
   if (session) {
@@ -136,10 +137,10 @@ export default async function HomePage({ searchParams }) {
   const loginPanel = (
     <main className="page">
       <LoginAuthPanel
-        enabledProviders={enabledProviders}
         authError={authError}
         initialMode={authMode}
         initialSignupStep={signupPreviewStep}
+        initialLoginStep={loginPreviewStep}
         qrClaim={Boolean(pendingQrClaim)}
       />
     </main>
@@ -147,7 +148,7 @@ export default async function HomePage({ searchParams }) {
 
   return (
     <>
-      <OnboardingGate enabled={!session && !pendingQrClaim && resolvedSearchParams?.login !== "1"}>{loginPanel}</OnboardingGate>
+      <OnboardingGate enabled={!session && !pendingQrClaim && resolvedSearchParams?.login !== "1" && !authPreview.startsWith("phone-")}>{loginPanel}</OnboardingGate>
       <StatusToast message={notice} type={noticeType} />
     </>
   );
@@ -184,16 +185,13 @@ async function resolvePendingQrClaim() {
 
 function isGuardianProfileComplete(guardian, session, admin) {
   if (admin) return true;
-  const provider = String(session?.user?.provider || "").trim().toLowerCase();
-  const socialAccount = ["google", "kakao", "naver", "facebook"].includes(provider);
   return Boolean(
     guardian?.name
       && guardian?.birth_date
       && guardian?.phone
-      && (socialAccount
-        ? (guardian.email_verified_at || guardian.phone_verified_at)
-          && guardian.terms_privacy_agreed_at
-          && guardian.terms_service_agreed_at
-        : guardian.login_id && guardian.password_hash)
+      && (
+        (guardian.phone_verified_at && guardian.terms_privacy_agreed_at && guardian.terms_service_agreed_at)
+        || (guardian.login_id && guardian.password_hash)
+      )
   );
 }

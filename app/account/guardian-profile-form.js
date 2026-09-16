@@ -49,13 +49,15 @@ export default function GuardianProfileForm({ guardian, provider = "credentials"
   const [showPasswords, setShowPasswords] = useState([false, false, false]);
 
   const socialAccount = isSocialProvider(provider);
+  const phoneAccount = String(provider || "").trim().toLowerCase() === "phone";
+  const passwordlessAccount = socialAccount || phoneAccount;
   const birthDate = `${year}-${month}-${day}`;
   const phoneChanged = digits(phone) !== digits(original.phone);
   const phoneValid = /^01[016789]\d{7,8}$/.test(digits(phone));
   const phoneVerified = phoneChanged && (admin
     ? phoneValid
     : digits(verifiedPhone) === digits(phone) && Boolean(phoneToken));
-  const loginChanged = !socialAccount && loginId.trim().toLowerCase() !== original.loginId.toLowerCase();
+  const loginChanged = !passwordlessAccount && loginId.trim().toLowerCase() !== original.loginId.toLowerCase();
   const loginFormatValid = LOGIN_ID_PATTERN.test(loginId.trim());
   const loginVerified = loginChanged && checkedLoginId.toLowerCase() === loginId.trim().toLowerCase();
   const passwordStarted = Boolean(password || passwordConfirmation);
@@ -277,11 +279,11 @@ export default function GuardianProfileForm({ guardian, provider = "credentials"
       </div>
 
       <div className={`profile-field${loginError ? " has-error" : ""}`}>
-        <strong>아이디</strong>
-        {socialAccount ? (
+        <strong>{phoneAccount ? "로그인 방식" : "아이디"}</strong>
+        {passwordlessAccount ? (
           <>
             <input name="loginId" className="profile-social-login" value={original.loginId} readOnly />
-            <small className="profile-social-provider">{socialProviderLabel(provider)}</small>
+            <small className="profile-social-provider">{phoneAccount ? "휴대폰 번호 인증 로그인" : socialProviderLabel(provider)}</small>
           </>
         ) : (
           <>
@@ -294,7 +296,7 @@ export default function GuardianProfileForm({ guardian, provider = "credentials"
         )}
       </div>
 
-      {guardian.password_hash && (
+      {guardian.password_hash && !phoneAccount && (
         <section className="profile-password-section">
           <h2>비밀번호 변경</h2>
           <div className="profile-password-fields">

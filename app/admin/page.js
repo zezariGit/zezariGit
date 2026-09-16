@@ -93,7 +93,7 @@ export default async function AdminPage({ searchParams }) {
       <main className="admin-page">
         <section className="admin-empty">
           <h1>관리자 로그인</h1>
-          <p>관리자 페이지를 사용하려면 등록된 소셜 계정 로그인이 필요합니다.</p>
+          <p>관리자 휴대폰 번호 인증 후 이용할 수 있습니다.</p>
           <SocialLoginButtons enabledProviders={enabledProviders} />
         </section>
         <StatusToast message={notice} type={noticeType} />

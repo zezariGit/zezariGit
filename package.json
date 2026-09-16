@@ -17,6 +17,7 @@
     "test:notifications": "node scripts/notification-popover-regression.mjs",
     "test:admin-phone-otp": "tsx scripts/admin-phone-verification-regression.mjs",
     "test:login-ui": "node scripts/login-ui-regression.mjs",
+    "test:phone-auth": "tsx scripts/phone-auth-regression.mjs",
     "test:signup-phone-ui": "node scripts/signup-phone-ui-regression.mjs",
     "test:signup-profile-ui": "node scripts/signup-profile-ui-regression.mjs",
     "test:service-regulations": "node scripts/service-regulations-regression.mjs",

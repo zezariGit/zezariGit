@@ -23,7 +23,7 @@ const previewGuardian = {
 export default async function GuardianProfilePage({ searchParams }) {
   const params = await searchParams;
   const preview = process.env.NODE_ENV === "development" && params?.preview === "1";
-  const previewProvider = socialProvider(params?.provider) ? params.provider : "credentials";
+  const previewProvider = params?.provider === "phone" || socialProvider(params?.provider) ? params.provider : "phone";
   const session = preview ? { user: { provider: previewProvider } } : await getServerSession(authOptions);
   if (!session) redirect("/");
   const guardian = preview

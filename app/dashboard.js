@@ -51,16 +51,14 @@ export default async function GuardianDashboard({
   const selectedEditSubject = subjectsWithQr.find((subject) => subject.id === editSubjectId) || null;
   const registeredSubject = subjectsWithQr.find((subject) => subject.id === registeredSubjectId) || null;
   const admin = isAdminSession(session) || Number(guardian.is_admin || 0) === 1;
-  const socialAccount = isSocialAccount(session);
   const guardianComplete = admin || Boolean(
     guardian.name
       && guardian.birth_date
       && guardian.phone
-      && (socialAccount
-        ? (guardian.email_verified_at || guardian.phone_verified_at)
-          && guardian.terms_privacy_agreed_at
-          && guardian.terms_service_agreed_at
-        : guardian.login_id && guardian.password_hash)
+      && (
+        (guardian.phone_verified_at && guardian.terms_privacy_agreed_at && guardian.terms_service_agreed_at)
+        || (guardian.login_id && guardian.password_hash)
+      )
   );
   const guardianActive = guardian.is_active !== 0;
   const isDashboard = activeTab === "dashboard";
@@ -171,6 +169,7 @@ export default async function GuardianDashboard({
             registeredQrClaim={registeredQrClaim}
             hasQrSignupClaim={hasQrSignupClaim}
             imageUploadSettings={imageUploadSettings}
+            requiredRegistration={!admin && subjectsWithQr.length === 0 && !selectedEditSubject}
           />
         )}
 
@@ -276,7 +275,7 @@ function MyPageTab({ closeHref = "", admin = false }) {
   );
 }
 
-function SubjectsInfoTab({ selectedSubject, registeredSubject, hasQrSignupClaim = false, imageUploadSettings }) {
+function SubjectsInfoTab({ selectedSubject, registeredSubject, hasQrSignupClaim = false, imageUploadSettings, requiredRegistration = false }) {
   if (registeredSubject) {
     return <SubjectRegistrationComplete />;
   }
@@ -292,7 +291,7 @@ function SubjectsInfoTab({ selectedSubject, registeredSubject, hasQrSignupClaim 
             <span>이 대상자를 저장하면 방금 접근한 QR이 자동으로 연결됩니다.</span>
           </div>
         )}
-        <SubjectForm subject={selectedSubject || undefined} imageUploadSettings={imageUploadSettings} />
+        <SubjectForm subject={selectedSubject || undefined} imageUploadSettings={imageUploadSettings} requiredRegistration={requiredRegistration} />
       </div>
     </section>
   );
@@ -498,6 +497,7 @@ function StatusDashboard({ subjects }) {
 
 function GuardianForm({ guardian, session, admin }) {
   const socialAccount = isSocialAccount(session);
+  const phoneAccount = String(session?.user?.provider || "").trim().toLowerCase() === "phone";
 
   return (
     <form action={saveGuardianAction} className="form-grid">
@@ -505,12 +505,12 @@ function GuardianForm({ guardian, session, admin }) {
                 이름
                 <input name="guardianName" defaultValue={guardian.name || ""} required />
               </label>
-              {socialAccount ? (
+              {socialAccount || phoneAccount ? (
                 <>
                   <input name="loginId" type="hidden" defaultValue={guardian.login_id || ""} />
                   <label>
                     로그인 방식
-                    <input value={`${socialProviderLabel(session?.user?.provider)} 계정 로그인`} readOnly />
+                    <input value={phoneAccount ? "휴대폰 번호 인증" : `${socialProviderLabel(session?.user?.provider)} 계정 로그인`} readOnly />
                   </label>
                 </>
               ) : (
@@ -564,18 +564,20 @@ function GuardianForm({ guardian, session, admin }) {
   );
 }
 
-function SubjectForm({ subject, imageUploadSettings }) {
+function SubjectForm({ subject, imageUploadSettings, requiredRegistration = false }) {
   const isExisting = Boolean(subject?.id);
   const photoSrc = subjectPhotoSrc(subject);
 
   return (
     <article className={`subject-edit-card ${isExisting ? "is-editing" : "is-registering"}`}>
       <header className="subject-form-header">
-        <BackButton
-          className="subject-form-back"
-          href={isExisting ? `/?tab=dashboard&previewSubject=${encodeURIComponent(subject.id)}` : "/?tab=dashboard"}
-          label={isExisting ? "대상자 정보 미리보기로 돌아가기" : "대시보드로 돌아가기"}
-        />
+        {!requiredRegistration && (
+          <BackButton
+            className="subject-form-back"
+            href={isExisting ? `/?tab=dashboard&previewSubject=${encodeURIComponent(subject.id)}` : "/?tab=dashboard"}
+            label={isExisting ? "대상자 정보 미리보기로 돌아가기" : "대시보드로 돌아가기"}
+          />
+        )}
         <h1>{isExisting ? "대상자 정보 수정" : "대상자 정보 등록"}</h1>
         {isExisting && <p>정확한 정보를 위해 수정해 주세요.</p>}
       </header>

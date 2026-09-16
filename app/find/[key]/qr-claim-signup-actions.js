@@ -1,19 +1,10 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { GoogleLogo, KakaoLogo, NaverLogo } from "../../auth-actions";
 
-const providers = [
-  { id: "google", label: "Google", className: "google-action", Logo: GoogleLogo },
-  { id: "kakao", label: "카카오", className: "kakao-action", Logo: KakaoLogo },
-  { id: "naver", label: "네이버", className: "naver-action", Logo: NaverLogo },
-];
-
-export default function QrClaimSignupActions({ publicKey, enabledProviders = [], signedIn = false }) {
+export default function QrClaimSignupActions({ publicKey, signedIn = false }) {
   const [pending, setPending] = useState("");
   const [message, setMessage] = useState("");
-  const enabled = new Set(enabledProviders);
 
   const beginClaim = async () => {
     const response = await fetch("/api/qr-claim/start", {
@@ -44,18 +35,6 @@ export default function QrClaimSignupActions({ publicKey, enabledProviders = [],
     }
   };
 
-  const continueWithSocial = async (providerId) => {
-    setPending(providerId);
-    setMessage("");
-    try {
-      await beginClaim();
-      await signIn(providerId, { callbackUrl: "/?tab=subjects&mode=new&qrClaim=1" });
-    } catch (error) {
-      setMessage(error.message || "SNS 가입을 시작하지 못했습니다.");
-      setPending("");
-    }
-  };
-
   return (
     <div className="qr-claim-actions">
       <button className="primary-button qr-claim-primary" type="button" onClick={() => continueWithPage("signup")} disabled={Boolean(pending)}>
@@ -64,26 +43,8 @@ export default function QrClaimSignupActions({ publicKey, enabledProviders = [],
 
       {!signedIn && (
         <>
-          <div className="login-divider qr-claim-divider"><span>또는 SNS로 가입</span></div>
-          <div className="social-login-stack qr-claim-social-list">
-            {providers.map(({ id, label, className, Logo }) => {
-              const configured = enabled.has(id);
-              return (
-                <button
-                  className={`action social-action ${className}`}
-                  type="button"
-                  key={id}
-                  onClick={() => continueWithSocial(id)}
-                  disabled={!configured || Boolean(pending)}
-                >
-                  <Logo />
-                  <span>{pending === id ? "연결 중" : configured ? `${label}로 가입` : `${label} 설정 필요`}</span>
-                </button>
-              );
-            })}
-          </div>
           <button className="admin-link qr-claim-login" type="button" onClick={() => continueWithPage("login")} disabled={Boolean(pending)}>
-            이미 가입한 회원 로그인
+            이미 가입한 회원 휴대폰 인증 로그인
           </button>
         </>
       )}
