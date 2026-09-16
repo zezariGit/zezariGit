@@ -43,6 +43,7 @@ export default async function GuardianDashboard({
   registeredQrClaim = false,
   hasQrSignupClaim = false,
   notificationPreview = false,
+  previewMode = "",
 }) {
   const qrImageSubjectIds = new Set([adSubjectId, editSubjectId].filter(Boolean));
   const subjectsWithQr = await withSubjectQrImages(subjects, qrImageSubjectIds);
@@ -159,6 +160,7 @@ export default async function GuardianDashboard({
             adPricing={adPricing}
             selectedAdSubject={selectedAdSubject}
             selectedPreviewSubject={selectedPreviewSubject}
+            previewMode={previewMode}
           />
         ) : isGuardianTab ? (
           <GuardianInfoTab guardian={guardian} session={session} admin={admin} />
@@ -197,6 +199,7 @@ function DashboardTab({
   adPricing,
   selectedAdSubject,
   selectedPreviewSubject,
+  previewMode,
 }) {
   if (!guardianComplete) {
     return (
@@ -215,7 +218,7 @@ function DashboardTab({
       {selectedPreviewSubject ? (
         <SubjectPreviewPage subject={selectedPreviewSubject} />
       ) : (
-        <StatusDashboard subjects={subjects} />
+        <StatusDashboard subjects={subjects} previewMode={previewMode} />
       )}
       {selectedAdSubject && (
         <AdCampaignModal
@@ -387,44 +390,37 @@ function EditIcon() {
   );
 }
 
-function StatusDashboard({ subjects }) {
+function StatusDashboard({ subjects, previewMode = "" }) {
   const pageSize = 3;
+  const addSubjectHref = previewMode
+    ? "/?preview=subject-registration"
+    : "/?tab=subjects&mode=new#subjects-info";
   const subjectPages = [];
   for (let index = 0; index < subjects.length; index += pageSize) {
     subjectPages.push(subjects.slice(index, index + pageSize));
   }
   if (subjects.length === 0) {
     subjectPages.push([]);
-  } else if (subjectPages.at(-1).length < pageSize) {
-    subjectPages.at(-1).push(null);
-  } else {
-    subjectPages.push([null]);
   }
 
   return (
     <section className="status-dashboard" aria-label="관리대상 현재 상태">
       <div className="status-phone">
         <div className="status-phone-top">
-          <h2>현재 상태</h2>
-          <SubjectStatusGuide />
+          <div className="status-phone-heading">
+            <h2>현재 상태</h2>
+            <SubjectStatusGuide />
+          </div>
+          <Link className="status-add-subject" href={addSubjectHref}>
+            <span aria-hidden="true">+</span>
+            대상자 추가
+          </Link>
         </div>
         <ManagedSubjectCarousel pageCount={subjectPages.length} showDots={subjects.length > 0}>
           <div className="managed-pages">
             {subjectPages.map((pageSubjects, pageIndex) => (
               <div className="managed-page" key={`managed-page-${pageIndex}`}>
                 {pageSubjects.map((subject) => {
-                  if (!subject) {
-                    return (
-                      <Link
-                        className="managed-add-subject"
-                        href="/?tab=subjects&mode=new#subjects-info"
-                        aria-label="대상자 추가하기"
-                        key={`managed-add-${pageIndex}`}
-                      >
-                        <span aria-hidden="true">+</span>
-                      </Link>
-                    );
-                  }
                   const displayStatus = resolveSubjectStatus(subject);
                   return (
                   <Link
@@ -458,9 +454,6 @@ function StatusDashboard({ subjects }) {
                   <div className="managed-empty-state">
                     <strong>등록된 대상자가 없습니다.</strong>
                     <p>대상자를 등록하고 제자리 서비스를 시작해 보세요.</p>
-                    <Link className="managed-empty-add" href="/?tab=subjects&mode=new#subjects-info">
-                      <span aria-hidden="true">+</span> 대상자 추가하기
-                    </Link>
                   </div>
                 )}
               </div>

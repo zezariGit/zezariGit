@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../../lib/auth";
-import { markProductOrderFailedForGuardian } from "../../../../../lib/db";
+import { markProductOrderCancelledForGuardian, markProductOrderFailedForGuardian } from "../../../../../lib/db";
+import { isTossPaymentCancellation } from "../../../../../lib/toss-payments";
 
 export const dynamic = "force-dynamic";
 
@@ -9,10 +10,12 @@ export default async function TossSubscriptionFailPage({ searchParams }) {
   const code = String(params?.code || "").trim();
   const message = String(params?.message || "이용권 결제가 완료되지 않았습니다.").trim();
   const productOrderId = String(params?.productOrderId || "").trim();
+  const cancelled = isTossPaymentCancellation(code);
   const session = await getServerSession(authOptions);
 
   if (session && productOrderId) {
-    await markProductOrderFailedForGuardian(session, productOrderId);
+    if (cancelled) await markProductOrderCancelledForGuardian(session, productOrderId);
+    else await markProductOrderFailedForGuardian(session, productOrderId);
   }
 
   return (

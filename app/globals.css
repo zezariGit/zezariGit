@@ -2042,6 +2042,13 @@ a {
   padding: 0;
 }
 
+.dashboard-home-shell .status-phone-heading {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
 .dashboard-home-shell .status-phone-top h2 {
   color: #252b2d;
   font-size: 16px;
@@ -2049,8 +2056,8 @@ a {
 }
 
 .subject-status-guide-trigger {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: grid;
   place-items: center;
   border: 0;
@@ -2060,9 +2067,35 @@ a {
 }
 
 .subject-status-guide-trigger img {
-  width: 40px;
-  height: 40px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
+}
+
+.dashboard-home-shell .status-add-subject {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 2px;
+  color: #009b50;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.dashboard-home-shell .status-add-subject span {
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.dashboard-home-shell .status-add-subject:hover,
+.dashboard-home-shell .status-add-subject:focus-visible {
+  color: #008447;
+  text-decoration: none;
 }
 
 .dashboard-home-shell .managed-carousel {

@@ -90,6 +90,7 @@ export default async function HomePage({ searchParams }) {
         showMyPage={dashboardPreview === "settings"}
         notificationPreview={dashboardPreview === "dashboard-notifications"}
         adSubjectId={dashboardPreview === "ad-campaign" ? dashboardSubjects[0]?.id : ""}
+        previewMode={dashboardPreview}
       />
     );
   }

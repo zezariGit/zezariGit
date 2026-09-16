@@ -6,18 +6,28 @@ import BackButton from "./back-button";
 
 const PREVIEW_NOTIFICATIONS = [
   { id: "preview-location", category: "safety", event_key: "safety.location_shared", title: "위치가 공유되었습니다", body: "박제자리 관리대상자의 현재 위치를 공유했습니다.", url: "/account/location-shares/preview?preview=1", created_at: "2026-09-04T03:10:00.000Z", read_at: null },
-  { id: "preview-contact", category: "safety", title: "보호자 안심번호로 연락이 왔습니다", body: "김제자리 관리대상자의 QR 페이지에서 보호자에게 연락했습니다.", created_at: "2026-09-04T01:20:00.000Z", read_at: null },
-  { id: "preview-ad-active", category: "ad", title: "수정된 광고가 게재되었습니다", body: "Meta 검토가 완료되어 온라인 실종 광고가 다시 게재되었습니다.", created_at: "2026-09-04T01:12:00.000Z", read_at: "2026-09-04T01:15:00.000Z" },
+  { id: "preview-contact", category: "safety", event_key: "safety.safe_phone_contact", title: "보호자 안심번호로 연락이 왔습니다", body: "김제자리 관리대상자의 QR 페이지에서 보호자에게 연락했습니다.", created_at: "2026-09-04T01:20:00.000Z", read_at: null },
+  { id: "preview-ad-active", category: "ad", event_key: "ad.started", title: "온라인 실종 광고가 시작되었습니다", body: "META 검토가 완료되어 박제자리 관리대상자의 광고 게재가 시작되었습니다.", created_at: "2026-09-04T01:12:00.000Z", read_at: null },
+  { id: "preview-ad-rejected", category: "ad", event_key: "ad.rejected", title: "온라인 실종 광고 게재가 제한되었습니다", body: "META 검토 결과 광고를 게재하지 못했습니다. 관리자에게 문의해 주세요.", created_at: "2026-09-04T00:55:00.000Z", read_at: null },
   { id: "preview-ad-paused", category: "ad", title: "광고가 일시정지되었습니다", body: "광고 변경 요청으로 기존 광고가 일시정지되었습니다.", created_at: "2026-09-03T10:35:00.000Z", read_at: "2026-09-03T11:00:00.000Z" },
-  { id: "preview-payment", category: "commerce", title: "결제가 완료되었습니다", body: "결제 내역을 확인해 주세요.", created_at: "2026-09-02T10:35:00.000Z", read_at: "2026-09-02T11:00:00.000Z" },
+  { id: "preview-ad-ended", category: "ad", event_key: "ad.ended", title: "온라인 실종 광고가 종료되었습니다", body: "박제자리 관리대상자의 온라인 실종 광고 기간이 종료되었습니다.", created_at: "2026-09-03T09:20:00.000Z", read_at: "2026-09-03T09:30:00.000Z" },
+  { id: "preview-ad-payment-completed", category: "ad", event_key: "ad.payment_completed", title: "광고 결제가 완료되었습니다.", body: "광고 결제 내역을 확인해 주세요.", created_at: "2026-09-03T08:35:00.000Z", read_at: "2026-09-03T08:40:00.000Z" },
+  { id: "preview-ad-payment-failed", category: "ad", event_key: "ad.payment_failed", title: "광고 결제에 실패했습니다.", body: "결제수단을 확인한 후 다시 시도해 주세요.", created_at: "2026-09-03T08:10:00.000Z", read_at: "2026-09-03T08:15:00.000Z" },
+  { id: "preview-ad-payment-cancelled", category: "ad", event_key: "ad.payment_cancelled", title: "광고 결제가 취소되었습니다.", body: "광고 결제 취소 내역을 확인해 주세요.", created_at: "2026-09-03T07:50:00.000Z", read_at: "2026-09-03T08:00:00.000Z" },
+  { id: "preview-ad-refund-completed", category: "ad", event_key: "ad.refund_completed", title: "광고 결제 금액의 환불이 완료되었습니다.", body: "광고 환불 내역을 확인해 주세요.", created_at: "2026-09-03T07:20:00.000Z", read_at: "2026-09-03T07:30:00.000Z" },
+  { id: "preview-product-payment-completed", category: "commerce", event_key: "commerce.product_payment_completed", title: "상품 결제가 완료되었습니다.", body: "상품 결제 내역을 확인해 주세요.", created_at: "2026-09-02T10:35:00.000Z", read_at: "2026-09-02T11:00:00.000Z" },
+  { id: "preview-product-payment-failed", category: "commerce", event_key: "commerce.product_payment_failed", title: "상품 결제에 실패했습니다.", body: "결제수단을 확인한 후 다시 시도해 주세요.", created_at: "2026-09-02T10:10:00.000Z", read_at: "2026-09-02T10:15:00.000Z" },
+  { id: "preview-product-payment-cancelled", category: "commerce", event_key: "commerce.product_payment_cancelled", title: "상품 결제가 취소되었습니다.", body: "상품 결제 취소 내역을 확인해 주세요.", created_at: "2026-09-02T09:50:00.000Z", read_at: "2026-09-02T10:00:00.000Z" },
+  { id: "preview-product-refund-completed", category: "commerce", event_key: "commerce.product_refund_completed", title: "상품 결제 금액의 환불이 완료되었습니다.", body: "상품 환불 내역을 확인해 주세요.", created_at: "2026-09-02T09:20:00.000Z", read_at: "2026-09-02T09:30:00.000Z" },
 ];
+const PREVIEW_UNREAD_COUNT = PREVIEW_NOTIFICATIONS.filter((notification) => !notification.read_at).length;
 
 export default function NotificationBell({ preview = false }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(preview);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [notifications, setNotifications] = useState(preview ? PREVIEW_NOTIFICATIONS : []);
-  const [unreadCount, setUnreadCount] = useState(preview ? 2 : 0);
+  const [unreadCount, setUnreadCount] = useState(preview ? PREVIEW_UNREAD_COUNT : 0);
   const popoverRef = useRef(null);
   const notificationsRef = useRef(preview ? PREVIEW_NOTIFICATIONS : []);
   const exposedUnreadIdsRef = useRef(new Set());

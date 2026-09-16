@@ -15,8 +15,12 @@ const [page, dashboard, authActions, carousel, guide, adCampaign, privacyPage, s
 ]);
 
 assert.match(dashboard, /const pageSize = 3;/, "대상자 목록은 3명 단위여야 합니다.");
-assert.match(dashboard, /subjectPages\.at\(-1\)\.push\(null\)/, "마지막 페이지의 빈 슬롯에는 대상자 추가 버튼이 있어야 합니다.");
-assert.match(dashboard, /subjectPages\.push\(\[null\]\)/, "3명 단위로 가득 찬 경우 다음 페이지에 대상자 추가 버튼이 있어야 합니다.");
+assert.doesNotMatch(dashboard, /subjectPages\.at\(-1\)\.push\(null\)|subjectPages\.push\(\[null\]\)/, "대상자 추가 전용 카드나 페이지를 만들지 않아야 합니다.");
+assert.match(dashboard, /className="status-phone-heading"[\s\S]*<h2>현재 상태<\/h2>[\s\S]*<SubjectStatusGuide \/>/, "상태 안내 아이콘은 현재 상태 문구 바로 옆에 있어야 합니다.");
+assert.match(dashboard, /className="status-add-subject"[\s\S]*대상자 추가/, "대상자 추가 버튼은 현재 상태 헤더 오른쪽에 있어야 합니다.");
+assert.match(dashboard, /previewMode[\s\S]*\? "\/\?preview=subject-registration"[\s\S]*: "\/\?tab=subjects&mode=new#subjects-info"/, "미리보기의 대상자 추가 버튼은 로그인 화면이 아닌 대상자 등록 미리보기로 이동해야 합니다.");
+assert.match(page, /previewMode=\{dashboardPreview\}/, "대시보드 미리보기 상태를 대상자 추가 링크에 전달해야 합니다.");
+assert.doesNotMatch(dashboard, /className="managed-add-subject"/, "대상자 그리드 안에 원형 추가 버튼을 표시하지 않아야 합니다.");
 assert.match(dashboard, /subjects\.length === 0 && pageSubjects\.length === 0/, "빈 상태는 대상자가 0명일 때만 표시해야 합니다.");
 assert.doesNotMatch(dashboard, /className="managed-empty-plus"/, "빈 상태 상단의 큰 플러스 아이콘은 표시하지 않아야 합니다.");
 assert.match(dashboard, /안녕하세요, 보호자님!/);
@@ -28,7 +32,7 @@ assert.match(dashboard, /<MyPageTab closeHref=\{closeMyPageHref\} admin=\{admin\
 assert.match(dashboard, /\.\.\.\(admin \? \[\["관리자 화면", "\/admin"\]\] : \[\]\)/, "관리자 화면 메뉴는 관리자에게만 표시되어야 합니다.");
 assert.match(dashboard, /href=\{`\/\?tab=dashboard&previewSubject=/, "대상자 행 전체가 미리보기 링크여야 합니다.");
 assert.match(dashboard, /등록된 대상자가 없습니다\./);
-assert.match(dashboard, /대상자 추가하기/);
+assert.match(dashboard, /대상자 추가/);
 assert.doesNotMatch(adCampaign, /ActiveAdvertisement|ad-current-panel/, "광고 설정 화면에 예전 현재 광고 요약 화면이 노출되면 안 됩니다.");
 assert.match(adCampaign, /<form action=\{createAction\} className="ad-setup-form"/, "광고 설정 진입 시 새 광고 설정 폼을 바로 표시해야 합니다.");
 assert.match(page, /"ad-campaign"/, "로그인 없이 광고 설정 단계를 확인할 개발 미리보기가 있어야 합니다.");
