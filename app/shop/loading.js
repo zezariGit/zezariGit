@@ -7,7 +7,9 @@ export default function ShopLoading() {
         <header className="shop-topbar">
           <span className="app-back-button shop-back-link" aria-hidden="true"><BackIcon /></span>
           <h1>상품 구매</h1>
-          <span className="shop-help-mark" aria-hidden="true">?</span>
+          <span className="shop-help-mark" aria-hidden="true">
+            <img src="/assets/shop-icons/help-question.png" alt="" />
+          </span>
         </header>
         <div className="shop-loading-stack">
           <span className="shop-loading-line wide" />

@@ -454,7 +454,9 @@ export default function ShopCheckoutClient({
         )}
         <h1>{selectionView ? selectionTitle : step === "configure" ? "상품 구매" : "결제"}</h1>
         {step === "configure" || selectionView ? (
-          <a className="shop-help-mark" href="/shop/service" aria-label="상품구매 서비스 소개">?</a>
+          <a className="shop-help-mark" href="/shop/service" aria-label="상품구매 서비스 소개">
+            <img src="/assets/shop-icons/help-question.png" alt="" />
+          </a>
         ) : (
           <span aria-hidden="true" />
         )}
@@ -666,7 +668,7 @@ function ProductConfiguration({
           label="디자인"
           prompt={product && designs.length === 0 ? "선택 가능한 디자인이 없습니다" : "디자인을 선택해 주세요"}
           selectedOption={displayDesign}
-          image={displayDesign ? designPickerImage(displayDesign) : "/assets/shop-icons/zodiac-rabbit.png"}
+          image={displayDesign ? designPickerImage(displayDesign) : "/assets/shop-icons/design-placeholder-animals.png"}
           onClick={openDesignSelection}
           type="design"
           disabled={Boolean(product && designs.length === 0)}

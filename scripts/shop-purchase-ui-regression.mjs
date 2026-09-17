@@ -22,6 +22,8 @@ assert.match(checkout, /configurationReady = Boolean\(subjectId && product && se
 assert.match(checkout, /Number\(product\?\.unit_price \|\| 0\)/);
 assert.match(checkout, /prompt="상품을 선택해 주세요"/);
 assert.match(checkout, /prompt=\{product && designs\.length === 0 \? "선택 가능한 디자인이 없습니다" : "디자인을 선택해 주세요"\}/);
+assert.match(checkout, /design-placeholder-animals\.png/, "디자인 미선택 상태는 제공된 동물 얼굴 아이콘을 사용해야 합니다.");
+assert.match(checkout, /shop-icons\/help-question\.png/, "상품구매 도움말은 제공된 물음표 아이콘을 사용해야 합니다.");
 assert.match(checkout, /disabled=\{!selectionReady \|\| quantity <= 1\}/);
 assert.match(checkout, /disabled=\{!selectionReady\}>\+<\/button>/);
 assert.match(checkout, /disabled=\{!configurationReady\}/);
@@ -41,6 +43,9 @@ assert.match(servicePage, /<h1>제품보기<\/h1>/);
 assert.match(servicePage, /getProductServiceIntro\(\)/);
 assert.match(serviceControls, /router\.back\(\)/);
 assert.match(serviceControls, /window\.scrollTo\(\{ top: 0, behavior: "smooth" \}\)/);
+assert.match(serviceControls, /window\.scrollY >= window\.innerHeight/, "위로가기 버튼은 한 화면 높이 이상 스크롤한 뒤 표시해야 합니다.");
+assert.match(serviceControls, /addEventListener\("scroll", updateVisibility, \{ passive: true \}\)/, "서비스 소개 스크롤 위치를 감지해야 합니다.");
+assert.match(serviceControls, /if \(!visible\) return null;/, "최상단에서는 위로가기 버튼을 렌더링하지 않아야 합니다.");
 assert.match(imageRoute, /getProductServiceIntroImage/);
 assert.match(adminWorkspace, /상품구매 서비스소개 관리/);
 assert.match(adminWorkspace, /상품\/디자인 관리/);
@@ -72,5 +77,6 @@ assert.match(styles, /\.catalog-management-image img,[\s\S]*width:\s*100%[\s\S]*
 assert.match(styles, /\.shop-subject-backdrop[\s\S]*backdrop-filter:\s*blur/);
 assert.match(styles, /\.quantity-control button:disabled/);
 assert.match(styles, /\.shop-next-button:disabled/);
+assert.match(styles, /\.shop-help-mark\s*\{[^}]*background:\s*transparent;/s, "도움말 아이콘 배경은 투명해야 합니다.");
 
 console.log("shop purchase UI regression passed");

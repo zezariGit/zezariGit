@@ -13617,7 +13617,15 @@ button:disabled:hover {
 
 .shop-help-mark {
   justify-self: end;
-  font-size: 1rem;
+  border-color: transparent;
+  background: transparent;
+}
+
+.shop-help-mark img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
 }
 
 .shop-back-link.plain {
@@ -14017,7 +14025,7 @@ button:disabled:hover {
   white-space: nowrap;
 }
 
-.shop-image-picker-trigger:has(img[src]:not([src="/assets/dashboard-action-shop.png"]):not([src="/assets/shop-icons/zodiac-rabbit.png"])) > strong {
+.shop-image-picker-trigger.selected > strong {
   color: var(--c-text);
   font-weight: 800;
 }
