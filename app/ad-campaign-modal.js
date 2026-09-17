@@ -32,7 +32,7 @@ export default function AdCampaignModal({
   const durationOptions = useMemo(() => normalizeDurationOptions(pricing?.durationOptions), [pricing]);
   const [distanceOptionId, setDistanceOptionId] = useState("");
   const [durationOptionId, setDurationOptionId] = useState("");
-  const [location, setLocation] = useState({ selected: false, lat: null, lng: null, label: "" });
+  const [location, setLocation] = useState({ selected: false, isLocality: false, lat: null, lng: null, label: "" });
   const [locationQuery, setLocationQuery] = useState("");
   const [locationResults, setLocationResults] = useState([]);
   const [locationOpen, setLocationOpen] = useState(false);
@@ -58,7 +58,8 @@ export default function AdCampaignModal({
   const backHref = String(subject?.id || "").startsWith("preview-")
     ? "/missing-report?preview=1"
     : `/missing-report${subject?.id ? `?subject=${encodeURIComponent(subject.id)}` : ""}`;
-  const regionComplete = selectedDistance?.coverageType === "country" || (location.selected && regionLabel);
+  const regionComplete = selectedDistance?.coverageType === "country"
+    || (location.selected && location.isLocality && regionLabel);
   const canSubmit = Boolean(
     selectedDistance
       && selectedDuration
@@ -69,7 +70,7 @@ export default function AdCampaignModal({
   useEffect(() => {
     setDistanceOptionId("");
     setDurationOptionId("");
-    setLocation({ selected: false, lat: null, lng: null, label: "" });
+    setLocation({ selected: false, isLocality: false, lat: null, lng: null, label: "" });
     setLocationQuery("");
     setLocationResults([]);
     setLocationMessage("");
@@ -154,16 +155,18 @@ export default function AdCampaignModal({
   }
 
   function chooseLocation(result) {
-    setLocation({ selected: true, lat: result.lat, lng: result.lng, label: result.label });
+    const isLocality = result?.isLocality === true;
+    setLocation({ selected: isLocality, isLocality, lat: result.lat, lng: result.lng, label: result.label });
     setLocationQuery(result.label);
     setLocationResults([]);
     setLocationOpen(false);
     setLocationMessage("");
+    if (!isLocality) setShowErrors(true);
   }
 
   function changeLocationQuery(value) {
     setLocationQuery(value);
-    setLocation({ selected: false, lat: null, lng: null, label: "" });
+    setLocation({ selected: false, isLocality: false, lat: null, lng: null, label: "" });
     setLocationOpen(value.trim().length >= 2);
     setLocationMessage("");
   }
@@ -182,7 +185,7 @@ export default function AdCampaignModal({
 
   return (
     <section className="modal-backdrop ad-modal-backdrop ad-setup-backdrop" aria-label="온라인 실종광고 설정" role="dialog" aria-modal="true">
-      <ModalScrollLock />
+      <ModalScrollLock allowSurfaceScroll />
       <div className="modal-surface ad-setup-page" data-modal-surface>
         <header className="ad-setup-topbar">
           <BackButton href={backHref} label="대상자 선택으로 돌아가기" />
@@ -228,7 +231,7 @@ export default function AdCampaignModal({
               </div>
               <p className="ad-setup-helper">지역명 또는 주소를 읍/면/동 기준으로 검색해 주세요</p>
               {locationMessage && <p className="ad-setup-message" role="status">{locationMessage}</p>}
-              {showErrors && !regionComplete && <p className="ad-setup-error">광고 기준 지역을 선택해 주세요.</p>}
+              {showErrors && !regionComplete && <p className="ad-setup-error">읍·면·동까지 선택해 주세요.</p>}
             </section>
 
             <section className="ad-setup-section" aria-labelledby="ad-setup-distance-title">

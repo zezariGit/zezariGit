@@ -110,24 +110,43 @@ function normalizeMapResult(item) {
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
 
   const address = item?.address || {};
-  const label = buildApproximateRegionLabel(address)
+  const locality = findLocality(address, `${item?.name || ""} ${item?.display_name || ""}`);
+  const label = buildApproximateRegionLabel(address, locality)
     || String(item?.name || item?.display_name || "선택 지역");
 
   return {
     id: String(item?.place_id || `${lat},${lng}`),
     label,
     address: String(item?.display_name || ""),
+    isLocality: Boolean(locality),
     lat: Number(lat.toFixed(6)),
     lng: Number(lng.toFixed(6)),
   };
 }
 
-function buildApproximateRegionLabel(address = {}) {
+function buildApproximateRegionLabel(address = {}, resolvedLocality = "") {
   const region = address.state || address.city || address.province || address.county;
   const city = address.city && address.city !== region ? address.city : "";
   const district = address.city_district || address.borough
     || (address.county !== region ? address.county : "")
     || address.town || address.municipality;
-  const locality = address.suburb || address.village || address.neighbourhood || address.quarter;
-  return [...new Set([region, city, district, locality].filter(Boolean))].slice(0, 3).join(" ");
+  const locality = resolvedLocality || findLocality(address);
+  return [...new Set([region, city, district, locality].filter(Boolean))].slice(0, 4).join(" ");
+}
+
+function findLocality(address = {}, fallback = "") {
+  const candidates = [
+    address.suburb,
+    address.village,
+    address.neighbourhood,
+    address.quarter,
+    address.town,
+    address.hamlet,
+    fallback,
+  ];
+  for (const value of candidates) {
+    const match = String(value || "").match(/(?:^|[\s,])([가-힣0-9]+(?:읍|면|동))(?=\s|,|$)/);
+    if (match) return match[1];
+  }
+  return "";
 }

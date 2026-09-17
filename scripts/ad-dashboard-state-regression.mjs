@@ -47,14 +47,11 @@ assert.doesNotMatch(database, /export async function endSubjectAd[\s\S]{0,180}al
 assert.match(successPage, /광고 상태 테스트하기/);
 assert.match(successPage, /testAd=\$\{encodeURIComponent\(testAdId\)\}/);
 assert.match(successPage, /AdPaymentSuccessClient/);
-assert.match(successPage, /해당 문구는 관리자만 볼 수 있습니다/);
 assert.match(successPage, /\["1", "admin", "user"\]\.includes\(previewMode\)/);
-assert.match(successPage, /const previewAdmin = previewMode !== "user"/);
-assert.match(successPage, /publicationMessage=\{previewAdmin[\s\S]+: ""\}/);
-assert.match(successPage, /시작 시각은 결제 처리 약 1분 후로 예약/);
-assert.match(successPage, /const admin = isAdminSession\(session\)[\s\S]+isDbAdminSession\(session\)/);
-assert.match(successPage, /publicationMessage=\{admin \? publicationMessage\([\s\S]+\) : ""\}/);
-assert.match(successClient, /isAdmin && publicationMessage/);
+assert.doesNotMatch(successPage, /publicationMessage/);
+assert.doesNotMatch(successPage, /해당 문구는 관리자만 볼 수 있습니다/);
+assert.doesNotMatch(successClient, /광고 검토 중 · META 검토 대기/);
+assert.doesNotMatch(successClient, /ad-complete-publication-note/);
 assert.doesNotMatch(successClient, /광고 상태 테스트하기/);
 assert.doesNotMatch(successClient, /광고내역 보기/);
 assert.doesNotMatch(successClient, /대시보드 이동/);
@@ -65,6 +62,7 @@ assert.match(successClient, /112로 전화할까요\?/);
 assert.match(successClient, /tel:112/);
 assert.match(successClient, /police-call-modal/);
 assert.match(styles, /\.ad-payment-success-panel\s*\{/);
+assert.match(styles, /\.ad-payment-success-panel \.police-report-prompt-section\s*\{[\s\S]*?margin-top: 58px/);
 assert.match(styles, /\.ad-history-status\.paused/);
 assert.match(styles, /\.police-call-modal-dialog\s*\{/);
 

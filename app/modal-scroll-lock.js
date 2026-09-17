@@ -5,7 +5,7 @@ import { useEffect } from "react";
 let lockCount = 0;
 let previousState = null;
 
-export default function ModalScrollLock() {
+export default function ModalScrollLock({ allowSurfaceScroll = false }) {
   useEffect(() => {
     const html = document.documentElement;
     const body = document.body;
@@ -28,14 +28,14 @@ export default function ModalScrollLock() {
       html.classList.add("modal-open");
       body.classList.add("modal-open");
       html.style.overflow = "hidden";
-      html.style.touchAction = "none";
+      html.style.touchAction = allowSurfaceScroll ? "pan-y" : "none";
       body.style.overflow = "hidden";
       body.style.position = "fixed";
       body.style.top = `-${scrollY}px`;
       body.style.left = "0";
       body.style.right = "0";
       body.style.width = "100%";
-      body.style.touchAction = "none";
+      body.style.touchAction = allowSurfaceScroll ? "pan-y" : "none";
     }
 
     lockCount += 1;
@@ -69,7 +69,7 @@ export default function ModalScrollLock() {
       window.scrollTo(0, previousState.scrollY);
       previousState = null;
     };
-  }, []);
+  }, [allowSurfaceScroll]);
 
   return null;
 }

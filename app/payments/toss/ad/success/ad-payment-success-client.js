@@ -2,10 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export default function AdPaymentSuccessClient({
-  isAdmin = false,
-  publicationMessage = "",
-}) {
+export default function AdPaymentSuccessClient() {
   const [policeModalOpen, setPoliceModalOpen] = useState(false);
   const callStartedAtRef = useRef(0);
 
@@ -50,11 +47,6 @@ export default function AdPaymentSuccessClient({
         <p className="ad-payment-review-copy">
           광고는 META 광고 검토가<br />완료된 후 게재됩니다.
         </p>
-        <p className="ad-payment-review-badge">광고 검토 중 · META 검토 대기</p>
-
-        {isAdmin && publicationMessage && (
-          <p className="ad-complete-publication-note">{publicationMessage}</p>
-        )}
 
         <section className="police-report-prompt-section" aria-label="경찰 신고 연계 안내">
           <h2>경찰 신고도 함께 진행하시겠어요?</h2>

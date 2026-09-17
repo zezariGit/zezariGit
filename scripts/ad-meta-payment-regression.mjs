@@ -20,6 +20,7 @@ assert.match(metaMarketing, /start_time:\s*schedule\.startTime/);
 assert.match(metaMarketing, /end_time:\s*schedule\.endTime/);
 assert.match(paymentClient, /Toss 결제는 발생하지 않지만 설정된 예산으로 실제 Meta 광고가 발행됩니다/);
 assert.match(successPage, /publishPaidSubjectAd\(adId\)/);
-assert.match(successPage, /관리자 결제패스가 완료되었습니다[\s\S]+Meta 예산/);
+assert.doesNotMatch(successPage, /관리자 결제패스가 완료되었습니다/);
+assert.doesNotMatch(successPage, /publicationMessage/);
 
 console.log("Ad payment Meta publication regression checks passed.");

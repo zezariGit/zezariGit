@@ -4572,7 +4572,7 @@ a {
   background: transparent;
   color: #1f252b;
   font: inherit;
-  font-size: 0.88rem;
+  font-size: 16px;
 }
 
 .ad-setup-location-input input:disabled {
@@ -24798,24 +24798,9 @@ body:has(.my-page-panel) .status-toast.success::before {
   line-height: 1.55;
 }
 
-.ad-payment-review-badge {
-  align-self: center;
-  margin: 13px 0 0;
-  padding: 6px 10px;
-  border-radius: 5px;
-  background: #eef8f0;
-  color: #078c38;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.ad-payment-success-panel .ad-complete-publication-note {
-  margin-top: 14px;
-}
-
 .ad-payment-success-panel .police-report-prompt-section {
-  margin-top: auto;
-  padding-top: 36px;
+  margin-top: 58px;
+  padding-top: 0;
   border-top: 0;
   max-width: 340px;
 }
