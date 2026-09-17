@@ -14557,6 +14557,7 @@ button:disabled:hover {
 .shop-service-top-button {
   position: fixed;
   z-index: 20;
+  left: auto;
   right: max(18px, calc((100vw - 460px) / 2 + 18px));
   bottom: 24px;
   width: 44px;
@@ -14570,6 +14571,10 @@ button:disabled:hover {
   font-size: 1.3rem;
   font-weight: 900;
   box-shadow: 0 8px 22px rgba(15, 23, 42, 0.16);
+}
+
+.shop-service-top-button:not([data-shop-service-top-button="primary"]) {
+  display: none !important;
 }
 
 .product-service-intro-form {

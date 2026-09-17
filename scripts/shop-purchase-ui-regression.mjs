@@ -46,6 +46,8 @@ assert.match(serviceControls, /window\.scrollTo\(\{ top: 0, behavior: "smooth" \
 assert.match(serviceControls, /window\.scrollY >= window\.innerHeight/, "위로가기 버튼은 한 화면 높이 이상 스크롤한 뒤 표시해야 합니다.");
 assert.match(serviceControls, /addEventListener\("scroll", updateVisibility, \{ passive: true \}\)/, "서비스 소개 스크롤 위치를 감지해야 합니다.");
 assert.match(serviceControls, /if \(!visible\) return null;/, "최상단에서는 위로가기 버튼을 렌더링하지 않아야 합니다.");
+assert.match(serviceControls, /data-shop-service-top-button="primary"/, "우측 하단 위로가기 버튼을 단일 기본 버튼으로 식별해야 합니다.");
+assert.match(serviceControls, /button !== buttonRef\.current\) button\.hidden = true/, "중복 위로가기 버튼은 숨겨야 합니다.");
 assert.match(imageRoute, /getProductServiceIntroImage/);
 assert.match(adminWorkspace, /상품구매 서비스소개 관리/);
 assert.match(adminWorkspace, /상품\/디자인 관리/);
@@ -78,5 +80,6 @@ assert.match(styles, /\.shop-subject-backdrop[\s\S]*backdrop-filter:\s*blur/);
 assert.match(styles, /\.quantity-control button:disabled/);
 assert.match(styles, /\.shop-next-button:disabled/);
 assert.match(styles, /\.shop-help-mark\s*\{[^}]*background:\s*transparent;/s, "도움말 아이콘 배경은 투명해야 합니다.");
+assert.match(styles, /\.shop-service-top-button:not\(\[data-shop-service-top-button="primary"\]\)\s*\{[^}]*display:\s*none !important;/s, "기존 가운데 위로가기 버튼은 숨겨야 합니다.");
 
 console.log("shop purchase UI regression passed");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "../../back-button";
 
@@ -26,6 +26,7 @@ function ShopServiceBackButton({ backHref }) {
 
 function ShopServiceTopButton() {
   const [visible, setVisible] = useState(false);
+  const buttonRef = useRef(null);
 
   useEffect(() => {
     const updateVisibility = () => setVisible(window.scrollY >= window.innerHeight);
@@ -38,11 +39,20 @@ function ShopServiceTopButton() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!visible || !buttonRef.current) return;
+    document.querySelectorAll(".shop-service-top-button").forEach((button) => {
+      if (button !== buttonRef.current) button.hidden = true;
+    });
+  }, [visible]);
+
   if (!visible) return null;
 
   return (
     <button
+      ref={buttonRef}
       className="shop-service-top-button"
+      data-shop-service-top-button="primary"
       type="button"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label="페이지 맨 위로 이동"
