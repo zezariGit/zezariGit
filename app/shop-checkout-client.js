@@ -4,6 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import KakaoPostcodeAddress from "./kakao-postcode-address";
 import BackButton from "./back-button";
 import { formatDateOnly } from "../lib/date-format";
+import {
+  DEFAULT_SHOP_SHIPPING_SETTINGS,
+  calculateShopShippingFee,
+  normalizeShopShippingSettings,
+} from "../lib/shop-shipping";
 
 const TOSS_SDK_URL = "https://js.tosspayments.com/v2/standard";
 const SHOP_CONFIGURATION_DRAFT_KEY = "zezari:shop-configuration-before-service";
@@ -55,6 +60,7 @@ export default function ShopCheckoutClient({
   initialOrderPreview = false,
   initialBraceletLength = "",
   initialNecklaceLength = "",
+  shippingSettings = DEFAULT_SHOP_SHIPPING_SETTINGS,
 }) {
   const initialProduct = products.find((item) => item.id === initialProductId) || null;
   const initialDesign = getShopDesigns(initialProduct)[0] || null;
@@ -72,6 +78,7 @@ export default function ShopCheckoutClient({
   const [braceletLength, setBraceletLength] = useState(initialBraceletLength);
   const [necklaceLength, setNecklaceLength] = useState(initialNecklaceLength);
   const [couponId, setCouponId] = useState("");
+  const [couponInventory, setCouponInventory] = useState(coupons);
   const [couponPickerOpen, setCouponPickerOpen] = useState(false);
   const [recipientName, setRecipientName] = useState("");
   const [recipientPhone, setRecipientPhone] = useState("");
@@ -135,12 +142,14 @@ export default function ShopCheckoutClient({
   const productAmount = productUnitPrice * quantity;
   const subtotalAmount = productAmount;
   const applicableCoupons = useMemo(
-    () => coupons.filter((coupon) => isCouponApplicableToOrder(coupon, "product", product?.slug, subtotalAmount)),
-    [coupons, product?.slug, subtotalAmount]
+    () => couponInventory.filter((coupon) => isCouponApplicableToOrder(coupon, "product", product?.slug, subtotalAmount)),
+    [couponInventory, product?.slug, subtotalAmount]
   );
   const selectedCoupon = applicableCoupons.find((coupon) => coupon.id === couponId) || null;
   const discountAmount = selectedCoupon ? calculateCouponDiscount(selectedCoupon, subtotalAmount) : 0;
-  const paymentAmount = Math.max(0, subtotalAmount - discountAmount);
+  const normalizedShippingSettings = normalizeShopShippingSettings(shippingSettings);
+  const shippingFee = calculateShopShippingFee(subtotalAmount, normalizedShippingSettings);
+  const paymentAmount = Math.max(0, subtotalAmount - discountAmount) + shippingFee;
   const freePayment = paymentAmount <= 0;
 
   useEffect(() => {
@@ -388,6 +397,47 @@ export default function ShopCheckoutClient({
     closeCouponPicker();
   };
 
+  const registerCouponForCheckout = async (rawCode) => {
+    const code = String(rawCode || "").trim().toUpperCase();
+    if (!code) throw new Error("유효한 쿠폰코드가 아닙니다");
+    if (couponInventory.some((coupon) => String(coupon.code || "").toUpperCase() === code)) {
+      throw new Error("이미 등록된 쿠폰입니다.");
+    }
+
+    let coupon;
+    if (initialOrderPreview) {
+      if (code !== "ZEZARI-5000") throw new Error("유효한 쿠폰코드가 아닙니다");
+      coupon = {
+        id: `preview-coupon-${Date.now()}`,
+        code,
+        name: "상품 1,000원 할인 쿠폰",
+        status: "available",
+        coupon_status: "active",
+        discount_type: "fixed",
+        discount_value: 1000,
+        master_discount_label: "1,000원",
+        service_scope: "all",
+      };
+    } else {
+      const response = await fetch("/api/coupons/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data?.message || "유효한 쿠폰코드가 아닙니다");
+      coupon = data.coupon;
+    }
+
+    if (!coupon?.id) throw new Error("유효한 쿠폰코드가 아닙니다");
+    setCouponInventory((current) => [...current, coupon]);
+    if (isCouponApplicableToOrder(coupon, "product", product?.slug, subtotalAmount)) {
+      setCouponId(coupon.id);
+      return coupon;
+    }
+    throw new Error("등록된 쿠폰은 현재 상품에 사용할 수 없습니다.");
+  };
+
   const startProductServicePurchase = async (adminPass = false) => {
     const response = await fetch("/api/payments/toss/subscription/prepare", {
       method: "POST",
@@ -613,10 +663,13 @@ export default function ShopCheckoutClient({
             openCouponPicker={openCouponPicker}
             closeCouponPicker={closeCouponPicker}
             chooseCoupon={chooseCoupon}
+            registerCoupon={registerCouponForCheckout}
             widgetStatus={widgetStatus}
             paymentPreview={initialOrderPreview}
             subtotalAmount={subtotalAmount}
             discountAmount={discountAmount}
+            shippingFee={shippingFee}
+            shippingSettings={normalizedShippingSettings}
             amount={paymentAmount}
           />
           <div className="payment-action-stack">
@@ -915,10 +968,13 @@ function OrderInformation({
   openCouponPicker,
   closeCouponPicker,
   chooseCoupon,
+  registerCoupon,
   widgetStatus,
   paymentPreview,
   subtotalAmount,
   discountAmount,
+  shippingFee,
+  shippingSettings,
   amount,
 }) {
   return (
@@ -960,8 +1016,8 @@ function OrderInformation({
             <input
               type="tel"
               value={recipientPhone}
-              onChange={(event) => setRecipientPhone(event.target.value)}
-              placeholder="휴대전화 번호를 입력해 주세요"
+              onChange={(event) => setRecipientPhone(formatMobilePhoneInput(event.target.value))}
+              placeholder="000-0000-0000"
               autoComplete="tel"
               inputMode="tel"
               maxLength={13}
@@ -985,6 +1041,7 @@ function OrderInformation({
       <section className="order-section">
         <h2>3. 쿠폰 선택</h2>
         <div className="coupon-select-box">
+          <CheckoutCouponRegistration onRegister={registerCoupon} />
           <div className="coupon-select-summary">
             <strong>할인쿠폰</strong>
             <span>{coupons.length}개 보유</span>
@@ -1065,10 +1122,15 @@ function OrderInformation({
           <span>쿠폰 할인</span>
           <strong>{discountAmount > 0 ? `-${formatCurrency(discountAmount)}` : "0원"}</strong>
           <span>배송비</span>
-          <strong>0원</strong>
+          <strong>{shippingFee > 0 ? formatCurrency(shippingFee) : "무료"}</strong>
           <span>총 결제 금액</span>
           <strong>{formatCurrency(amount)}</strong>
         </div>
+        {shippingSettings.freeShippingThreshold > 0 && (
+          <p className="shop-free-shipping-note">
+            {formatCompactCurrency(shippingSettings.freeShippingThreshold)} 이상 구매 시 무료배송
+          </p>
+        )}
       </section>
 
       <section className="order-section payment-method-section">
@@ -1114,6 +1176,53 @@ function OrderInformation({
         )}
       </section>
     </div>
+  );
+}
+
+function CheckoutCouponRegistration({ onRegister }) {
+  const [code, setCode] = useState("");
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const submit = async (event) => {
+    event.preventDefault();
+    if (loading) return;
+    setLoading(true);
+    setMessage("");
+    setMessageType("");
+    try {
+      await onRegister(code);
+      setCode("");
+      setMessage("쿠폰이 등록되어 이번 주문에 적용되었습니다.");
+      setMessageType("success");
+    } catch (error) {
+      setMessage(error.message || "유효한 쿠폰코드가 아닙니다");
+      setMessageType("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form className={`checkout-coupon-register ${messageType}`} onSubmit={submit}>
+      <div>
+        <input
+          value={code}
+          onChange={(event) => {
+            setCode(event.target.value.toUpperCase());
+            setMessage("");
+            setMessageType("");
+          }}
+          placeholder="쿠폰 코드를 입력해 주세요"
+          aria-label="쿠폰 코드"
+          maxLength={40}
+        />
+        <button type="submit" disabled={loading || !code.trim()}>{loading ? "등록 중" : "등록"}</button>
+      </div>
+      <small>등록한 쿠폰은 이번 주문에 바로 사용할 수 있어요</small>
+      {message && <p role={messageType === "error" ? "alert" : "status"}>{message}</p>}
+    </form>
   );
 }
 
@@ -1240,6 +1349,19 @@ function productFallbackIcon(slug) {
 
 function formatCurrency(value) {
   return `${Number(value || 0).toLocaleString("ko-KR")}원`;
+}
+
+function formatCompactCurrency(value) {
+  const amount = Math.max(0, Number(value || 0));
+  if (amount > 0 && amount % 10000 === 0) return `${amount / 10000}만원`;
+  return formatCurrency(amount);
+}
+
+function formatMobilePhoneInput(value) {
+  const digits = String(value || "").replace(/\D/g, "").slice(0, 11);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
 }
 
 function formatDate(value) {

@@ -4,7 +4,8 @@ import StatusToast from "../status-toast";
 import ShopCheckoutClient from "../shop-checkout-client";
 import { isAdminSession } from "../../lib/admin";
 import { authOptions } from "../../lib/auth";
-import { getShopPageData, getShopProducts } from "../../lib/db";
+import { getShopPageData, getShopProducts, getShopPurchaseSettings } from "../../lib/db";
+import { DEFAULT_SHOP_SHIPPING_SETTINGS } from "../../lib/shop-shipping";
 
 export default async function ShopPage({ searchParams }) {
   const params = await searchParams;
@@ -41,6 +42,7 @@ export default async function ShopPage({ searchParams }) {
           ]}
           guardian={{ name: "보호자", address: "", address_detail: "" }}
           coupons={[]}
+          shippingSettings={DEFAULT_SHOP_SHIPPING_SETTINGS}
         />
       </main>
     );
@@ -49,9 +51,10 @@ export default async function ShopPage({ searchParams }) {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/");
 
-  const [shopPageData, productRows] = await Promise.all([
+  const [shopPageData, productRows, shippingSettings] = await Promise.all([
     getShopPageData(session),
     getShopProducts(),
+    getShopPurchaseSettings(),
   ]);
   const { guardian, subjects, coupons } = toClientData(shopPageData);
   const products = toClientData(sortShopProducts(productRows));
@@ -71,6 +74,7 @@ export default async function ShopPage({ searchParams }) {
           subjects={subjects}
           guardian={guardian}
           coupons={availableCoupons}
+          shippingSettings={shippingSettings}
           adminPaymentPassEnabled={adminPaymentPassEnabled}
         />
       ) : (

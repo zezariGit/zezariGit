@@ -84,6 +84,7 @@ export async function POST(request) {
       serviceIncluded: true,
       subtotalAmount: productOrder.subtotalAmount,
       discountAmount: productOrder.discountAmount,
+      shippingFee: productOrder.shippingFee,
       amount: productOrder.amount,
       orderName: `${productOrder.product.name}${productOrder.product.selected_design?.name ? ` - ${productOrder.product.selected_design.name}` : ""} + QR 안심 서비스`,
       successUrl,

@@ -42,6 +42,7 @@ import {
   getImageUploadSettings,
   getQrAdminData,
   getServiceRegulations,
+  getShopPurchaseSettings,
   isDbAdminSession,
 } from "../../lib/db";
 import {
@@ -73,6 +74,7 @@ import {
   setSubscriptionAdminMemoAction,
   setSubscriptionAdminTestAction,
   setSubscriptionPlanPriceAction,
+  setShopPurchaseSettingsAction,
 } from "./actions";
 
 export default async function AdminPage({ searchParams }) {
@@ -234,7 +236,12 @@ export default async function AdminPage({ searchParams }) {
       }
     : null;
   const couponsData = activeSection === "coupons" ? await getAdminCouponsData(couponFilters, selectedCouponId) : null;
-  const productsData = activeSection === "products" ? await getAdminProductsData() : null;
+  const productsData = activeSection === "products"
+    ? {
+        ...(await getAdminProductsData()),
+        shippingSettings: await getShopPurchaseSettings(),
+      }
+    : null;
   const productServiceIntro = activeSection === "product-service-intro" ? await getProductServiceIntro() : null;
   const imageUploadSettings = activeSection === "image-uploads" ? await getImageUploadSettings() : null;
   const ordersData = activeSection === "orders" ? await getAdminOrdersData(orderFilters, selectedOrderId) : null;
@@ -2234,9 +2241,9 @@ function OrderManagementSection({ ordersData }) {
               <section className="admin-detail-section">
                 <h3>결제정보</h3>
                 <dl className="admin-detail-list">
-                  <div><dt>상품금액</dt><dd>{formatCurrency(selectedOrder.amount)}</dd></div>
-                  <div><dt>배송비</dt><dd>{formatCurrency(0)}</dd></div>
-                  <div><dt>할인금액</dt><dd>{formatCurrency(0)}</dd></div>
+                  <div><dt>상품금액</dt><dd>{formatCurrency(selectedOrder.subtotal_amount)}</dd></div>
+                  <div><dt>배송비</dt><dd>{formatCurrency(selectedOrder.shipping_fee)}</dd></div>
+                  <div><dt>할인금액</dt><dd>{formatCurrency(selectedOrder.discount_amount)}</dd></div>
                   <div><dt>결제금액</dt><dd>{formatCurrency(selectedOrder.amount)}</dd></div>
                   <div><dt>결제방법</dt><dd>{selectedOrder.payment_method || "-"}</dd></div>
                   <div><dt>결제일</dt><dd>{formatDateTime(selectedOrder.paid_at)}</dd></div>
@@ -3487,11 +3494,31 @@ function SubscriptionAvatar({ subscription }) {
 }
 
 function ProductManagementSection({ productsData, selectedItemKey = "" }) {
-  const { products, designs } = productsData;
+  const { products, designs, shippingSettings } = productsData;
   const designCount = designs.length;
 
   return (
     <div className="qr-admin-stack">
+      <section className="admin-panel shop-shipping-settings-panel">
+        <div className="panel-heading">
+          <h2>상품 배송비 설정</h2>
+          <span>결제 화면 자동 반영</span>
+        </div>
+        <form action={setShopPurchaseSettingsAction} className="shop-shipping-settings-form">
+          <input type="hidden" name="returnTo" value="/admin?section=products" />
+          <label>
+            기본 배송비
+            <input name="shippingFee" type="number" min="0" step="100" defaultValue={shippingSettings.shippingFee} />
+            <small>원</small>
+          </label>
+          <label>
+            무료배송 기준 금액
+            <input name="freeShippingThreshold" type="number" min="0" step="1000" defaultValue={shippingSettings.freeShippingThreshold} />
+            <small>원 이상</small>
+          </label>
+          <FormSubmitButton className="primary-button compact" pendingText="저장중">배송비 설정 저장</FormSubmitButton>
+        </form>
+      </section>
       <section className="admin-panel">
         <div className="panel-heading">
           <h2>상품/디자인 관리</h2>
@@ -4768,6 +4795,7 @@ function orderExportRows(orders = []) {
     구매유형: orderPurchaseTypeLabel(order),
     팔찌길이: order.bracelet_length || "-",
     목걸이길이: order.necklace_length || "-",
+    배송비: formatCurrency(order.shipping_fee),
     결제금액: formatCurrency(order.amount),
     결제상태: paymentStatusLabel(order.status),
     배송상태: fulfillmentStatusLabel(order.fulfillment_status || (isPaidOrder(order.status) ? "preparing" : "pending")),

@@ -37,6 +37,7 @@ import {
   setGlobalProductDesignCatalogItem,
   setProductCatalogItem,
   setProductOrderFulfillment,
+  setShopPurchaseSettings,
   setQrAdminMemo,
   setQrActive,
   setQrLifecycle,
@@ -531,6 +532,20 @@ export async function setProductOrderFulfillmentAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=orders"), error.message || "배송 정보 저장에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin?section=orders"), "배송 정보가 저장되었습니다."));
+}
+
+export async function setShopPurchaseSettingsAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  try {
+    await setShopPurchaseSettings(formData);
+    revalidatePath("/admin");
+    revalidatePath("/shop");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=products"), error.message || "배송비 설정 저장에 실패했습니다.", "error"));
+  }
+  redirect(withNotice(getReturnTo(formData, "/admin?section=products"), "상품 배송비 설정이 저장되었습니다."));
 }
 
 export async function setAdPricingAction(formData) {

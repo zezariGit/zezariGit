@@ -28,6 +28,7 @@
     "test:ad-meta-status": "tsx scripts/ad-meta-status-sync-regression.mjs",
     "test:billing-history": "node scripts/billing-history-regression.mjs",
     "test:shop-ui": "node scripts/shop-purchase-ui-regression.mjs",
+    "test:shop-checkout": "node scripts/shop-checkout-payment-regression.mjs",
     "test:product-qr-activation": "node scripts/product-qr-auto-activation-regression.mjs",
     "test:onboarding": "node scripts/onboarding-regression.mjs",
     "test:password-reset": "tsx scripts/password-reset-regression.mjs",
