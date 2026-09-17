@@ -16,13 +16,25 @@ export default async function ShopPage({ searchParams }) {
   if (preview) {
     const products = toClientData(sortShopProducts(await getShopProducts()));
     const paymentPreview = params?.screen === "payment";
+    const necklaceLengthPreview = params?.screen === "length-necklace";
+    const setLengthPreview = params?.screen === "length-set";
+    const braceletKeyringPreview = params?.screen === "length-bracelet-keyring";
+    const previewProduct = braceletKeyringPreview
+      ? products.find((product) => String(product.name || "").trim() === "팔찌&키링")
+      : setLengthPreview
+      ? products.find((product) => String(product.slug || "").includes("bracelet-necklace"))
+      : necklaceLengthPreview
+        ? products.find((product) => String(product.slug || "") === "necklace")
+        : null;
     return (
       <main className="shop-page">
         <ShopCheckoutClient
           products={products}
-          initialProductId={paymentPreview ? products[0]?.id || "" : ""}
+          initialProductId={previewProduct?.id || (paymentPreview ? products[0]?.id || "" : "")}
           initialSubjectId="preview-recent"
           initialOrderPreview={paymentPreview}
+          initialBraceletLength={setLengthPreview || braceletKeyringPreview ? "성인용 16 + 3cm" : ""}
+          initialNecklaceLength={necklaceLengthPreview || setLengthPreview ? "성인 남성 50 + 5cm" : ""}
           subjects={[
             { id: "preview-recent", name: "로로", birth_date: "2022-06-23", created_at: "2026-09-11" },
             { id: "preview-older", name: "제자리", birth_date: "2020-03-18", created_at: "2026-09-10" },

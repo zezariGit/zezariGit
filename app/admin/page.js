@@ -2223,6 +2223,8 @@ function OrderManagementSection({ ordersData }) {
                   <dl className="admin-detail-list">
                     <div><dt>상품명</dt><dd>{formatOrderProductName(selectedOrder)}</dd></div>
                     <div><dt>옵션</dt><dd>{orderPurchaseTypeLabel(selectedOrder)}</dd></div>
+                    {selectedOrder.bracelet_length && <div><dt>팔찌 길이</dt><dd>{selectedOrder.bracelet_length}</dd></div>}
+                    {selectedOrder.necklace_length && <div><dt>목걸이 길이</dt><dd>{selectedOrder.necklace_length}</dd></div>}
                     <div><dt>수량</dt><dd>{selectedOrder.quantity || 1}개</dd></div>
                     <div><dt>결제금액</dt><dd>{formatCurrency(selectedOrder.amount)}</dd></div>
                   </dl>
@@ -4764,6 +4766,8 @@ function orderExportRows(orders = []) {
     대상자: order.subject_name || "대상자 미선택",
     상품: formatOrderProductName(order),
     구매유형: orderPurchaseTypeLabel(order),
+    팔찌길이: order.bracelet_length || "-",
+    목걸이길이: order.necklace_length || "-",
     결제금액: formatCurrency(order.amount),
     결제상태: paymentStatusLabel(order.status),
     배송상태: fulfillmentStatusLabel(order.fulfillment_status || (isPaidOrder(order.status) ? "preparing" : "pending")),

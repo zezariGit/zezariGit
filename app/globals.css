@@ -13618,7 +13618,7 @@ button:disabled:hover {
 .shop-help-mark {
   justify-self: end;
   border-color: transparent;
-  background: transparent;
+  background: #ffffff;
 }
 
 .shop-help-mark img {
@@ -13730,6 +13730,97 @@ button:disabled:hover {
   gap: 14px;
   padding-block: 2px 0;
   border-bottom: 0;
+}
+
+.shop-length-section {
+  display: grid;
+  gap: 10px;
+  padding-top: 2px;
+}
+
+.shop-length-section h2 {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 0.94rem;
+  font-weight: 900;
+}
+
+.shop-length-section > p {
+  margin: -1px 0 0;
+  color: var(--c-text-muted);
+  font-size: 0.73rem;
+  line-height: 1.45;
+}
+
+.shop-length-group {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.shop-length-group legend {
+  margin-bottom: 7px;
+  padding: 0;
+  color: var(--c-text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.shop-length-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.shop-length-options button {
+  position: relative;
+  min-width: 0;
+  min-height: 66px;
+  display: grid;
+  place-content: center;
+  gap: 3px;
+  padding: 8px 24px 8px 8px;
+  border: 1px solid #dfe4e1;
+  border-radius: 7px;
+  background: #ffffff;
+  color: var(--c-text);
+  text-align: center;
+}
+
+.shop-length-options button.selected {
+  border-color: var(--c-primary);
+  background: var(--c-primary-light);
+  box-shadow: inset 0 0 0 1px var(--c-primary);
+}
+
+.shop-length-options button > span {
+  color: var(--c-text-muted);
+  font-size: 0.72rem;
+  line-height: 1.25;
+}
+
+.shop-length-options button > strong {
+  font-size: 0.9rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.shop-length-options button > b {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 19px;
+  height: 19px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--c-primary);
+  color: #ffffff;
+  font-size: 0.68rem;
+  line-height: 1;
 }
 
 .shop-subject-picker {
@@ -14348,11 +14439,14 @@ button:disabled:hover {
   display: grid;
   place-items: center;
   overflow: hidden;
+  padding: 4px;
 }
 
 .shop-choice-image img {
-  width: 100%;
-  height: 100%;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
   object-fit: contain;
 }
 
@@ -14818,6 +14912,7 @@ button:disabled:hover {
 }
 
 .order-purchase-details strong,
+.order-purchase-details small,
 .order-purchase-details span,
 .order-purchase-details em {
   min-width: 0;
@@ -14830,6 +14925,14 @@ button:disabled:hover {
   line-height: 1.35;
   text-align: center;
   overflow-wrap: anywhere;
+}
+
+.order-purchase-details small {
+  grid-column: 1 / -1;
+  color: var(--c-text-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 .order-purchase-details span,

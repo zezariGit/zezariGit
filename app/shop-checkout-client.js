@@ -6,7 +6,19 @@ import BackButton from "./back-button";
 import { formatDateOnly } from "../lib/date-format";
 
 const TOSS_SDK_URL = "https://js.tosspayments.com/v2/standard";
+const SHOP_CONFIGURATION_DRAFT_KEY = "zezari:shop-configuration-before-service";
+const SHOP_CONFIGURATION_DRAFT_TTL_MS = 6 * 60 * 60 * 1000;
 const ZODIAC_DESIGN_ORDER = ["쥐", "소", "호랑이", "토끼", "용", "뱀", "말", "양", "원숭이", "닭", "개", "돼지"];
+const BRACELET_LENGTH_OPTIONS = [
+  { value: "유아용 13 + 3cm", label: "유아용", measurement: "13 + 3cm" },
+  { value: "성인용 16 + 3cm", label: "성인용", measurement: "16 + 3cm" },
+];
+const NECKLACE_LENGTH_OPTIONS = [
+  { value: "유아 · 5세 미만 35 + 3cm", label: "유아 · 5세 미만", measurement: "35 + 3cm" },
+  { value: "아동 · 5세 이상 38 + 3cm", label: "아동 · 5세 이상", measurement: "38 + 3cm" },
+  { value: "성인 여성 45 + 5cm", label: "성인 여성", measurement: "45 + 5cm" },
+  { value: "성인 남성 50 + 5cm", label: "성인 남성", measurement: "50 + 5cm" },
+];
 const PRODUCT_PICKER_IMAGES = {
   sticker: "/assets/shop-icons/product-sticker.png",
   bracelet: "/assets/shop-icons/product-bracelet.png",
@@ -41,6 +53,8 @@ export default function ShopCheckoutClient({
   coupons = [],
   adminPaymentPassEnabled = false,
   initialOrderPreview = false,
+  initialBraceletLength = "",
+  initialNecklaceLength = "",
 }) {
   const initialProduct = products.find((item) => item.id === initialProductId) || null;
   const initialDesign = getShopDesigns(initialProduct)[0] || null;
@@ -55,6 +69,8 @@ export default function ShopCheckoutClient({
   const [designIndex, setDesignIndex] = useState(0);
   const [designId, setDesignId] = useState(initialDesign?.id || "");
   const [selectedDesignName, setSelectedDesignName] = useState(initialDesign?.name || "");
+  const [braceletLength, setBraceletLength] = useState(initialBraceletLength);
+  const [necklaceLength, setNecklaceLength] = useState(initialNecklaceLength);
   const [couponId, setCouponId] = useState("");
   const [couponPickerOpen, setCouponPickerOpen] = useState(false);
   const [recipientName, setRecipientName] = useState("");
@@ -111,7 +127,10 @@ export default function ShopCheckoutClient({
     return designs.find((design) => design.id === designId) || null;
   }, [designId, designIndex, designs]);
   const displayDesign = selectedDesign || universalDesigns.find((design) => design.name === selectedDesignName) || null;
-  const configurationReady = Boolean(subjectId && product && selectedDesign);
+  const lengthRequirements = getProductLengthRequirements(product);
+  const lengthSelectionReady = (!lengthRequirements.bracelet || Boolean(braceletLength))
+    && (!lengthRequirements.necklace || Boolean(necklaceLength));
+  const configurationReady = Boolean(subjectId && product && selectedDesign && lengthSelectionReady);
   const productUnitPrice = getDesignUnitPrice(product, selectedDesign);
   const productAmount = productUnitPrice * quantity;
   const subtotalAmount = productAmount;
@@ -135,6 +154,40 @@ export default function ShopCheckoutClient({
     setDesignId(matchingDesign?.id || "");
     setQuantity(1);
   }, [product, selectedDesignName]);
+
+  useEffect(() => {
+    const requirements = getProductLengthRequirements(product);
+    if (!requirements.bracelet) setBraceletLength("");
+    if (!requirements.necklace) setNecklaceLength("");
+  }, [product]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || initialOrderPreview) return;
+
+    const storedDraft = window.sessionStorage.getItem(SHOP_CONFIGURATION_DRAFT_KEY);
+    if (!storedDraft) return;
+    window.sessionStorage.removeItem(SHOP_CONFIGURATION_DRAFT_KEY);
+
+    try {
+      const draft = JSON.parse(storedDraft);
+      if (Date.now() - Number(draft.savedAt || 0) > SHOP_CONFIGURATION_DRAFT_TTL_MS) return;
+      const restoredProduct = products.find((item) => item.id === draft.productId);
+      if (!restoredProduct) return;
+
+      setProductId(restoredProduct.id);
+      if (subjects.some((subject) => subject.id === draft.subjectId)) setSubjectId(draft.subjectId);
+      setQuantity(Math.max(1, Math.min(99, Number(draft.quantity || 1))));
+      setSelectedDesignName(String(draft.selectedDesignName || ""));
+      if (BRACELET_LENGTH_OPTIONS.some((option) => option.value === draft.braceletLength)) {
+        setBraceletLength(draft.braceletLength);
+      }
+      if (NECKLACE_LENGTH_OPTIONS.some((option) => option.value === draft.necklaceLength)) {
+        setNecklaceLength(draft.necklaceLength);
+      }
+    } catch {
+      // Ignore malformed browser state and keep the server-provided defaults.
+    }
+  }, [initialOrderPreview, products, subjects]);
 
   useEffect(() => {
     if (couponId && !applicableCoupons.some((coupon) => coupon.id === couponId)) {
@@ -273,6 +326,14 @@ export default function ShopCheckoutClient({
       setMessage("상품 디자인을 선택해 주세요.");
       return false;
     }
+    if (lengthRequirements.bracelet && !braceletLength) {
+      setMessage("팔찌 길이를 선택해 주세요.");
+      return false;
+    }
+    if (lengthRequirements.necklace && !necklaceLength) {
+      setMessage("목걸이 길이를 선택해 주세요.");
+      return false;
+    }
     if (step === "order" && !recipientName.trim()) {
       setMessage("수령인 이름을 입력해 주세요.");
       return false;
@@ -339,6 +400,8 @@ export default function ShopCheckoutClient({
         quantity,
         designIndex,
         designId: selectedDesign?.id || "",
+        braceletLength,
+        necklaceLength,
         couponId,
         recipientName,
         recipientPhone,
@@ -426,6 +489,10 @@ export default function ShopCheckoutClient({
   const confirmSelection = () => {
     if (!draftSelectionId) return;
     if (selectionView === "product") {
+      if (draftSelectionId !== productId) {
+        setBraceletLength("");
+        setNecklaceLength("");
+      }
       setProductId(draftSelectionId);
     } else if (selectionView === "design") {
       const nextDesign = designChoices.find((design) => design.id === draftSelectionId);
@@ -439,6 +506,19 @@ export default function ShopCheckoutClient({
   };
 
   const selectionTitle = selectionView === "product" ? "상품 선택" : "디자인 선택";
+
+  const preserveConfigurationForService = () => {
+    if (typeof window === "undefined") return;
+    window.sessionStorage.setItem(SHOP_CONFIGURATION_DRAFT_KEY, JSON.stringify({
+      savedAt: Date.now(),
+      productId,
+      selectedDesignName,
+      subjectId,
+      quantity,
+      braceletLength,
+      necklaceLength,
+    }));
+  };
 
   return (
     <section className="shop-phone-panel">
@@ -454,7 +534,7 @@ export default function ShopCheckoutClient({
         )}
         <h1>{selectionView ? selectionTitle : step === "configure" ? "상품 구매" : "결제"}</h1>
         {step === "configure" || selectionView ? (
-          <a className="shop-help-mark" href="/shop/service" aria-label="상품구매 서비스 소개">
+          <a className="shop-help-mark" href="/shop/service" onClick={preserveConfigurationForService} aria-label="상품구매 서비스 소개">
             <img src="/assets/shop-icons/help-question.png" alt="" />
           </a>
         ) : (
@@ -494,6 +574,10 @@ export default function ShopCheckoutClient({
             changeQuantity={changeQuantity}
             displayDesign={displayDesign}
             designReady={Boolean(selectedDesign)}
+            braceletLength={braceletLength}
+            setBraceletLength={setBraceletLength}
+            necklaceLength={necklaceLength}
+            setNecklaceLength={setNecklaceLength}
             productUnitPrice={productUnitPrice}
             productAmount={productAmount}
             openProductSelection={() => openSelectionView("product")}
@@ -510,6 +594,8 @@ export default function ShopCheckoutClient({
           <OrderInformation
             product={product}
             design={selectedDesign}
+            braceletLength={braceletLength}
+            necklaceLength={necklaceLength}
             quantity={quantity}
             subject={selectedSubject}
             recipientName={recipientName}
@@ -574,6 +660,10 @@ function ProductConfiguration({
   changeQuantity,
   displayDesign,
   designReady,
+  braceletLength,
+  setBraceletLength,
+  necklaceLength,
+  setNecklaceLength,
   productUnitPrice,
   productAmount,
   openProductSelection,
@@ -581,7 +671,10 @@ function ProductConfiguration({
 }) {
   const [subjectPickerOpen, setSubjectPickerOpen] = useState(false);
   const pickerAreaRef = useRef(null);
-  const selectionReady = Boolean(product && designReady);
+  const lengthRequirements = getProductLengthRequirements(product);
+  const lengthSelectionReady = (!lengthRequirements.bracelet || Boolean(braceletLength))
+    && (!lengthRequirements.necklace || Boolean(necklaceLength));
+  const selectionReady = Boolean(product && designReady && lengthSelectionReady);
 
   useEffect(() => {
     const closePickers = (event) => {
@@ -664,6 +757,29 @@ function ProductConfiguration({
           type="product"
         />
 
+        {(lengthRequirements.bracelet || lengthRequirements.necklace) && (
+          <section className="shop-length-section" aria-labelledby="shop-length-title">
+            <h2 id="shop-length-title">길이 선택</h2>
+            {lengthRequirements.bracelet && (
+              <LengthOptionGroup
+                label="팔찌 길이"
+                options={BRACELET_LENGTH_OPTIONS}
+                value={braceletLength}
+                onChange={setBraceletLength}
+              />
+            )}
+            {lengthRequirements.necklace && (
+              <LengthOptionGroup
+                label="목걸이 길이"
+                options={NECKLACE_LENGTH_OPTIONS}
+                value={necklaceLength}
+                onChange={setNecklaceLength}
+              />
+            )}
+            <p>착용하실 분에게 맞는 길이를 선택해 주세요.</p>
+          </section>
+        )}
+
         <ShopSelectionTrigger
           label="디자인"
           prompt={product && designs.length === 0 ? "선택 가능한 디자인이 없습니다" : "디자인을 선택해 주세요"}
@@ -695,6 +811,32 @@ function ProductConfiguration({
         </div>
       </div>
     </>
+  );
+}
+
+function LengthOptionGroup({ label, options, value, onChange }) {
+  return (
+    <fieldset className="shop-length-group">
+      <legend>{label}</legend>
+      <div className="shop-length-options">
+        {options.map((option) => {
+          const selected = option.value === value;
+          return (
+            <button
+              className={selected ? "selected" : ""}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => onChange(option.value)}
+              key={option.value}
+            >
+              <span>{option.label}</span>
+              <strong>{option.measurement}</strong>
+              {selected && <b aria-hidden="true">✓</b>}
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
   );
 }
 
@@ -754,6 +896,8 @@ function CatalogSelectionView({ type, options, selectedId, onSelect, onConfirm }
 function OrderInformation({
   product,
   design,
+  braceletLength,
+  necklaceLength,
   quantity,
   subject,
   recipientName,
@@ -790,6 +934,9 @@ function OrderInformation({
             <strong>{formatProductDesignName(product, design)}</strong>
             <span>{quantity}개</span>
             <em>{formatCurrency(subtotalAmount)}</em>
+            {(braceletLength || necklaceLength) && (
+              <small>{[braceletLength, necklaceLength].filter(Boolean).join(" / ")}</small>
+            )}
           </div>
         </div>
       </section>
@@ -1070,6 +1217,16 @@ function getUniversalShopDesigns(products) {
     }
   }
   return [...designsById.values()].sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0));
+}
+
+function getProductLengthRequirements(product) {
+  const productName = String(product?.name || "").trim();
+  const hasKoreanProductType = ["팔찌", "목걸이", "키링"].some((type) => productName.includes(type));
+  const descriptor = (hasKoreanProductType ? productName : String(product?.slug || "")).toLowerCase();
+  return {
+    bracelet: descriptor.includes("bracelet") || descriptor.includes("팔찌"),
+    necklace: descriptor.includes("necklace") || descriptor.includes("목걸이"),
+  };
 }
 
 function productFallbackIcon(slug) {

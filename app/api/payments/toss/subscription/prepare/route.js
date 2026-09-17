@@ -34,6 +34,8 @@ export async function POST(request) {
       quantity: body.quantity,
       designIndex: body.designIndex,
       designId: body.designId,
+      braceletLength: body.braceletLength,
+      necklaceLength: body.necklaceLength,
       couponId: body.couponId,
       recipientName: body.recipientName,
       recipientPhone: body.recipientPhone,
