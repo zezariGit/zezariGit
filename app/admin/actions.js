@@ -10,6 +10,7 @@ import {
   addSafePhonePoolNumber,
   assignSafePhonePoolNumberForAdmin,
   createProductCatalogItem,
+  deleteAdminSubject,
   deleteSafePhonePoolNumber,
   generateQrCodes,
   createAdminPaymentRefund,
@@ -305,6 +306,26 @@ export async function setQrSubjectAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), error.message || "QR 매칭 변경에 실패했습니다.", "error"));
   }
   redirect(withNotice(getReturnTo(formData, "/admin?section=qr"), hasSubject ? "QR 매칭이 저장되었습니다." : "QR 매칭이 해제되었습니다."));
+}
+
+export async function deleteAdminSubjectAction(formData) {
+  const session = await getServerSession(authOptions);
+  if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
+
+  let result;
+  try {
+    result = await deleteAdminSubject(formData);
+    revalidatePath("/admin");
+    revalidatePath("/");
+    revalidatePath("/find/[key]", "page");
+  } catch (error) {
+    redirect(withNotice(getReturnTo(formData, "/admin?section=subjects"), error.message || "대상자 삭제에 실패했습니다.", "error"));
+  }
+
+  const qrMessage = result.releasedQrCount > 0
+    ? ` 연결된 QR ${result.releasedQrCount}개는 미매칭·비활성 상태로 변경되었습니다.`
+    : "";
+  redirect(withNotice("/admin?section=subjects", `${result.subjectName} 대상자가 삭제되었습니다.${qrMessage}`));
 }
 
 export async function setGuardianAdminAction(formData) {

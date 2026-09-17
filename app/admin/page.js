@@ -7,6 +7,7 @@ import { LogoutButton, SocialLoginButtons } from "../auth-actions";
 import ModalScrollLock from "../modal-scroll-lock";
 import StatusToast from "../status-toast";
 import AdminWorkspace from "./admin-workspace";
+import ConfirmSubmitButton from "./confirm-submit-button";
 import AdminExportButton from "./export-button";
 import AdPricingForm from "./ad-pricing-form";
 import ProductAdminWorkspace from "./product-admin-catalog-form";
@@ -64,6 +65,7 @@ import {
   setAdminSubjectAdStatusAction,
   createAdminPaymentRefundAction,
   completeAdminPaymentRefundAction,
+  deleteAdminSubjectAction,
   saveAdminCouponAction,
   saveAdminMessageAction,
   saveAdminMessageTemplateAction,
@@ -4151,6 +4153,22 @@ function SubjectManagementSection({ adminSubjectsData, selectedSubjectQrImage })
                       <div><dt>대상자 상태</dt><dd>{statusLabel(selectedSubject.status)}</dd></div>
                       <div><dt>QR 상태</dt><dd>{qrAdminStateLabel(selectedSubject)}</dd></div>
                     </dl>
+                    <div className="subject-delete-row">
+                      <div>
+                        <strong>대상자 삭제</strong>
+                        <span>대상자 정보가 삭제되며 연결된 QR은 미매칭·비활성 상태로 변경됩니다.</span>
+                      </div>
+                      <form action={deleteAdminSubjectAction}>
+                        <input type="hidden" name="subjectId" value={selectedSubject.id} />
+                        <input type="hidden" name="returnTo" value="/admin?section=subjects" />
+                        <ConfirmSubmitButton
+                          confirmMessage={`${selectedSubject.name || "선택한 대상자"} 정보를 삭제할까요? 연결된 QR도 미매칭·비활성 상태로 변경됩니다.`}
+                          pendingText="삭제중"
+                        >
+                          대상자 삭제
+                        </ConfirmSubmitButton>
+                      </form>
+                    </div>
                     <div className="subject-detail-media-block">
                       <div className="guardian-tab-section-title">사진</div>
                       <div className="subject-photo-strip">
