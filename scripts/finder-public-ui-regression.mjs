@@ -20,7 +20,10 @@ assert.doesNotMatch(page, /subscriptionReady|!data\.qr_activated_at/);
 assert.match(page, /const subscriptionActive = !data\.subscription_status/);
 assert.match(page, /if \(state === "purchase-needed"\)[\s\S]*qr_activation_source: "subject_registration"[\s\S]*subject_status: "상품구매필요"/);
 assert.doesNotMatch(page, /상품 수령 후 활성화|아직 활성화되지 않은 QR입니다|activateQrAction/);
-assert.match(page, /qr-status-message-unassigned/);
+assert.match(page, /unassigned"\}-icon-hd\.png/);
+assert.match(page, /kakao-inquiry-hd\.png/);
+assert.match(page, /미배정 QR입니다\./);
+assert.match(page, /사용할 수 없는 QR 입니다\./);
 assert.match(page, /gender === "남" \|\| gender === "남성"\) return "남성"/);
 assert.match(page, /gender === "여" \|\| gender === "여성"\) return "여성"/);
 assert.match(safePhone, /\/api\/find\/\$\{encodeURIComponent\(qrKey\)\}\/safe-phone/);
@@ -41,7 +44,14 @@ assert.match(voice, /if \(!hasVoice\) return null/);
 assert.match(voice, /audio\.play\(\)/);
 assert.match(voice, /assets\/finder\/guardian-voice-button\.png/);
 assert.match(styles, /\.finder-public-page[\s\S]*min-height:\s*100svh/);
+assert.match(styles, /\.finder-public-page[\s\S]*grid-template-columns:\s*minmax\(0, 430px\)/);
+assert.match(styles, /\.finder-public-shell[\s\S]*max-width:\s*430px/);
+assert.match(styles, /\.finder-public-shell[\s\S]*margin-inline:\s*auto/);
 assert.match(styles, /\.finder-public-action-grid[\s\S]*grid-template-columns:\s*repeat\(2/);
+assert.match(styles, /\.location-flow\s*\{[\s\S]*height:\s*100dvh/);
+assert.match(styles, /\.location-flow\s*\{[\s\S]*-webkit-overflow-scrolling:\s*touch/);
+assert.match(styles, /\.location-flow\s*\{[\s\S]*touch-action:\s*pan-y/);
+assert.match(styles, /\.qr-status-kakao-link\s*\{[\s\S]*margin-top:\s*28px/);
 
 await Promise.all([
   "guardian-call.png",
@@ -51,5 +61,11 @@ await Promise.all([
   "guardian-message.png",
   "shield-check.png",
 ].map((name) => access(new URL(`../public/assets/finder/${name}`, import.meta.url))));
+
+await Promise.all([
+  "unassigned-icon-hd.png",
+  "expired-icon-hd.png",
+  "kakao-inquiry-hd.png",
+].map((name) => access(new URL(`../public/assets/qr-status/${name}`, import.meta.url))));
 
 console.log("finder public UI regression passed");

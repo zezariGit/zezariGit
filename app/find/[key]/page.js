@@ -285,20 +285,25 @@ function QrStatusScreen({ type }) {
   return (
     <main className="qr-status-page">
       <section className="qr-status-shell">
-        <img
-          className={`qr-status-message${expired ? "" : " qr-status-message-unassigned"}`}
-          src={`/assets/qr-status/${expired ? "expired" : "unassigned"}.png?v=20260913-white`}
-          alt={expired ? "사용할 수 없는 QR입니다. 관련된 문의는 관리자에게 문의해 주세요." : "미배정 QR입니다. 관리자에게 문의해 주세요."}
-        />
-        <a
-          className="qr-status-kakao-link"
-          href="https://pf.kakao.com/_xmuiln/chat"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="카카오톡으로 문의하기"
-        >
-          <img src="/assets/qr-status/kakao-inquiry.png?v=20260913-white" alt="카카오톡 문의" />
-        </a>
+        <div className="qr-status-content">
+          <img className="qr-status-brand" src="/assets/finder/zezari-wordmark.png" alt="제자리" />
+          <img
+            className="qr-status-icon"
+            src={`/assets/qr-status/${expired ? "expired" : "unassigned"}-icon-hd.png`}
+            alt=""
+          />
+          <h1>{expired ? "사용할 수 없는 QR 입니다." : "미배정 QR입니다."}</h1>
+          <p>{expired ? "관련된 문의는 관리자에게 문의해 주세요" : "관리자에게 문의해 주세요"}</p>
+          <a
+            className="qr-status-kakao-link"
+            href="https://pf.kakao.com/_xmuiln/chat"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="카카오톡으로 문의하기"
+          >
+            <img src="/assets/qr-status/kakao-inquiry-hd.png" alt="카카오톡 문의" />
+          </a>
+        </div>
       </section>
     </main>
   );

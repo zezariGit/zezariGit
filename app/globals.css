@@ -12277,28 +12277,52 @@ button:disabled:hover {
   width: min(100%, 430px);
   min-height: 100vh;
   min-height: 100svh;
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  justify-items: center;
-  padding: 56px 20px 34px;
+  padding: clamp(104px, 18svh, 172px) 20px 40px;
   background: #fff;
 }
 
-.qr-status-message {
-  width: min(100%, 330px);
+.qr-status-content {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.qr-status-brand {
+  width: 92px;
   height: auto;
-  align-self: center;
+  display: block;
   object-fit: contain;
 }
 
-.qr-status-message-unassigned {
-  transform: translateX(7px);
+.qr-status-icon {
+  width: 132px;
+  height: 132px;
+  display: block;
+  margin-top: 46px;
+  object-fit: contain;
+}
+
+.qr-status-content h1 {
+  margin: 34px 0 0;
+  color: #0a9b55;
+  font-size: 27px;
+  font-weight: 900;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.qr-status-content p {
+  margin: 20px 0 0;
+  color: #555555;
+  font-size: 17px;
+  line-height: 1.45;
 }
 
 .qr-status-kakao-link {
-  width: 145px;
+  width: 168px;
   display: block;
-  border-radius: 8px;
+  margin-top: 28px;
+  border-radius: 10px;
 }
 
 .qr-status-kakao-link img {
@@ -12572,17 +12596,22 @@ button:disabled:hover {
 
 .finder-public-page {
   min-height: 100svh;
+  grid-template-columns: minmax(0, 430px);
+  justify-content: center;
   place-items: start center;
   padding: 0;
   background: #ffffff;
 }
 
 .finder-public-shell {
-  width: min(100%, 430px);
+  width: 100%;
+  max-width: 430px;
   min-height: 100svh;
+  margin-inline: auto;
   align-content: start;
   gap: 8px;
   padding: 10px 8px 8px;
+  box-sizing: border-box;
   border: 0;
   border-radius: 0;
   background: #ffffff;
@@ -12988,7 +13017,14 @@ button:disabled:hover {
   position: fixed;
   inset: 0;
   z-index: 1000;
+  width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 .location-flow > *,
@@ -13031,7 +13067,7 @@ button:disabled:hover {
   display: grid;
   align-content: start;
   gap: 20px;
-  padding: 26px 18px 28px;
+  padding: 26px 18px calc(28px + env(safe-area-inset-bottom));
   background: #fff;
 }
 
