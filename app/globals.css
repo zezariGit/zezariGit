@@ -23850,6 +23850,11 @@ body:has(.my-page-panel) .status-toast.success::before {
   color: #00a548;
 }
 
+.ad-history-status.paused {
+  background: #eef1f3;
+  color: #59636b;
+}
+
 .ad-history-status.done {
   background: #f0f0f0;
   color: #505050;

@@ -576,6 +576,7 @@ export async function setAdminSubjectAdStatusAction(formData) {
   try {
     await setAdminSubjectAdStatus(formData);
     revalidatePath("/admin");
+    revalidatePath("/");
     revalidatePath("/account/ads");
   } catch (error) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=ads"), error.message || "광고 상태 변경에 실패했습니다.", "error"));

@@ -13,12 +13,13 @@ const [page, actions, serverActions, selector, selectorPage, database, successPa
   readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
 ]);
 
-assert.match(page, /statusFilter === "running"[^\n]+stage === "review" \|\| stage === "running"/);
+assert.match(page, /statusFilter === "running"[^\n]+\["review", "running", "paused"\]\.includes\(stage\)/);
 assert.match(page, /statusFilter === "done"[^\n]+stage === "done"/);
-assert.match(page, /stage === "running" && <AdHistoryActions/);
+assert.match(page, /\["running", "paused"\]\.includes\(stage\) && <AdHistoryActions/);
 assert.match(page, /stage === "review" \? "-"/);
 assert.match(page, /광고 검토 중/);
 assert.match(page, /진행 중/);
+assert.match(page, /광고 중단/);
 assert.match(page, /광고 완료/);
 assert.match(page, /ad-test-status-panel/);
 assert.match(page, /activateTestSubjectAdAction/);
@@ -34,6 +35,8 @@ assert.match(selector, /buildAdSetupHref\(subject\.id, true\)/);
 assert.match(selector, /forceNew \? "&newAd=1" : ""/);
 assert.match(serverActions, /revalidatePath\("\/account\/ads"\)/);
 assert.match(database, /is_test_payment = \?,[\s\S]+ELSE 'meta_publish_queued'/);
+assert.match(database, /export async function markSubjectAdPaid[\s\S]+SET status = '찾는중'/);
+assert.match(database, /a\.paid_at IS NOT NULL[\s\S]+a\.status IN \('ready', 'active', 'paused', 'rejected'\)/);
 assert.doesNotMatch(database, /관리자 테스트 광고는 Meta에 발행하지 않습니다/);
 assert.match(database, /export async function activateTestSubjectAd/);
 assert.match(database, /is_test_payment = 1[\s\S]+status = 'ready'[\s\S]+meta_status = 'test_in_review'[\s\S]+COALESCE\(meta_ad_id, ''\) = ''/);
@@ -62,6 +65,7 @@ assert.match(successClient, /112로 전화할까요\?/);
 assert.match(successClient, /tel:112/);
 assert.match(successClient, /police-call-modal/);
 assert.match(styles, /\.ad-payment-success-panel\s*\{/);
+assert.match(styles, /\.ad-history-status\.paused/);
 assert.match(styles, /\.police-call-modal-dialog\s*\{/);
 
 console.log("Ad dashboard state regression checks passed.");

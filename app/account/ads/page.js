@@ -13,6 +13,7 @@ import AdStatusAutoSync from "./ad-status-auto-sync";
 const previewAds = [
   { id: "preview-review", subject_id: "preview-1", subject_name: "김제자리", status: "ready", meta_status: "test_in_review", is_test_payment: 1, region: "서울특별시 강남구 역삼동", start_date: "2026-09-05", end_date: "2026-09-11", amount: 89900, reach_count: 0, creative_image_url: "/assets/missing-ad-template.png", created_at: "2026-09-08" },
   { id: "preview-running", subject_id: "preview-2", subject_name: "박제자리", status: "active", meta_status: "test_active", is_test_payment: 1, region: "서울특별시 송파구 잠실동", start_date: "2026-09-01", end_date: "2026-09-07", amount: 69900, reach_count: 6000, creative_image_url: "/assets/missing-ad-template.png", created_at: "2026-09-07" },
+  { id: "preview-paused", subject_id: "preview-4", subject_name: "최제자리", status: "paused", meta_status: "campaign_paused", is_test_payment: 1, region: "경기도 성남시 분당구", start_date: "2026-09-03", end_date: "2026-09-10", amount: 49900, reach_count: 3200, creative_image_url: "/assets/missing-ad-template.png", created_at: "2026-09-06" },
   { id: "preview-ended", subject_id: "preview-3", subject_name: "이제자리", status: "ended", meta_status: "test_ended", is_test_payment: 1, region: "서울특별시 마포구 서교동", start_date: "2026-08-20", end_date: "2026-08-26", amount: 39900, reach_count: 4320, creative_image_url: "/assets/missing-ad-template.png", created_at: "2026-08-26" },
 ];
 
@@ -44,12 +45,12 @@ export default async function AccountAdsPage({ searchParams }) {
     : null;
   const filteredAds = ads.filter((ad) => {
     const stage = adStage(ad);
-    if (statusFilter === "running") return stage === "review" || stage === "running";
+    if (statusFilter === "running") return ["review", "running", "paused"].includes(stage);
     if (statusFilter === "done") return stage === "done";
     return true;
   });
   const nextExpiryDate = ads
-    .filter((ad) => adStage(ad) === "running")
+    .filter((ad) => ["running", "paused"].includes(adStage(ad)))
     .map((ad) => String(ad.end_date || ""))
     .filter((date) => /^\d{4}-\d{2}-\d{2}$/.test(date))
     .sort()[0] || "";
@@ -119,7 +120,7 @@ function AdHistoryCard({ ad, preview }) {
       <div className="ad-history-details">
         <header>
           <strong>{ad.subject_name}</strong>
-          {stage === "running" && <AdHistoryActions ad={ad} action={endSubjectAdAction} preview={preview} />}
+          {["running", "paused"].includes(stage) && <AdHistoryActions ad={ad} action={endSubjectAdAction} preview={preview} />}
         </header>
         <span className={`ad-history-status ${stage}`}>{adStageLabel(stage)}</span>
         <dl>
@@ -136,12 +137,14 @@ function AdHistoryCard({ ad, preview }) {
 function adStage(ad) {
   if (String(ad.status) === "ended") return "done";
   if (String(ad.status) === "rejected") return "rejected";
-  if (["active", "paused"].includes(String(ad.status))) return "running";
+  if (String(ad.status) === "paused") return "paused";
+  if (String(ad.status) === "active") return "running";
   return "review";
 }
 
 function adStageLabel(stage) {
   if (stage === "running") return "진행 중";
+  if (stage === "paused") return "광고 중단";
   if (stage === "done") return "광고 완료";
   if (stage === "rejected") return "광고 반려";
   return "광고 검토 중";
