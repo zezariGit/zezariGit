@@ -29,12 +29,14 @@ function ShopServiceTopButton() {
   const buttonRef = useRef(null);
 
   useEffect(() => {
-    const updateVisibility = () => setVisible(window.scrollY >= window.innerHeight);
+    const scrollContainer = document.getElementById("shop-service-top");
+    if (!scrollContainer) return undefined;
+    const updateVisibility = () => setVisible(scrollContainer.scrollTop >= scrollContainer.clientHeight);
     updateVisibility();
-    window.addEventListener("scroll", updateVisibility, { passive: true });
+    scrollContainer.addEventListener("scroll", updateVisibility, { passive: true });
     window.addEventListener("resize", updateVisibility);
     return () => {
-      window.removeEventListener("scroll", updateVisibility);
+      scrollContainer.removeEventListener("scroll", updateVisibility);
       window.removeEventListener("resize", updateVisibility);
     };
   }, []);
@@ -54,7 +56,7 @@ function ShopServiceTopButton() {
       className="shop-service-top-button"
       data-shop-service-top-button="primary"
       type="button"
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      onClick={() => document.getElementById("shop-service-top")?.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label="페이지 맨 위로 이동"
     >
       ↑
