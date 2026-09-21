@@ -21054,6 +21054,7 @@ button:disabled:hover {
   border-radius: 0;
   background: #ffffff;
   box-shadow: none;
+  touch-action: pan-y;
 }
 
 .onboarding-brand-row {
@@ -21069,6 +21070,7 @@ button:disabled:hover {
   height: 90px;
   object-fit: cover;
   object-position: center 35%;
+  pointer-events: none;
   user-select: none;
 }
 
@@ -21090,7 +21092,6 @@ button:disabled:hover {
 .onboarding-shell .slide-window {
   flex: 0 0 auto;
   overflow: hidden;
-  touch-action: pan-y;
   cursor: grab;
   outline: none;
 }
@@ -21247,30 +21248,50 @@ button:disabled:hover {
 
 .onboarding-shell .onboarding-controls {
   position: absolute;
-  top: 780px;
+  top: 764px;
   right: 20px;
   left: 20px;
   width: auto;
   margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-content: stretch;
+  gap: 8px;
 }
 
-.onboarding-shell .onboarding-controls .onboarding-login-button {
-  flex: none;
+.onboarding-shell .onboarding-start-button {
   width: 100%;
-  min-height: 0;
+  min-height: 50px;
+  display: flex;
+  justify-self: stretch;
+  align-items: center;
+  justify-content: center;
   border: 0;
-  border-radius: 0;
-  padding: 0;
-  overflow: visible;
-  background: transparent;
+  border-radius: 6px;
+  background: #009b50;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 800;
+  text-decoration: none;
   cursor: pointer;
 }
 
-.onboarding-login-button-image {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
+.onboarding-shell .onboarding-start-button:hover {
+  background: #008a47;
+}
+
+.onboarding-login-prompt {
+  margin: 0;
+  color: #66706b;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.onboarding-login-prompt a {
+  color: #08783f;
+  font-weight: 800;
+  text-underline-offset: 3px;
 }
 
 @media (max-width: 389px) {

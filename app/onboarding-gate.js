@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const STORAGE_KEY = "zezari:onboarding:hidden";
 const SWIPE_THRESHOLD = 44;
@@ -58,10 +59,11 @@ const slides = [
   },
 ];
 
-export default function OnboardingGate({ enabled, children }) {
+export default function OnboardingGate({ enabled, forceVisible = false, children }) {
   const [showOnboarding, setShowOnboarding] = useState(enabled);
   const [active, setActive] = useState(0);
   const dragStart = useRef(null);
+  const swipeHandled = useRef(false);
 
   useEffect(() => {
     if (!enabled) {
@@ -69,35 +71,86 @@ export default function OnboardingGate({ enabled, children }) {
       return;
     }
 
+    if (forceVisible) {
+      setShowOnboarding(true);
+      return;
+    }
+
     const hidden = window.localStorage.getItem(STORAGE_KEY) === "true";
     setShowOnboarding(!hidden);
-  }, [enabled]);
+  }, [enabled, forceVisible]);
 
   if (!enabled || !showOnboarding) return children;
-
-  const goToLogin = () => setShowOnboarding(false);
 
   const hideForever = () => {
     window.localStorage.setItem(STORAGE_KEY, "true");
     setShowOnboarding(false);
   };
 
-  const finishSwipe = (clientX) => {
-    if (dragStart.current === null) return;
-    const difference = dragStart.current - clientX;
-    dragStart.current = null;
-    if (Math.abs(difference) < SWIPE_THRESHOLD) return;
+  const startSwipe = (event) => {
+    if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
+    dragStart.current = { x: event.clientX, y: event.clientY, pointerId: event.pointerId, captured: false };
+    swipeHandled.current = false;
+  };
 
+  const trackSwipe = (event) => {
+    const drag = dragStart.current;
+    if (!drag || drag.pointerId !== event.pointerId || drag.captured) return;
+    const horizontalDistance = Math.abs(drag.x - event.clientX);
+    const verticalDistance = Math.abs(drag.y - event.clientY);
+    if (horizontalDistance < 8 || horizontalDistance <= verticalDistance) return;
+    drag.captured = true;
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  };
+
+  const finishSwipe = (event) => {
+    if (dragStart.current === null) return;
+    const { x, y, pointerId } = dragStart.current;
+    if (pointerId !== event.pointerId) return;
+    const difference = x - event.clientX;
+    const verticalDifference = y - event.clientY;
+    dragStart.current = null;
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (Math.abs(difference) < SWIPE_THRESHOLD || Math.abs(difference) <= Math.abs(verticalDifference)) return;
+
+    swipeHandled.current = true;
     setActive((current) => (
       difference > 0
         ? Math.min(current + 1, slides.length - 1)
         : Math.max(current - 1, 0)
     ));
+    window.setTimeout(() => { swipeHandled.current = false; }, 0);
+  };
+
+  const cancelSwipe = (event) => {
+    dragStart.current = null;
+    swipeHandled.current = false;
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const preventClickAfterSwipe = (event, action) => {
+    if (swipeHandled.current) {
+      event.preventDefault();
+      return;
+    }
+    action?.();
   };
 
   return (
     <main className="onboarding-page">
-      <section className="onboarding-shell" aria-label="서비스 소개" data-active-slide={active + 1}>
+      <section
+        className="onboarding-shell"
+        aria-label="서비스 소개"
+        data-active-slide={active + 1}
+        onPointerDown={startSwipe}
+        onPointerMove={trackSwipe}
+        onPointerUp={finishSwipe}
+        onPointerCancel={cancelSwipe}
+      >
         <header className="onboarding-brand-row">
           <Image
             className="onboarding-wordmark"
@@ -105,10 +158,11 @@ export default function OnboardingGate({ enabled, children }) {
             alt="제자리"
             width={512}
             height={512}
+            draggable="false"
             priority
           />
           {active === slides.length - 1 && (
-            <button className="onboarding-skip-button" type="button" onClick={hideForever}>
+            <button className="onboarding-skip-button" type="button" onClick={(event) => preventClickAfterSwipe(event, hideForever)}>
               다시 보지 않기
             </button>
           )}
@@ -118,9 +172,6 @@ export default function OnboardingGate({ enabled, children }) {
           className="slide-window"
           tabIndex={0}
           aria-label={`${active + 1}번째 서비스 소개. 좌우로 밀어 이동할 수 있습니다.`}
-          onPointerDown={(event) => { dragStart.current = event.clientX; }}
-          onPointerUp={(event) => finishSwipe(event.clientX)}
-          onPointerCancel={() => { dragStart.current = null; }}
           onKeyDown={(event) => {
             if (event.key === "ArrowLeft") setActive((current) => Math.max(current - 1, 0));
             if (event.key === "ArrowRight") setActive((current) => Math.min(current + 1, slides.length - 1));
@@ -150,23 +201,24 @@ export default function OnboardingGate({ enabled, children }) {
               type="button"
               aria-label={`${index + 1}번 소개 보기`}
               aria-current={index === active ? "step" : undefined}
-              onClick={() => setActive(index)}
+              onClick={(event) => preventClickAfterSwipe(event, () => setActive(index))}
             />
           ))}
         </div>
 
         {active === slides.length - 1 && (
           <div className="onboarding-controls">
-            <button className="onboarding-login-button" type="button" onClick={goToLogin} aria-label="로그인하기">
-              <Image
-                className="onboarding-login-button-image"
-                src="/images/onboarding/login-button.png"
-                alt=""
-                width={329}
-                height={73}
-              />
-              <span className="visually-hidden">로그인하기</span>
-            </button>
+            <Link
+              className="onboarding-start-button"
+              href="/?login=1&signup=1"
+              onClick={(event) => preventClickAfterSwipe(event)}
+            >
+              시작하기
+            </Link>
+            <p className="onboarding-login-prompt">
+              이미 계정이 있나요?{" "}
+              <Link href="/?login=1" onClick={(event) => preventClickAfterSwipe(event)}>로그인</Link>
+            </p>
           </div>
         )}
       </section>

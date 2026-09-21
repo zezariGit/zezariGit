@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const [component, styles, loginButton, ...images] = await Promise.all([
+const [component, page, styles, ...images] = await Promise.all([
   readFile(new URL("../app/onboarding-gate.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/page.js", import.meta.url), "utf8"),
   readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
-  readFile(new URL("../public/images/onboarding/login-button.png", import.meta.url)),
   ...[1, 2, 3].map((number) => (
     readFile(new URL(`../public/images/onboarding/${number}.png`, import.meta.url))
   )),
@@ -22,7 +22,9 @@ const requiredCopy = [
   "필요한 정보를 온라인으로 공유하고",
   "더 많은 사람이 확인할 수 있도록 지원합니다.",
   "(인스타그램, 페이스북)",
-  "로그인하기",
+  "시작하기",
+  "이미 계정이 있나요?",
+  "로그인",
   "다시 보지 않기",
 ];
 
@@ -35,21 +37,27 @@ assert.equal((component.match(/number: "0[123]"/g) || []).length, 3);
 assert.match(component, /const SWIPE_THRESHOLD = 44;/);
 assert.match(component, /Math\.min\(current \+ 1, slides\.length - 1\)/);
 assert.match(component, /Math\.max\(current - 1, 0\)/);
-assert.match(component, /onPointerDown=/);
-assert.match(component, /onPointerUp=/);
+assert.match(component, /className="onboarding-shell"[\s\S]*onPointerDown=\{startSwipe\}[\s\S]*onPointerUp=\{finishSwipe\}/);
+assert.match(component, /onPointerMove=\{trackSwipe\}/);
+assert.match(component, /setPointerCapture/);
+assert.match(component, /Math\.abs\(difference\) <= Math\.abs\(verticalDifference\)/);
+assert.match(component, /className="onboarding-wordmark"[\s\S]*draggable="false"/);
 assert.match(component, /active === slides\.length - 1/);
 assert.match(component, /window\.localStorage\.setItem\(STORAGE_KEY, "true"\)/);
+assert.match(component, /href="\/\?login=1&signup=1"/);
+assert.match(component, /href="\/\?login=1"/);
+assert.match(page, /forceVisible=\{onboardingPreview\}/);
 assert.doesNotMatch(component, />\s*(다음|이전|뒤로가기)\s*</);
 
 assert.match(styles, /\.onboarding-shell \{[\s\S]*?width: min\(100%, 390px\)/);
 assert.match(styles, /\.onboarding-shell \.slide-track \{[\s\S]*?transition: transform/);
 assert.match(styles, /\.onboarding-shell \.dot\.active \{[\s\S]*?background: #009b50/);
 assert.match(styles, /\.onboarding-shell \.slide-dots \{[\s\S]*?top: 742px;/);
-assert.match(styles, /\.onboarding-shell \.onboarding-controls \{[\s\S]*?top: 780px;/);
+assert.match(styles, /\.onboarding-shell \.onboarding-controls \{[\s\S]*?top: 764px;/);
 assert.match(styles, /\.onboarding-shell \.onboarding-controls \{[\s\S]*?width: auto;/);
-assert.match(styles, /\.onboarding-shell \.onboarding-controls \.onboarding-login-button/);
-assert.match(component, /src="\/images\/onboarding\/login-button\.png"/);
-assert.equal(loginButton.toString("ascii", 1, 4), "PNG");
+assert.match(styles, /\.onboarding-shell \.onboarding-controls \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)/);
+assert.match(styles, /\.onboarding-shell \{[\s\S]*?touch-action: pan-y/);
+assert.match(styles, /\.onboarding-shell \.onboarding-start-button/);
 
 for (const [index, image] of images.entries()) {
   assert.equal(image.toString("ascii", 1, 4), "PNG");

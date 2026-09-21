@@ -33,6 +33,7 @@ export default async function HomePage({ searchParams }) {
   const noticeType = resolvedSearchParams?.noticeType || "success";
   const authError = resolvedSearchParams?.error || "";
   const authPreview = process.env.NODE_ENV === "development" ? String(resolvedSearchParams?.preview || "") : "";
+  const onboardingPreview = authPreview === "onboarding";
   const authMode = authPreview.startsWith("phone-signup") || resolvedSearchParams?.signup === "1" ? "signup" : "login";
   const signupPreviewStep = process.env.NODE_ENV === "development"
     ? authPreview === "phone-signup-profile"
@@ -97,8 +98,8 @@ export default async function HomePage({ searchParams }) {
       </>
     );
   }
-  const session = await getServerSession(authOptions);
-  const pendingQrClaim = await resolvePendingQrClaim();
+  const session = onboardingPreview ? null : await getServerSession(authOptions);
+  const pendingQrClaim = onboardingPreview ? null : await resolvePendingQrClaim();
 
   if (session) {
     const dashboardData = await getDashboardData(session, {
@@ -152,7 +153,12 @@ export default async function HomePage({ searchParams }) {
 
   return (
     <>
-      <OnboardingGate enabled={!session && !pendingQrClaim && resolvedSearchParams?.login !== "1" && !authPreview.startsWith("phone-")}>{loginPanel}</OnboardingGate>
+      <OnboardingGate
+        enabled={!session && !pendingQrClaim && resolvedSearchParams?.login !== "1" && !authPreview.startsWith("phone-")}
+        forceVisible={onboardingPreview}
+      >
+        {loginPanel}
+      </OnboardingGate>
       <StatusToast message={notice} type={noticeType} />
     </>
   );
