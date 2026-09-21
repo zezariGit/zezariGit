@@ -182,7 +182,7 @@ export async function endSubjectAdAction(formData) {
   } catch (error) {
     redirect(withNotice(returnTo, error.message || "광고 종료에 실패했습니다.", "error"));
   }
-  redirect(withNotice(returnTo, "광고가 종료되었습니다."));
+  redirect(withNotice(returnTo, "광고가 중단되었습니다."));
 }
 
 export async function registerCouponAction(formData) {

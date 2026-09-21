@@ -120,7 +120,7 @@ function AdHistoryCard({ ad, preview }) {
       <div className="ad-history-details">
         <header>
           <strong>{ad.subject_name}</strong>
-          {["running", "paused"].includes(stage) && <AdHistoryActions ad={ad} action={endSubjectAdAction} preview={preview} />}
+          {stage === "running" && <AdHistoryActions ad={ad} action={endSubjectAdAction} preview={preview} />}
         </header>
         <span className={`ad-history-status ${stage}`}>{adStageLabel(stage)}</span>
         <dl>
