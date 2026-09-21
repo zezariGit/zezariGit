@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import VoicePlaybackGraphic from "../../voice-playback-graphic";
 
 export default function GuardianVoicePlayer({ src, name = "보호자 음성 메시지" }) {
   const audioRef = useRef(null);
@@ -51,7 +52,7 @@ export default function GuardianVoicePlayer({ src, name = "보호자 음성 메�
         onClick={togglePlayback}
         aria-label={status === "playing" ? "보호자 음성 일시정지" : "보호자 음성 듣기"}
       >
-        <img className="guardian-voice-button-image" src="/assets/finder/guardian-voice-button.png" alt="" />
+        <VoicePlaybackGraphic playing={status === "playing"} />
       </button>
       {status === "playing" && <em>보호자 음성을 재생하고 있습니다.</em>}
       {message && <p className="find-audio-error">{message}</p>}

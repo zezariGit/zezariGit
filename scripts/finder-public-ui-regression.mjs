@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 
-const [page, safePhone, locationShare, emergency, voice, styles] = await Promise.all([
+const [page, safePhone, locationShare, emergency, voice, voiceGraphic, styles] = await Promise.all([
   readFile(new URL("../app/find/[key]/page.js", import.meta.url), "utf8"),
   readFile(new URL("../app/find/[key]/safe-phone-call-button.js", import.meta.url), "utf8"),
   readFile(new URL("../app/find/[key]/location-share-button.js", import.meta.url), "utf8"),
   readFile(new URL("../app/find/[key]/emergency-call-button.js", import.meta.url), "utf8"),
   readFile(new URL("../app/find/[key]/guardian-voice-player.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/voice-playback-graphic.js", import.meta.url), "utf8"),
   readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
 ]);
 
@@ -42,7 +43,8 @@ assert.match(emergency, /112에 전화할까요/);
 assert.match(emergency, /href="tel:112"/);
 assert.match(voice, /if \(!hasVoice\) return null/);
 assert.match(voice, /audio\.play\(\)/);
-assert.match(voice, /assets\/finder\/guardian-voice-button\.png/);
+assert.match(voice, /VoicePlaybackGraphic playing=\{status === "playing"\}/);
+assert.match(voiceGraphic, /assets\/finder\/voice-play\.png[\s\S]*assets\/finder\/voice-waveform\.png/);
 assert.match(styles, /\.finder-public-page[\s\S]*min-height:\s*100svh/);
 assert.match(styles, /\.finder-public-page[\s\S]*grid-template-columns:\s*minmax\(0, 430px\)/);
 assert.match(styles, /\.finder-public-shell[\s\S]*max-width:\s*430px/);

@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const [dashboard, registrationForm, voiceRecorder, voicePlayer, database, styles, ...subjectImages] = await Promise.all([
+const [dashboard, registrationForm, voiceRecorder, voicePlayer, voiceGraphic, database, styles, ...subjectImages] = await Promise.all([
   readFile(new URL("../app/dashboard.js", import.meta.url), "utf8"),
   readFile(new URL("../app/subject-registration-form.js", import.meta.url), "utf8"),
   readFile(new URL("../app/subject-voice-recorder.js", import.meta.url), "utf8"),
   readFile(new URL("../app/subject-preview-voice-player.js", import.meta.url), "utf8"),
+  readFile(new URL("../app/voice-playback-graphic.js", import.meta.url), "utf8"),
   readFile(new URL("../lib/db.js", import.meta.url), "utf8"),
   readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
   readFile(new URL("../public/assets/subject-registration/photo-placeholder.png", import.meta.url)),
@@ -30,7 +31,10 @@ assert.match(dashboard, /subject\.voice_data_url && \(/, "음성 영역은 등�
 assert.match(dashboard, /subject-preview-heading\.png/, "미리보기 제목은 제공된 원본 이미지를 사용해야 합니다.");
 assert.match(dashboard, /subject-preview-call-v2\.png[\s\S]*subject-preview-location-v2\.png[\s\S]*subject-preview-emergency-v2\.png/, "전화, 위치 공유, 112 신고는 새로 제공된 이미지를 각각 사용해야 합니다.");
 assert.match(dashboard, /subject-preview-message-v2\.png[\s\S]*subject\.guardian_message/, "메시지 카드에는 실제 보호자 입력값이 표시되어야 합니다.");
-assert.match(voicePlayer, /subject-preview-voice\.png/, "음성 재생 영역은 제공된 이미지를 사용해야 합니다.");
+assert.match(voicePlayer, /VoicePlaybackGraphic playing=\{playing\}/, "음성 재생 영역은 재생 상태가 반영된 그래픽을 사용해야 합니다.");
+assert.match(voicePlayer, /onPlay=\{\(\) => setPlaying\(true\)\}[\s\S]*onPause=\{\(\) => setPlaying\(false\)\}/, "오디오 재생과 일시정지 이벤트가 아이콘 상태를 갱신해야 합니다.");
+assert.match(voiceGraphic, /playing \? \([\s\S]*M25 21v22M39 21v22[\s\S]*voice-play\.png/, "재생 중에는 일시정지 아이콘, 정지 중에는 재생 아이콘을 표시해야 합니다.");
+assert.match(voiceGraphic, /voice-waveform\.png/, "고해상도 음성 파형 이미지를 사용해야 합니다.");
 assert.match(dashboard, /대상자 정보 수정/);
 assert.match(dashboard, /대상자 정보 등록/);
 assert.ok(
