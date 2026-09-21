@@ -290,13 +290,13 @@ function SignupContent({ verifiedPhone, profile, setProfile, profileTouched, set
   return (
     <form className="phone-signup-content" onSubmit={submitSignup} noValidate>
       <section className="phone-signup-section">
-        <div className="phone-signup-heading"><span>1</span><div><h2>휴대전화번호 인증</h2><p>가입된 회원인지 먼저 확인합니다.</p></div></div>
+        <div className="phone-signup-heading"><h2>휴대전화번호 인증</h2><p>가입된 회원인지 먼저 확인합니다.</p></div>
         <PhoneVerificationFields {...verificationProps} verifiedPhone={verifiedPhone} mode="signup" />
         {verifiedPhone && <p className="phone-verification-success"><ShieldCheckIcon /> 휴대폰 인증이 완료되었습니다.</p>}
       </section>
       <div className="phone-signup-divider" />
       <section className={`phone-signup-section profile-section${disabled ? " is-disabled" : ""}`} aria-disabled={disabled}>
-        <div className="phone-signup-heading"><span>2</span><div><h2>회원 정보 입력</h2><p>보호자 정보를 입력해 주세요.</p></div></div>
+        <div className="phone-signup-heading"><h2>회원 정보</h2></div>
         <label className="phone-profile-field"><span>이름</span><input value={profile.name} onChange={(event) => updateProfile("name", event.target.value)} onBlur={() => setProfileTouched((value) => ({ ...value, name: true }))} disabled={disabled} placeholder="이름을 입력해 주세요" /></label>
         {profileTouched.name && !profile.name.trim() && <small className="phone-field-error">이름을 입력해 주세요.</small>}
         <fieldset className="phone-profile-gender" disabled={disabled}><legend>성별</legend><label><input type="radio" name="signupGender" checked={profile.gender === "남성"} onChange={() => updateProfile("gender", "남성")} /><span>남성</span></label><label><input type="radio" name="signupGender" checked={profile.gender === "여성"} onChange={() => updateProfile("gender", "여성")} /><span>여성</span></label></fieldset>
@@ -305,12 +305,12 @@ function SignupContent({ verifiedPhone, profile, setProfile, profileTouched, set
       <section className={`phone-terms-section${disabled ? " is-disabled" : ""}`}>
         <h2>약관 동의</h2>
         <label className="phone-terms-all"><input type="checkbox" disabled={disabled} checked={allTermsAgreed} onChange={(event) => { const checked = event.target.checked; setProfile((value) => ({ ...value, privacyAgreed: checked, serviceAgreed: checked, notificationAgreed: checked })); }} /><span>전체 동의</span></label>
-        <label><input type="checkbox" disabled={disabled} checked={profile.privacyAgreed} onChange={(event) => updateProfile("privacyAgreed", event.target.checked)} /><span>(필수) 개인정보 수집 및 이용 동의</span><button type="button" disabled={disabled} onClick={() => setOpenRegulationType("privacy")}>보기</button></label>
-        <label><input type="checkbox" disabled={disabled} checked={profile.serviceAgreed} onChange={(event) => updateProfile("serviceAgreed", event.target.checked)} /><span>(필수) 서비스 이용약관 동의</span><button type="button" disabled={disabled} onClick={() => setOpenRegulationType("service")}>보기</button></label>
-        <label><input type="checkbox" disabled={disabled} checked={profile.notificationAgreed} onChange={(event) => updateProfile("notificationAgreed", event.target.checked)} /><span>(선택) 알림 수신 동의</span><button type="button" disabled={disabled} onClick={() => setOpenRegulationType("notification")}>보기</button></label>
+        <label><input type="checkbox" disabled={disabled} checked={profile.privacyAgreed} onChange={(event) => updateProfile("privacyAgreed", event.target.checked)} /><span>(필수) 개인정보 수집 및 이용 동의</span><button type="button" disabled={disabled} onClick={() => setOpenRegulationType("privacy")}>자세히</button></label>
+        <label><input type="checkbox" disabled={disabled} checked={profile.serviceAgreed} onChange={(event) => updateProfile("serviceAgreed", event.target.checked)} /><span>(필수) 서비스 이용약관 동의</span><button type="button" disabled={disabled} onClick={() => setOpenRegulationType("service")}>자세히</button></label>
+        <label><input type="checkbox" disabled={disabled} checked={profile.notificationAgreed} onChange={(event) => updateProfile("notificationAgreed", event.target.checked)} /><span>(선택) 알림 수신 동의</span><button type="button" disabled={disabled} onClick={() => setOpenRegulationType("notification")}>자세히</button></label>
       </section>
       {message && <p className="phone-auth-message" role="status">{message}</p>}
-      <button className="phone-auth-primary phone-signup-submit" type="submit" disabled={disabled || !profileReady}>회원가입</button>
+      <button className="phone-auth-primary phone-signup-submit" type="submit" disabled={disabled || !profileReady}>가입하기</button>
     </form>
   );
 }
@@ -323,15 +323,18 @@ function PhoneVerificationFields({ mode, phone, setPhone, phoneValid, phoneError
   };
   return (
     <div className={`phone-verification-fields${verifiedPhone ? " is-verified" : ""}`}>
-      <label className="phone-auth-field"><span>휴대폰 번호</span><input value={phone} onChange={(event) => setPhone(event.target.value)} disabled={Boolean(verifiedPhone)} placeholder="010-0000-0000" inputMode="tel" autoComplete="tel" maxLength={13} /></label>
+      <label className="phone-auth-field"><span>휴대전화번호</span><input value={phone} onChange={(event) => setPhone(event.target.value)} disabled={Boolean(verifiedPhone)} placeholder="010-0000-0000" inputMode="tel" autoComplete="tel" maxLength={13} /></label>
       {phoneError && <small className="phone-field-error" role="alert">{phoneError}</small>}
       <button className="phone-auth-primary phone-code-request" type="button" onClick={requestCode} disabled={loading || !phoneValid || Boolean(verifiedPhone)}>{verifiedPhone ? "인증 완료" : codeRequested ? "인증번호 다시 받기" : "인증번호 받기"}</button>
       <div className="phone-auth-separator" />
-      <div className="phone-code-heading"><strong>인증번호 입력</strong><span>{codeRequested ? formatTimer(seconds) : "03:00"}</span></div>
+      <div className="phone-code-heading">
+        <strong>인증번호</strong>
+        {codeRequested && <span aria-live="polite">{verifiedPhone ? "인증 완료" : formatTimer(seconds)}</span>}
+      </div>
       <div className={`phone-code-row${codeError ? " is-invalid" : ""}`}>{code.map((value, index) => <input id={`${mode}-code-${index}`} key={index} value={value} onChange={(event) => updateCode(index, event.target.value)} onKeyDown={(event) => { if (event.key === "Backspace" && !value && index > 0) document.getElementById(`${mode}-code-${index - 1}`)?.focus(); }} disabled={!codeRequested || seconds <= 0 || Boolean(verifiedPhone)} inputMode="numeric" maxLength={1} aria-label={`${index + 1}번째 인증번호`} />)}</div>
       {codeError && <small className="phone-field-error" role="alert">{codeError}</small>}
-      <button className="phone-auth-primary phone-code-confirm" type="button" onClick={verifyCode} disabled={loading || !codeReady || Boolean(verifiedPhone)}>확인</button>
-      <button className="phone-code-resend" type="button" onClick={requestCode} disabled={loading || !phoneValid || Boolean(verifiedPhone)}>인증번호가 오지 않았나요? <strong>재전송</strong></button>
+      <button className="phone-auth-primary phone-code-confirm" type="button" onClick={verifyCode} disabled={loading || !codeReady || Boolean(verifiedPhone)}>{verifiedPhone ? "완료" : "확인"}</button>
+      {codeRequested && !verifiedPhone && <button className="phone-code-resend" type="button" onClick={requestCode} disabled={loading || !phoneValid}>인증번호가 오지 않았나요? <strong>재전송</strong></button>}
     </div>
   );
 }

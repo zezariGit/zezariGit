@@ -12,6 +12,8 @@ assert.match(component, /placeholder="010-0000-0000"/, "phone placeholder should
 assert.match(component, /disabled=\{loading \|\| !phoneValid \|\| Boolean\(verifiedPhone\)\}/, "send buttons require a valid phone number");
 assert.match(component, /codeRequested \? "인증번호 다시 받기" : "인증번호 받기"/, "send label should change after a request");
 assert.match(component, /setSeconds\(data\.expiresInSeconds \|\| 180\)/, "verification timer should start at three minutes");
+assert.match(component, /\{codeRequested && <span aria-live="polite">/, "verification timer must stay hidden until a code is requested");
+assert.doesNotMatch(component, /codeRequested \? formatTimer\(seconds\) : "03:00"/, "verification timer must not render a placeholder before requesting a code");
 assert.match(component, /disabled=\{loading \|\| !codeReady \|\| Boolean\(verifiedPhone\)\}/, "confirm requires six valid digits and an active timer");
 assert.match(component, /인증시간이 만료되었습니다\. 인증번호를 다시 받아 주세요\./, "expiry error should be explicit");
 assert.match(component, /이미 가입된 휴대폰번호입니다\./, "existing signup numbers need a dedicated dialog");

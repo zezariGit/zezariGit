@@ -25192,51 +25192,49 @@ body:has(.my-page-panel) .status-toast.success::before {
 }
 
 .phone-signup-content {
-  padding-top: 30px;
+  padding-top: 18px;
 }
 
 .phone-signup-section {
   display: grid;
-  gap: 16px;
-}
-
-.phone-signup-heading {
-  display: flex;
-  align-items: flex-start;
   gap: 12px;
 }
 
-.phone-signup-heading > span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  background: #079d50;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 800;
+.phone-signup-heading {
+  display: block;
 }
 
-.phone-signup-heading h2,
-.phone-terms-section h2 {
+.phone-signup-heading h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: 0;
 }
 
 .phone-signup-heading p {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   color: #757a77;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .phone-signup-content .phone-verification-fields {
-  grid-template-columns: minmax(0, 1fr) 126px;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  gap: 8px;
   align-items: end;
+}
+
+.phone-signup-content .phone-auth-field input,
+.phone-signup-content .phone-auth-primary,
+.phone-signup-content .phone-profile-field input,
+.phone-signup-content .phone-profile-birth select {
+  min-height: 46px;
+  height: 46px;
+}
+
+.phone-signup-content .phone-code-request,
+.phone-signup-content .phone-code-confirm {
+  padding-inline: 8px;
+  font-size: 12px;
 }
 
 .phone-signup-content .phone-auth-separator,
@@ -25247,12 +25245,32 @@ body:has(.my-page-panel) .status-toast.success::before {
   grid-column: 1 / -1;
 }
 
+.phone-signup-content .phone-auth-separator {
+  display: none;
+}
+
 .phone-signup-content .phone-code-row {
   grid-column: 1 / 2;
 }
 
 .phone-signup-content .phone-code-confirm {
   grid-column: 2 / 3;
+}
+
+.phone-signup-content .phone-code-row input,
+.phone-signup-content .phone-code-confirm {
+  height: 40px;
+  min-height: 40px;
+}
+
+.profile-section .phone-signup-heading h2 {
+  font-size: 27px;
+  line-height: 1.25;
+}
+
+.phone-signup-content .phone-verification-fields.is-verified .phone-code-heading span {
+  color: #079d50;
+  font-weight: 700;
 }
 
 .phone-verification-success {
@@ -25271,9 +25289,9 @@ body:has(.my-page-panel) .status-toast.success::before {
 }
 
 .phone-signup-divider {
-  height: 8px;
-  margin: 28px -28px;
-  background: #f4f5f4;
+  height: 1px;
+  margin: 12px 0;
+  background: #ededed;
 }
 
 .profile-section.is-disabled,
@@ -25305,11 +25323,8 @@ body:has(.my-page-panel) .status-toast.success::before {
 .phone-profile-gender label {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 112px;
-  height: 44px;
-  border: 1px solid #d9dedb;
-  border-radius: 5px;
+  min-width: 74px;
+  min-height: 28px;
   cursor: pointer;
 }
 
@@ -25326,14 +25341,21 @@ body:has(.my-page-panel) .status-toast.success::before {
 
 .phone-profile-birth > div {
   display: grid;
-  grid-template-columns: 1.25fr 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 
 .phone-terms-section {
   display: grid;
-  gap: 10px;
-  margin-top: 28px;
+  gap: 5px;
+  margin-top: 16px;
+}
+
+.phone-terms-section h2 {
+  margin: 0 0 3px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0;
 }
 
 .phone-terms-section label {
@@ -25361,14 +25383,14 @@ body:has(.my-page-panel) .status-toast.success::before {
 }
 
 .phone-terms-all {
-  padding-bottom: 10px;
+  padding-bottom: 6px;
   border-bottom: 1px solid #eceeec;
   font-weight: 800;
 }
 
 .phone-signup-submit {
   width: 100%;
-  margin-top: 28px;
+  margin-top: 18px;
 }
 
 .phone-auth-dialog-backdrop {
@@ -25421,7 +25443,7 @@ body:has(.my-page-panel) .status-toast.success::before {
   }
 
   .phone-signup-divider {
-    margin-inline: -20px;
+    margin-inline: 0;
   }
 
   .phone-auth-copy h2 {
@@ -25436,7 +25458,13 @@ body:has(.my-page-panel) .status-toast.success::before {
     min-height: 44px;
   }
 
+  .phone-signup-content .phone-code-row input,
+  .phone-signup-content .phone-code-confirm {
+    height: 38px;
+    min-height: 38px;
+  }
+
   .phone-signup-content .phone-verification-fields {
-    grid-template-columns: minmax(0, 1fr) 112px;
+    grid-template-columns: minmax(0, 1fr) 84px;
   }
 }
