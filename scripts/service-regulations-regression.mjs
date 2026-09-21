@@ -42,9 +42,11 @@ assert.match(shared, /SERVICE_REGULATION_TYPES = \["privacy", "service", "notifi
 assert.match(shared, /\[14, 16, 18, 20, 24\]\.includes/, "저장된 글씨 크기를 허용 목록으로 정규화해야 합니다.");
 assert.match(css, /\.service-regulation-scroll\s*\{[^}]*overflow-y: auto;/s, "팝업 본문만 세로 스크롤되어야 합니다.");
 assert.match(privacyPage, /getServiceRegulation\(type\)/, "설정의 약관 화면은 관리자 저장 내용을 조회해야 합니다.");
+assert.match(privacyPage, /\["privacy", "service", "notification"\]\.includes\(value\)/, "설정의 약관 화면은 알림 동의 규정을 허용해야 합니다.");
 assert.match(privacyPage, /href="\/\?panel=my" replace/, "약관 화면 뒤로가기는 설정 팝업으로 돌아가야 합니다.");
 assert.match(dashboard, /\/privacy\?type=service/, "설정의 이용약관 링크는 서비스 약관을 열어야 합니다.");
 assert.match(dashboard, /\/privacy\?type=privacy/, "설정의 개인정보처리방침 링크는 개인정보 문서를 열어야 합니다.");
+assert.match(dashboard, /알림 동의 규정[\s\S]{0,80}\/privacy\?type=notification/, "설정의 알림 동의 규정 링크는 알림 문서를 열어야 합니다.");
 assert.match(myPageOverlay, /router\.push\(`\$\{url\.pathname\}/, "설정 팝업 진입은 Next 라우터 기록에 저장해야 합니다.");
 
 const databasePath = path.join(os.tmpdir(), `zezari-service-regulations-${Date.now()}.db`).replaceAll("\\", "/");

@@ -48,5 +48,5 @@ export default async function PrivacyPolicyPage({ searchParams }) {
 }
 
 function regulationType(value) {
-  return value === "service" ? "service" : "privacy";
+  return ["privacy", "service", "notification"].includes(value) ? value : "privacy";
 }

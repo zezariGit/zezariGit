@@ -77,7 +77,7 @@ export default function ServiceRegulationEditor({ regulation, saveAction }) {
         ))}
       </div>
       <div className="service-regulation-save-bar">
-        <p>저장한 내용은 회원가입 약관과 설정의 이용약관·개인정보처리방침에 즉시 반영됩니다.</p>
+        <p>저장한 내용은 회원가입 약관과 설정의 이용약관·개인정보처리방침·알림 동의 규정에 즉시 반영됩니다.</p>
         <FormSubmitButton className="primary-button" pendingText="저장중">저장</FormSubmitButton>
       </div>
     </form>

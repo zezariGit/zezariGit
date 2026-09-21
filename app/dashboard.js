@@ -249,6 +249,7 @@ function MyPageTab({ closeHref = "", admin = false }) {
     ["제자리 서비스 소개", "/shop/service?from=settings"],
     ["이용약관", "/privacy?type=service"],
     ["개인정보처리방침", "/privacy?type=privacy"],
+    ["알림 동의 규정", "/privacy?type=notification"],
     ...(admin ? [["관리자 화면", "/admin?from=settings"]] : []),
   ];
   return (
