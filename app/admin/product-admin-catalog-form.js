@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import FormSubmitButton from "../form-submit-button";
 import {
+  createProductCatalogItemAction,
   setGlobalProductDesignCatalogItemAction,
   setProductCatalogItemAction,
 } from "./actions";
@@ -38,7 +39,7 @@ const DESIGN_DEFAULT_IMAGES = {
   돼지: "/assets/shop-icons/zodiac-pig.png",
 };
 
-export default function ProductAdminWorkspace({ products = [], designs = [], initialItemKey = "" }) {
+export default function ProductAdminWorkspace({ products = [], designs = [], initialItemKey = "", preview = false }) {
   const items = useMemo(() => [
     ...products.map((item) => ({ ...item, type: "product", key: `product:${item.id}` })),
     ...designs.map((item) => ({ ...item, type: "design", key: `design:${item.id}` })),
@@ -46,21 +47,37 @@ export default function ProductAdminWorkspace({ products = [], designs = [], ini
   const initialItem = items.find((item) => item.key === initialItemKey) || items[0] || null;
   const [filter, setFilter] = useState("all");
   const [selectedKey, setSelectedKey] = useState(initialItem?.key || "");
+  const [mode, setMode] = useState(initialItem ? "edit" : "create");
   const visibleItems = filter === "all" ? items : items.filter((item) => item.type === filter);
   const selectedItem = items.find((item) => item.key === selectedKey) || visibleItems[0] || null;
+  const nextSortOrder = products.reduce((maximum, product) => Math.max(maximum, Number(product.sort_order || 0)), 0) + 1;
 
   const selectFilter = (nextFilter) => {
     setFilter(nextFilter);
     const firstVisible = nextFilter === "all" ? items[0] : items.find((item) => item.type === nextFilter);
     if (selectedItem?.type !== nextFilter && nextFilter !== "all" && firstVisible) {
       setSelectedKey(firstVisible.key);
+      setMode("edit");
       updateSelectedCatalogUrl(firstVisible.key);
     }
   };
 
   const selectItem = (item) => {
     setSelectedKey(item.key);
+    setMode("edit");
     updateSelectedCatalogUrl(item.key);
+  };
+
+  const openCreateForm = () => {
+    setFilter("product");
+    setMode("create");
+    updateSelectedCatalogUrl("");
+  };
+
+  const closeCreateForm = () => {
+    if (!selectedItem) return;
+    setMode("edit");
+    updateSelectedCatalogUrl(selectedItem.key);
   };
 
   return (
@@ -71,19 +88,24 @@ export default function ProductAdminWorkspace({ products = [], designs = [], ini
             <h3>상품/디자인 목록</h3>
             <span>상품 {products.length}개 · 디자인 {designs.length}개</span>
           </div>
-          <div className="catalog-type-filters" role="tablist" aria-label="카탈로그 구분">
-            {FILTERS.map((item) => (
-              <button
-                aria-selected={filter === item.id}
-                className={filter === item.id ? "active" : ""}
-                key={item.id}
-                onClick={() => selectFilter(item.id)}
-                role="tab"
-                type="button"
-              >
-                {item.label}
-              </button>
-            ))}
+          <div className="catalog-toolbar-actions">
+            <div className="catalog-type-filters" role="tablist" aria-label="카탈로그 구분">
+              {FILTERS.map((item) => (
+                <button
+                  aria-selected={filter === item.id}
+                  className={filter === item.id ? "active" : ""}
+                  key={item.id}
+                  onClick={() => selectFilter(item.id)}
+                  role="tab"
+                  type="button"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            <button className="primary-button compact catalog-add-product-button" type="button" onClick={openCreateForm}>
+              <span aria-hidden="true">+</span> 상품 추가
+            </button>
           </div>
         </div>
 
@@ -109,7 +131,13 @@ export default function ProductAdminWorkspace({ products = [], designs = [], ini
       </section>
 
       <aside className="product-management-detail-panel" aria-label="상품 또는 디자인 상세 편집">
-        {selectedItem ? <CatalogItemEditor item={selectedItem} key={selectedItem.key} /> : (
+        {mode === "create" ? (
+          <ProductAdminCreateForm
+            defaultSortOrder={nextSortOrder}
+            onCancel={selectedItem ? closeCreateForm : null}
+            preview={preview}
+          />
+        ) : selectedItem ? <CatalogItemEditor item={selectedItem} key={selectedItem.key} preview={preview} /> : (
           <p className="product-catalog-empty">관리할 항목이 없습니다.</p>
         )}
       </aside>
@@ -117,7 +145,68 @@ export default function ProductAdminWorkspace({ products = [], designs = [], ini
   );
 }
 
-function CatalogItemEditor({ item }) {
+function ProductAdminCreateForm({ defaultSortOrder, onCancel, preview }) {
+  return (
+    <div className="product-admin-editor product-admin-create-editor">
+      <div className="product-admin-editor-heading">
+        <div>
+          <span>상품 등록</span>
+          <h3>새 상품 추가</h3>
+        </div>
+        {onCancel && <button className="plain-button compact" type="button" onClick={onCancel}>취소</button>}
+      </div>
+      <form
+        action={createProductCatalogItemAction}
+        className="product-admin-create-form"
+        onSubmit={preview ? (event) => event.preventDefault() : undefined}
+      >
+        <input type="hidden" name="returnTo" value="/admin?section=products" />
+        <div className="product-admin-detail-scroll">
+          <div className="product-admin-create-fields">
+            <label>
+              상품명
+              <input name="name" placeholder="예: 안전 스티커" required />
+            </label>
+            <label>
+              판매 가격
+              <input name="unitPrice" type="number" min="0" step="100" placeholder="0" required />
+            </label>
+          </div>
+          <label>
+            상품 설명
+            <textarea name="description" rows="3" placeholder="상품 선택 및 주문 화면에 표시할 설명" />
+          </label>
+          <label>
+            정렬 순서
+            <input name="sortOrder" type="number" step="1" defaultValue={defaultSortOrder} />
+          </label>
+          <div className="product-admin-create-fields media">
+            <label>
+              상품 이미지
+              <input name="image" type="file" accept="image/*" required />
+              <small>원본 비율 유지, 1MB 이하</small>
+            </label>
+            <label>
+              상세 이미지
+              <input name="detailImage" type="file" accept="image/*" />
+              <small>선택 입력, 세로형 이미지 4MB 이하</small>
+            </label>
+          </div>
+          <label className="product-admin-create-active">
+            <input name="isActive" type="checkbox" value="1" defaultChecked />
+            <span>추가 즉시 상품 구매 화면에 노출</span>
+          </label>
+          <p className="product-admin-editor-note">등록 후 상품명, 가격, 이미지와 노출 여부를 언제든 다시 수정할 수 있습니다.</p>
+        </div>
+        <div className="product-admin-editor-footer">
+          <FormSubmitButton pendingText="추가중">상품 추가</FormSubmitButton>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function CatalogItemEditor({ item, preview }) {
   const isProduct = item.type === "product";
   const action = isProduct ? setProductCatalogItemAction : setGlobalProductDesignCatalogItemAction;
 
@@ -137,7 +226,11 @@ function CatalogItemEditor({ item }) {
         <span className={`catalog-type-badge ${item.type}`}>{isProduct ? "상품" : "디자인"}</span>
       </div>
 
-      <form action={action} className="product-admin-form product-admin-editor-form">
+      <form
+        action={action}
+        className="product-admin-form product-admin-editor-form"
+        onSubmit={preview ? (event) => event.preventDefault() : undefined}
+      >
         <input type="hidden" name="returnTo" value={`/admin?section=products&item=${encodeURIComponent(item.key)}`} />
         {isProduct ? (
           <>

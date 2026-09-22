@@ -13839,9 +13839,11 @@ button:disabled:hover {
 }
 
 .shop-length-options {
+  width: min(100%, 320px);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 7px;
+  margin-inline: auto;
 }
 
 .shop-length-options button {
@@ -13851,7 +13853,7 @@ button:disabled:hover {
   display: grid;
   place-content: center;
   gap: 3px;
-  padding: 8px 24px 8px 8px;
+  padding: 8px;
   border: 1px solid #dfe4e1;
   border-radius: 7px;
   background: #ffffff;
@@ -14516,6 +14518,21 @@ button:disabled:hover {
   max-width: 100%;
   height: auto;
   max-height: 100%;
+  object-fit: contain;
+}
+
+.shop-catalog-selection-view.product .shop-choice-image {
+  position: relative;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  padding: 0;
+}
+
+.shop-catalog-selection-view.product .shop-choice-image img {
+  position: absolute;
+  inset: 8px;
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
   object-fit: contain;
 }
 
@@ -15935,6 +15952,25 @@ button:disabled:hover {
   align-items: flex-end;
 }
 
+.catalog-toolbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.catalog-add-product-button {
+  min-height: 34px;
+  white-space: nowrap;
+}
+
+.product-catalog-toolbar .catalog-add-product-button > span {
+  display: inline;
+  margin: 0;
+  color: inherit;
+  font-size: 1rem;
+}
+
 .catalog-type-filters {
   display: inline-grid;
   grid-template-columns: repeat(3, minmax(62px, 1fr));
@@ -16748,6 +16784,16 @@ button:disabled:hover {
 
   .catalog-filter-toolbar {
     flex-direction: column;
+  }
+
+  .catalog-toolbar-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .catalog-toolbar-actions .catalog-type-filters {
+    width: auto;
+    flex: 1;
   }
 
   .catalog-type-filters {

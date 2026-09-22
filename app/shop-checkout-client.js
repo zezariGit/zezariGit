@@ -644,8 +644,6 @@ export default function ShopCheckoutClient({
           <OrderInformation
             product={product}
             design={selectedDesign}
-            braceletLength={braceletLength}
-            necklaceLength={necklaceLength}
             quantity={quantity}
             subject={selectedSubject}
             recipientName={recipientName}
@@ -949,8 +947,6 @@ function CatalogSelectionView({ type, options, selectedId, onSelect, onConfirm }
 function OrderInformation({
   product,
   design,
-  braceletLength,
-  necklaceLength,
   quantity,
   subject,
   recipientName,
@@ -990,9 +986,6 @@ function OrderInformation({
             <strong>{formatProductDesignName(product, design)}</strong>
             <span>{quantity}개</span>
             <em>{formatCurrency(subtotalAmount)}</em>
-            {(braceletLength || necklaceLength) && (
-              <small>{[braceletLength, necklaceLength].filter(Boolean).join(" / ")}</small>
-            )}
           </div>
         </div>
       </section>

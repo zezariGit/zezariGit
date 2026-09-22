@@ -80,13 +80,16 @@ import {
 } from "./actions";
 
 export default async function AdminPage({ searchParams }) {
-  const session = await getServerSession(authOptions);
+  const resolvedSearchParams = await searchParams;
+  const productPreview = process.env.NODE_ENV === "development" && resolvedSearchParams?.preview === "products";
+  const session = productPreview
+    ? { user: { email: "product-preview@zezari.local", name: "상품 관리자 미리보기" } }
+    : await getServerSession(authOptions);
   const requestHeaders = await headers();
   const adminRequestMeta = {
     ipAddress: (requestHeaders.get("x-forwarded-for") || "").split(",")[0]?.trim() || requestHeaders.get("x-real-ip") || "",
     userAgent: requestHeaders.get("user-agent") || "",
   };
-  const resolvedSearchParams = await searchParams;
   const enabledProviders = getConfiguredProviderIds();
   const notice = resolvedSearchParams?.notice || "";
   const noticeType = resolvedSearchParams?.noticeType || "success";
@@ -104,7 +107,7 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const adminAuthorized = isAdminSession(session) || (await isDbAdminSession(session));
+  const adminAuthorized = productPreview || isAdminSession(session) || (await isDbAdminSession(session));
   if (!adminAuthorized) {
     return (
       <main className="admin-page">
@@ -118,7 +121,9 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const activeSection = ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "product-service-intro", "image-uploads", "orders", "subscriptions", "ads", "ad-pricing", "missing", "locations", "location-security", "safe-phones", "notifications", "message-templates", "service-regulations", "inquiries"].includes(resolvedSearchParams?.section)
+  const activeSection = productPreview
+    ? "products"
+    : ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "product-service-intro", "image-uploads", "orders", "subscriptions", "ads", "ad-pricing", "missing", "locations", "location-security", "safe-phones", "notifications", "message-templates", "service-regulations", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -387,7 +392,7 @@ export default async function AdminPage({ searchParams }) {
           ) : activeSection === "coupons" ? (
             <CouponManagementSection couponsData={couponsData} />
           ) : activeSection === "products" ? (
-            <ProductManagementSection productsData={productsData} selectedItemKey={resolvedSearchParams?.item || ""} />
+            <ProductManagementSection productsData={productsData} selectedItemKey={resolvedSearchParams?.item || ""} preview={productPreview} />
           ) : activeSection === "product-service-intro" ? (
             <ProductServiceIntroManagementSection setting={productServiceIntro} />
           ) : activeSection === "image-uploads" ? (
@@ -3495,8 +3500,10 @@ function SubscriptionAvatar({ subscription }) {
   );
 }
 
-function ProductManagementSection({ productsData, selectedItemKey = "" }) {
+function ProductManagementSection({ productsData, selectedItemKey = "", preview = false }) {
   const { products, designs, shippingSettings } = productsData;
+  const clientProducts = JSON.parse(JSON.stringify(products));
+  const clientDesigns = JSON.parse(JSON.stringify(designs));
   const designCount = designs.length;
 
   return (
@@ -3531,7 +3538,7 @@ function ProductManagementSection({ productsData, selectedItemKey = "" }) {
           </div>
         </div>
         <p className="empty-text">현재 {products.length}개 상품과 공용 {designCount}개 디자인의 이미지, 명칭과 가격을 각각 관리할 수 있습니다. 항목을 선택하면 오른쪽 상세 패널에서 수정할 수 있습니다.</p>
-        <ProductAdminWorkspace products={products} designs={designs} initialItemKey={selectedItemKey} />
+        <ProductAdminWorkspace products={clientProducts} designs={clientDesigns} initialItemKey={selectedItemKey} preview={preview} />
       </section>
     </div>
   );

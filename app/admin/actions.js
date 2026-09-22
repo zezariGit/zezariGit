@@ -536,7 +536,7 @@ export async function createProductCatalogItemAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=products"), error.message || "상품 추가에 실패했습니다.", "error"));
   }
   const returnTo = productId
-    ? `/admin?section=products&product=${encodeURIComponent(productId)}`
+    ? `/admin?section=products&item=${encodeURIComponent(`product:${productId}`)}`
     : getReturnTo(formData, "/admin?section=products");
   redirect(withNotice(returnTo, "새 상품이 추가되었습니다."));
 }
