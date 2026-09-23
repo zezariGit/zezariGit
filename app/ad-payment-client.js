@@ -243,7 +243,7 @@ export default function AdPaymentClient({
         <div className="ad-payment-poster-row">
           <img src={posterSrc} alt={`${ad.subject_name || "대상자"} 실종광고 포스터`} />
           <button type="button" onClick={() => setPosterOpen(true)} aria-label="광고 포스터 크게 보기" title="광고 포스터 크게 보기">
-            <span aria-hidden="true">↗</span>
+            <img src="/assets/ad-payment/poster-expand.png" alt="" aria-hidden="true" />
           </button>
         </div>
       </section>

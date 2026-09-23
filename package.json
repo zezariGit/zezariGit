@@ -28,6 +28,7 @@
     "test:ad-setup": "node scripts/ad-setup-regression.mjs",
     "test:ad-meta-payment": "node scripts/ad-meta-payment-regression.mjs",
     "test:ad-meta-status": "tsx scripts/ad-meta-status-sync-regression.mjs",
+    "test:poster-template": "tsx scripts/poster-template-regression.mjs",
     "test:billing-history": "node scripts/billing-history-regression.mjs",
     "test:shop-ui": "node scripts/shop-purchase-ui-regression.mjs",
     "test:shop-checkout": "node scripts/shop-checkout-payment-regression.mjs",

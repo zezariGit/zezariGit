@@ -24673,6 +24673,13 @@ body:has(.my-page-panel) .status-toast.success::before {
   cursor: pointer;
 }
 
+.ad-payment-poster-row > button img {
+  width: 27px;
+  height: 27px;
+  display: block;
+  object-fit: contain;
+}
+
 .ad-payment-notice {
   gap: 8px;
   padding: 14px;
@@ -24687,13 +24694,20 @@ body:has(.my-page-panel) .status-toast.success::before {
 .ad-payment-notice ul {
   gap: 6px;
   padding-left: 18px;
+  list-style: disc;
+  list-style-position: outside;
   color: #3f4246;
   font-size: 11px;
   line-height: 1.45;
 }
 
-.ad-payment-notice li:first-child {
-  white-space: nowrap;
+.ad-payment-notice li {
+  padding-left: 1px;
+  white-space: normal;
+}
+
+.ad-payment-notice li::marker {
+  color: #a66d16;
 }
 
 .ad-payment-method {
@@ -25590,5 +25604,300 @@ body:has(.my-page-panel) .status-toast.success::before {
 
   .phone-signup-content .phone-verification-fields {
     grid-template-columns: minmax(0, 1fr) 84px;
+  }
+}
+
+.poster-template-admin {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: 32px;
+  color: #17211a;
+}
+
+.poster-template-admin-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #dce4de;
+}
+
+.poster-template-admin-header p,
+.poster-template-admin-header h1 {
+  margin: 0;
+}
+
+.poster-template-admin-header p {
+  margin-bottom: 5px;
+  color: #16834b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.poster-template-admin-header h1 {
+  font-size: 28px;
+  letter-spacing: 0;
+}
+
+.poster-template-admin-header > span {
+  color: #4f6658;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.poster-template-editor {
+  display: grid;
+  grid-template-columns: minmax(300px, 480px) minmax(0, 1fr);
+  gap: 32px;
+  padding-top: 28px;
+  align-items: start;
+}
+
+.poster-template-preview-panel {
+  position: sticky;
+  top: 24px;
+}
+
+.poster-template-preview-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.poster-template-preview-heading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.poster-template-preview-heading span {
+  color: #6b7c70;
+  font-size: 13px;
+}
+
+.poster-template-preview-frame {
+  position: relative;
+  width: min(100%, 540px);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid #cbd7ce;
+  background: #f4f7f5;
+  box-shadow: 0 10px 30px rgba(20, 48, 30, 0.08);
+}
+
+.poster-template-preview-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.poster-template-preview-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.78);
+  color: #147644;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.poster-template-policy {
+  width: min(100%, 540px);
+  margin: 12px 0 0;
+  color: #66756a;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.poster-template-controls {
+  min-width: 0;
+}
+
+.poster-template-basic-fields {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto auto;
+  gap: 12px;
+  align-items: end;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #dce4de;
+}
+
+.poster-template-controls label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.poster-template-controls label > span {
+  color: #4f6255;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.poster-template-controls input,
+.poster-template-controls select {
+  min-width: 0;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid #cbd7ce;
+  border-radius: 6px;
+  background: #fff;
+  color: #17211a;
+  font: inherit;
+}
+
+.poster-template-upload input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.poster-template-upload b,
+.poster-template-reset {
+  display: inline-flex;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border: 1px solid #93a99a;
+  border-radius: 6px;
+  background: #fff;
+  color: #24432f;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.poster-template-field-list {
+  display: grid;
+  gap: 14px;
+  padding-top: 20px;
+}
+
+.poster-template-field-list fieldset {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid #d8e1da;
+  border-radius: 8px;
+}
+
+.poster-template-field-list legend {
+  padding: 0 6px;
+  color: #173d26;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.poster-template-input-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(68px, 1fr));
+  gap: 10px;
+}
+
+.poster-template-color-control input {
+  width: 100%;
+  padding: 5px;
+}
+
+.poster-template-save {
+  width: 100%;
+  height: 50px;
+  margin-top: 18px;
+  border: 0;
+  border-radius: 6px;
+  background: #07883f;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.poster-template-save:disabled {
+  opacity: 0.58;
+  cursor: wait;
+}
+
+.poster-template-feedback {
+  margin: 16px 0 0;
+  padding: 11px 13px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.poster-template-feedback.error {
+  color: #9f1d1d;
+  background: #fff1f1;
+}
+
+.poster-template-feedback.success {
+  color: #116d3b;
+  background: #ebf8f0;
+}
+
+.poster-template-history {
+  margin-top: 16px;
+  border-top: 1px solid #dce4de;
+  padding-top: 14px;
+  color: #506258;
+  font-size: 13px;
+}
+
+.poster-template-history summary {
+  color: #243c2c;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.poster-template-history p {
+  margin: 8px 0 0;
+}
+
+@media (max-width: 1280px) {
+  .poster-template-admin {
+    padding: 20px;
+  }
+
+  .poster-template-editor {
+    grid-template-columns: 1fr;
+  }
+
+  .poster-template-preview-panel {
+    position: static;
+  }
+
+  .poster-template-preview-frame,
+  .poster-template-policy {
+    width: min(100%, 520px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 680px) {
+  .poster-template-admin {
+    padding: 16px;
+  }
+
+  .poster-template-admin-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .poster-template-basic-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .poster-template-basic-fields > label:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .poster-template-input-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

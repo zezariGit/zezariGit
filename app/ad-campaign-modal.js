@@ -41,9 +41,6 @@ export default function AdCampaignModal({
   const [distanceOpen, setDistanceOpen] = useState(false);
   const [durationOpen, setDurationOpen] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
-  const [capturePending, setCapturePending] = useState(false);
-  const creativeInputRef = useRef(null);
-  const capturedSubmitRef = useRef(false);
   const locationSearchRef = useRef(null);
   const distanceSelectRef = useRef(null);
   const durationSelectRef = useRef(null);
@@ -125,32 +122,10 @@ export default function AdCampaignModal({
 
   if (!subject) return null;
 
-  async function prepareCreativeImage(event) {
-    if (capturedSubmitRef.current) {
-      capturedSubmitRef.current = false;
-      return;
-    }
-
-    event.preventDefault();
-    const form = event.currentTarget;
-    const submitter = event.nativeEvent.submitter;
+  function validateSubmission(event) {
     if (!canSubmit) {
+      event.preventDefault();
       setShowErrors(true);
-      return;
-    }
-    if (!creativeInputRef.current) return;
-
-    setCapturePending(true);
-    try {
-      const dataUrl = await createMissingAdCreativeImage(subject);
-      if (dataUrl.length > 1.8 * 1024 * 1024) throw new Error("광고 이미지 용량이 너무 큽니다.");
-      creativeInputRef.current.value = dataUrl;
-      capturedSubmitRef.current = true;
-      form.requestSubmit(submitter || undefined);
-    } catch (error) {
-      window.alert(error?.message || "광고 미리보기 이미지를 생성하지 못했습니다. 다시 시도해 주세요.");
-    } finally {
-      setCapturePending(false);
     }
   }
 
@@ -193,14 +168,13 @@ export default function AdCampaignModal({
           <span aria-hidden="true" />
         </header>
 
-        <form action={createAction} className="ad-setup-form" onSubmit={prepareCreativeImage}>
+        <form action={createAction} className="ad-setup-form" onSubmit={validateSubmission}>
             <input type="hidden" name="subjectId" value={subject.id} />
             <input type="hidden" name="distanceOptionId" value={selectedDistance?.id || ""} />
             <input type="hidden" name="durationOptionId" value={selectedDuration?.id || ""} />
             <input type="hidden" name="region" value={regionLabel} />
             <input type="hidden" name="regionLatitude" value={regionComplete && location.selected ? location.lat : ""} />
             <input type="hidden" name="regionLongitude" value={regionComplete && location.selected ? location.lng : ""} />
-            <input ref={creativeInputRef} type="hidden" name="creativeImageDataUrl" />
 
             <section className="ad-setup-section" aria-labelledby="ad-setup-region-title">
               <AdSetupHeading number="1" id="ad-setup-region-title" title="지역 선택" description="광고 거리의 기준이 될 지역을 선택해 주세요." />
@@ -303,9 +277,8 @@ export default function AdCampaignModal({
               className={`ad-setup-next${canSubmit ? "" : " disabled"}`}
               type="submit"
               aria-label={canSubmit ? "다음" : "다음, 필수 항목 선택 필요"}
-              disabled={capturePending}
             >
-              {capturePending ? "준비 중" : "다음"}
+              다음
             </button>
         </form>
       </div>
@@ -393,160 +366,6 @@ function MissingAdPreview({ subject, quote, startDate, endDate, regionLabel, dis
       </div>
     </section>
   );
-}
-
-async function createMissingAdCreativeImage(subject) {
-  if (typeof document !== "undefined" && document.fonts?.ready) {
-    await document.fonts.ready.catch(() => null);
-  }
-
-  const canvas = document.createElement("canvas");
-  canvas.width = 1080;
-  canvas.height = 1350;
-  const context = canvas.getContext("2d");
-  if (!context) throw new Error("광고 이미지 캔버스를 생성하지 못했습니다.");
-
-  const photoSrc = subjectPhotoSrc(subject);
-  const [template, photo, qr] = await Promise.all([
-    loadCreativeImage("/assets/missing-ad-template.png", "실종광고 양식을 불러오지 못했습니다."),
-    photoSrc ? loadCreativeImage(photoSrc, "관리대상 사진을 불러오지 못했습니다.") : Promise.resolve(null),
-    subject?.qr_image ? loadCreativeImage(subject.qr_image, "관리대상 QR 코드를 불러오지 못했습니다.") : Promise.resolve(null),
-  ]);
-
-  context.drawImage(template, 0, 0, canvas.width, canvas.height);
-  if (photo) {
-    drawCoverImage(context, photo, 36, 396, 462, 558);
-  } else {
-    context.fillStyle = "#f3f4f6";
-    context.fillRect(36, 396, 462, 558);
-    drawCenteredText(context, "사진 없음", 267, 675, 52, 360, "#6b7280");
-  }
-
-  const age = calculateAge(subject?.birth_date);
-  drawFittedText(context, String(subject?.name || "-"), 765, 431, 270, 62);
-  drawFittedText(context, age ? `${age}세` : "-", 765, 575, 270, 62);
-  drawFittedText(context, formatGender(subject?.gender), 765, 719, 270, 62);
-
-  const guardianMessage = sanitizeAdGuardianMessage(subject?.guardian_message)
-    || "보호자가 작성한 메시지가 이 영역에 표시됩니다.";
-  drawWrappedText(context, guardianMessage, {
-    x: 660,
-    y: 842,
-    maxWidth: 350,
-    maxHeight: 154,
-    fontSize: 35,
-    minFontSize: 24,
-    lineHeightRatio: 1.24,
-    maxLines: 4,
-  });
-
-  if (qr) {
-    context.fillStyle = "#ffffff";
-    context.fillRect(58, 1079, 236, 236);
-    drawContainImage(context, qr, 66, 1087, 220, 220);
-  } else {
-    context.fillStyle = "#ffffff";
-    context.fillRect(58, 1079, 236, 236);
-    drawCenteredText(context, "QR", 176, 1197, 54, 180, "#111827");
-  }
-
-  return canvas.toDataURL("image/jpeg", 0.92);
-}
-
-function loadCreativeImage(src, errorMessage) {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.decoding = "async";
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error(errorMessage));
-    image.src = src;
-  });
-}
-
-function drawCoverImage(context, image, x, y, width, height) {
-  const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
-  const sourceWidth = width / scale;
-  const sourceHeight = height / scale;
-  const sourceX = Math.max(0, (image.naturalWidth - sourceWidth) / 2);
-  const sourceY = Math.max(0, (image.naturalHeight - sourceHeight) / 2);
-  context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
-}
-
-function drawContainImage(context, image, x, y, width, height) {
-  const scale = Math.min(width / image.naturalWidth, height / image.naturalHeight);
-  const drawWidth = image.naturalWidth * scale;
-  const drawHeight = image.naturalHeight * scale;
-  context.drawImage(image, x + (width - drawWidth) / 2, y + (height - drawHeight) / 2, drawWidth, drawHeight);
-}
-
-function drawFittedText(context, text, x, centerY, maxWidth, preferredSize) {
-  let fontSize = preferredSize;
-  context.fillStyle = "#111111";
-  context.textAlign = "left";
-  context.textBaseline = "middle";
-  while (fontSize > 34) {
-    context.font = `900 ${fontSize}px "Malgun Gothic", "Apple SD Gothic Neo", sans-serif`;
-    if (context.measureText(text).width <= maxWidth) break;
-    fontSize -= 2;
-  }
-  context.fillText(text, x, centerY, maxWidth);
-}
-
-function drawCenteredText(context, text, centerX, centerY, fontSize, maxWidth, color) {
-  context.fillStyle = color;
-  context.font = `800 ${fontSize}px "Malgun Gothic", "Apple SD Gothic Neo", sans-serif`;
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.fillText(text, centerX, centerY, maxWidth);
-}
-
-function drawWrappedText(context, text, options) {
-  const words = Array.from(String(text || "").replace(/\s+/g, " ").trim());
-  let fontSize = options.fontSize;
-
-  while (fontSize >= options.minFontSize) {
-    context.font = `800 ${fontSize}px "Malgun Gothic", "Apple SD Gothic Neo", sans-serif`;
-    const lines = wrapCanvasCharacters(context, words, options.maxWidth);
-    const lineHeight = fontSize * options.lineHeightRatio;
-    if (lines.length <= options.maxLines && lines.length * lineHeight <= options.maxHeight) {
-      context.fillStyle = "#111111";
-      context.textAlign = "left";
-      context.textBaseline = "top";
-      lines.forEach((line, index) => context.fillText(line, options.x, options.y + index * lineHeight, options.maxWidth));
-      return;
-    }
-    fontSize -= 2;
-  }
-
-  context.font = `800 ${options.minFontSize}px "Malgun Gothic", "Apple SD Gothic Neo", sans-serif`;
-  const lines = wrapCanvasCharacters(context, words, options.maxWidth).slice(0, options.maxLines);
-  if (lines.length === options.maxLines) {
-    while (lines[lines.length - 1] && context.measureText(`${lines[lines.length - 1]}…`).width > options.maxWidth) {
-      lines[lines.length - 1] = lines[lines.length - 1].slice(0, -1);
-    }
-    lines[lines.length - 1] = `${lines[lines.length - 1]}…`;
-  }
-  const lineHeight = options.minFontSize * options.lineHeightRatio;
-  context.fillStyle = "#111111";
-  context.textAlign = "left";
-  context.textBaseline = "top";
-  lines.forEach((line, index) => context.fillText(line, options.x, options.y + index * lineHeight, options.maxWidth));
-}
-
-function wrapCanvasCharacters(context, characters, maxWidth) {
-  const lines = [];
-  let line = "";
-  characters.forEach((character) => {
-    const candidate = `${line}${character}`;
-    if (line && context.measureText(candidate).width > maxWidth) {
-      lines.push(line.trimEnd());
-      line = character.trimStart();
-    } else {
-      line = candidate;
-    }
-  });
-  if (line) lines.push(line.trimEnd());
-  return lines;
 }
 
 function normalizeDistanceOptions(rows) {
