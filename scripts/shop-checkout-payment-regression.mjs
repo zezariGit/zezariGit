@@ -44,6 +44,8 @@ assert.match(adminActions, /setShopPurchaseSettingsAction/);
 
 assert.match(complete, /<h1>주문이 완료되었습니다<\/h1>/);
 assert.doesNotMatch(complete, /product-order-complete\.png/);
+assert.match(complete, /홈으로 이동/);
+assert.doesNotMatch(complete, /대시보드(?:로)? 이동/);
 assert.match(complete, /주문정보는 결제 및 서비스 현황에서/);
 
 console.log("shop checkout payment regression passed");

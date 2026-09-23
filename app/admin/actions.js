@@ -332,13 +332,17 @@ export async function setGuardianAdminAction(formData) {
   const session = await getServerSession(authOptions);
   if (!(isAdminSession(session) || (await isDbAdminSession(session)))) throw new Error("관리자 권한이 필요합니다.");
 
+  let result;
   try {
-    await setGuardianAdmin(formData);
+    result = await setGuardianAdmin(formData);
     revalidatePath("/admin");
   } catch (error) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=admins"), error.message || "관리자 권한 수정에 실패했습니다.", "error"));
   }
-  redirect(withNotice(getReturnTo(formData, "/admin?section=admins"), "관리자 권한이 수정되었습니다."));
+  const message = result.admin
+    ? `${result.phone} 번호에 관리자 권한을 부여했습니다.`
+    : `${result.phone} 번호의 관리자 권한을 회수했습니다.`;
+  redirect(withNotice(getReturnTo(formData, "/admin?section=admins"), message));
 }
 
 export async function setSubscriptionPlanPriceAction(formData) {

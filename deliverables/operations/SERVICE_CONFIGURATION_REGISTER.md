@@ -14,7 +14,7 @@
 | GitHub | 소스·이력·배포 트리거 | 운영 | [저장소](https://github.com/zezariGit/zezariGit) | 없음 | 전체 저장소 |
 | Vercel | Next.js 호스팅·도메인·서버리스·환경변수 | 운영 | [프로젝트](https://vercel.com/zezari/zezari) | Vercel Environments | `.vercel/project.json`, `next.config.mjs` |
 | Turso | 운영 libSQL DB | 설정됨·운영 | [Turso](https://app.turso.tech/zezarigit) | `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` | `lib/db.js` |
-| NextAuth | 세션·일반/SNS 로그인 | 운영 | Vercel | `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `ADMIN_EMAILS` | `lib/auth.js` |
+| NextAuth | 휴대폰 인증 로그인·세션 | 운영 | Vercel | `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `ADMIN_PHONES` | `lib/auth.js` |
 | Google OAuth | Google 로그인 | 운영 확인 완료 | [Google Cloud](https://console.cloud.google.com/apis/credentials) | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | `lib/auth.js` |
 | Kakao OAuth | Kakao 로그인 | 키 설정됨·운영 검증 필요 | [Kakao Developers](https://developers.kakao.com/console/app) | `KAKAO_CLIENT_ID`, `KAKAO_CLIENT_SECRET`(선택), `KAKAO_SCOPE` | `lib/auth.js` |
 | Naver OAuth | Naver 로그인 | 키 설정됨·검수 결과 확인 필요 | [Naver Developers](https://developers.naver.com/apps/) | `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET` | `lib/auth.js` |

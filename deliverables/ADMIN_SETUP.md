@@ -9,13 +9,11 @@ Project: REAL_QR_FIND / zezari
 - `/admin`
 
 ## Access Control
-- Admin access requires Google login.
+- Admin access requires phone verification login.
 - Admin access is granted by either:
-  - Email listed in `ADMIN_EMAILS`.
+  - Phone number listed in `ADMIN_PHONES`.
   - `guardians.is_admin = 1` in the database.
-- If `ADMIN_EMAILS` is empty, the default admin emails are:
-  - `general@zezari.com`
-  - `soonsuboy10@gmail.com`
+- Former `ADMIN_EMAILS` entries are migrated once to `guardians.is_admin = 1` and are not used for runtime authorization.
 
 ## Admin Page Layout
 - Top admin menu:
@@ -30,7 +28,7 @@ Project: REAL_QR_FIND / zezari
   - QR card grid with image, unique key, URL, and active state.
 - `관리자 관리`:
   - Lists registered guardians.
-  - Allows admins to grant/revoke DB admin role.
+  - Uses the verified phone number to grant/revoke the DB admin role.
   - Environment default admins are shown as protected base admins.
 
 ## Guardian Activation
@@ -45,7 +43,7 @@ Project: REAL_QR_FIND / zezari
 - Values:
   - `1`: DB administrator
   - `0`: normal guardian
-- DB administrators can access `/admin` after Google login.
+- DB administrators can access `/admin` after phone verification login.
 - Environment default admins still have access even if their DB flag is off.
 - The admin management UI disables role removal for environment default admins because that access is configured outside the database.
 
@@ -60,11 +58,7 @@ Project: REAL_QR_FIND / zezari
 ## Environment Variable
 
 ```text
-ADMIN_EMAILS=general@zezari.com,soonsuboy10@gmail.com
+ADMIN_PHONES=010-1234-5678,010-9876-5432
 ```
 
-Multiple admins can be comma-separated.
-
-```text
-ADMIN_EMAILS=admin1@example.com,admin2@example.com
-```
+Multiple phone numbers can be comma-separated. Store only verified guardian phone numbers.

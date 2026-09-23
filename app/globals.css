@@ -10447,6 +10447,14 @@ a.inline-scroll-value {
   color: var(--c-text);
 }
 
+.admin-phone-role-form {
+  grid-template-columns: minmax(220px, 1fr) auto;
+}
+
+.admin-phone-role-form input {
+  min-width: 220px;
+}
+
 .qr-filter-panel {
   padding: var(--space-md);
 }
@@ -10770,6 +10778,13 @@ a.inline-scroll-value {
   color: var(--c-text-muted);
   font-size: 0.9rem;
   overflow-wrap: anywhere;
+}
+
+.admin-user-card .admin-user-phone {
+  color: var(--c-text);
+  font-size: 1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .image-upload-settings-panel {

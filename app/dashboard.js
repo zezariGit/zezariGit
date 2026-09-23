@@ -244,7 +244,7 @@ function MyPageTab({ closeHref = "", admin = false }) {
   const menuItems = [
     ["보호자 정보", "/account/profile"],
     ["쿠폰함", "/account/coupons"],
-    ["광고 대시보드", "/account/ads"],
+    ["광고 현황", "/account/ads"],
     ["결제 및 서비스 현황", "/account/billing"],
     ["제자리 서비스 소개", "/shop/service?from=settings"],
     ["이용약관", "/privacy?type=service"],
@@ -672,7 +672,7 @@ function SubjectRegistrationComplete() {
           상품 구매하기
         </Link>
         <Link className="outline-login-button subject-complete-action" href="/?tab=dashboard">
-          대시보드 이동하기
+          홈 이동하기
         </Link>
       </div>
     </section>

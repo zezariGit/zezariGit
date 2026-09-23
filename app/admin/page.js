@@ -12,7 +12,7 @@ import AdminExportButton from "./export-button";
 import AdPricingForm from "./ad-pricing-form";
 import ProductAdminWorkspace from "./product-admin-catalog-form";
 import ServiceRegulationEditor from "./service-regulation-editor";
-import { isAdminSession, isDefaultAdminEmail } from "../../lib/admin";
+import { isAdminSession, isDefaultAdminPhone } from "../../lib/admin";
 import { authOptions, getConfiguredProviderIds } from "../../lib/auth";
 import {
   formatDateOnly as formatStandardDate,
@@ -110,7 +110,7 @@ export default async function AdminPage({ searchParams }) {
       <main className="admin-page">
         <section className="admin-empty">
           <h1>접근 권한이 없습니다</h1>
-          <p>등록된 관리자 이메일만 관리자 페이지에 접근할 수 있습니다.</p>
+          <p>관리자로 등록된 휴대폰번호로 로그인해 주세요.</p>
           <LogoutButton />
         </section>
         <StatusToast message={notice} type={noticeType} />
@@ -3554,10 +3554,27 @@ function AdminRoleManagementSection({ adminUsersData }) {
             <span>{accessCount}명</span>
           </div>
           <p className="empty-text">
-            가입된 보호자 중에서 관리자 페이지에 접근할 사용자를 선택합니다. 기본 관리자는 환경변수로
-            보호됩니다.
+            가입된 보호자의 휴대폰번호로 관리자 권한을 부여하거나 회수합니다. 기본 관리자 번호는
+            환경변수로 보호됩니다.
           </p>
         </div>
+        <form action={setGuardianAdminAction} className="qr-create-form admin-phone-role-form">
+          <label>
+            관리자 휴대폰번호
+            <input
+              name="phone"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              placeholder="010-0000-0000"
+              maxLength={13}
+              required
+            />
+          </label>
+          <input type="hidden" name="admin" value="1" />
+          <input type="hidden" name="returnTo" value="/admin?section=admins" />
+          <FormSubmitButton className="primary-button compact" pendingText="부여중">관리자 권한 부여</FormSubmitButton>
+        </form>
         <div className="qr-stats" aria-label="관리자 권한 요약">
           <span>DB 관리자 {adminCount}명</span>
           <span>전체 사용자 {users.length}명</span>
@@ -3582,8 +3599,7 @@ function AdminRoleManagementSection({ adminUsersData }) {
               <article className="admin-user-card" key={user.id}>
                 <div>
                   <strong>{user.name || "이름 미입력"}</strong>
-                  <span>{user.email || user.google_email || "-"}</span>
-                  <span>{user.phone || "전화번호 미입력"}</span>
+                  <span className="admin-user-phone">{user.phone || "전화번호 미입력"}</span>
                 </div>
                 <div className="admin-role-badges">
                   <em className={hasAccess ? "status-badge safe" : "status-badge neutral"}>
@@ -3594,15 +3610,21 @@ function AdminRoleManagementSection({ adminUsersData }) {
                   <em className="status-badge neutral">관리대상 {user.subject_count || 0}명</em>
                 </div>
                 <form action={setGuardianAdminAction}>
-                  <input type="hidden" name="guardianId" value={user.id} />
+                  <input type="hidden" name="phone" value={user.phone || ""} />
                   <input type="hidden" name="admin" value={dbAdmin ? "0" : "1"} />
                   <input type="hidden" name="returnTo" value="/admin?section=admins" />
                   <FormSubmitButton
                     className={dbAdmin ? "danger-button compact" : "activate-button"}
-                    disabled={baseAdmin}
+                    disabled={baseAdmin || !user.phone || (!dbAdmin && !user.is_active)}
                     pendingText={dbAdmin ? "회수중" : "부여중"}
                   >
-                    {baseAdmin ? "기본관리자 유지" : dbAdmin ? "관리자 회수" : "관리자 부여"}
+                    {baseAdmin
+                      ? "기본관리자 유지"
+                      : !user.phone
+                        ? "전화번호 등록 필요"
+                        : dbAdmin
+                          ? "관리자 회수"
+                          : "관리자 부여"}
                   </FormSubmitButton>
                 </form>
               </article>
@@ -4891,9 +4913,7 @@ function adminUserExportRows(users = []) {
   return users.map((user) => ({
     회원번호: formatMemberNumber(user.id),
     이름: user.name || "이름 미입력",
-    아이디: user.login_id || "-",
-    연락처: user.phone || "전화번호 미입력",
-    이메일: user.email || user.google_email || "-",
+    관리자식별번호: user.phone || "전화번호 미입력",
     권한: isBaseAdminUser(user) || Number(user.is_admin || 0) === 1 ? "관리자" : "일반 보호자",
     상태: user.is_active ? "활성" : "비활성",
     등록대상자수: Number(user.subject_count || 0),
@@ -5592,5 +5612,5 @@ function formatPercent(value) {
 }
 
 function isBaseAdminUser(user) {
-  return isDefaultAdminEmail(user.email) || isDefaultAdminEmail(user.google_email);
+  return isDefaultAdminPhone(user.phone);
 }

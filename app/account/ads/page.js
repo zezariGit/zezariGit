@@ -62,7 +62,7 @@ export default async function AccountAdsPage({ searchParams }) {
           reviewEnabled={!preview && ads.some((ad) => adStage(ad) === "review")}
           nextExpiryDate={preview ? "" : nextExpiryDate}
         />
-        <AccountTopbar title="광고 대시보드" />
+        <AccountTopbar title="광고 현황" />
         <nav className="ad-history-filters" aria-label="광고 상태 필터">
           <FilterLink active={statusFilter === "all"} href={filterHref("all", preview, selectedTestAd?.id)}>전체</FilterLink>
           <FilterLink active={statusFilter === "running"} href={filterHref("running", preview, selectedTestAd?.id)}>진행 중</FilterLink>

@@ -9,7 +9,10 @@ process.env.TURSO_AUTH_TOKEN = "local-test-token";
 process.env.NEXTAUTH_SECRET = "admin-phone-regression-secret";
 process.env.SMS_DEV_BYPASS_CODE = "123456";
 process.env.ADMIN_EMAILS = "general@zezari.com";
+process.env.ADMIN_PHONES = "01011112222";
 process.env.NODE_ENV = "test";
+
+const { isAdminSession, isDefaultAdminPhone } = await import("../lib/admin.js");
 
 const {
   createGuardianSignup,
@@ -46,6 +49,8 @@ async function createVerifiedGuardian({ phone, email, loginId, requestLabel }) {
 }
 
 const configuredAdminPhone = "010-1111-2222";
+assert.equal(isDefaultAdminPhone("01011112222"), true);
+assert.equal(isAdminSession({ user: { phone: configuredAdminPhone } }), true);
 await createVerifiedGuardian({
   phone: configuredAdminPhone,
   email: "general@zezari.com",
@@ -67,9 +72,17 @@ const roleAdmin = await createVerifiedGuardian({
   requestLabel: "role-admin",
 });
 const adminForm = new FormData();
-adminForm.set("guardianId", roleAdmin.id);
+adminForm.set("phone", roleAdminPhone);
 adminForm.set("admin", "1");
-await setGuardianAdmin(adminForm);
+const adminResult = await setGuardianAdmin(adminForm);
+assert.equal(adminResult.guardianId, roleAdmin.id);
+assert.equal(adminResult.phone, roleAdminPhone);
+assert.equal(adminResult.admin, 1);
+
+const legacyIdForm = new FormData();
+legacyIdForm.set("guardianId", roleAdmin.id);
+legacyIdForm.set("admin", "0");
+await assert.rejects(setGuardianAdmin(legacyIdForm), /휴대전화번호를 정확하게 입력해 주세요/);
 const roleAdminResend = await requestSignupPhoneVerification(
   { phone: roleAdminPhone, purpose: "signup" },
   null,
@@ -151,6 +164,14 @@ duplicateManagedPhoneForm.set("phone", changedAdminPhone);
 await assert.rejects(
   setGuardianPhoneForAdmin(duplicateManagedPhoneForm),
   /이미 사용 중인 휴대전화번호입니다/,
+);
+
+const configuredAdminRevokeForm = new FormData();
+configuredAdminRevokeForm.set("phone", configuredAdminPhone);
+configuredAdminRevokeForm.set("admin", "0");
+await assert.rejects(
+  setGuardianAdmin(configuredAdminRevokeForm),
+  /기본 관리자의 권한은 회수할 수 없습니다/,
 );
 
 const withdrawForm = new FormData();

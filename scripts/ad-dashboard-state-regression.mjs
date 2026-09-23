@@ -60,6 +60,7 @@ assert.doesNotMatch(successClient, /ad-complete-publication-note/);
 assert.doesNotMatch(successClient, /광고 상태 테스트하기/);
 assert.doesNotMatch(successClient, /광고내역 보기/);
 assert.doesNotMatch(successClient, /대시보드 이동/);
+assert.match(page, /AccountTopbar title="광고 현황"/);
 assert.match(successClient, /\/assets\/ad-payment\/payment-complete\.png/);
 assert.match(successClient, /경찰 신고도 함께 진행하시겠어요\?/);
 assert.match(successClient, /112로 연결해 드립니다/);

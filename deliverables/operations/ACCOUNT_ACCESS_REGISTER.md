@@ -13,7 +13,7 @@
 - Vercel Team/Project: `zezari / zezari`
 - Vercel 배포 사용자 식별자: `zezarigit`
 - Turso 조직 식별자: `zezarigit`
-- 애플리케이션 관리자 계정 목록: Vercel `ADMIN_EMAILS`와 DB `guardians.is_admin`에서 관리
+- 애플리케이션 관리자 계정 목록: Vercel `ADMIN_PHONES`와 DB `guardians.is_admin`에서 관리
 
 ## 2026-08-24 운영 계정 점검 요약
 

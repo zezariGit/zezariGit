@@ -5,7 +5,7 @@ export default function ShopOrderComplete({ title, message, order = null }) {
         <section className="shop-complete-panel shop-complete-error">
           <h1>{title}</h1>
           <p>{message}</p>
-          <a className="shop-next-button" href="/?tab=dashboard">대시보드 이동</a>
+          <a className="shop-next-button" href="/?tab=dashboard">홈 이동</a>
         </section>
       </main>
     );
@@ -21,7 +21,7 @@ export default function ShopOrderComplete({ title, message, order = null }) {
         </div>
 
         <a className="order-complete-dashboard-link" href="/?tab=dashboard">
-          대시보드로 이동 <span aria-hidden="true">›</span>
+          홈으로 이동 <span aria-hidden="true">›</span>
         </a>
       </section>
     </main>

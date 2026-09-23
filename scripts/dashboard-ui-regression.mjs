@@ -20,6 +20,8 @@ assert.match(dashboard, /className="status-phone-heading"[\s\S]*<h2>현재 상�
 assert.match(dashboard, /className="status-add-subject"[\s\S]*대상자 추가/, "대상자 추가 버튼은 현재 상태 헤더 오른쪽에 있어야 합니다.");
 assert.match(dashboard, /previewMode[\s\S]*\? "\/\?preview=subject-registration"[\s\S]*: "\/\?tab=subjects&mode=new#subjects-info"/, "미리보기의 대상자 추가 버튼은 로그인 화면이 아닌 대상자 등록 미리보기로 이동해야 합니다.");
 assert.match(page, /previewMode=\{dashboardPreview\}/, "대시보드 미리보기 상태를 대상자 추가 링크에 전달해야 합니다.");
+assert.match(dashboard, /\["광고 현황", "\/account\/ads"\]/, "설정 메뉴의 광고 항목은 광고 현황으로 표시해야 합니다.");
+assert.match(dashboard, /홈 이동하기/, "대상자 등록 완료 화면은 홈 이동 문구를 사용해야 합니다.");
 assert.doesNotMatch(dashboard, /className="managed-add-subject"/, "대상자 그리드 안에 원형 추가 버튼을 표시하지 않아야 합니다.");
 assert.match(dashboard, /subjects\.length === 0 && pageSubjects\.length === 0/, "빈 상태는 대상자가 0명일 때만 표시해야 합니다.");
 assert.doesNotMatch(dashboard, /className="managed-empty-plus"/, "빈 상태 상단의 큰 플러스 아이콘은 표시하지 않아야 합니다.");

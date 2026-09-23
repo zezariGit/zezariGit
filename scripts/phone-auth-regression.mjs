@@ -39,6 +39,7 @@ assert.ok(guardian.phoneLoginToken);
 
 const automaticLogin = await authenticateGuardianPhone(phone, guardian.phoneLoginToken, requestMeta());
 assert.equal(automaticLogin?.provider, "phone");
+assert.equal(automaticLogin?.phone, phone);
 await assert.rejects(
   () => authenticateGuardianPhone(phone, guardian.phoneLoginToken, requestMeta()),
   /만료되었습니다/,
