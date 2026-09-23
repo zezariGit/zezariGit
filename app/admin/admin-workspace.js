@@ -9,6 +9,7 @@ const STORAGE_KEY = "zezari:admin-menu-collapsed";
 const MENU_ITEMS = [
   { id: "dashboard", label: "대시보드", href: "/admin", icon: "home" },
   { id: "guardians", label: "보호자 관리", href: "/admin?section=guardians", icon: "guardian" },
+  { id: "support", label: "사용자지원", href: "/admin?section=support", icon: "screen" },
   { id: "subjects", label: "대상자 관리", href: "/admin?section=subjects", icon: "group" },
   { id: "qr", label: "QR 관리", href: "/admin?section=qr", icon: "qr" },
   { id: "orders", label: "주문 관리", href: "/admin?section=orders", icon: "cart" },

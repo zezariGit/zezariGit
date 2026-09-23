@@ -8755,6 +8755,201 @@ textarea:focus {
   font-weight: 700;
 }
 
+.admin-support-page {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.admin-support-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  border-left: 4px solid var(--c-primary);
+}
+
+.admin-support-intro h2,
+.admin-support-intro p {
+  margin: 0;
+}
+
+.admin-support-intro h2 {
+  color: #111111;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.admin-support-intro p {
+  margin-top: 6px;
+  color: var(--c-text-muted);
+  font-size: 13px;
+}
+
+.admin-support-intro > strong {
+  flex: 0 0 auto;
+  color: var(--c-primary-dark);
+  font-size: 17px;
+}
+
+.admin-support-filter {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) auto auto;
+  align-items: end;
+  gap: var(--space-sm);
+}
+
+.admin-support-filter label {
+  display: grid;
+  gap: 6px;
+  color: #111111;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.admin-support-filter input,
+.admin-support-filter button,
+.admin-support-filter a {
+  min-height: 42px;
+  border-radius: var(--radius-sm);
+}
+
+.admin-support-filter button,
+.admin-support-filter a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-lg);
+  font-weight: 900;
+}
+
+.admin-support-filter button {
+  border: 0;
+  background: var(--c-primary);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.support-admin-table {
+  min-width: 980px;
+}
+
+.support-admin-table .admin-record-header,
+.support-admin-table .admin-record-row {
+  grid-template-columns: 82px minmax(130px, 1fr) 118px 58px 100px 64px 88px 72px 84px;
+}
+
+.support-admin-table .admin-record-row {
+  min-height: 50px;
+  cursor: default;
+}
+
+.support-admin-table .admin-record-row:hover {
+  background: #ffffff;
+}
+
+.support-login-button {
+  width: 68px;
+  min-height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--c-primary);
+  border-radius: 4px;
+  background: #ffffff;
+  color: var(--c-primary-dark);
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.support-login-button:hover:not(:disabled) {
+  background: var(--c-primary);
+  color: #ffffff;
+}
+
+.support-login-button:disabled {
+  border-color: #c9c9c9;
+  color: #9b9b9b;
+  cursor: not-allowed;
+}
+
+.admin-support-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.admin-support-pagination a,
+.admin-support-pagination span {
+  display: inline-flex;
+  min-width: 72px;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  background: #ffffff;
+  color: #111111;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-support-pagination span {
+  border: 0;
+}
+
+.admin-support-pagination a.disabled {
+  color: #aaaaaa;
+  pointer-events: none;
+}
+
+.support-mode-banner {
+  position: fixed;
+  z-index: 10000;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  left: 16px;
+  display: flex;
+  width: min(560px, calc(100% - 32px));
+  min-height: 62px;
+  margin: 0 auto;
+  padding: 10px 12px 10px 16px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #805b00;
+  border-radius: 6px;
+  background: #fff4cf;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
+  color: #2c2208;
+}
+
+.support-mode-banner > div {
+  display: grid;
+  gap: 2px;
+}
+
+.support-mode-banner strong {
+  font-size: 14px;
+}
+
+.support-mode-banner span {
+  font-size: 12px;
+}
+
+.support-mode-banner button {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 4px;
+  background: #111111;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
 .guardian-table-badge {
   justify-self: center;
   min-width: 58px;
@@ -10056,6 +10251,21 @@ a.inline-scroll-value {
 }
 
 @media (max-width: 620px) {
+  .admin-support-intro,
+  .admin-support-filter,
+  .support-mode-banner {
+    align-items: stretch;
+    display: grid;
+  }
+
+  .admin-support-filter {
+    grid-template-columns: 1fr;
+  }
+
+  .support-mode-banner button {
+    width: 100%;
+  }
+
   .safe-phone-stat-grid,
   .safe-phone-add-form,
   .safe-phone-guardian-search {

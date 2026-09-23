@@ -2,6 +2,7 @@ import "../css/gov-style.css";
 import "./globals.css";
 import SessionKeepAlive from "./session-keep-alive";
 import PushSubscriptionSync from "./push-subscription-sync";
+import SupportModeBanner from "./support-mode-banner";
 
 export const metadata = {
   metadataBase: new URL("https://zezari.family"),
@@ -33,6 +34,7 @@ export default function RootLayout({ children }) {
       <body>
         <SessionKeepAlive />
         <PushSubscriptionSync />
+        <SupportModeBanner />
         {children}
       </body>
     </html>

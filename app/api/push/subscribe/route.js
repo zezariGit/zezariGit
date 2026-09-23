@@ -9,6 +9,12 @@ export async function POST(request) {
   if (!session) {
     return NextResponse.json({ message: "로그인이 필요합니다." }, { status: 401, headers: NO_STORE_HEADERS });
   }
+  if (session.user?.supportMode) {
+    return NextResponse.json(
+      { message: "사용자지원 로그인 중에는 관리자 기기의 푸시 연결을 변경하지 않습니다." },
+      { status: 409, headers: NO_STORE_HEADERS },
+    );
+  }
 
   const subscription = await request.json().catch(() => null);
   if (!subscription?.endpoint) {

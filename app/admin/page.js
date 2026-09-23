@@ -39,6 +39,7 @@ import {
   getAdminSubscriptionPlansData,
   getAdminSubjectsData,
   getAdminUsersData,
+  getAdminSupportUsersData,
   getAdPricingSettings,
   getImageUploadSettings,
   getQrAdminData,
@@ -75,6 +76,7 @@ import {
   setSubscriptionPlanPriceAction,
   setShopPurchaseSettingsAction,
 } from "./actions";
+import { startAdminSupportLoginAction } from "../support-actions";
 
 export default async function AdminPage({ searchParams }) {
   const resolvedSearchParams = await searchParams;
@@ -120,7 +122,7 @@ export default async function AdminPage({ searchParams }) {
 
   const activeSection = productPreview
     ? "products"
-    : ["dashboard", "guardians", "subjects", "qr", "admins", "payments", "coupons", "products", "product-service-intro", "image-uploads", "orders", "subscriptions", "ads", "ad-pricing", "missing", "locations", "location-security", "safe-phones", "notifications", "message-templates", "service-regulations", "inquiries"].includes(resolvedSearchParams?.section)
+    : ["dashboard", "guardians", "support", "subjects", "qr", "admins", "payments", "coupons", "products", "product-service-intro", "image-uploads", "orders", "subscriptions", "ads", "ad-pricing", "missing", "locations", "location-security", "safe-phones", "notifications", "message-templates", "service-regulations", "inquiries"].includes(resolvedSearchParams?.section)
     ? resolvedSearchParams.section
     : "dashboard";
   const selectedGuardianId = resolvedSearchParams?.guardian || "";
@@ -131,6 +133,10 @@ export default async function AdminPage({ searchParams }) {
     type: resolvedSearchParams?.guardianType || "all",
     startDate: resolvedSearchParams?.guardianStart || "",
     endDate: resolvedSearchParams?.guardianEnd || "",
+  };
+  const supportFilters = {
+    query: resolvedSearchParams?.supportQuery || "",
+    page: resolvedSearchParams?.supportPage || "1",
   };
   const subjectAdminFilters = {
     query: resolvedSearchParams?.subjectAdminQuery || "",
@@ -228,6 +234,7 @@ export default async function AdminPage({ searchParams }) {
   };
   const dashboardData = activeSection === "dashboard" ? await getAdminDashboardData(resolvedSearchParams?.month) : null;
   const adminData = activeSection === "guardians" ? await getAdminData(selectedGuardianId, guardianFilters) : null;
+  const supportUsersData = activeSection === "support" ? await getAdminSupportUsersData(supportFilters) : null;
   const adminSubjectsData = activeSection === "subjects"
     ? await getAdminSubjectsData(selectedSubjectId, subjectAdminFilters)
     : null;
@@ -280,6 +287,8 @@ export default async function AdminPage({ searchParams }) {
       ? "대시보드"
       : activeSection === "subjects"
         ? "관리대상자 관리"
+      : activeSection === "support"
+        ? "사용자지원"
       : activeSection === "qr"
       ? "QR 관리"
       : activeSection === "admins"
@@ -324,6 +333,8 @@ export default async function AdminPage({ searchParams }) {
       ? "회원, 관리대상, QR, 실종신고, 광고와 월별 매출 현황을 한눈에 확인합니다."
       : activeSection === "subjects"
         ? "전체 관리대상자를 조회하고 보호자 메시지, 음성, QR과 부가정보를 확인합니다."
+      : activeSection === "support"
+        ? "보호자 계정으로 안전하게 접속해 실제 사용자 환경과 알림을 확인하고 운영 문제를 지원합니다."
       : activeSection === "qr"
       ? "사람찾기 URL로 연결되는 QR 코드와 고유 문자열을 생성하고 활성 상태를 관리합니다."
       : activeSection === "admins"
@@ -378,6 +389,8 @@ export default async function AdminPage({ searchParams }) {
 
           {activeSection === "dashboard" ? (
             <AdminDashboardSection dashboardData={dashboardData} />
+          ) : activeSection === "support" ? (
+            <AdminSupportSection data={supportUsersData} currentGuardianId={session.user?.id || ""} />
           ) : activeSection === "subjects" ? (
             <SubjectManagementSection adminSubjectsData={adminSubjectsData} selectedSubjectQrImage={selectedSubjectQrImage} />
           ) : activeSection === "qr" ? (
@@ -428,6 +441,109 @@ export default async function AdminPage({ searchParams }) {
       </section>
       <StatusToast message={notice} type={noticeType} />
     </main>
+  );
+}
+
+function AdminSupportSection({ data, currentGuardianId }) {
+  const { users, total, page, pageSize, totalPages, filters } = data;
+  const firstItem = total === 0 ? 0 : (page - 1) * pageSize + 1;
+  const lastItem = Math.min(page * pageSize, total);
+
+  return (
+    <div className="admin-support-page">
+      <section className="admin-panel admin-support-intro" aria-labelledby="admin-support-title">
+        <div>
+          <h2 id="admin-support-title">보호자 사용자지원</h2>
+          <p>지원할 보호자를 선택하면 2시간 동안 해당 보호자의 실제 화면과 알림을 확인할 수 있습니다.</p>
+        </div>
+        <strong>전체 {formatMetricValue(total)}명</strong>
+      </section>
+
+      <section className="admin-panel guardian-search-panel">
+        <h2>조회</h2>
+        <form action="/admin" className="admin-support-filter">
+          <input type="hidden" name="section" value="support" />
+          <label>
+            보호자 검색
+            <input name="supportQuery" defaultValue={filters.query} placeholder="이름 또는 휴대폰번호" />
+          </label>
+          <Link className="plain-button guardian-reset-button" href="/admin?section=support">초기화</Link>
+          <button type="submit">검색</button>
+        </form>
+      </section>
+
+      <section className="admin-panel admin-support-list-panel">
+        <div className="guardian-list-heading">
+          <h2>보호자 목록 <strong>{formatMetricValue(total)}</strong>명</h2>
+          <span>{firstItem}-{lastItem} 표시</span>
+        </div>
+        <div className="admin-record-table-wrap guardian-admin-table-wrap">
+          <div className="admin-record-table guardian-admin-table support-admin-table" role="table" aria-label="사용자지원 보호자 목록">
+            <div className="admin-record-header" role="row">
+              <span role="columnheader">로그인</span>
+              <span role="columnheader">보호자</span>
+              <span role="columnheader">휴대폰번호</span>
+              <span role="columnheader">성별</span>
+              <span role="columnheader">생년월일</span>
+              <span role="columnheader">대상자</span>
+              <span role="columnheader">미확인 알림</span>
+              <span role="columnheader">상태</span>
+              <span role="columnheader">가입일</span>
+            </div>
+            {users.map((user) => {
+              const isActive = Number(user.is_active || 0) === 1;
+              const isCurrentAdmin = user.google_id === currentGuardianId;
+              return (
+                <div className="admin-record-row" role="row" key={user.id}>
+                  <form action={startAdminSupportLoginAction} role="cell">
+                    <input type="hidden" name="targetGuardianId" value={user.id} />
+                    <FormSubmitButton
+                      className="support-login-button"
+                      disabled={!isActive || isCurrentAdmin}
+                      pendingText="접속중"
+                    >
+                      로그인
+                    </FormSubmitButton>
+                  </form>
+                  <strong role="cell">{user.name || "이름 미입력"}<small>{formatMemberNumber(user.id)}</small></strong>
+                  <span role="cell">{user.phone || "-"}</span>
+                  <span role="cell">{formatGuardianGender(user.gender)}</span>
+                  <span role="cell">{formatDate(user.birth_date)}</span>
+                  <span role="cell">{formatMetricValue(user.subject_count)}명</span>
+                  <span role="cell">{formatMetricValue(user.unread_notification_count)}건</span>
+                  <em role="cell" className={`guardian-table-badge ${isActive ? "active" : "inactive"}`}>
+                    {isActive ? "활성" : "비활성"}
+                  </em>
+                  <time role="cell">{formatDateOnlyValue(user.created_at)}</time>
+                </div>
+              );
+            })}
+            {users.length === 0 && (
+              <div className="admin-record-row guardian-empty-result" role="row">
+                <span role="cell">조건에 맞는 보호자가 없습니다.</span>
+              </div>
+            )}
+          </div>
+        </div>
+        <nav className="admin-support-pagination" aria-label="사용자지원 보호자 페이지">
+          <Link
+            aria-disabled={page <= 1}
+            className={page <= 1 ? "disabled" : ""}
+            href={page <= 1 ? buildAdminSupportUrl(filters, page) : buildAdminSupportUrl(filters, page - 1)}
+          >
+            이전
+          </Link>
+          <span>{page} / {totalPages}</span>
+          <Link
+            aria-disabled={page >= totalPages}
+            className={page >= totalPages ? "disabled" : ""}
+            href={page >= totalPages ? buildAdminSupportUrl(filters, page) : buildAdminSupportUrl(filters, page + 1)}
+          >
+            다음
+          </Link>
+        </nav>
+      </section>
+    </div>
   );
 }
 
@@ -5035,6 +5151,19 @@ function orderRatio(value, total) {
 
 function formatMemberNumber(id) {
   return `U-${String(id || "").replace(/-/g, "").slice(-8).toUpperCase() || "UNKNOWN"}`;
+}
+
+function formatGuardianGender(value) {
+  const gender = String(value || "").trim();
+  if (gender === "남" || gender === "남성" || gender.toLowerCase() === "male") return "남성";
+  if (gender === "여" || gender === "여성" || gender.toLowerCase() === "female") return "여성";
+  return "-";
+}
+
+function buildAdminSupportUrl(filters, page) {
+  const params = new URLSearchParams({ section: "support", supportPage: String(page) });
+  if (filters.query) params.set("supportQuery", filters.query);
+  return `/admin?${params.toString()}`;
 }
 
 function formatSubjectNumber(id) {

@@ -18,6 +18,7 @@
     "test:finder-public-ui": "node scripts/finder-public-ui-regression.mjs",
     "test:notifications": "node scripts/notification-popover-regression.mjs",
     "test:admin-phone-otp": "tsx scripts/admin-phone-verification-regression.mjs",
+    "test:admin-support": "tsx scripts/admin-support-regression.mjs",
     "test:login-ui": "node scripts/login-ui-regression.mjs",
     "test:phone-auth": "tsx scripts/phone-auth-regression.mjs",
     "test:signup-phone-ui": "node scripts/signup-phone-ui-regression.mjs",

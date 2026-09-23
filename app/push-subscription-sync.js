@@ -29,6 +29,7 @@ export default function PushSubscriptionSync() {
         });
         const session = await sessionResponse.json().catch(() => null);
         if (!sessionResponse.ok || !session?.user) return;
+        if (session.user.supportMode) return;
 
         await registerPushDevice({ requestPermission: false });
         setLastPushSyncAt(Date.now());
