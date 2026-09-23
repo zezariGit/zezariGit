@@ -30,6 +30,8 @@ assert.match(page, /gender === "여" \|\| gender === "여성"\) return "여성"/
 assert.match(safePhone, /\/api\/find\/\$\{encodeURIComponent\(qrKey\)\}\/safe-phone/);
 assert.match(safePhone, /window\.location\.assign\(data\.telUrl\)/);
 assert.match(locationShare, /setStep\("intro"\)/);
+assert.match(locationShare, /ModalScrollLock allowSurfaceScroll/);
+assert.match(locationShare, /className="location-flow"[^>]*data-modal-surface/);
 assert.match(locationShare, /IntroScreen busy=\{busy\} onAgree=\{requestPermission\}/);
 assert.doesNotMatch(locationShare, /onAgree=\{\(\) => setStep\("permission"\)\}/);
 assert.match(locationShare, /if \(preview\) \{ setLocation\(PREVIEW_LOCATION\); setStep\("confirm"\); return; \}/);
@@ -55,11 +57,10 @@ assert.match(styles, /\.finder-public-brand[\s\S]*width:\s*76px/);
 assert.match(styles, /@media \(max-height:\s*620px\) and \(max-width:\s*520px\)/);
 assert.match(styles, /\.finder-public-action-grid[\s\S]*grid-template-columns:\s*repeat\(2/);
 assert.match(styles, /\.location-flow\s*\{[^}]*height:\s*100dvh/);
-assert.match(styles, /\.location-flow\s*\{[^}]*grid-template-rows:\s*auto minmax\(0, 1fr\)/);
-assert.match(styles, /\.location-flow\s*\{[^}]*overflow:\s*hidden/);
-assert.match(styles, /\.location-flow > \.location-flow-body\s*\{[^}]*overflow-y:\s*auto/);
-assert.match(styles, /\.location-flow > \.location-flow-body\s*\{[^}]*-webkit-overflow-scrolling:\s*touch/);
-assert.match(styles, /\.location-flow > \.location-flow-body\s*\{[^}]*touch-action:\s*pan-y/);
+assert.match(styles, /\.location-flow\s*\{[^}]*overflow-y:\s*auto/);
+assert.match(styles, /\.location-flow\s*\{[^}]*-webkit-overflow-scrolling:\s*touch/);
+assert.match(styles, /\.location-flow\s*\{[^}]*touch-action:\s*pan-y/);
+assert.doesNotMatch(styles, /\.location-flow > \.location-flow-body\s*\{[^}]*overflow-y:\s*auto/);
 assert.match(styles, /\.qr-status-kakao-link\s*\{[\s\S]*margin-top:\s*28px/);
 
 await Promise.all([

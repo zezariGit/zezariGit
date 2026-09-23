@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import BackButton from "../../back-button";
+import ModalScrollLock from "../../modal-scroll-lock";
 
 const PREVIEW_LOCATION = { latitude: 37.5665, longitude: 126.978, accuracy: 18, addressLabel: "서울특별시 중구 세종대로 110", checkedAt: "2026-09-13T14:30:00+09:00" };
 
@@ -58,8 +59,9 @@ export default function LocationShareButton({ qrKey, subjectName = "김제자리
     </button>
   );
 
-  return (
-    <section className="location-flow" aria-label="위치 공유">
+  return <>
+    <ModalScrollLock allowSurfaceScroll />
+    <section className="location-flow" aria-label="위치 공유" data-modal-surface>
       <LocationHeader title={stepTitle(step)} onBack={step === "complete" ? null : step === "intro" ? closeFlow : () => setStep("intro")} />
       {step === "intro" && <IntroScreen busy={busy} onAgree={requestPermission} onCancel={closeFlow} />}
       {step === "confirm" && location && <ConfirmScreen subjectName={subjectName} subjectPhoto={subjectPhoto} location={location} busy={busy} error={error} onShare={sendLocation} />}
@@ -67,7 +69,7 @@ export default function LocationShareButton({ qrKey, subjectName = "김제자리
       {step === "permission-denied" && <PermissionDeniedScreen message={error} onRetry={requestPermission} onReturn={closeFlow} />}
       {step === "location-error" && <LocationErrorScreen message={error} onRetry={requestPermission} onReturn={closeFlow} />}
     </section>
-  );
+  </>;
 }
 
 function LocationHeader({ title, onBack }) {
