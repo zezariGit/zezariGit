@@ -90,8 +90,13 @@ export default function PosterTemplateEditor({ initialTemplate, initialHistory, 
     setError("");
     try {
       const optimized = await optimizePosterBackground(file, normalizedLayout.canvas);
+      if (previewUrlRef.current) {
+        URL.revokeObjectURL(previewUrlRef.current);
+        previewUrlRef.current = "";
+      }
+      setPreviewUrl("");
       setTemplate((current) => ({ ...current, backgroundImageUrl: optimized }));
-      setMessage("배경 이미지가 포스터 크기에 맞게 적용되었습니다. 저장 버튼을 눌러 확정해 주세요.");
+      setMessage("기존 배경을 제거하고 새 이미지로 교체했습니다. 저장 버튼을 눌러 확정해 주세요.");
     } catch (uploadError) {
       setError(uploadError.message || "배경 이미지를 읽지 못했습니다.");
       setPreviewPending(false);
@@ -133,8 +138,22 @@ export default function PosterTemplateEditor({ initialTemplate, initialHistory, 
           <h2>실시간 미리보기</h2>
           <span>{normalizedLayout.canvas.width} × {normalizedLayout.canvas.height}px</span>
         </div>
-        <div className="poster-template-preview-frame">
+        <div
+          className="poster-template-preview-frame"
+          style={{ aspectRatio: `${normalizedLayout.canvas.width} / ${normalizedLayout.canvas.height}` }}
+        >
           {previewUrl ? <img src={previewUrl} alt="샘플 데이터로 생성한 실종자 광고 포스터" /> : null}
+          <div className="poster-template-preview-overlays" aria-hidden="true">
+            {FIELD_NAMES.map((fieldName) => (
+              <div
+                key={fieldName}
+                className={`poster-template-preview-zone zone-${fieldName}`}
+                style={posterPreviewZoneStyle(normalizedLayout[fieldName], normalizedLayout.canvas)}
+              >
+                <span>{POSTER_FIELD_LABELS[fieldName]}</span>
+              </div>
+            ))}
+          </div>
           {previewPending ? <div className="poster-template-preview-loading">포스터 생성 중</div> : null}
         </div>
         <p className="poster-template-policy">저장한 템플릿은 이후 처음 발행되는 광고부터 적용됩니다. 이미 발행된 광고 소재는 변경되지 않습니다.</p>
@@ -240,6 +259,15 @@ function NumberControl({ label, value, step = 1, onChange }) {
       />
     </label>
   );
+}
+
+function posterPreviewZoneStyle(field, canvas) {
+  return {
+    left: `${(field.x / canvas.width) * 100}%`,
+    top: `${(field.y / canvas.height) * 100}%`,
+    width: `${(field.width / canvas.width) * 100}%`,
+    height: `${(field.height / canvas.height) * 100}%`,
+  };
 }
 
 async function optimizePosterBackground(file, canvasSize) {

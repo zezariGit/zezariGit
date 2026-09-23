@@ -25694,8 +25694,72 @@ body:has(.my-page-panel) .status-toast.success::before {
   object-fit: contain;
 }
 
+.poster-template-preview-overlays {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+}
+
+.poster-template-preview-zone {
+  position: absolute;
+  min-width: 2px;
+  min-height: 2px;
+  border: 2px solid #07883f;
+  background: rgba(7, 136, 63, 0.09);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.72);
+}
+
+.poster-template-preview-zone span {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  max-width: calc(100% - 4px);
+  overflow: hidden;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background: #07883f;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.poster-template-preview-zone.zone-qr {
+  border-color: #176fbd;
+  background: rgba(23, 111, 189, 0.09);
+}
+
+.poster-template-preview-zone.zone-qr span {
+  background: #176fbd;
+}
+
+.poster-template-preview-zone.zone-name,
+.poster-template-preview-zone.zone-age,
+.poster-template-preview-zone.zone-gender {
+  border-color: #c57900;
+  background: rgba(197, 121, 0, 0.09);
+}
+
+.poster-template-preview-zone.zone-name span,
+.poster-template-preview-zone.zone-age span,
+.poster-template-preview-zone.zone-gender span {
+  background: #a96800;
+}
+
+.poster-template-preview-zone.zone-memo {
+  border-color: #c9365a;
+  background: rgba(201, 54, 90, 0.09);
+}
+
+.poster-template-preview-zone.zone-memo span {
+  background: #b62b4d;
+}
+
 .poster-template-preview-loading {
   position: absolute;
+  z-index: 3;
   inset: 0;
   display: flex;
   align-items: center;
