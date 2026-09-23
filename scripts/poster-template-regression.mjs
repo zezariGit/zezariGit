@@ -61,6 +61,10 @@ assert.match(dbSource, /await regenerateSubjectAdCreative\(db, id, ad\.subject_i
 assert.doesNotMatch(modalSource, /creativeImageDataUrl|createMissingAdCreativeImage/);
 assert.match(editorSource, /450/);
 assert.match(editorSource, /실시간 미리보기/);
+assert.match(editorSource, /optimizePosterBackground/);
+assert.match(editorSource, /1\.5 \* 1024 \* 1024/);
+assert.match(editorSource, /fetch\(`\/api\/admin\/poster-template\$\{endpointSuffix\}`/);
+assert.doesNotMatch(editorSource, /미리보기 모드에서는 저장되지 않습니다/);
 assert.match(apiSource, /export async function PUT/);
 assert.match(metaSource, /image_hash/);
 assert.match(migrationSource, /poster_template_versions/);

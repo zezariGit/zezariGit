@@ -22,6 +22,11 @@ export async function POST(request) {
     return NextResponse.json({ message: "관리자 권한이 필요합니다." }, { status: 403 });
   }
 
+  const contentLength = Number(request.headers.get("content-length") || 0);
+  if (contentLength > 2.5 * 1024 * 1024) {
+    return NextResponse.json({ message: "배경 이미지 용량이 너무 큽니다. 이미지를 다시 선택해 주세요." }, { status: 413 });
+  }
+
   try {
     const body = await request.json();
     const qrCodeUrl = await QRCode.toDataURL("https://zezari.family/find/sample", {

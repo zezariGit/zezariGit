@@ -81,32 +81,41 @@ export default function PosterTemplateEditor({ initialTemplate, initialHistory, 
       setError("PNG, JPEG, WebP 이미지만 사용할 수 있습니다.");
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setError("배경 이미지는 5MB 이하여야 합니다.");
+    if (file.size > 12 * 1024 * 1024) {
+      setError("배경 원본 이미지는 12MB 이하여야 합니다.");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => setTemplate((current) => ({ ...current, backgroundImageUrl: String(reader.result || "") }));
-    reader.onerror = () => setError("배경 이미지를 읽지 못했습니다.");
-    reader.readAsDataURL(file);
+    setPreviewPending(true);
+    setMessage("");
+    setError("");
+    try {
+      const optimized = await optimizePosterBackground(file, normalizedLayout.canvas);
+      setTemplate((current) => ({ ...current, backgroundImageUrl: optimized }));
+      setMessage("배경 이미지가 포스터 크기에 맞게 적용되었습니다. 저장 버튼을 눌러 확정해 주세요.");
+    } catch (uploadError) {
+      setError(uploadError.message || "배경 이미지를 읽지 못했습니다.");
+      setPreviewPending(false);
+    }
   }
 
   async function save() {
-    if (previewMode) {
-      setMessage("미리보기 모드에서는 저장되지 않습니다.");
-      return;
-    }
     setSaving(true);
     setMessage("");
     setError("");
     try {
-      const response = await fetch("/api/admin/poster-template", {
+      const response = await fetch(`/api/admin/poster-template${endpointSuffix}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...template, layout: normalizedLayout }),
       });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.message || "저장하지 못했습니다.");
+      const responseText = await response.text();
+      const data = parseJsonResponse(responseText);
+      if (!response.ok) {
+        const fallback = response.status === 413
+          ? "배경 이미지 용량이 너무 큽니다. 이미지를 다시 선택해 주세요."
+          : "저장하지 못했습니다.";
+        throw new Error(data.message || fallback);
+      }
       setTemplate(data.template);
       setHistory(data.history || []);
       setMessage(`포스터 템플릿 v${data.template.version}이 저장되었습니다.`);
@@ -231,4 +240,68 @@ function NumberControl({ label, value, step = 1, onChange }) {
       />
     </label>
   );
+}
+
+async function optimizePosterBackground(file, canvasSize) {
+  const source = await loadLocalImage(file);
+  const width = Math.max(600, Math.min(1600, Math.round(Number(canvasSize?.width || 1080))));
+  const height = Math.max(315, Math.min(2000, Math.round(Number(canvasSize?.height || 1350))));
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d", { alpha: false });
+  if (!context) {
+    source.cleanup();
+    throw new Error("배경 이미지 처리 기능을 사용할 수 없습니다.");
+  }
+
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, width, height);
+  const scale = Math.min(width / source.width, height / source.height);
+  const drawWidth = source.width * scale;
+  const drawHeight = source.height * scale;
+  context.drawImage(source.image, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
+  source.cleanup();
+
+  let quality = 0.94;
+  let dataUrl = canvas.toDataURL("image/jpeg", quality);
+  while (estimateDataUrlBytes(dataUrl) > 1.5 * 1024 * 1024 && quality > 0.62) {
+    quality -= 0.08;
+    dataUrl = canvas.toDataURL("image/jpeg", quality);
+  }
+  if (estimateDataUrlBytes(dataUrl) > 1.5 * 1024 * 1024) {
+    throw new Error("배경 이미지를 저장 가능한 크기로 줄이지 못했습니다. 다른 이미지를 선택해 주세요.");
+  }
+  return dataUrl;
+}
+
+function loadLocalImage(file) {
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => resolve({
+      image,
+      width: image.naturalWidth,
+      height: image.naturalHeight,
+      cleanup: () => URL.revokeObjectURL(objectUrl),
+    });
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("배경 이미지 파일을 읽지 못했습니다."));
+    };
+    image.src = objectUrl;
+  });
+}
+
+function estimateDataUrlBytes(dataUrl) {
+  const encoded = String(dataUrl || "").split(",")[1] || "";
+  return Math.ceil(encoded.length * 0.75);
+}
+
+function parseJsonResponse(value) {
+  try {
+    return JSON.parse(value || "{}");
+  } catch {
+    return {};
+  }
 }
