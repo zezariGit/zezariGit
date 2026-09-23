@@ -47,7 +47,6 @@ import {
   isDbAdminSession,
 } from "../../lib/db";
 import {
-  generateQrCodesAction,
   releaseSafePhonePoolNumberAction,
   setGuardianActiveAction,
   setGuardianAdminMemoAction,
@@ -57,9 +56,7 @@ import {
   setAdPricingAction,
   setProductOrderFulfillmentAction,
   setQrAdminMemoAction,
-  setQrActiveAction,
   setQrLifecycleAction,
-  setQrStoreSaleReservationAction,
   setQrSubjectAction,
   setAdminSubjectAdMemoAction,
   setAdminSubjectAdStatusAction,
@@ -4163,13 +4160,13 @@ function SubjectManagementSection({ adminSubjectsData, selectedSubjectQrImage })
                     <div className="subject-delete-row">
                       <div>
                         <strong>대상자 삭제</strong>
-                        <span>대상자 정보가 삭제되며 연결된 QR은 미매칭·비활성 상태로 변경됩니다.</span>
+                        <span>대상자 정보가 삭제되며 연결된 QR은 폐기되어 만료 페이지로 전환됩니다.</span>
                       </div>
                       <form action={deleteAdminSubjectAction}>
                         <input type="hidden" name="subjectId" value={selectedSubject.id} />
                         <input type="hidden" name="returnTo" value="/admin?section=subjects" />
                         <ConfirmSubmitButton
-                          confirmMessage={`${selectedSubject.name || "선택한 대상자"} 정보를 삭제할까요? 연결된 QR도 미매칭·비활성 상태로 변경됩니다.`}
+                          confirmMessage={`${selectedSubject.name || "선택한 대상자"} 정보를 삭제할까요? 연결된 QR도 폐기되어 만료 페이지로 전환됩니다.`}
                           pendingText="삭제중"
                         >
                           대상자 삭제
@@ -4222,29 +4219,6 @@ function SubjectManagementSection({ adminSubjectsData, selectedSubjectQrImage })
                         <div className="guardian-detail-row"><strong>최근 수정일</strong><span>{formatRecentDateTime(selectedSubject.qr_updated_at)}</span></div>
                       </div>
                     </article>
-                    {selectedSubject.qr_id && (
-                      <div className="subject-qr-toggle-control">
-                        <div>
-                          <strong>QR 서비스 상태 변경</strong>
-                          <p>
-                            {subscription?.status === "active"
-                              ? "사용 중지 후 24시간을 초과하면 재개 시 완료 일수만큼 구독 종료일이 연장됩니다."
-                              : "현재 활성 구독이 없어 QR 상태만 변경됩니다."}
-                          </p>
-                        </div>
-                        <form action={setQrActiveAction}>
-                          <input type="hidden" name="qrId" value={selectedSubject.qr_id} />
-                          <input type="hidden" name="active" value={Number(selectedSubject.qr_is_active || 0) === 1 ? "0" : "1"} />
-                          <input type="hidden" name="returnTo" value={buildSubjectAdminUrl(filters, selectedSubject.id)} />
-                          <FormSubmitButton
-                            className={Number(selectedSubject.qr_is_active || 0) === 1 ? "plain-button" : "activate-button"}
-                            pendingText={Number(selectedSubject.qr_is_active || 0) === 1 ? "중지중" : "재개중"}
-                          >
-                            {Number(selectedSubject.qr_is_active || 0) === 1 ? "QR 사용 중지" : "QR 사용 재개"}
-                          </FormSubmitButton>
-                        </form>
-                      </div>
-                    )}
                   </section>
 
                   <section className="guardian-tab-panel subject-ads-panel">
@@ -4385,12 +4359,6 @@ function QrManagementSection({ qrData, qrItems }) {
           </fieldset>
           <Link className="plain-button guardian-reset-button" href="/admin?section=qr">초기화</Link>
           <button type="submit">검색</button>
-        </form>
-        <form className="qr-inline-create-form" action={generateQrCodesAction}>
-          <label htmlFor="qr-count">QR 추가 생성</label>
-          <input id="qr-count" type="number" name="count" min="1" max="200" defaultValue="10" />
-          <input type="hidden" name="returnTo" value={buildQrListUrl(qrData)} />
-          <FormSubmitButton pendingText="생성중">생성</FormSubmitButton>
         </form>
       </section>
 
@@ -4543,40 +4511,12 @@ function QrManagementSection({ qrData, qrItems }) {
                             매칭대상 조회
                           </Link>
                         )}
-                        <form action={setQrStoreSaleReservationAction}>
-                          <input type="hidden" name="qrId" value={selectedQr.id} />
-                          <input type="hidden" name="reserved" value={Number(selectedQr.store_sale_reserved || 0) === 1 ? "0" : "1"} />
-                          <input type="hidden" name="returnTo" value={selectedQrReturnTo} />
-                          <FormSubmitButton
-                            className={Number(selectedQr.store_sale_reserved || 0) === 1 ? "plain-button" : "activate-button"}
-                            pendingText={Number(selectedQr.store_sale_reserved || 0) === 1 ? "선점 해제중" : "선점 처리중"}
-                            disabled={Boolean(selectedQr.subject_id) || selectedQr.lifecycle_status === "discarded" || Number(selectedQr.is_active || 0) !== 1}
-                          >
-                            {selectedQr.subject_id
-                              ? "배정 QR - 선점 불가"
-                              : selectedQr.lifecycle_status === "discarded" || Number(selectedQr.is_active || 0) !== 1
-                                ? "사용 가능한 미배정 QR만 선점"
-                                : Number(selectedQr.store_sale_reserved || 0) === 1
-                                  ? "스토어 판매 선점 해제"
-                                  : "QR선점 - 스토어판매용"}
-                          </FormSubmitButton>
-                        </form>
                         {selectedQr.lifecycle_status !== "discarded" && selectedQr.subject_id && (
                           <form action={setQrSubjectAction}>
                             <input type="hidden" name="qrId" value={selectedQr.id} />
                             <input type="hidden" name="subjectId" value="" />
                             <input type="hidden" name="returnTo" value={selectedQrReturnTo} />
                             <FormSubmitButton className="plain-button" pendingText="해제중">매칭 해제</FormSubmitButton>
-                          </form>
-                        )}
-                        {selectedQr.lifecycle_status !== "discarded" && (
-                          <form action={setQrActiveAction}>
-                            <input type="hidden" name="qrId" value={selectedQr.id} />
-                            <input type="hidden" name="active" value={selectedQr.is_active ? "0" : "1"} />
-                            <input type="hidden" name="returnTo" value={selectedQrReturnTo} />
-                            <FormSubmitButton className={selectedQr.is_active ? "plain-button" : "activate-button"} pendingText={selectedQr.is_active ? "중지중" : "재개중"}>
-                              {selectedQr.is_active ? "QR 사용 중지" : "QR 사용 재개"}
-                            </FormSubmitButton>
                           </form>
                         )}
                         {selectedQr.lifecycle_status !== "discarded" ? (

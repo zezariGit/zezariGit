@@ -322,8 +322,8 @@ export async function deleteAdminSubjectAction(formData) {
     redirect(withNotice(getReturnTo(formData, "/admin?section=subjects"), error.message || "대상자 삭제에 실패했습니다.", "error"));
   }
 
-  const qrMessage = result.releasedQrCount > 0
-    ? ` 연결된 QR ${result.releasedQrCount}개는 미매칭·비활성 상태로 변경되었습니다.`
+  const qrMessage = result.discardedQrCount > 0
+    ? ` 연결된 QR ${result.discardedQrCount}개는 폐기되어 만료 페이지로 전환되었습니다.`
     : "";
   redirect(withNotice("/admin?section=subjects", `${result.subjectName} 대상자가 삭제되었습니다.${qrMessage}`));
 }

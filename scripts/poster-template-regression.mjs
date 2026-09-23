@@ -54,7 +54,7 @@ const [dbSource, modalSource, editorSource, apiSource, metaSource, migrationSour
   readFile(new URL("../migrations/0051_poster_templates.sql", import.meta.url), "utf8"),
 ]);
 
-assert.match(dbSource, /const DB_SCHEMA_VERSION = 51/);
+assert.match(dbSource, /const DB_SCHEMA_VERSION = 52/);
 assert.match(dbSource, /CREATE UNIQUE INDEX IF NOT EXISTS idx_poster_templates_single_active/);
 assert.match(dbSource, /poster_template_version/);
 assert.match(dbSource, /await regenerateSubjectAdCreative\(db, id, ad\.subject_id\)/);

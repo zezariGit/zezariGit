@@ -38,21 +38,8 @@ export default async function FindPage({ params, searchParams }) {
     );
   }
 
-  if (!data.qr_active) {
-    return (
-      <main className="find-page">
-        <section className="find-shell">
-          <p className="intro-kicker">QR 사용 중지</p>
-          <h1>현재 사용할 수 없는 QR입니다</h1>
-          <p>관리자가 사용을 중지한 QR 코드입니다. 필요한 경우 보호자 또는 관리자에게 문의해 주세요.</p>
-          <div className="find-key-box">
-            <span>식별 문자열</span>
-            <strong>{data.public_key}</strong>
-          </div>
-        </section>
-        <StatusToast message={notice} type={noticeType} />
-      </main>
-    );
+  if (!data.qr_active || data.qr_lifecycle_status === "discarded") {
+    return <QrStatusScreen type="expired" />;
   }
 
   if (!data.subject_id || !data.guardian_id) {
@@ -234,6 +221,7 @@ function getLocationPreviewData(state = "") {
     code: "PREVIEW",
     public_key: "preview",
     qr_active: 1,
+    qr_lifecycle_status: "in_use",
     qr_activated_at: "2026-09-01T00:00:00.000Z",
     qr_activation_source: "subject_registration",
     subject_id: "preview-subject",

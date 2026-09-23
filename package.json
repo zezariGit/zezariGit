@@ -12,6 +12,7 @@
     "test:push": "node scripts/push-subscription-regression.mjs",
     "test:admin-grid": "node scripts/admin-grid-selection-regression.mjs",
     "test:admin-subject-delete": "node scripts/admin-subject-delete-regression.mjs",
+    "test:qr-subject-lifecycle": "node scripts/qr-subject-lifecycle-regression.mjs",
     "test:dashboard-ui": "node scripts/dashboard-ui-regression.mjs",
     "test:subject-flow": "node scripts/subject-flow-regression.mjs",
     "test:finder-public-ui": "node scripts/finder-public-ui-regression.mjs",
