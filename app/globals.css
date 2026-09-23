@@ -12637,7 +12637,7 @@ button:disabled:hover {
 
 .finder-public-page {
   min-height: 100svh;
-  grid-template-columns: minmax(0, 430px);
+  grid-template-columns: minmax(0, 390px);
   justify-content: center;
   place-items: start center;
   padding: 0;
@@ -12646,12 +12646,12 @@ button:disabled:hover {
 
 .finder-public-shell {
   width: 100%;
-  max-width: 430px;
+  max-width: 390px;
   min-height: 100svh;
   margin-inline: auto;
   align-content: start;
   gap: 8px;
-  padding: 10px 8px 8px;
+  padding: 8px 15px 10px;
   box-sizing: border-box;
   border: 0;
   border-radius: 0;
@@ -12697,7 +12697,7 @@ button:disabled:hover {
 }
 
 .finder-public-profile {
-  min-height: 112px;
+  min-height: 120px;
   grid-template-columns: 88px minmax(0, 1fr);
   gap: 16px;
   padding: 12px;
@@ -12742,7 +12742,7 @@ button:disabled:hover {
 
 .finder-primary-call {
   width: 100%;
-  min-height: 70px;
+  min-height: 64px;
   display: grid;
   grid-template-columns: 48px minmax(0, 1fr);
   gap: 14px;
@@ -12767,8 +12767,8 @@ button:disabled:hover {
 }
 
 .finder-primary-call > img {
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 46px;
   object-fit: contain;
 }
 
@@ -12806,7 +12806,7 @@ button:disabled:hover {
 .finder-public-action-grid .find-location-action,
 .finder-emergency-action {
   width: 100%;
-  min-height: 112px;
+  min-height: 108px;
   display: grid;
   place-items: center;
   align-content: center;
@@ -12932,7 +12932,7 @@ button:disabled:hover {
 }
 
 .finder-public-brand {
-  width: 108px;
+  width: 76px;
   height: auto;
   display: grid;
   place-items: center;
@@ -12941,7 +12941,7 @@ button:disabled:hover {
 }
 
 .finder-public-brand img {
-  width: 108px;
+  width: 76px;
   max-width: 100%;
   height: auto;
   display: block;
@@ -12954,7 +12954,7 @@ button:disabled:hover {
   height: 44px;
 }
 
-@media (max-height: 730px) and (max-width: 520px) {
+@media (max-height: 620px) and (max-width: 520px) {
   .finder-public-shell {
     gap: 6px;
     padding-top: 6px;
