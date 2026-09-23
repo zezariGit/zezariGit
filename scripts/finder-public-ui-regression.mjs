@@ -54,9 +54,12 @@ assert.match(styles, /\.finder-public-shell[\s\S]*padding:\s*8px 15px 10px/);
 assert.match(styles, /\.finder-public-brand[\s\S]*width:\s*76px/);
 assert.match(styles, /@media \(max-height:\s*620px\) and \(max-width:\s*520px\)/);
 assert.match(styles, /\.finder-public-action-grid[\s\S]*grid-template-columns:\s*repeat\(2/);
-assert.match(styles, /\.location-flow\s*\{[\s\S]*height:\s*100dvh/);
-assert.match(styles, /\.location-flow\s*\{[\s\S]*-webkit-overflow-scrolling:\s*touch/);
-assert.match(styles, /\.location-flow\s*\{[\s\S]*touch-action:\s*pan-y/);
+assert.match(styles, /\.location-flow\s*\{[^}]*height:\s*100dvh/);
+assert.match(styles, /\.location-flow\s*\{[^}]*grid-template-rows:\s*auto minmax\(0, 1fr\)/);
+assert.match(styles, /\.location-flow\s*\{[^}]*overflow:\s*hidden/);
+assert.match(styles, /\.location-flow > \.location-flow-body\s*\{[^}]*overflow-y:\s*auto/);
+assert.match(styles, /\.location-flow > \.location-flow-body\s*\{[^}]*-webkit-overflow-scrolling:\s*touch/);
+assert.match(styles, /\.location-flow > \.location-flow-body\s*\{[^}]*touch-action:\s*pan-y/);
 assert.match(styles, /\.qr-status-kakao-link\s*\{[\s\S]*margin-top:\s*28px/);
 
 await Promise.all([

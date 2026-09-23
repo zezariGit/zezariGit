@@ -118,7 +118,19 @@ function SubjectStrip({ name, photo, subtitle }) { return <div className="locati
 
 export function LocationMap({ location }) {
   const src = useMemo(() => buildMapEmbedUrl(location.latitude, location.longitude), [location.latitude, location.longitude]);
-  return <div className="location-map-frame"><iframe title="공유 위치 지도" src={src} loading="lazy" referrerPolicy="no-referrer" /><span className="location-map-marker"><img src="/assets/location-share/location-pin.png" alt="현재 위치" /></span></div>;
+  const [resetKey, setResetKey] = useState(0);
+
+  return <div className="location-map-frame">
+    <iframe key={resetKey} title="공유 위치 지도" src={src} loading="lazy" referrerPolicy="no-referrer" />
+    <span className="location-map-marker"><img src="/assets/location-share/location-pin.png" alt="현재 위치" /></span>
+    <button className="location-map-recenter" type="button" onClick={() => setResetKey((value) => value + 1)}>
+      <img src="/assets/location-share/location-pin.png" alt="" />
+      현재 위치
+    </button>
+    <a className="location-map-attribution" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
+      © OpenStreetMap
+    </a>
+  </div>;
 }
 
 function buildMapEmbedUrl(latitude, longitude) { const lat = Number(latitude); const lng = Number(longitude); const delta = 0.006; const bbox = [lng - delta, lat - delta, lng + delta, lat + delta].join(","); return `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${encodeURIComponent(`${lat},${lng}`)}`; }
